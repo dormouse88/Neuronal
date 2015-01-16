@@ -8,26 +8,19 @@
 #ifndef APP_HPP
 #define	APP_HPP
 
-#include <SFML/Graphics.hpp>
-#include "NeuronBox.hpp"
-#include <vector>
-#include "Wire.hpp"
+#include "Model.hpp"
+#include "View.hpp"
+#include "Controller.hpp"
 
 class App {
 public:
     App();
     void Run();
+    void MakeSomeStuff();
 private:
-    void HandleInput();
-    void Logic();
-    void Draw();
-    
-    sf::RenderWindow window;
-    sf::View view;
-
-    
-    NeuronBox nBox;
-    std::vector<std::unique_ptr<Wire> > wires;
+    Model model;
+    View view;
+    Controller controller;
 };
 
 #endif	/* APP_HPP */

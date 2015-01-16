@@ -7,27 +7,13 @@
 
 #include "Neuron.hpp"
 #include "Wire.hpp"
-#include <string>
-#include <sstream>
-#include <iostream>
 
-const float SIZE_X = 70.f;
-const float SIZE_Y = 40.f;
 const int INITIAL_THRESHOLD = 1;
 
-Neuron::Neuron(int x, int y, const sf::Font & font_p)
-    :shape(sf::Vector2f(SIZE_X, SIZE_Y)), threshold(INITIAL_THRESHOLD), pos(x, y), firing(false)
+Neuron::Neuron(sf::Vector2i pos_p)
+    :threshold(INITIAL_THRESHOLD), pos(pos_p), firing(false)
 {
-    shape.setOutlineColor(sf::Color::White);
-    shape.setOutlineThickness(2);
-    shape.setPosition(pos.x, pos.y);
-    
-    thresholdText.setFont(font_p);
-    //thresholdText.setCharacterSize(20);
-    thresholdText.setColor(sf::Color::Red);
-    thresholdText.setPosition(pos.x+18, pos.y+2);
 }
-
 
 void Neuron::StepPartOne()
 {
@@ -50,15 +36,4 @@ void Neuron::StepPartTwo()
     }
 }
 
-void Neuron::Draw(sf::RenderTarget & rt)
-{
-    if (firing) shape.setFillColor(sf::Color::Green);
-    else shape.setFillColor(sf::Color::Blue);
-    rt.draw(shape);
 
-        //I would've used std::to_string() here but for a MinGW bug
-        std::ostringstream ss;
-        ss << threshold;
-    thresholdText.setString(ss.str());
-    rt.draw(thresholdText);
-}

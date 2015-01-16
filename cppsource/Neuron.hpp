@@ -8,19 +8,19 @@
 #ifndef NEURON_HPP
 #define	NEURON_HPP
 
-#include <SFML/Graphics.hpp>
-#include <SFML/System.hpp>
-#include <memory>
+#include <SFML/System.hpp>  //for sf::Vector
+#include "Gobject.hpp"
 class Wire;
 
-class Neuron {
+class Neuron// : public Gobject
+{
 public:
-    Neuron(int x, int y, const sf::Font & font_p);
-    void Draw(sf::RenderTarget & rt);
+    Neuron(sf::Vector2i pos_p);
     void StepPartOne();
     void StepPartTwo();
+    unsigned GetThreshold() const {return threshold;}
     void SetThreshold(unsigned t) {threshold = t;}
-    sf::Vector2i GetPosition() {return pos;}
+    sf::Vector2i GetPosition() const {return pos;}
 
     void RegisterIn(Wire* wp)  {inWires.emplace_back(wp);}
     void RegisterOut(Wire* wp) {outWires.emplace_back(wp);}
@@ -34,11 +34,6 @@ private:
     unsigned id;
     unsigned threshold;
     sf::Vector2i pos;
-
-    //Visuals
-    sf::RectangleShape shape;
-    //std::shared_ptr<sf::Font> font;
-    sf::Text thresholdText;
 };
 
 #endif	/* NEURON_HPP */

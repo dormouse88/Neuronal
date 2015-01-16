@@ -8,19 +8,22 @@
 #ifndef WIRE_HPP
 #define	WIRE_HPP
 
-#include <SFML/Graphics.hpp>
+#include "Gobject.hpp"
 class Neuron;
 
-class Wire {
+class Wire// : public Gobject
+{
 public:
     Wire(Neuron & from_p, Neuron & to_p);
-    void Draw(sf::RenderTarget & rt);
 
     bool GetFiring() const {return firing;}
     void SetFiring(bool f) {firing = f;}
     int GetWeight() const {return weight;}
     void SetWeight(int w) {weight = w;}
 
+    const Neuron& GetFrom() const {return from; }
+    const Neuron& GetTo() const {return to; }
+    
 private:
     Neuron& from;
     Neuron& to;
