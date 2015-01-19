@@ -16,11 +16,15 @@ class Neuron// : public Gobject
 {
 public:
     Neuron(sf::Vector2i pos_p);
+    bool operator==(const Neuron& rhs) const    { return this->GetPosition() == rhs.GetPosition(); }    
+
     void StepPartOne();
     void StepPartTwo();
     unsigned GetThreshold() const {return threshold;}
     void SetThreshold(unsigned t) {threshold = t;}
+    void ModifyThreshold(int v) {threshold += v;}
     sf::Vector2i GetPosition() const {return pos;}
+    void SetPosition(sf::Vector2i p) {pos = p;}
 
     void RegisterIn(Wire* wp)  {inWires.emplace_back(wp);}
     void RegisterOut(Wire* wp) {outWires.emplace_back(wp);}

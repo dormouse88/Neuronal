@@ -19,9 +19,8 @@ void WireView::Draw(sf::RenderTarget & rt)
     else col = sf::Color(170,170,170);
     sf::Vertex line[] =
         {
-            //two methods... (both work)
-            sf::Vertex(static_cast<sf::Vector2f>(wire_m.GetFrom().GetPosition()), col),
-            sf::Vertex(sf::Vector2f(wire_m.GetTo().GetPosition().x - 5.f, wire_m.GetTo().GetPosition().y), col)
+            sf::Vertex( mapGridToCoords( wire_m.GetFrom().GetPosition() ), col ),
+            sf::Vertex( mapGridToCoords( wire_m.GetTo().GetPosition() ), col ),
         };
     rt.draw(line, 2, sf::Lines);
 }

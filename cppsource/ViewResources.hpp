@@ -10,6 +10,10 @@
 
 #include <SFML/Graphics.hpp>
 
+const float GRID_SIZE_X = 115.f;
+const float GRID_SIZE_Y = 75.f;
+
+
 class ViewResources
 {
 public:

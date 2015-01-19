@@ -19,21 +19,21 @@ bool Controller::HandleInput()
     {
         if (event.type == sf::Event::Closed)
             quitYet = true;
+        
+        //Mouse Events
         if (event.type == sf::Event::MouseButtonPressed)
         {
             if (event.mouseButton.button == sf::Mouse::Left)
             {
-                // get the current mouse position in the window
                 sf::Vector2i pixelPos(event.mouseButton.x, event.mouseButton.y);
-                
-                // convert it to world coordinates
                 sf::Vector2f worldPos = theView.GetWindow().mapPixelToCoords(pixelPos);
-               
-                theModel.AddNeuron( mapCoordsToGrid(worldPos) );
+                theView.SetCursorOnePos(worldPos);
             }
             if (event.mouseButton.button == sf::Mouse::Right)
             {
-                theModel.Logic();
+                sf::Vector2i pixelPos(event.mouseButton.x, event.mouseButton.y);
+                sf::Vector2f worldPos = theView.GetWindow().mapPixelToCoords(pixelPos);
+                theView.SetCursorTwoPos(worldPos);
             }
         }
         if (event.type == sf::Event::MouseWheelMoved)
@@ -46,9 +46,35 @@ bool Controller::HandleInput()
                 sf::Vector2f worldPos = theView.GetWindow().mapPixelToCoords(pixelPos);
                 theView.GetView().setCenter(worldPos.x, worldPos.y);
             }
-            theView.GetView().zoom( 1.f + (-0.4f * event.mouseWheel.delta) );
-            theView.GetWindow().setView(theView.GetView());
+            theView.Zoom( 1.f + (-0.4f * event.mouseWheel.delta) );
         }
+        
+        //Keyboard Events
+        if (event.type == sf::Event::KeyPressed)
+        {
+            if (event.key.code == sf::Keyboard::N)
+            {
+                theModel.AddNeuron( mapCoordsToGrid( theView.GetCursorOnePos() ) );
+            }
+            if (event.key.code == sf::Keyboard::A) {
+                theModel.ModifyThreshold( mapCoordsToGrid(theView.GetCursorOnePos() ), +1 );
+            }
+            if (event.key.code == sf::Keyboard::Z) {
+                theModel.ModifyThreshold( mapCoordsToGrid(theView.GetCursorOnePos() ), -1 );
+            }
+            if (event.key.code == sf::Keyboard::M) {
+                theModel.SetPosition( mapCoordsToGrid(theView.GetCursorOnePos()), mapCoordsToGrid(theView.GetCursorTwoPos()) );
+            }
+            if (event.key.code == sf::Keyboard::B)
+            {
+                theModel.AddWire( mapCoordsToGrid(theView.GetCursorOnePos()), mapCoordsToGrid(theView.GetCursorTwoPos()) );
+            }
+            if (event.key.code == sf::Keyboard::Space)
+            {
+                theModel.Logic();
+            }
+        }
+        
     }
     return quitYet;
 }

@@ -19,17 +19,18 @@ NeuronView::NeuronView(const Neuron & neuron_p, const ViewResources & vRes_p)
 {
     shape.setOutlineColor(sf::Color::White);
     shape.setOutlineThickness(2);
-    shape.setPosition(mapGridToCoords(neuron_m.GetPosition()) );
     
     thresholdText.setFont(vRes_p.font);
     //thresholdText.setCharacterSize(20);
     thresholdText.setColor(sf::Color::Red);
-    thresholdText.setPosition(mapGridToCoords(neuron_m.GetPosition()) + sf::Vector2f(18.f, 2.f) );
 }
 
 
 void NeuronView::Draw(sf::RenderTarget & rt)
 {
+    shape.setPosition(mapGridToCoords(neuron_m.GetPosition()) );
+    thresholdText.setPosition(mapGridToCoords(neuron_m.GetPosition()) + sf::Vector2f(18.f, 2.f) );
+
     if (neuron_m.firing) shape.setFillColor(sf::Color::Green);
     else shape.setFillColor(sf::Color::Blue);
     rt.draw(shape);

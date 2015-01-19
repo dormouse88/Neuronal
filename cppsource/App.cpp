@@ -17,6 +17,7 @@ App::App()
 
 void App::Run()
 {
+    MakeSomeStuff();
     bool quitYet = false;
     while (quitYet == false)
     {
@@ -31,9 +32,9 @@ void App::MakeSomeStuff()
     model.AddNeuron(sf::Vector2i(2,2) );
     model.AddNeuron(sf::Vector2i(3,4) );
     model.AddNeuron(sf::Vector2i(7,8) );
-    model.GetNeuron(sf::Vector2i(1,1)).SetThreshold(0);
-    model.AddWire(model.GetNeuron(sf::Vector2i(2,2)), model.GetNeuron(sf::Vector2i(3,4)));
-    model.AddWire(model.GetNeuron(sf::Vector2i(1,1)), model.GetNeuron(sf::Vector2i(2,2)));
-    model.AddWire(model.GetNeuron(sf::Vector2i(2,2)), model.GetNeuron(sf::Vector2i(7,8)));
+    model.SetThreshold(sf::Vector2i(1,1), 0);
+    model.AddWire(sf::Vector2i(2,2), sf::Vector2i(3,4));
+    model.AddWire(sf::Vector2i(1,1), sf::Vector2i(2,2));
+    model.AddWire(sf::Vector2i(2,2), sf::Vector2i(7,8));
 }
 

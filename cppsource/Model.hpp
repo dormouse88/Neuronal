@@ -22,11 +22,15 @@ public:
     void Logic();
     void AddNeuron(sf::Vector2i pos);
     void AddWire(Neuron & from, Neuron & to);
-    Neuron & GetNeuron(sf::Vector2i pos);
+    void AddWire(sf::Vector2i from, sf::Vector2i to);
+    void SetThreshold( sf::Vector2i pos, unsigned val );
+    void ModifyThreshold( sf::Vector2i pos, int val );
+    void SetPosition( sf::Vector2i pos, sf::Vector2i newPos );
     
     void AddListener(ModelListener* listener);
 private:
-    void NotifyListeners(bool added, Neuron * rp);//, Component* component);
+    void NotifyListeners(bool added, Neuron * rp);
+    void NotifyListeners(bool added, const Wire & cr);
     std::vector<ModelListener*> listeners;
     std::vector<std::unique_ptr<Neuron> > neurons;
     std::vector<std::unique_ptr<Wire> > wires;
