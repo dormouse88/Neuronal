@@ -33,7 +33,6 @@ void Model::AddNeuron(sf::Vector2i pos)
         NotifyListeners(true, rp);
     }
 }
-
 void Model::AddWire(Neuron & from, Neuron & to)
 {
     bool wireExists = false;
@@ -47,7 +46,6 @@ void Model::AddWire(Neuron & from, Neuron & to)
         NotifyListeners(true, cr);
     }
 }
-
 void Model::AddWire(sf::Vector2i fromPos, sf::Vector2i toPos)
 {
     Neuron * from = nullptr;
@@ -61,34 +59,49 @@ void Model::AddWire(sf::Vector2i fromPos, sf::Vector2i toPos)
     }
 }
 
-void Model::SetThreshold( sf::Vector2i pos, unsigned val )
+void Model::SetPosition( Neuron & n, sf::Vector2i newPos )
 {
-    for (auto & x: neurons) {
-        if (pos == x->GetPosition() ) {
-            x->SetThreshold(val);
+    bool posFree = true;
+    for (auto const & x : neurons) {
+        if (x->GetPosition() == newPos) {
+            posFree = false;
         }
     }
-}
-
-void Model::ModifyThreshold( sf::Vector2i pos, int val )
-{
-    for (auto & x: neurons) {
-        if (pos == x->GetPosition() ) {
-            x->SetThreshold( x->GetThreshold() + val );
-        }
-    }
-}
-
-void Model::SetPosition( sf::Vector2i pos, sf::Vector2i newPos )
-{
-    for (auto & x: neurons) {
-        if (pos == x->GetPosition() ) {
-            x->SetPosition( newPos );
-        }
-    }
+    if (posFree) n.SetPosition( newPos );
 }
 
 
+Neuron * Model::GetNeuron(sf::Vector2i pos)
+{
+    for (auto & x: neurons) {
+        if (pos == x->GetPosition()) {
+            return x.get();
+        }
+    }
+    return nullptr;
+}
+Wire * Model::GetWire(const Neuron& from, const Neuron& to)
+{
+    for (auto & x: wires) {
+        if (from == x->GetFrom() and to == x->GetTo()) {
+            return x.get();
+        }
+    }
+    return nullptr;
+}
+Wire * Model::GetWire(sf::Vector2i fromPos, sf::Vector2i toPos)
+{
+    Neuron * from = nullptr;
+    Neuron * to   = nullptr;
+    for (auto & x : neurons) {
+        if (x->GetPosition() == fromPos) from = x.get();
+        if (x->GetPosition() == toPos)   to   = x.get();
+    }
+    if (from != nullptr and to != nullptr) {
+        return GetWire(*from, *to);
+    }
+    return nullptr;
+}
 
 
 void Model::AddListener(ModelListener* listener)

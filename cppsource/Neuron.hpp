@@ -20,8 +20,8 @@ public:
 
     void StepPartOne();
     void StepPartTwo();
-    unsigned GetThreshold() const {return threshold;}
-    void SetThreshold(unsigned t) {threshold = t;}
+    int GetThreshold() const {return threshold;}
+    void SetThreshold(int t) {threshold = t;}
     void ModifyThreshold(int v) {threshold += v;}
     sf::Vector2i GetPosition() const {return pos;}
     void SetPosition(sf::Vector2i p) {pos = p;}
@@ -35,8 +35,8 @@ public:
     bool firing;
 private:
     //Saved
-    unsigned id;
-    unsigned threshold;
+    //unsigned id;
+    int threshold;
     sf::Vector2i pos;
 };
 

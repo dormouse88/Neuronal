@@ -10,12 +10,12 @@
 View::View(Model & model_p)
    :theModel(model_p),
     window(sf::VideoMode(800, 600), "Neuronal"),
-    view(sf::Vector2f(250.f, 300.f), sf::Vector2f(300.f, 200.f) ),
+    view(sf::Vector2f(250.f, 200.f), sf::Vector2f(800.f, 600.f) ),
     cursorOne(),
     cursorTwo(sf::Color::Cyan)
 {
     model_p.AddListener(this);
-    view.setViewport(sf::FloatRect(0.05, 0.05f, 0.9f, 0.7f));
+    view.setViewport(sf::FloatRect(0.f, 0.f, 1.f, 0.8f));
     window.setView(view);
 }
 
@@ -63,6 +63,7 @@ void View::Zoom(float zoomFactor)
 void View::Pan(sf::Vector2f moveBy)
 {
     view.move(moveBy);
+    window.setView(view);
 }
 
 void View::SetCursorOnePos(sf::Vector2f pos)

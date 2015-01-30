@@ -10,9 +10,7 @@
 
 #include <SFML/Graphics.hpp>
 
-const float GRID_SIZE_X = 115.f;
-const float GRID_SIZE_Y = 75.f;
-
+const sf::Vector2f GRID_SIZE { 115.f, 75.f };
 
 class ViewResources
 {

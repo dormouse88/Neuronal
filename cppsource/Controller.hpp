@@ -19,6 +19,8 @@ public:
 private:
     View & theView;
     Model & theModel;
+    sf::Vector2f mouseCursorWorldPos;
+    bool mouseCursorSet;
 };
 
 #endif	/* CONTROLLER_HPP */

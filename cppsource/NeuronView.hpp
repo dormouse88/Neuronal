@@ -18,6 +18,8 @@ public:
     void Draw(sf::RenderTarget & rt);
 private:
     const Neuron & neuron_m;
+    sf::Vector2f targetPos;
+    sf::Vector2f actualPos;
     sf::RectangleShape shape;
     sf::Text thresholdText;
 };

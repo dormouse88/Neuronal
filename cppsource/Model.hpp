@@ -23,9 +23,11 @@ public:
     void AddNeuron(sf::Vector2i pos);
     void AddWire(Neuron & from, Neuron & to);
     void AddWire(sf::Vector2i from, sf::Vector2i to);
-    void SetThreshold( sf::Vector2i pos, unsigned val );
-    void ModifyThreshold( sf::Vector2i pos, int val );
-    void SetPosition( sf::Vector2i pos, sf::Vector2i newPos );
+    void SetPosition( Neuron & n, sf::Vector2i newPos );
+
+    Neuron * GetNeuron(sf::Vector2i pos);
+    Wire * GetWire(const Neuron& from, const Neuron& to);
+    Wire * GetWire(sf::Vector2i fromPos, sf::Vector2i toPos);
     
     void AddListener(ModelListener* listener);
 private:

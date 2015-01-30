@@ -18,6 +18,7 @@ public:
     void Draw(sf::RenderTarget & rt);
 private:
     const Wire & wire_m;
+    sf::Text weightText;
 };
 
 #endif	/* WIREVIEW_HPP */

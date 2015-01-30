@@ -16,10 +16,10 @@ ViewResources::ViewResources()
 //Helper Functions
 sf::Vector2i mapCoordsToGrid(const sf::Vector2f & point)
 {
-    return sf::Vector2i{round(point.x / GRID_SIZE_X), round(point.y / GRID_SIZE_Y)};
+    return sf::Vector2i{floor(point.x / GRID_SIZE.x), floor(point.y / GRID_SIZE.y)};
 }
 
 sf::Vector2f mapGridToCoords(const sf::Vector2i & point)
 {
-    return sf::Vector2f{point.x * GRID_SIZE_X, point.y * GRID_SIZE_Y};
+    return sf::Vector2f{point.x * GRID_SIZE.x, point.y * GRID_SIZE.y};
 }

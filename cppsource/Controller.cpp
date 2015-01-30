@@ -8,11 +8,18 @@
 #include "Controller.hpp"
 
 Controller::Controller(View & view_p, Model & model_p)
-    :theView(view_p), theModel(model_p)
+    :theView(view_p), theModel(model_p), mouseCursorSet(false)
 {}
 
 bool Controller::HandleInput()
 {
+    //cursor selected objects...
+    sf::Vector2i cursor1pos = mapCoordsToGrid(theView.GetCursorOnePos());
+    sf::Vector2i cursor2pos = mapCoordsToGrid(theView.GetCursorTwoPos());
+    Neuron * neuron1 = theModel.GetNeuron( cursor1pos );
+    Neuron * neuron2 = theModel.GetNeuron( cursor2pos );
+    Wire * wire1 = theModel.GetWire(cursor1pos, cursor2pos);
+    
     bool quitYet = false;
     sf::Event event;
     while (theView.GetWindow().pollEvent(event))
@@ -56,26 +63,59 @@ bool Controller::HandleInput()
             {
                 theModel.AddNeuron( mapCoordsToGrid( theView.GetCursorOnePos() ) );
             }
-            if (event.key.code == sf::Keyboard::A) {
-                theModel.ModifyThreshold( mapCoordsToGrid(theView.GetCursorOnePos() ), +1 );
-            }
-            if (event.key.code == sf::Keyboard::Z) {
-                theModel.ModifyThreshold( mapCoordsToGrid(theView.GetCursorOnePos() ), -1 );
-            }
-            if (event.key.code == sf::Keyboard::M) {
-                theModel.SetPosition( mapCoordsToGrid(theView.GetCursorOnePos()), mapCoordsToGrid(theView.GetCursorTwoPos()) );
-            }
             if (event.key.code == sf::Keyboard::B)
             {
                 theModel.AddWire( mapCoordsToGrid(theView.GetCursorOnePos()), mapCoordsToGrid(theView.GetCursorTwoPos()) );
+            }
+            if (event.key.code == sf::Keyboard::A) {
+                if (neuron1 != nullptr) {
+                    neuron1->SetThreshold( neuron1->GetThreshold() + 1);
+                }
+            }
+            if (event.key.code == sf::Keyboard::Z) {
+                if (neuron1 != nullptr) {
+                    neuron1->SetThreshold( neuron1->GetThreshold() - 1);
+                }
+            }
+            if (event.key.code == sf::Keyboard::S) {
+                if (wire1 != nullptr) {
+                    wire1->SetWeight( wire1->GetWeight() + 1);
+                }
+            }
+            if (event.key.code == sf::Keyboard::X) {
+                if (wire1 != nullptr) {
+                    wire1->SetWeight( wire1->GetWeight() - 1);
+                }
+            }
+            if (event.key.code == sf::Keyboard::M) {
+                if (neuron1 != nullptr) {
+                    theModel.SetPosition( *neuron1, cursor2pos );
+                }
             }
             if (event.key.code == sf::Keyboard::Space)
             {
                 theModel.Logic();
             }
         }
-        
+    } //(while events)
+    
+    if ( sf::Mouse::isButtonPressed(sf::Mouse::Middle) )
+    {
+        sf::Vector2i pixelPos{ sf::Mouse::getPosition(theView.GetWindow()) };
+        sf::Vector2f worldPos{ theView.GetWindow().mapPixelToCoords( pixelPos ) };
+        if (!mouseCursorSet) {
+            mouseCursorSet = true;
+        }
+        else {
+            theView.Pan( (-worldPos + mouseCursorWorldPos) /1.00f );
+        }
+        sf::Vector2i newPixelPos{ sf::Mouse::getPosition(theView.GetWindow()) };
+        mouseCursorWorldPos = theView.GetWindow().mapPixelToCoords( newPixelPos );
     }
+    else {
+        mouseCursorSet = false;
+    }
+    
     return quitYet;
 }
 

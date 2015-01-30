@@ -10,6 +10,7 @@
 
 #include <SFML/Graphics.hpp>
 #include "ViewResources.hpp"
+//#include "Neuron.cpp"//
 
 class Cursor
 {
@@ -20,6 +21,7 @@ public:
     void SetPos(sf::Vector2f p) { representation.setPosition(p); }
 private:
     sf::RectangleShape representation;
+    //Neuron * neuron;//
 };
 
 #endif	/* CURSOR_HPP */

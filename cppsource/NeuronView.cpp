@@ -10,13 +10,18 @@
 #include <sstream>
 #include <iostream>
 
-const float SIZE_X = 70.f;
-const float SIZE_Y = 40.f;
+const sf::Vector2f NEURON_SIZE { 70.f, 40.f };
+const sf::Vector2f NEURON_OFFSET { (GRID_SIZE - NEURON_SIZE)/2.f };
+const sf::Vector2f THRESHOLD_OFFSET { 18.f, 2.f };
+
 
 NeuronView::NeuronView(const Neuron & neuron_p, const ViewResources & vRes_p)
-    :shape(sf::Vector2f(SIZE_X, SIZE_Y)),
+    :shape( NEURON_SIZE ),
      neuron_m(neuron_p)
 {
+    targetPos = mapGridToCoords( neuron_p.GetPosition() ) + NEURON_OFFSET;
+    actualPos = targetPos;
+    
     shape.setOutlineColor(sf::Color::White);
     shape.setOutlineThickness(2);
     
@@ -28,9 +33,10 @@ NeuronView::NeuronView(const Neuron & neuron_p, const ViewResources & vRes_p)
 
 void NeuronView::Draw(sf::RenderTarget & rt)
 {
-    shape.setPosition(mapGridToCoords(neuron_m.GetPosition()) );
-    thresholdText.setPosition(mapGridToCoords(neuron_m.GetPosition()) + sf::Vector2f(18.f, 2.f) );
+    targetPos = mapGridToCoords(neuron_m.GetPosition()) + NEURON_OFFSET ;
+    actualPos += (targetPos - actualPos) * 0.003f;
 
+    shape.setPosition( actualPos );
     if (neuron_m.firing) shape.setFillColor(sf::Color::Green);
     else shape.setFillColor(sf::Color::Blue);
     rt.draw(shape);
@@ -39,5 +45,6 @@ void NeuronView::Draw(sf::RenderTarget & rt)
         std::ostringstream ss;
         ss << neuron_m.GetThreshold();
     thresholdText.setString(ss.str());
+    thresholdText.setPosition( actualPos + THRESHOLD_OFFSET );
     rt.draw(thresholdText);
 }
