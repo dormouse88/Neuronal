@@ -28,6 +28,7 @@ public:
 
     void RegisterIn(Wire* wp)  {inWires.emplace_back(wp);}
     void RegisterOut(Wire* wp) {outWires.emplace_back(wp);}
+    void DeRegister(Wire* wp);
 
     //Not-saved
     std::vector<Wire*> inWires;

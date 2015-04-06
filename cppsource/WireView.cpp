@@ -8,9 +8,12 @@
 #include "WireView.hpp"
 #include "Neuron.hpp" //to get its position
 #include <sstream>
+#include <vector>
 
-const sf::Vector2f WIRE_FROM_OFFSET { GRID_SIZE / 2.f + sf::Vector2f(28.f, 0.f) };
-const sf::Vector2f WIRE_TO_OFFSET { GRID_SIZE / 2.f  - sf::Vector2f(28.f, 0.f) };
+const sf::Vector2f WIRE_FROM_OFFSET  { GRID_SIZE / 2.f + sf::Vector2f(+28.f, +8.f) };
+const sf::Vector2f WIRE_LOOP1_OFFSET { GRID_SIZE / 2.f + sf::Vector2f(+20.f, -30.f) };
+const sf::Vector2f WIRE_LOOP2_OFFSET { GRID_SIZE / 2.f + sf::Vector2f(-30.f, -30.f) };
+const sf::Vector2f WIRE_TO_OFFSET    { GRID_SIZE / 2.f + sf::Vector2f(-28.f, -8.f) };
 
 WireView::WireView(const Wire & wire_p, const ViewResources & vRes_p)
     :wire_m(wire_p)
@@ -32,12 +35,15 @@ void WireView::Draw(sf::RenderTarget & rt)
         colFrom = sf::Color(40,40,40);
         colTo = sf::Color(210,210,210);
     }
-    sf::Vertex line[] =
-        {
-            sf::Vertex( mapGridToCoords( wire_m.GetFrom().GetPosition() ) + WIRE_FROM_OFFSET, colFrom ),
-            sf::Vertex( mapGridToCoords( wire_m.GetTo().GetPosition() ) + WIRE_TO_OFFSET, colTo ),
-        };
-    rt.draw(line, 2, sf::Lines);
+    std::vector<sf::Vertex> line;
+    line.push_back( sf::Vertex( mapGridToCoords( wire_m.GetFrom().GetPosition() ) + WIRE_FROM_OFFSET, colFrom ) );
+    if (wire_m.GetFrom() == wire_m.GetTo())
+    {
+        line.push_back( sf::Vertex( mapGridToCoords( wire_m.GetFrom().GetPosition() ) + WIRE_LOOP1_OFFSET, colTo ) );
+        line.push_back( sf::Vertex( mapGridToCoords( wire_m.GetTo().GetPosition() )   + WIRE_LOOP2_OFFSET, colTo ) );
+    }
+    line.push_back( sf::Vertex( mapGridToCoords( wire_m.GetTo().GetPosition() ) + WIRE_TO_OFFSET, colTo ) );
+    rt.draw(&line[0], line.size(), sf::LinesStrip);
 
         //I would've used std::to_string() here but for a MinGW bug
         std::ostringstream ss;

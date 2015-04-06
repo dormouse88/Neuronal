@@ -18,6 +18,6 @@ Cursor::Cursor(sf::Color color)
 
 void Cursor::Draw(sf::RenderTarget & rt)
 {
-    rt.draw(representation);
+    rt.draw(representation, sf::RenderStates(sf::BlendAdd));
 }
 

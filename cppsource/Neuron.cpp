@@ -36,4 +36,13 @@ void Neuron::StepPartTwo()
     }
 }
 
+void Neuron::DeRegister(Wire* wp)
+{
+    auto DeReg = [&] (std::vector<Wire*> & container) {
+        auto new_end = std::remove_if(std::begin(container), std::end(container), [&] (Wire* param) {return *wp == *param; } );
+        container.erase(new_end, std::end(container));
+    };
+    DeReg(inWires);
+    DeReg(outWires);
+}
 

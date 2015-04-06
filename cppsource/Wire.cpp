@@ -14,3 +14,14 @@ Wire::Wire(Neuron & from_p, Neuron & to_p)
     from.RegisterOut(this);
     to.RegisterIn(this);
 }
+
+void Wire::PreDelete()
+{
+    from.DeRegister(this);
+    to.DeRegister(this);
+}
+
+bool Wire::operator==(const Wire& rhs) const
+{
+    return this->GetFrom() == rhs.GetFrom() and this->GetTo() == rhs.GetTo() ;
+}

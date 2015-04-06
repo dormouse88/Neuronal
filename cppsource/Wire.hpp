@@ -15,6 +15,8 @@ class Wire// : public Gobject
 {
 public:
     Wire(Neuron & from_p, Neuron & to_p);
+    void PreDelete();
+    bool operator==(const Wire& rhs) const;
 
     bool GetFiring() const {return firing;}
     void SetFiring(bool f) {firing = f;}

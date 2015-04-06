@@ -51,7 +51,7 @@ bool Controller::HandleInput()
                 sf::Vector2i pixelPos(event.mouseWheel.x, event.mouseWheel.y);
                 // convert it to world coordinates
                 sf::Vector2f worldPos = theView.GetWindow().mapPixelToCoords(pixelPos);
-                theView.GetView().setCenter(worldPos.x, worldPos.y);
+                theView.GetMainView().setCenter(worldPos.x, worldPos.y);
             }
             theView.Zoom( 1.f + (-0.4f * event.mouseWheel.delta) );
         }
@@ -61,11 +61,25 @@ bool Controller::HandleInput()
         {
             if (event.key.code == sf::Keyboard::N)
             {
-                theModel.AddNeuron( mapCoordsToGrid( theView.GetCursorOnePos() ) );
+                if (event.key.shift == false) {
+                    theModel.AddNeuron( cursor1pos );
+                }
+                else {
+                    theModel.RemoveNeuron( cursor1pos );
+                }
             }
             if (event.key.code == sf::Keyboard::B)
             {
-                theModel.AddWire( mapCoordsToGrid(theView.GetCursorOnePos()), mapCoordsToGrid(theView.GetCursorTwoPos()) );
+                if (event.key.shift == false) {
+                    if (neuron1 != nullptr and neuron2 != nullptr) {
+                        theModel.AddWire( *neuron1, *neuron2 );
+                    }
+                }
+                else {
+                    if (neuron1 != nullptr and neuron2 != nullptr) {
+                        theModel.RemoveWire( *neuron1, *neuron2 );
+                    }
+                }
             }
             if (event.key.code == sf::Keyboard::A) {
                 if (neuron1 != nullptr) {

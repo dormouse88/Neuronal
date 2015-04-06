@@ -38,7 +38,7 @@ public:
     void SetCursorTwoPos(sf::Vector2f pos);
     
     sf::RenderWindow & GetWindow() {return window;}
-    sf::View & GetView()           {return view;}
+    sf::View & GetMainView()           {return mainView;}
     
 private:
     const Model & theModel;
@@ -46,7 +46,8 @@ private:
     std::vector<std::unique_ptr<WireView> > wireViews;
     
     sf::RenderWindow window;
-    sf::View view;
+    sf::View mainView;
+    sf::View barView;
     ViewResources vRes;
     Cursor cursorOne;
     Cursor cursorTwo;

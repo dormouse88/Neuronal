@@ -16,6 +16,7 @@ class NeuronView {
 public:
     NeuronView(const Neuron & neuron_p, const ViewResources & vRes_p);
     void Draw(sf::RenderTarget & rt);
+    bool AmIYourDaddy(const Neuron & n) const {return n==neuron_m;}
 private:
     const Neuron & neuron_m;
     sf::Vector2f targetPos;

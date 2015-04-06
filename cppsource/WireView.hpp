@@ -16,6 +16,7 @@ class WireView {
 public:
     WireView(const Wire & wire_p, const ViewResources & vRes_p);
     void Draw(sf::RenderTarget & rt);
+    bool AmIYourDaddy(const Wire & w) const {return w==wire_m;}
 private:
     const Wire & wire_m;
     sf::Text weightText;

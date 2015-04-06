@@ -6,6 +6,7 @@
  */
 
 #include "Model.hpp"
+#include <iostream>
 
 Model::Model()
 {}
@@ -18,6 +19,7 @@ void Model::Logic()
     for (auto & n : neurons) {
         n->StepPartTwo();
     }
+    std::cout << "Vector sizes: " << neurons.size() << "  " << wires.size() << std::endl;
 }
 
 void Model::AddNeuron(sf::Vector2i pos)
@@ -33,6 +35,28 @@ void Model::AddNeuron(sf::Vector2i pos)
         NotifyListeners(true, rp);
     }
 }
+void Model::RemoveNeuron(sf::Vector2i pos)
+{
+    Neuron * n = GetNeuron(pos);
+    if (n != nullptr) {
+        //remove all wires joined to this neuron...
+        auto remove_func = [&] (std::unique_ptr<Wire> & param) {return *n == param->GetFrom() or *n == param->GetTo(); };
+        for (auto & w : wires) {
+            if (remove_func(w)) {
+                NotifyListeners(false, *w);
+                w->PreDelete();
+            }
+        }
+        auto new_end1 = std::remove_if( std::begin(wires), std::end(wires), remove_func);
+        wires.erase(new_end1, std::end(wires) );
+        
+        //then remove neuron itself...
+        NotifyListeners(false, n);
+        auto new_end = std::remove_if(std::begin(neurons), std::end(neurons), [&] (std::unique_ptr<Neuron> & param) {return *n==*param;} );
+        neurons.erase(new_end, std::end(neurons) );
+    }
+}
+
 void Model::AddWire(Neuron & from, Neuron & to)
 {
     bool wireExists = false;
@@ -44,6 +68,17 @@ void Model::AddWire(Neuron & from, Neuron & to)
         const Wire & cr = *p;
         wires.emplace_back(std::move(p));
         NotifyListeners(true, cr);
+    }
+}
+void Model::RemoveWire(Neuron & from, Neuron & to)
+{
+    Wire * w = GetWire(from, to);
+    if (w != nullptr) {
+        auto remove_func = [&] (std::unique_ptr<Wire> & param) {return *w==*param;};
+        NotifyListeners(false, *w);
+        w->PreDelete();
+        auto new_end = std::remove_if(std::begin(wires), std::end(wires), remove_func);
+        wires.erase(new_end, std::end(wires) );
     }
 }
 void Model::AddWire(sf::Vector2i fromPos, sf::Vector2i toPos)
