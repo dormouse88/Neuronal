@@ -21,20 +21,22 @@ public:
     Model(const Model&) = delete;
     void Logic();
     void AddNeuron(sf::Vector2i pos);
-    void RemoveNeuron(sf::Vector2i pos);
-    void AddWire(Neuron & from, Neuron & to);
+    void RemoveDevice(sf::Vector2i pos);
+    void AddWire(PinDevice & from, PinDevice & to);
     void AddWire(sf::Vector2i from, sf::Vector2i to); //Only needed by MakeSomeStuff(). Phase out
-    void RemoveWire( Neuron & from, Neuron & to);
-    void SetPosition( Neuron & n, sf::Vector2i newPos );
+    void RemoveWire( PinDevice & from, PinDevice & to);
+    void SetPosition( PinDevice & d, sf::Vector2i newPos );
 
-    Neuron * GetNeuron(sf::Vector2i pos);
-    Wire * GetWire(const Neuron& from, const Neuron& to);
-    Wire * GetWire(sf::Vector2i fromPos, sf::Vector2i toPos);
+    PinDevice * GetDevice(sf::Vector2i pos);
+    Wire * GetWire(const PinDevice& from, const PinDevice& to);
+    //Wire * GetWire(sf::Vector2i fromPos, sf::Vector2i toPos);
     
     void AddListener(ModelListener* listener);
 private:
-    void NotifyListeners(bool added, Neuron * rp);
-    void NotifyListeners(bool added, const Wire & cr);
+    void NotifyListenersAdd(Neuron * rp);
+    void NotifyListenersAdd(const Wire & cr);
+    void NotifyListenersRemove(PinDevice * rp);
+    void NotifyListenersRemove(const Wire & cr);
     std::vector<ModelListener*> listeners;
     std::vector<std::unique_ptr<Neuron> > neurons;
     std::vector<std::unique_ptr<Wire> > wires;

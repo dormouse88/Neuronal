@@ -11,9 +11,8 @@
 const int INITIAL_THRESHOLD = 1;
 
 Neuron::Neuron(sf::Vector2i pos_p)
-    :threshold(INITIAL_THRESHOLD), pos(pos_p), firing(false)
-{
-}
+    :PinDevice(pos_p, true), threshold(INITIAL_THRESHOLD), firing(false)
+{}
 
 void Neuron::StepPartOne()
 {
@@ -36,13 +35,4 @@ void Neuron::StepPartTwo()
     }
 }
 
-void Neuron::DeRegister(Wire* wp)
-{
-    auto DeReg = [&] (std::vector<Wire*> & container) {
-        auto new_end = std::remove_if(std::begin(container), std::end(container), [&] (Wire* param) {return *wp == *param; } );
-        container.erase(new_end, std::end(container));
-    };
-    DeReg(inWires);
-    DeReg(outWires);
-}
 

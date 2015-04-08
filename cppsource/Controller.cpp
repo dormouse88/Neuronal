@@ -16,9 +16,11 @@ bool Controller::HandleInput()
     //cursor selected objects...
     sf::Vector2i cursor1pos = mapCoordsToGrid(theView.GetCursorOnePos());
     sf::Vector2i cursor2pos = mapCoordsToGrid(theView.GetCursorTwoPos());
-    Neuron * neuron1 = theModel.GetNeuron( cursor1pos );
-    Neuron * neuron2 = theModel.GetNeuron( cursor2pos );
-    Wire * wire1 = theModel.GetWire(cursor1pos, cursor2pos);
+    PinDevice * device1 = theModel.GetDevice( cursor1pos );
+    PinDevice * device2 = theModel.GetDevice( cursor2pos );
+    //Wire * wire1 = theModel.GetWire(cursor1pos, cursor2pos);
+    Wire * wire1 = nullptr;
+    if (device1 != nullptr and device2 != nullptr) wire1 = theModel.GetWire(*device1, *device2);
     
     bool quitYet = false;
     sf::Event event;
@@ -65,31 +67,31 @@ bool Controller::HandleInput()
                     theModel.AddNeuron( cursor1pos );
                 }
                 else {
-                    theModel.RemoveNeuron( cursor1pos );
+                    theModel.RemoveDevice( cursor1pos );
                 }
             }
             if (event.key.code == sf::Keyboard::B)
             {
                 if (event.key.shift == false) {
-                    if (neuron1 != nullptr and neuron2 != nullptr) {
-                        theModel.AddWire( *neuron1, *neuron2 );
+                    if (device1 != nullptr and device2 != nullptr) {
+                        theModel.AddWire( *device1, *device2 );
                     }
                 }
                 else {
-                    if (neuron1 != nullptr and neuron2 != nullptr) {
-                        theModel.RemoveWire( *neuron1, *neuron2 );
+                    if (device1 != nullptr and device2 != nullptr) {
+                        theModel.RemoveWire( *device1, *device2 );
                     }
                 }
             }
             if (event.key.code == sf::Keyboard::A) {
-                if (neuron1 != nullptr) {
-                    neuron1->SetThreshold( neuron1->GetThreshold() + 1);
-                }
+//                if (neuron1 != nullptr) {
+//                    neuron1->SetThreshold( neuron1->GetThreshold() + 1);
+//                }
             }
             if (event.key.code == sf::Keyboard::Z) {
-                if (neuron1 != nullptr) {
-                    neuron1->SetThreshold( neuron1->GetThreshold() - 1);
-                }
+//                if (neuron1 != nullptr) {
+//                    neuron1->SetThreshold( neuron1->GetThreshold() - 1);
+//                }
             }
             if (event.key.code == sf::Keyboard::S) {
                 if (wire1 != nullptr) {
@@ -102,8 +104,8 @@ bool Controller::HandleInput()
                 }
             }
             if (event.key.code == sf::Keyboard::M) {
-                if (neuron1 != nullptr) {
-                    theModel.SetPosition( *neuron1, cursor2pos );
+                if (device1 != nullptr) {
+                    theModel.SetPosition( *device1, cursor2pos );
                 }
             }
             if (event.key.code == sf::Keyboard::Space)

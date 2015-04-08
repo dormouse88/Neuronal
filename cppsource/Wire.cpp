@@ -6,9 +6,9 @@
  */
 
 #include "Wire.hpp"
-#include "Neuron.hpp" //to get its position
+#include "PinDevice.hpp" //to get its position
 
-Wire::Wire(Neuron & from_p, Neuron & to_p)
+Wire::Wire(PinDevice & from_p, PinDevice & to_p)
     :from(from_p), to(to_p), weight(1), firing(false)
 {
     from.RegisterOut(this);

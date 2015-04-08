@@ -37,7 +37,7 @@ void NeuronView::Draw(sf::RenderTarget & rt)
     actualPos += (targetPos - actualPos) * 0.003f;
 
     shape.setPosition( actualPos );
-    if (neuron_m.firing) shape.setFillColor(sf::Color::Green);
+    if (neuron_m.GetFiring()) shape.setFillColor(sf::Color::Green);
     else shape.setFillColor(sf::Color::Blue);
     rt.draw(shape);
 

@@ -21,32 +21,29 @@ View::View(Model & model_p)
 }
 
 #include <iostream>
-void View::OnNotify(bool added, Neuron * rp)
+void View::OnNotifyAdd(Neuron * rp)
 {
-    if (added) {
-        std::cout << "View was notified of: Neuron Added." << std::endl;
-        std::unique_ptr<NeuronView> up{new NeuronView{*rp, vRes} };
-        neuronViews.push_back( std::move(up) );
-    }
-    else {
-        std::cout << "View was notified of: Neuron Removed." << std::endl;
-        auto killMe = [&] (std::unique_ptr<NeuronView> & nv) {return nv->AmIYourDaddy(*rp);} ;
-        neuronViews.erase( std::remove_if(std::begin(neuronViews), std::end(neuronViews), killMe), std::end(neuronViews) );
-    }
+    std::cout << "View was notified of: Neuron Added." << std::endl;
+    std::unique_ptr<NeuronView> up{new NeuronView{*rp, vRes} };
+    neuronViews.push_back( std::move(up) );
 }
-
-void View::OnNotify(bool added, const Wire & cr)
+void View::OnNotifyAdd(const Wire & cr)
 {
-    if (added) {
-        std::cout << "View was notified of: Wire   Added." << std::endl;
-        std::unique_ptr<WireView> up{new WireView{cr, vRes} };
-        wireViews.push_back( std::move(up) );
-    }
-    else {
-        std::cout << "View was notified of: Wire   Removed." << std::endl;
-        auto killMe = [&] (std::unique_ptr<WireView> & wv) {return wv->AmIYourDaddy(cr);} ;
-        wireViews.erase( std::remove_if(std::begin(wireViews), std::end(wireViews), killMe), std::end(wireViews) );
-    }
+    std::cout << "View was notified of: Wire   Added." << std::endl;
+    std::unique_ptr<WireView> up{new WireView{cr, vRes} };
+    wireViews.push_back( std::move(up) );
+}
+void View::OnNotifyRemove(PinDevice * rp)
+{
+    std::cout << "View was notified of: Device Removed." << std::endl;
+    auto killMe = [&] (std::unique_ptr<NeuronView> & nv) {return nv->AmIYourDaddy(*rp);} ;
+    neuronViews.erase( std::remove_if(std::begin(neuronViews), std::end(neuronViews), killMe), std::end(neuronViews) );
+}
+void View::OnNotifyRemove(const Wire & cr)
+{
+    std::cout << "View was notified of: Wire   Removed." << std::endl;
+    auto killMe = [&] (std::unique_ptr<WireView> & wv) {return wv->AmIYourDaddy(cr);} ;
+    wireViews.erase( std::remove_if(std::begin(wireViews), std::end(wireViews), killMe), std::end(wireViews) );
 }
 
 

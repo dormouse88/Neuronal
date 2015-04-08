@@ -12,8 +12,10 @@ class ModelListener
 {
 public:
     ModelListener() {}
-    virtual void OnNotify(bool added, Neuron * rp) = 0;
-    virtual void OnNotify(bool added, const Wire & cr) = 0;    
+    virtual void OnNotifyAdd(Neuron * rp) = 0;
+    virtual void OnNotifyAdd(const Wire & cr) = 0;
+    virtual void OnNotifyRemove(PinDevice * rp) = 0;
+    virtual void OnNotifyRemove(const Wire & cr) = 0;
     virtual ~ModelListener() {}
 };
 

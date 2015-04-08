@@ -25,8 +25,10 @@ public:
     View(Model & model_p);
     View(const View&) = delete;
     virtual ~View() {}
-    virtual void OnNotify(bool added, Neuron * rp);
-    virtual void OnNotify(bool added, const Wire & cr);
+    virtual void OnNotifyAdd(Neuron * rp);
+    virtual void OnNotifyAdd(const Wire & cr);
+    virtual void OnNotifyRemove(PinDevice * rp);
+    virtual void OnNotifyRemove(const Wire & cr);
     void Draw();
 
     void Zoom(float zoomFactor);

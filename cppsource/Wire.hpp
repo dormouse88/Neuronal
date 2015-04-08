@@ -9,12 +9,12 @@
 #define	WIRE_HPP
 
 #include "Gobject.hpp"
-class Neuron;
+class PinDevice;
 
 class Wire// : public Gobject
 {
 public:
-    Wire(Neuron & from_p, Neuron & to_p);
+    Wire(PinDevice & from_p, PinDevice & to_p);
     void PreDelete();
     bool operator==(const Wire& rhs) const;
 
@@ -23,12 +23,12 @@ public:
     int GetWeight() const {return weight;}
     void SetWeight(int w) {weight = w;}
 
-    const Neuron& GetFrom() const {return from; }
-    const Neuron& GetTo() const {return to; }
+    const PinDevice& GetFrom() const {return from; }
+    const PinDevice& GetTo() const {return to; }
     
 private:
-    Neuron& from;
-    Neuron& to;
+    PinDevice& from;
+    PinDevice& to;
     signed weight;
     bool firing;
 };
