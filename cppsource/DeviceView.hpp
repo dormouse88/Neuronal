@@ -8,11 +8,13 @@
 #ifndef DEVICEVIEW_HPP
 #define	DEVICEVIEW_HPP
 
-class DeviceView
+#include "GobjectView.hpp"
+
+class DeviceView : public GobjectView
 {
 public:
-    DeviceView() {}
-    virtual bool AmIYourDaddy(const PinDevice & n) const = 0;
+    DeviceView() :GobjectView() {}
+    virtual void Draw(sf::RenderTarget & rt) = 0;
     virtual ~DeviceView() {}
 };
 

@@ -11,16 +11,18 @@
 #include "Model.hpp"
 #include "View.hpp"
 #include "Controller.hpp"
+#include "Factory.hpp"
 
-class App {
+class App
+{
 public:
     App();
     void Run();
-    void MakeSomeStuff();
 private:
     Model model;
     View view;
     Controller controller;
+    std::shared_ptr<AbstractFactory> factory;
 };
 
 #endif	/* APP_HPP */

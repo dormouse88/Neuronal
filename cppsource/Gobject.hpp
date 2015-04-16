@@ -11,8 +11,15 @@
 class Gobject
 {
 public:
+    Gobject() :dead(false) {}
     virtual ~Gobject() = 0;
+    void Zingaya() {dead = true;}
+    bool IsDead() const {return dead;}
+private:
+    bool dead;
 };
+
+inline Gobject::~Gobject() {}
 
 #endif	/* GOBJECT_HPP */
 

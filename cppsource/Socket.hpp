@@ -8,9 +8,9 @@
 #ifndef SOCKET_HPP
 #define	SOCKET_HPP
 
-#include "PinDevice.hpp"
+#include "Device.hpp"
 
-class Socket : public PinDevice
+class Socket : public Device
 {
 public:
     Socket(sf::Vector2i pos_p);

@@ -8,7 +8,7 @@
 #include "Socket.hpp"
 
 Socket::Socket(sf::Vector2i pos_p)
-    :PinDevice(pos_p, false)
+    :Device(pos_p)
 {}
 
 

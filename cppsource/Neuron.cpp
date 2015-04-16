@@ -11,28 +11,26 @@
 const int INITIAL_THRESHOLD = 1;
 
 Neuron::Neuron(sf::Vector2i pos_p)
-    :PinDevice(pos_p, true), threshold(INITIAL_THRESHOLD), firing(false)
+    :Device(pos_p), threshold(INITIAL_THRESHOLD), firing(false), total(0)
 {}
 
-void Neuron::StepPartOne()
+void Neuron::ReceiveCharge(int weight)
 {
-    //get inputs and calculate firing bool
-    int total = 0;
-    for (const auto & w : inWires)
+    total += weight;
+}
+
+void Neuron::PushCharge()
+{
+    for (auto & w: outWires)
     {
-        if (w->GetFiring()) total += w->GetWeight();
+        w.lock()->ReceiveCharge(firing);
     }
+}
+
+void Neuron::CalculateFiring()
+{
     if (total >= threshold) firing = true;
     else firing = false;
+    total = 0;
 }
-
-void Neuron::StepPartTwo()
-{
-    //set outputs
-    for (auto & w : outWires)
-    {
-        w->SetFiring(firing);
-    }
-}
-
 

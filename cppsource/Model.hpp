@@ -11,35 +11,31 @@
 
 #include <vector>
 #include <memory>
-#include "Neuron.hpp"
+#include "Device.hpp"
 #include "Wire.hpp"
-#include "ModelListener.hpp"
 
-class Model {
+class Model
+{
 public:
     Model();
     Model(const Model&) = delete;
     void Logic();
-    void AddNeuron(sf::Vector2i pos);
-    void RemoveDevice(sf::Vector2i pos);
-    void AddWire(PinDevice & from, PinDevice & to);
-    void AddWire(sf::Vector2i from, sf::Vector2i to); //Only needed by MakeSomeStuff(). Phase out
-    void RemoveWire( PinDevice & from, PinDevice & to);
-    void SetPosition( PinDevice & d, sf::Vector2i newPos );
-
-    PinDevice * GetDevice(sf::Vector2i pos);
-    Wire * GetWire(const PinDevice& from, const PinDevice& to);
-    //Wire * GetWire(sf::Vector2i fromPos, sf::Vector2i toPos);
+    void SetPosition( Device & d, sf::Vector2i newPos );
+    bool IsPositionFree(sf::Vector2i pos) const;
+    bool IsWiringFree(Device & from, Device & to) const;
     
-    void AddListener(ModelListener* listener);
+    void ImportDevice(std::shared_ptr<Device> device);
+    void ExpelDevices();
+    void ImportWire(std::shared_ptr<Wire> wire);
+    void ExpelWires();
+    
+    std::shared_ptr<Device> GetDevice(sf::Vector2i pos);
+    std::shared_ptr<Wire> GetWire(const Device& from, const Device& to);
+    std::vector<std::shared_ptr<Wire> > GetWires(std::shared_ptr<Device> device, bool from, bool to); 
+    
 private:
-    void NotifyListenersAdd(Neuron * rp);
-    void NotifyListenersAdd(const Wire & cr);
-    void NotifyListenersRemove(PinDevice * rp);
-    void NotifyListenersRemove(const Wire & cr);
-    std::vector<ModelListener*> listeners;
-    std::vector<std::unique_ptr<Neuron> > neurons;
-    std::vector<std::unique_ptr<Wire> > wires;
+    std::vector<std::shared_ptr<Device> > devices;
+    std::vector<std::shared_ptr<Wire> > wires;
 
 };
 

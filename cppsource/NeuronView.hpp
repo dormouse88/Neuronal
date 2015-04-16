@@ -17,8 +17,9 @@ class NeuronView : public DeviceView
 {
 public:
     NeuronView(const Neuron & neuron_p, const ViewResources & vRes_p);
-    void Draw(sf::RenderTarget & rt);
-    virtual bool AmIYourDaddy(const PinDevice & n) const {return n==neuron_m;}
+    virtual ~NeuronView() {}
+    virtual void Draw(sf::RenderTarget & rt);
+    virtual bool IsDead() const {return neuron_m.IsDead();}
 private:
     const Neuron & neuron_m;
     sf::Vector2f targetPos;

@@ -13,91 +13,23 @@ Model::Model()
 
 void Model::Logic()
 {
-    for (auto & n : neurons) {
-        n->StepPartOne();
+    for (auto & d : devices) {
+        d->PushCharge();
     }
-    for (auto & n : neurons) {
-        n->StepPartTwo();
+    for (auto & w : wires) {
+        w->PushCharge();
     }
-    std::cout << "Vector sizes: " << neurons.size() << "  " << wires.size() << std::endl;
+    for (auto & d : devices) {
+        d->CalculateFiring();
+    }
+    std::cout << "Vector sizes: " << devices.size() << "  " << wires.size() << std::endl;
 }
 
-void Model::AddNeuron(sf::Vector2i pos)
-{
-    bool spotTaken = false;
-    for (const auto & x : neurons) {
-        if (x->GetPosition() == pos) spotTaken = true;
-    }
-    if (spotTaken == false) {
-        std::unique_ptr<Neuron> p{new Neuron{pos}};
-        Neuron * rp = p.get();
-        neurons.emplace_back(std::move(p));
-        NotifyListenersAdd(rp);
-    }
-}
-void Model::RemoveDevice(sf::Vector2i pos)
-{
-    PinDevice * d = GetDevice(pos);
-    if (d != nullptr) {
-        //remove all wires joined to this neuron...
-        auto remove_func = [&] (std::unique_ptr<Wire> & param) {return *d == param->GetFrom() or *d == param->GetTo(); };
-        for (auto & w : wires) {
-            if (remove_func(w)) {
-                NotifyListenersRemove(*w);
-                w->PreDelete();
-            }
-        }
-        auto new_end1 = std::remove_if( std::begin(wires), std::end(wires), remove_func);
-        wires.erase(new_end1, std::end(wires) );
-        
-        //then remove neuron itself...
-        NotifyListenersRemove(d);
-        auto new_end = std::remove_if(std::begin(neurons), std::end(neurons), [&] (std::unique_ptr<Neuron> & param) {return *d==*param;} );
-        neurons.erase(new_end, std::end(neurons) );
-    }
-}
 
-void Model::AddWire(PinDevice & from, PinDevice & to)
-{
-    bool wireExists = false;
-    for (const auto & x: wires) {
-        if (x->GetFrom() == from and x->GetTo() == to) wireExists = true;
-    }
-    if (wireExists == false) {
-        std::unique_ptr<Wire> p{new Wire{from, to}};
-        const Wire & cr = *p;
-        wires.emplace_back(std::move(p));
-        NotifyListenersAdd(cr);
-    }
-}
-void Model::RemoveWire(PinDevice & from, PinDevice & to)
-{
-    Wire * w = GetWire(from, to);
-    if (w != nullptr) {
-        auto remove_func = [&] (std::unique_ptr<Wire> & param) {return *w==*param;};
-        NotifyListenersRemove(*w);
-        w->PreDelete();
-        auto new_end = std::remove_if(std::begin(wires), std::end(wires), remove_func);
-        wires.erase(new_end, std::end(wires) );
-    }
-}
-void Model::AddWire(sf::Vector2i fromPos, sf::Vector2i toPos)
-{
-    PinDevice * from = nullptr;
-    PinDevice * to   = nullptr;
-    for (auto & x : neurons) {
-        if (x->GetPosition() == fromPos) from = x.get();
-        if (x->GetPosition() == toPos)   to   = x.get();
-    }
-    if (from != nullptr and to != nullptr) {
-        AddWire(*from, *to);
-    }
-}
-
-void Model::SetPosition( PinDevice & d, sf::Vector2i newPos )
+void Model::SetPosition( Device & d, sf::Vector2i newPos )
 {
     bool posFree = true;
-    for (auto const & x : neurons) {
+    for (auto const & x : devices) {
         if (x->GetPosition() == newPos) {
             posFree = false;
         }
@@ -105,69 +37,69 @@ void Model::SetPosition( PinDevice & d, sf::Vector2i newPos )
     if (posFree) d.SetPosition( newPos );
 }
 
-
-PinDevice * Model::GetDevice(sf::Vector2i pos)
+bool Model::IsPositionFree(sf::Vector2i pos) const
 {
-    for (auto & x: neurons) {
+    for (const auto & x : devices) {
+        if (x->GetPosition() == pos) return false;
+    }
+    return true;
+}
+bool Model::IsWiringFree(Device & from, Device & to) const
+{
+    for (const auto & x: wires) {
+        if (x->GetFrom() == from and x->GetTo() == to) return false;
+    }
+    return true;
+}
+
+void Model::ImportDevice(std::shared_ptr<Device> device)
+{
+    devices.emplace_back(device);
+}
+void Model::ExpelDevices()
+{
+    auto return_func = [] (std::shared_ptr<Device> eachDevice) {return eachDevice->IsDead();};
+    auto new_end = std::remove_if(std::begin(devices), std::end(devices), return_func );
+    devices.erase(new_end, std::end(devices) );
+}
+void Model::ImportWire(std::shared_ptr<Wire> wire)
+{
+    wires.emplace_back(wire);
+}
+void Model::ExpelWires()
+{
+    auto remove_func = [] (std::shared_ptr<Wire> eachWire) {return eachWire->IsDead();};
+    auto new_end = std::remove_if(std::begin(wires), std::end(wires), remove_func);
+    wires.erase(new_end, std::end(wires) );
+}
+
+std::shared_ptr<Device> Model::GetDevice(sf::Vector2i pos)
+{
+    for (auto & x: devices) {
         if (pos == x->GetPosition()) {
-            return x.get();
+            return x;
         }
     }
     return nullptr;
 }
-Wire * Model::GetWire(const PinDevice& from, const PinDevice& to)
+std::shared_ptr<Wire> Model::GetWire(const Device& from, const Device& to)
 {
     for (auto & x: wires) {
         if (from == x->GetFrom() and to == x->GetTo()) {
-            return x.get();
+            return x;
         }
     }
     return nullptr;
 }
-//Wire * Model::GetWire(sf::Vector2i fromPos, sf::Vector2i toPos)
-//{
-//    Neuron * from = nullptr;
-//    Neuron * to   = nullptr;
-//    for (auto & x : neurons) {
-//        if (x->GetPosition() == fromPos) from = x.get();
-//        if (x->GetPosition() == toPos)   to   = x.get();
-//    }
-//    if (from != nullptr and to != nullptr) {
-//        return GetWire(*from, *to);
-//    }
-//    return nullptr;
-//}
 
-
-void Model::AddListener(ModelListener* listener)
+std::vector<std::shared_ptr<Wire> > Model::GetWires(std::shared_ptr<Device> device, bool from, bool to)
 {
-    listeners.emplace_back(listener);
-}
-
-void Model::NotifyListenersAdd(Neuron * rp)
-{
-    for (auto & x : listeners) {
-        x->OnNotifyAdd(rp);
+    std::vector<std::shared_ptr<Wire> > ret_vec;
+    for (auto & x: wires) {
+        if ((from and *device == x->GetFrom()) or (to and *device == x->GetTo())) {
+            ret_vec.emplace_back(x);
+        }
     }
+    return ret_vec;
 }
 
-void Model::NotifyListenersAdd(const Wire & cr)
-{
-    for (auto & x : listeners) {
-        x->OnNotifyAdd(cr);
-    }
-}
-
-void Model::NotifyListenersRemove(PinDevice * rp)
-{
-    for (auto & x : listeners) {
-        x->OnNotifyRemove(rp);
-    }
-}
-
-void Model::NotifyListenersRemove(const Wire & cr)
-{
-    for (auto & x : listeners) {
-        x->OnNotifyRemove(cr);
-    }
-}

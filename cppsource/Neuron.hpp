@@ -8,25 +8,28 @@
 #ifndef NEURON_HPP
 #define	NEURON_HPP
 
-#include "PinDevice.hpp"
+#include "Device.hpp"
 
-class Neuron : public PinDevice
+class Neuron : public Device
 {
 public:
     Neuron(sf::Vector2i pos_p);
     virtual ~Neuron() {;}
 
-    void StepPartOne();
-    void StepPartTwo();
-    
+    virtual bool IsInstant() {return false;}
+    virtual void ReceiveCharge(int weight);
+    virtual void PushCharge();
+    virtual void CalculateFiring();
+
     int GetThreshold() const {return threshold;}
-    void SetThreshold(int t) {threshold = t;}
+//    void SetThreshold(int t) {threshold = t;}
     void ModifyThreshold(int v) {threshold += v;}
     bool GetFiring() const {return firing;}
 
 private:
     bool firing;
     int threshold;
+    int total;
 };
 
 #endif	/* NEURON_HPP */

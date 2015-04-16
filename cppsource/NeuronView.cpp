@@ -16,8 +16,9 @@ const sf::Vector2f THRESHOLD_OFFSET { 18.f, 2.f };
 
 
 NeuronView::NeuronView(const Neuron & neuron_p, const ViewResources & vRes_p)
-    :shape( NEURON_SIZE ),
-     neuron_m(neuron_p)
+    :DeviceView(),
+     neuron_m(neuron_p),
+     shape( NEURON_SIZE )
 {
     targetPos = mapGridToCoords( neuron_p.GetPosition() ) + NEURON_OFFSET;
     actualPos = targetPos;

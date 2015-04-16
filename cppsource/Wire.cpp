@@ -6,22 +6,24 @@
  */
 
 #include "Wire.hpp"
-#include "PinDevice.hpp" //to get its position
+#include "Device.hpp" //to get its position
 
-Wire::Wire(PinDevice & from_p, PinDevice & to_p)
+Wire::Wire(Device & from_p, Device & to_p)
     :from(from_p), to(to_p), weight(1), firing(false)
-{
-    from.RegisterOut(this);
-    to.RegisterIn(this);
-}
-
-void Wire::PreDelete()
-{
-    from.DeRegister(this);
-    to.DeRegister(this);
-}
+{}
 
 bool Wire::operator==(const Wire& rhs) const
 {
     return this->GetFrom() == rhs.GetFrom() and this->GetTo() == rhs.GetTo() ;
+}
+
+void Wire::PushCharge()
+{
+    to.ReceiveCharge(weight * firing);
+}
+
+void Wire::ReceiveCharge(bool f)
+{
+    firing = f;
+    if (to.IsInstant()) PushCharge();
 }

@@ -14,36 +14,32 @@ View::View(Model & model_p)
     cursorOne(),
     cursorTwo(sf::Color::Cyan)
 {
-    model_p.AddListener(this);
     mainView.setViewport(sf::FloatRect(0.f, 0.f, 1.f, 0.8f));
     barView.setViewport(sf::FloatRect(0.f, 0.8f, 1.f, 0.2f));
     window.setView(mainView);
 }
 
-#include <iostream>
-void View::OnNotifyAdd(Neuron * rp)
+
+
+void View::ImportDevice(std::shared_ptr<DeviceView> device)
 {
-    std::cout << "View was notified of: Neuron Added." << std::endl;
-    std::unique_ptr<NeuronView> up{new NeuronView{*rp, vRes} };
-    neuronViews.push_back( std::move(up) );
+    deviceViews.emplace_back(device);
 }
-void View::OnNotifyAdd(const Wire & cr)
+void View::ExpelDevices()
 {
-    std::cout << "View was notified of: Wire   Added." << std::endl;
-    std::unique_ptr<WireView> up{new WireView{cr, vRes} };
-    wireViews.push_back( std::move(up) );
+    auto return_func = [] (std::shared_ptr<DeviceView> eachDevice) {return eachDevice->IsDead();};
+    auto new_end = std::remove_if(std::begin(deviceViews), std::end(deviceViews), return_func );
+    deviceViews.erase(new_end, std::end(deviceViews) );
 }
-void View::OnNotifyRemove(PinDevice * rp)
+void View::ImportWire(std::shared_ptr<WireView> wire)
 {
-    std::cout << "View was notified of: Device Removed." << std::endl;
-    auto killMe = [&] (std::unique_ptr<NeuronView> & nv) {return nv->AmIYourDaddy(*rp);} ;
-    neuronViews.erase( std::remove_if(std::begin(neuronViews), std::end(neuronViews), killMe), std::end(neuronViews) );
+    wireViews.emplace_back(wire);
 }
-void View::OnNotifyRemove(const Wire & cr)
+void View::ExpelWires()
 {
-    std::cout << "View was notified of: Wire   Removed." << std::endl;
-    auto killMe = [&] (std::unique_ptr<WireView> & wv) {return wv->AmIYourDaddy(cr);} ;
-    wireViews.erase( std::remove_if(std::begin(wireViews), std::end(wireViews), killMe), std::end(wireViews) );
+    auto remove_func = [] (std::shared_ptr<WireView> eachWire) {return eachWire->IsDead();};
+    auto new_end = std::remove_if(std::begin(wireViews), std::end(wireViews), remove_func);
+    wireViews.erase(new_end, std::end(wireViews) );
 }
 
 
@@ -69,7 +65,7 @@ void View::Draw()
     
     
     window.setView(mainView);
-    for (auto &n: neuronViews) {
+    for (auto &n: deviceViews) {
         n->Draw(window);
     }
     for (auto &w: wireViews) {
@@ -86,12 +82,17 @@ void View::Zoom(float zoomFactor)
     mainView.zoom( zoomFactor );
     window.setView(mainView);
 }
-
 void View::Pan(sf::Vector2f moveBy)
 {
     mainView.move(moveBy);
     window.setView(mainView);
 }
+void View::Resize(sf::Vector2f newSize)
+{
+    mainView.setSize(newSize);
+    window.setView(mainView);
+}
+
 
 void View::SetCursorOnePos(sf::Vector2f pos)
 {

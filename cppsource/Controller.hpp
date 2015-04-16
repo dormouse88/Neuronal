@@ -8,17 +8,35 @@
 #ifndef CONTROLLER_HPP
 #define	CONTROLLER_HPP
 
-#include "View.hpp"
 #include "Model.hpp"
+#include "View.hpp"
+#include "AbstractFactory.hpp"
+#include "DeviceCon.hpp"
+#include "WireCon.hpp"
 
-class Controller {
+class Controller
+{
 public:
-    Controller(View & view_p, Model & model_p);
+    Controller(Model & model_p, View & view_p);
     Controller(const Controller&) = delete;
     bool HandleInput();
+    void SetFactory(std::shared_ptr<AbstractFactory> f) {theFactory = f;}
+
+    std::shared_ptr<DeviceCon> GetDevice(std::shared_ptr<Device> d);
+    std::shared_ptr<WireCon> GetWire(std::shared_ptr<Wire> w);
+    
+    void ImportDevice(std::shared_ptr<DeviceCon> device);
+    void ExpelDevices();
+    void ImportWire(std::shared_ptr<WireCon> wire);
+    void ExpelWires();
 private:
-    View & theView;
     Model & theModel;
+    View & theView;
+    std::shared_ptr<AbstractFactory> theFactory;
+
+    std::vector<std::shared_ptr<DeviceCon> > deviceCons;
+    std::vector<std::shared_ptr<WireCon> > wireCons;    
+    
     sf::Vector2f mouseCursorWorldPos;
     bool mouseCursorSet;
 };

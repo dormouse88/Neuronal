@@ -8,31 +8,32 @@
 #ifndef VIEW_HPP
 #define	VIEW_HPP
 
+#include <vector>
 #include <SFML/Graphics.hpp>
 #include "ViewResources.hpp"
 #include "Model.hpp"
-#include "ModelListener.hpp"
-#include "Gobject.hpp"
-#include <vector>
-#include "NeuronView.hpp"
+#include "DeviceView.hpp"
 #include "WireView.hpp"
 #include "Cursor.hpp"
 
 
-class View : public ModelListener
+class View
 {
 public:
     View(Model & model_p);
     View(const View&) = delete;
-    virtual ~View() {}
-    virtual void OnNotifyAdd(Neuron * rp);
-    virtual void OnNotifyAdd(const Wire & cr);
-    virtual void OnNotifyRemove(PinDevice * rp);
-    virtual void OnNotifyRemove(const Wire & cr);
+    ~View() {}
+
+    void ImportDevice(std::shared_ptr<DeviceView> device);
+    void ExpelDevices();
+    void ImportWire(std::shared_ptr<WireView> wire);
+    void ExpelWires();
+    
     void Draw();
 
     void Zoom(float zoomFactor);
     void Pan(sf::Vector2f moveBy);
+    void Resize(sf::Vector2f newSize);
 
     sf::Vector2f GetCursorOnePos() const { return cursorOne.GetPos(); }
     void SetCursorOnePos(sf::Vector2f pos);
@@ -43,14 +44,14 @@ public:
     sf::View & GetMainView()           {return mainView;}
     
 private:
-    const Model & theModel;
-    std::vector<std::unique_ptr<NeuronView> > neuronViews;
-    std::vector<std::unique_ptr<WireView> > wireViews;
-    
     sf::RenderWindow window;
     sf::View mainView;
     sf::View barView;
-    ViewResources vRes;
+
+    const Model & theModel;
+    std::vector<std::shared_ptr<DeviceView> > deviceViews;
+    std::vector<std::shared_ptr<WireView> > wireViews;
+
     Cursor cursorOne;
     Cursor cursorTwo;
 };

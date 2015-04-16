@@ -7,8 +7,8 @@
 
 #include "Controller.hpp"
 
-Controller::Controller(View & view_p, Model & model_p)
-    :theView(view_p), theModel(model_p), mouseCursorSet(false)
+Controller::Controller(Model & model_p, View & view_p)
+    :theModel(model_p), theView(view_p), mouseCursorSet(false)
 {}
 
 bool Controller::HandleInput()
@@ -16,11 +16,16 @@ bool Controller::HandleInput()
     //cursor selected objects...
     sf::Vector2i cursor1pos = mapCoordsToGrid(theView.GetCursorOnePos());
     sf::Vector2i cursor2pos = mapCoordsToGrid(theView.GetCursorTwoPos());
-    PinDevice * device1 = theModel.GetDevice( cursor1pos );
-    PinDevice * device2 = theModel.GetDevice( cursor2pos );
-    //Wire * wire1 = theModel.GetWire(cursor1pos, cursor2pos);
-    Wire * wire1 = nullptr;
-    if (device1 != nullptr and device2 != nullptr) wire1 = theModel.GetWire(*device1, *device2);
+    std::shared_ptr<Device> device1 = theModel.GetDevice( cursor1pos );
+    std::shared_ptr<Device> device2 = theModel.GetDevice( cursor2pos );
+    std::shared_ptr<DeviceCon> dc1 = nullptr;
+    if (device1) dc1 = GetDevice(device1);
+    std::shared_ptr<DeviceCon> dc2 = nullptr;
+    if (device2) dc2 = GetDevice(device2);
+    std::shared_ptr<Wire> wire1 = nullptr;
+    if (device1 and device2) wire1 = theModel.GetWire(*device1, *device2);
+    std::shared_ptr<WireCon> wc1 = nullptr;
+    if (wire1) wc1 = GetWire(wire1);
     
     bool quitYet = false;
     sf::Event event;
@@ -28,6 +33,11 @@ bool Controller::HandleInput()
     {
         if (event.type == sf::Event::Closed)
             quitYet = true;
+        if (event.type == sf::Event::Resized)
+        {
+            // update the view to the new size of the window
+            theView.Resize( sf::Vector2f{event.size.width, event.size.height} );
+        }
         
         //Mouse Events
         if (event.type == sf::Event::MouseButtonPressed)
@@ -64,43 +74,43 @@ bool Controller::HandleInput()
             if (event.key.code == sf::Keyboard::N)
             {
                 if (event.key.shift == false) {
-                    theModel.AddNeuron( cursor1pos );
+                    theFactory->AddNeuron( cursor1pos );
                 }
                 else {
-                    theModel.RemoveDevice( cursor1pos );
+                    theFactory->RemoveDevice( device1 );
                 }
             }
             if (event.key.code == sf::Keyboard::B)
             {
                 if (event.key.shift == false) {
                     if (device1 != nullptr and device2 != nullptr) {
-                        theModel.AddWire( *device1, *device2 );
+                        theFactory->AddWire( *device1, *device2 );
                     }
                 }
                 else {
-                    if (device1 != nullptr and device2 != nullptr) {
-                        theModel.RemoveWire( *device1, *device2 );
+                    if (wire1 != nullptr) {
+                        theFactory->RemoveWire( wire1 );
                     }
                 }
             }
             if (event.key.code == sf::Keyboard::A) {
-//                if (neuron1 != nullptr) {
-//                    neuron1->SetThreshold( neuron1->GetThreshold() + 1);
-//                }
+                if (dc1 != nullptr) {
+                    dc1->Handle(1);
+                }
             }
             if (event.key.code == sf::Keyboard::Z) {
-//                if (neuron1 != nullptr) {
-//                    neuron1->SetThreshold( neuron1->GetThreshold() - 1);
-//                }
+                if (dc1 != nullptr) {
+                    dc1->Handle(2);
+                }
             }
             if (event.key.code == sf::Keyboard::S) {
-                if (wire1 != nullptr) {
-                    wire1->SetWeight( wire1->GetWeight() + 1);
+                if (wc1 != nullptr) {
+                    wc1->Handle(1);
                 }
             }
             if (event.key.code == sf::Keyboard::X) {
-                if (wire1 != nullptr) {
-                    wire1->SetWeight( wire1->GetWeight() - 1);
+                if (wc1 != nullptr) {
+                    wc1->Handle(2);
                 }
             }
             if (event.key.code == sf::Keyboard::M) {
@@ -135,3 +145,40 @@ bool Controller::HandleInput()
     return quitYet;
 }
 
+
+std::shared_ptr<DeviceCon> Controller::GetDevice(std::shared_ptr<Device> d)
+{
+    for (auto &c: deviceCons) {
+        if (*d == c->GetDevice()) return c;
+    }
+    return nullptr;
+}
+std::shared_ptr<WireCon> Controller::GetWire(std::shared_ptr<Wire> w)
+{
+    for (auto &c: wireCons) {
+        if (*w == c->GetWire()) return c;
+    }
+    return nullptr;
+}
+
+
+void Controller::ImportDevice(std::shared_ptr<DeviceCon> device)
+{
+    deviceCons.emplace_back(device);
+}
+void Controller::ExpelDevices()
+{
+    auto return_func = [] (std::shared_ptr<DeviceCon> eachDevice) {return eachDevice->IsDead();};
+    auto new_end = std::remove_if(std::begin(deviceCons), std::end(deviceCons), return_func );
+    deviceCons.erase(new_end, std::end(deviceCons) );
+}
+void Controller::ImportWire(std::shared_ptr<WireCon> wire)
+{
+    wireCons.emplace_back(wire);
+}
+void Controller::ExpelWires()
+{
+    auto remove_func = [] (std::shared_ptr<WireCon> eachWire) {return eachWire->IsDead();};
+    auto new_end = std::remove_if(std::begin(wireCons), std::end(wireCons), remove_func);
+    wireCons.erase(new_end, std::end(wireCons) );
+}
