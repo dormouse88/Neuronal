@@ -12,17 +12,14 @@
 
 const sf::Vector2f NEURON_SIZE { 70.f, 40.f };
 const sf::Vector2f NEURON_OFFSET { (GRID_SIZE - NEURON_SIZE)/2.f };
-const sf::Vector2f THRESHOLD_OFFSET { 18.f, 2.f };
+const sf::Vector2f THRESHOLD_OFFSET { NEURON_OFFSET.x + 18.f, NEURON_OFFSET.y + 2.f };
 
 
 NeuronView::NeuronView(const Neuron & neuron_p, const ViewResources & vRes_p)
-    :DeviceView(),
+    :DeviceView(neuron_p),
      neuron_m(neuron_p),
      shape( NEURON_SIZE )
 {
-    targetPos = mapGridToCoords( neuron_p.GetPosition() ) + NEURON_OFFSET;
-    actualPos = targetPos;
-    
     shape.setOutlineColor(sf::Color::White);
     shape.setOutlineThickness(2);
     
@@ -34,10 +31,8 @@ NeuronView::NeuronView(const Neuron & neuron_p, const ViewResources & vRes_p)
 
 void NeuronView::Draw(sf::RenderTarget & rt)
 {
-    targetPos = mapGridToCoords(neuron_m.GetPosition()) + NEURON_OFFSET ;
-    actualPos += (targetPos - actualPos) * 0.003f;
-
-    shape.setPosition( actualPos );
+    UpdatePos();
+    shape.setPosition( actualPos + NEURON_OFFSET );
     if (neuron_m.GetFiring()) shape.setFillColor(sf::Color::Green);
     else shape.setFillColor(sf::Color::Blue);
     rt.draw(shape);

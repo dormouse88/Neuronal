@@ -22,12 +22,9 @@ public:
     virtual void CalculateFiring();
 
     int GetThreshold() const {return threshold;}
-//    void SetThreshold(int t) {threshold = t;}
     void ModifyThreshold(int v) {threshold += v;}
-    bool GetFiring() const {return firing;}
 
 private:
-    bool firing;
     int threshold;
     int total;
 };

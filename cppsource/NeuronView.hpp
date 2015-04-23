@@ -22,8 +22,6 @@ public:
     virtual bool IsDead() const {return neuron_m.IsDead();}
 private:
     const Neuron & neuron_m;
-    sf::Vector2f targetPos;
-    sf::Vector2f actualPos;
     sf::RectangleShape shape;
     sf::Text thresholdText;
 };

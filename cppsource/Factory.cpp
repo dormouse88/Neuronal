@@ -8,6 +8,7 @@
 #include "Factory.hpp"
 #include "NeuronView.hpp"
 #include "NeuronCon.hpp"
+#include "SocketView.hpp"
 #include "WireView.hpp"
 #include "WireCon.hpp"
 
@@ -25,6 +26,19 @@ void Factory::AddNeuron(sf::Vector2i pos)
         view.ImportDevice(vp);
         auto cp = std::make_shared<NeuronCon> (*mp);
         controller.ImportDevice(cp);
+    }
+}
+
+void Factory::AddSocket(sf::Vector2i pos)
+{
+    if (model.IsPositionFree(pos))
+    {
+        auto mp = std::make_shared<Socket> (pos);
+        model.ImportDevice(mp);
+        auto vp = std::make_shared<SocketView> (*mp, vRes);
+        view.ImportDevice(vp);
+//        auto cp = std::make_shared<SocketCon> (*mp);
+//        controller.ImportDevice(cp);
     }
 }
 
@@ -47,7 +61,7 @@ void Factory::RemoveDevice(std::shared_ptr<Device> device)
 
 void Factory::AddWire(Device & from, Device & to)
 {
-    if (model.IsWiringFree(from, to))
+    if (model.IsWiringFree(from, to) and from.CanAcceptOutput() and to.CanAcceptInput())
     {
         auto mp = std::make_shared<Wire> (from, to);
         from.RegisterOut(mp);

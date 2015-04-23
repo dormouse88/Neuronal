@@ -13,10 +13,26 @@
 class DeviceView : public GobjectView
 {
 public:
-    DeviceView() :GobjectView() {}
-    virtual void Draw(sf::RenderTarget & rt) = 0;
+    DeviceView(const Device & device_p)
+        :GobjectView(device_p), device_m(device_p)
+        {
+            targetPos = mapGridToCoords(device_m.GetPosition());
+            actualPos = targetPos;
+        }
     virtual ~DeviceView() {}
+    virtual void Draw(sf::RenderTarget & rt) = 0;
+    void UpdatePos()
+    {
+        targetPos = mapGridToCoords(device_m.GetPosition());
+        actualPos += (targetPos - actualPos) * 0.003f;
+    }
+protected:
+    sf::Vector2f targetPos;
+    sf::Vector2f actualPos;
+private:
+    const Device & device_m;
 };
+
 
 #endif	/* DEVICEVIEW_HPP */
 

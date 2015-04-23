@@ -80,6 +80,10 @@ bool Controller::HandleInput()
                     theFactory->RemoveDevice( device1 );
                 }
             }
+            if (event.key.code == sf::Keyboard::H)
+            {
+                theFactory->AddSocket( cursor1pos );
+            }
             if (event.key.code == sf::Keyboard::B)
             {
                 if (event.key.shift == false) {

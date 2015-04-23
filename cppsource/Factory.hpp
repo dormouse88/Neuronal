@@ -10,6 +10,7 @@
 
 #include "Wire.hpp"
 #include "Neuron.hpp"
+#include "Socket.hpp"
 #include "Model.hpp"
 #include "View.hpp"
 #include "Controller.hpp"
@@ -21,10 +22,11 @@ public:
     Factory(Model & m, View & v, Controller & c);
     virtual ~Factory() {}
 
-    void AddNeuron(sf::Vector2i pos);
-    void RemoveDevice(std::shared_ptr<Device> device);
-    void AddWire(Device & from, Device & to);
-    void RemoveWire(std::shared_ptr<Wire> wire);
+    virtual void AddNeuron(sf::Vector2i pos);
+    virtual void AddSocket(sf::Vector2i pos);
+    virtual void RemoveDevice(std::shared_ptr<Device> device);
+    virtual void AddWire(Device & from, Device & to);
+    virtual void RemoveWire(std::shared_ptr<Wire> wire);
 private:
     Model & model;
     View & view;

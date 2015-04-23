@@ -18,6 +18,7 @@ public:
     virtual ~AbstractFactory() {}
 
     virtual void AddNeuron(sf::Vector2i pos) = 0;
+    virtual void AddSocket(sf::Vector2i pos) = 0;
     virtual void RemoveDevice(std::shared_ptr<Device> device) = 0;
     virtual void AddWire(Device & from, Device & to) = 0;
     virtual void RemoveWire(std::shared_ptr<Wire> wire) = 0;

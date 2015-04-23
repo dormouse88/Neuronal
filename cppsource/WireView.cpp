@@ -16,7 +16,7 @@ const sf::Vector2f WIRE_LOOP2_OFFSET { GRID_SIZE / 2.f + sf::Vector2f(-30.f, -30
 const sf::Vector2f WIRE_TO_OFFSET    { GRID_SIZE / 2.f + sf::Vector2f(-28.f, -8.f) };
 
 WireView::WireView(const Wire & wire_p, const ViewResources & vRes_p)
-    :wire_m(wire_p)
+    :GobjectView(wire_p), wire_m(wire_p)
 {
     weightText.setFont(vRes_p.font);
     weightText.setCharacterSize(18);

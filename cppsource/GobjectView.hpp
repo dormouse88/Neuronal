@@ -8,12 +8,16 @@
 #ifndef GOBJECTVIEW_HPP
 #define	GOBJECTVIEW_HPP
 
+#include "Gobject.hpp"
+
 class GobjectView
 {
 public:
-    GobjectView() {}
+    GobjectView(const Gobject & gobject_p) :gobject_m(gobject_p) {}
     virtual bool IsDead() const = 0;
     virtual ~GobjectView() {}
+private:
+    const Gobject & gobject_m;
 };
 
 

@@ -13,14 +13,14 @@ Model::Model()
 
 void Model::Logic()
 {
-    for (auto & d : devices) {
-        d->PushCharge();
-    }
     for (auto & w : wires) {
         w->PushCharge();
     }
     for (auto & d : devices) {
         d->CalculateFiring();
+    }
+    for (auto & d : devices) {
+        d->PushCharge();
     }
     std::cout << "Vector sizes: " << devices.size() << "  " << wires.size() << std::endl;
 }
@@ -58,8 +58,8 @@ void Model::ImportDevice(std::shared_ptr<Device> device)
 }
 void Model::ExpelDevices()
 {
-    auto return_func = [] (std::shared_ptr<Device> eachDevice) {return eachDevice->IsDead();};
-    auto new_end = std::remove_if(std::begin(devices), std::end(devices), return_func );
+    auto remove_func = [] (std::shared_ptr<Device> eachDevice) {return eachDevice->IsDead();};
+    auto new_end = std::remove_if(std::begin(devices), std::end(devices), remove_func );
     devices.erase(new_end, std::end(devices) );
 }
 void Model::ImportWire(std::shared_ptr<Wire> wire)
