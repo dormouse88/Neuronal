@@ -10,6 +10,7 @@
 
 #include <memory>
 #include <vector>
+#include <string>
 #include <SFML/System.hpp>  //for sf::Vector
 #include "Gobject.hpp"
 class Wire;
@@ -20,8 +21,9 @@ class Device : public Gobject
 public:
     Device(sf::Vector2i pos_p, int in = -1, int out = -1) :pos(pos_p), firing(false), inLimit(in), outLimit(out) {}
     virtual ~Device() = 0;
-    bool operator==(const Device& rhs) const    { return this->GetPosition() == rhs.GetPosition(); }
+    bool operator==(const Device& rhs) const    { return this == &rhs; }
 
+    virtual std::string SerialName() const = 0;
     virtual bool IsInstant() = 0;
     virtual void ReceiveCharge(int weight) = 0;
     virtual void PushCharge() = 0;
@@ -48,7 +50,8 @@ protected:
     mutable std::vector<std::weak_ptr<Wire> > inWires;
     mutable std::vector<std::weak_ptr<Wire> > outWires;
 private:
-    void CleanWireVectors() const {
+    void CleanWireVectors() const //this method is necessary since the limits work by checking vector size.
+    {
         auto cleanVector = [&] (std::vector<std::weak_ptr<Wire> > & wv) {
             auto remove_func = [] (std::weak_ptr<Wire> & w) { return w.expired(); } ;
             auto new_end = std::remove_if(begin(wv), end(wv), remove_func );

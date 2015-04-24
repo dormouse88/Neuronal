@@ -36,7 +36,7 @@ bool Controller::HandleInput()
         if (event.type == sf::Event::Resized)
         {
             // update the view to the new size of the window
-            theView.Resize( sf::Vector2f{event.size.width, event.size.height} );
+            theView.Resize( sf::Vector2f{static_cast<float>(event.size.width), static_cast<float>(event.size.height)} );
         }
         
         //Mouse Events
@@ -121,6 +121,14 @@ bool Controller::HandleInput()
                 if (device1 != nullptr) {
                     theModel.SetPosition( *device1, cursor2pos );
                 }
+            }
+            if (event.key.code == sf::Keyboard::Q)
+            {
+                theModel.SaveXML();
+            }
+            if (event.key.code == sf::Keyboard::W)
+            {
+                theModel.LoadXML();
             }
             if (event.key.code == sf::Keyboard::Space)
             {

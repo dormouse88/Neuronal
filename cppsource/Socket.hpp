@@ -16,6 +16,7 @@ public:
     Socket(sf::Vector2i pos_p);
     virtual ~Socket() {;}
 
+    virtual std::string SerialName() const { return "SOCK";}
     virtual bool IsInstant() {return true;}
     virtual void ReceiveCharge(int weight);
     virtual void PushCharge();

@@ -14,7 +14,8 @@ Wire::Wire(Device & from_p, Device & to_p)
 
 bool Wire::operator==(const Wire& rhs) const
 {
-    return this->GetFrom() == rhs.GetFrom() and this->GetTo() == rhs.GetTo() ;
+    return this == &rhs;
+//    return this->GetFrom() == rhs.GetFrom() and this->GetTo() == rhs.GetTo() ;
 }
 
 void Wire::PushCharge()

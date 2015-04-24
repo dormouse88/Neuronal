@@ -15,6 +15,7 @@ App::App()
 {
     factory = std::make_shared<Factory> (model, view, controller);
     controller.SetFactory(factory);
+    model.SetFactory(factory);
 }
 
 void App::Run()

@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<FIRE>
+	Cheese
+</FIRE>
+<PLAN>
+	<NEUR x="-1" y="5" />
+	<NEUR x="2" y="5" />
+	<NEUR x="0" y="5" />
+	<SOCK x="-1" y="2" />
+	<SOCK x="1" y="4" />
+	<SOCK x="2" y="0" />
+	<SOCK x="4" y="3" />
+	<SOCK x="0" y="3" />
+	<SOCK x="1" y="1" />
+	<SOCK x="3" y="4" />
+</PLAN>

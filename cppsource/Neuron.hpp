@@ -16,6 +16,7 @@ public:
     Neuron(sf::Vector2i pos_p);
     virtual ~Neuron() {;}
 
+    virtual std::string SerialName() const { return "NEUR";}
     virtual bool IsInstant() {return false;}
     virtual void ReceiveCharge(int weight);
     virtual void PushCharge();
@@ -26,7 +27,7 @@ public:
 
 private:
     int threshold;
-    int total;
+    int receivedCharge;
 };
 
 #endif	/* NEURON_HPP */

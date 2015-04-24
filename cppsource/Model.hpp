@@ -13,13 +13,18 @@
 #include <memory>
 #include "Device.hpp"
 #include "Wire.hpp"
+#include "AbstractFactory.hpp"
+#include "Serializer.hpp"
 
 class Model
 {
 public:
     Model();
     Model(const Model&) = delete;
+    void SetFactory(std::shared_ptr<AbstractFactory> f) {theFactory = f; }
     void Logic();
+    void SaveXML();
+    void LoadXML();
     void SetPosition( Device & d, sf::Vector2i newPos );
     bool IsPositionFree(sf::Vector2i pos) const;
     bool IsWiringFree(Device & from, Device & to) const;
@@ -36,7 +41,8 @@ public:
 private:
     std::vector<std::shared_ptr<Device> > devices;
     std::vector<std::shared_ptr<Wire> > wires;
-
+    std::shared_ptr<AbstractFactory> theFactory;
+    std::shared_ptr<Serializer> theSerializer;
 };
 
 #endif	/* MODEL_HPP */

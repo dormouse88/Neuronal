@@ -9,7 +9,9 @@
 #include <iostream>
 
 Model::Model()
-{}
+{
+    theSerializer = std::make_shared<Serializer> ();
+}
 
 void Model::Logic()
 {
@@ -25,6 +27,14 @@ void Model::Logic()
     std::cout << "Vector sizes: " << devices.size() << "  " << wires.size() << std::endl;
 }
 
+void Model::SaveXML()
+{
+    theSerializer->SaveFile(devices);
+}
+void Model::LoadXML()
+{
+    theSerializer->LoadFile(theFactory);
+}
 
 void Model::SetPosition( Device & d, sf::Vector2i newPos )
 {
