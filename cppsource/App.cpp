@@ -13,7 +13,7 @@ App::App()
     view(model),
     controller(model, view)
 {
-    factory = std::make_shared<Factory> (model, view, controller);
+    factory = std::make_shared<MVCFactory> (model, view, controller);
     controller.SetFactory(factory);
     model.SetFactory(factory);
 }

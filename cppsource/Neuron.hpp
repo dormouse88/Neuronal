@@ -13,7 +13,7 @@
 class Neuron : public Device
 {
 public:
-    Neuron(sf::Vector2i pos_p);
+    Neuron(int serial_p, sf::Vector2i pos_p, int threshold_p);
     virtual ~Neuron() {;}
 
     virtual std::string SerialName() const { return "NEUR";}

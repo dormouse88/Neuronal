@@ -13,24 +13,27 @@
 class DeviceView : public GobjectView
 {
 public:
-    DeviceView(const Device & device_p)
+    DeviceView(std::shared_ptr<const Device> device_p)
         :GobjectView(device_p), device_m(device_p)
         {
-            targetPos = mapGridToCoords(device_m.GetPosition());
+            targetPos = mapGridToCoords(device_p->GetPosition());
             actualPos = targetPos;
         }
     virtual ~DeviceView() {}
     virtual void Draw(sf::RenderTarget & rt) = 0;
     void UpdatePos()
     {
-        targetPos = mapGridToCoords(device_m.GetPosition());
-        actualPos += (targetPos - actualPos) * 0.003f;
+        std::shared_ptr<const Device> m {device_m.lock()};
+        if (m) {
+            targetPos = mapGridToCoords(m->GetPosition());
+            actualPos += (targetPos - actualPos) * 0.003f;
+        }
     }
 protected:
     sf::Vector2f targetPos;
     sf::Vector2f actualPos;
 private:
-    const Device & device_m;
+    std::weak_ptr<const Device> device_m;
 };
 
 

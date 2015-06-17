@@ -11,7 +11,7 @@
 #include "Model.hpp"
 #include "View.hpp"
 #include "Controller.hpp"
-#include "Factory.hpp"
+#include "MVCFactory.hpp"
 
 class App
 {
@@ -22,7 +22,7 @@ private:
     Model model;
     View view;
     Controller controller;
-    std::shared_ptr<AbstractFactory> factory;
+    std::shared_ptr<FactoryBase> factory;
 };
 
 #endif	/* APP_HPP */

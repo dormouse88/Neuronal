@@ -23,7 +23,8 @@ public:
     View(Model & model_p);
     View(const View&) = delete;
     ~View() {}
-
+    void DebugInfo();
+    
     void ImportDevice(std::shared_ptr<DeviceView> device);
     void ExpelDevices();
     void ImportWire(std::shared_ptr<WireView> wire);

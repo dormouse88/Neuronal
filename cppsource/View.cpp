@@ -6,6 +6,7 @@
  */
 
 #include "View.hpp"
+#include <iostream>
 
 View::View(Model & model_p)
    :theModel(model_p),
@@ -19,6 +20,10 @@ View::View(Model & model_p)
     window.setView(mainView);
 }
 
+void View::DebugInfo()
+{
+    std::cout << "-VIEW: " << "DEVI: " << deviceViews.size() << ", WIRE: " << wireViews.size() << std::endl;
+}
 
 
 void View::ImportDevice(std::shared_ptr<DeviceView> device)

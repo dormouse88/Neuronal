@@ -8,8 +8,8 @@
 #include "Socket.hpp"
 #include "Wire.hpp"
 
-Socket::Socket(sf::Vector2i pos_p)
-    :Device(pos_p, 1)
+Socket::Socket(int serial, sf::Vector2i pos_p)
+    :Device(serial, pos_p, 1, -1)
 {}
 
 

@@ -16,7 +16,7 @@ class DeviceCon : public GobjectCon
 public:
     DeviceCon() :GobjectCon() {}
     virtual void Handle(int code) = 0;
-    virtual const Device& GetDevice() const = 0;
+    virtual std::shared_ptr<const Device> GetDevice() const = 0;
     virtual ~DeviceCon() {}
 };
 

@@ -11,6 +11,11 @@ Controller::Controller(Model & model_p, View & view_p)
     :theModel(model_p), theView(view_p), mouseCursorSet(false)
 {}
 
+void Controller::DebugInfo()
+{
+    std::cout << "--CONT: " << "DEVI: " << deviceCons.size() << ", WIRE: " << wireCons.size() << std::endl;
+}
+
 bool Controller::HandleInput()
 {
     //cursor selected objects...
@@ -74,7 +79,7 @@ bool Controller::HandleInput()
             if (event.key.code == sf::Keyboard::N)
             {
                 if (event.key.shift == false) {
-                    theFactory->AddNeuron( cursor1pos );
+                    theFactory->AddNeuron( 0, cursor1pos, 1 );
                 }
                 else {
                     theFactory->RemoveDevice( device1 );
@@ -82,13 +87,13 @@ bool Controller::HandleInput()
             }
             if (event.key.code == sf::Keyboard::H)
             {
-                theFactory->AddSocket( cursor1pos );
+                theFactory->AddSocket( 0, cursor1pos );
             }
             if (event.key.code == sf::Keyboard::B)
             {
                 if (event.key.shift == false) {
                     if (device1 != nullptr and device2 != nullptr) {
-                        theFactory->AddWire( *device1, *device2 );
+                        theFactory->AddWire( *device1, *device2, 1 );
                     }
                 }
                 else {
@@ -130,6 +135,12 @@ bool Controller::HandleInput()
             {
                 theModel.LoadXML();
             }
+            if (event.key.code == sf::Keyboard::E)
+            {
+                theModel.DebugInfo();
+                theView.DebugInfo();
+                DebugInfo();
+            }
             if (event.key.code == sf::Keyboard::Space)
             {
                 theModel.Logic();
@@ -161,14 +172,14 @@ bool Controller::HandleInput()
 std::shared_ptr<DeviceCon> Controller::GetDevice(std::shared_ptr<Device> d)
 {
     for (auto &c: deviceCons) {
-        if (*d == c->GetDevice()) return c;
+        if (d == c->GetDevice()) return c;
     }
     return nullptr;
 }
 std::shared_ptr<WireCon> Controller::GetWire(std::shared_ptr<Wire> w)
 {
     for (auto &c: wireCons) {
-        if (*w == c->GetWire()) return c;
+        if (w == c->GetWire()) return c;
     }
     return nullptr;
 }

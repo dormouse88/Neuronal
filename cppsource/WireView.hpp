@@ -16,11 +16,11 @@
 class WireView : public GobjectView
 {
 public:
-    WireView(const Wire & wire_p, const ViewResources & vRes_p);
+    WireView(std::shared_ptr<const Wire> wire_p, const ViewResources & vRes_p);
     virtual void Draw(sf::RenderTarget & rt);
-    virtual bool IsDead() const {return wire_m.IsDead();}
+    //virtual bool IsDead() const {return wire_m.IsDead();}
 private:
-    const Wire & wire_m;
+    std::weak_ptr<const Wire> wire_m;
     sf::Text weightText;
 };
 

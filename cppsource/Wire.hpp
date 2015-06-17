@@ -14,7 +14,7 @@ class Device;
 class Wire : public Gobject
 {
 public:
-    Wire(Device & from_p, Device & to_p);
+    Wire(Device & from_p, Device & to_p, signed weight_p);
     bool operator==(const Wire& rhs) const;
 
     void PushCharge();

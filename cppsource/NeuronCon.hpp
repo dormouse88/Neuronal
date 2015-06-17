@@ -8,20 +8,21 @@
 #ifndef NEURONCON_HPP
 #define	NEURONCON_HPP
 
+#include <memory>
 #include "DeviceCon.hpp"
 #include "Neuron.hpp"
 
 class NeuronCon : public DeviceCon
 {
 public:
-    NeuronCon(Neuron & neuron_p);
+    NeuronCon(std::shared_ptr<Neuron> neuron_p);
     virtual ~NeuronCon() {}
     
-    virtual const Device& GetDevice() const { return neuron_m; }
+    virtual std::shared_ptr<const Device> GetDevice() const { return neuron_m.lock(); }
     virtual void Handle(int code);
-    virtual bool IsDead() const {return neuron_m.IsDead();}
+    virtual bool IsDead() const { std::shared_ptr<const Neuron> sh {neuron_m.lock() } ; if (!sh) return true; return sh->IsDead();}
 private:
-    Neuron & neuron_m;
+    std::weak_ptr<Neuron> neuron_m;
 };
 
 #endif	/* NEURONCON_HPP */

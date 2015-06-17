@@ -3,14 +3,20 @@
 	Cheese
 </FIRE>
 <PLAN>
-	<NEUR x="-1" y="5" />
-	<NEUR x="2" y="5" />
-	<NEUR x="0" y="5" />
-	<SOCK x="-1" y="2" />
-	<SOCK x="1" y="4" />
-	<SOCK x="2" y="0" />
-	<SOCK x="4" y="3" />
-	<SOCK x="0" y="3" />
-	<SOCK x="1" y="1" />
-	<SOCK x="3" y="4" />
+	<NEUR x="-2" y="4" thr="1" i="3" />
+	<NEUR x="2" y="2" thr="2" i="4" />
+	<NEUR x="3" y="1" thr="4" i="5" />
+	<NEUR x="4" y="2" thr="0" i="6" />
+	<NEUR x="-1" y="2" thr="4" i="7" />
+	<NEUR x="0" y="0" thr="6" i="1" />
+	<NEUR x="1" y="1" thr="-1" i="2" />
+	<WIRE f="3" t="4" w="1" />
+	<WIRE f="4" t="5" w="4" />
+	<WIRE f="5" t="6" w="1" />
+	<WIRE f="6" t="3" w="1" />
+	<WIRE f="7" t="2" w="-2" />
+	<WIRE f="1" t="2" w="3" />
+	<WIRE f="3" t="7" w="4" />
+	<WIRE f="7" t="1" w="1" />
+	<WIRE f="2" t="4" w="1" />
 </PLAN>

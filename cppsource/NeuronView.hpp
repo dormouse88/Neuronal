@@ -13,15 +13,17 @@
 #include "ViewResources.hpp"
 #include "DeviceView.hpp"
 
+#include <iostream>
+
 class NeuronView : public DeviceView
 {
 public:
-    NeuronView(const Neuron & neuron_p, const ViewResources & vRes_p);
-    virtual ~NeuronView() {}
+    NeuronView(std::shared_ptr<const Neuron> neuron_p, const ViewResources & vRes_p);
+    virtual ~NeuronView() { std::cout << "NVIEW KILLED" << std::endl; }
     virtual void Draw(sf::RenderTarget & rt);
-    virtual bool IsDead() const {return neuron_m.IsDead();}
+    //virtual bool IsDead() const {return neuron_m.IsDead();}
 private:
-    const Neuron & neuron_m;
+    std::weak_ptr<const Neuron> neuron_m;
     sf::RectangleShape shape;
     sf::Text thresholdText;
 };

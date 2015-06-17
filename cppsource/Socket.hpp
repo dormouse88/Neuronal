@@ -13,7 +13,7 @@
 class Socket : public Device
 {
 public:
-    Socket(sf::Vector2i pos_p);
+    Socket(int serial, sf::Vector2i pos_p);
     virtual ~Socket() {;}
 
     virtual std::string SerialName() const { return "SOCK";}

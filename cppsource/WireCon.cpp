@@ -7,12 +7,15 @@
 
 #include "WireCon.hpp"
 
-WireCon::WireCon(Wire & wire_p)
+WireCon::WireCon(std::shared_ptr<Wire> wire_p)
     :wire_m(wire_p)
 {}
 
 void WireCon::Handle(int code)
 {
-    if (code == 1) { wire_m.SetWeight( wire_m.GetWeight() + 1); }
-    if (code == 2) { wire_m.SetWeight( wire_m.GetWeight() - 1); }
+    std::shared_ptr<Wire> m {wire_m.lock()};
+    if (m) {
+        if (code == 1) { m->SetWeight( m->GetWeight() + 1); }
+        if (code == 2) { m->SetWeight( m->GetWeight() - 1); }
+    }
 }

@@ -8,16 +8,29 @@
 #ifndef GOBJECTVIEW_HPP
 #define	GOBJECTVIEW_HPP
 
+#include <memory>
 #include "Gobject.hpp"
+
+#include <iostream>
 
 class GobjectView
 {
 public:
-    GobjectView(const Gobject & gobject_p) :gobject_m(gobject_p) {}
-    virtual bool IsDead() const = 0;
+    GobjectView(std::shared_ptr<const Gobject> gobject_p)
+        :gobject_m(gobject_p)
+    {}
+    bool IsDead()
+    {
+        auto sh = gobject_m.lock(); std::cout << "-" << sh;
+        if (sh) {
+            std::cout << ">" << sh->IsDead();
+            if (sh->IsDead() == false) return false;
+        }
+        return true;
+    }
     virtual ~GobjectView() {}
 private:
-    const Gobject & gobject_m;
+    std::weak_ptr<const Gobject> gobject_m;
 };
 
 

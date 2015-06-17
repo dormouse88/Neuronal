@@ -13,6 +13,11 @@ Model::Model()
     theSerializer = std::make_shared<Serializer> ();
 }
 
+void Model::DebugInfo()
+{
+    std::cout << "MODL: " << "DEVI: " << devices.size() << ", WIRE: " << wires.size() << std::endl;
+}
+
 void Model::Logic()
 {
     for (auto & w : wires) {
@@ -25,11 +30,12 @@ void Model::Logic()
         d->PushCharge();
     }
     std::cout << "Vector sizes: " << devices.size() << "  " << wires.size() << std::endl;
+    theFactory->ExpelDead();
 }
 
 void Model::SaveXML()
 {
-    theSerializer->SaveFile(devices);
+    theSerializer->SaveFile(devices, wires);
 }
 void Model::LoadXML()
 {
@@ -47,6 +53,20 @@ void Model::SetPosition( Device & d, sf::Vector2i newPos )
     if (posFree) d.SetPosition( newPos );
 }
 
+int Model::GetFreeSerial() const
+{
+    for (int i = 1; true; i++)
+    {
+        if (IsSerialFree(i)) return i;
+    }
+}
+bool Model::IsSerialFree(int serial) const
+{
+    for (const auto & x : devices) {
+        if (x->GetSerial() == serial) return false;
+    }
+    return true;
+}
 bool Model::IsPositionFree(sf::Vector2i pos) const
 {
     for (const auto & x : devices) {
@@ -62,6 +82,11 @@ bool Model::IsWiringFree(Device & from, Device & to) const
     return true;
 }
 
+void Model::ClearEverything()
+{
+    wires.clear();
+    devices.clear();
+}
 void Model::ImportDevice(std::shared_ptr<Device> device)
 {
     devices.emplace_back(device);
@@ -91,6 +116,14 @@ std::shared_ptr<Device> Model::GetDevice(sf::Vector2i pos)
         }
     }
     return nullptr;
+}
+std::shared_ptr<Device> Model::GetDevice(int serial)
+{
+    for (auto & x: devices) {
+        if (serial == x->GetSerial()) {
+            return x;
+        }
+    }
 }
 std::shared_ptr<Wire> Model::GetWire(const Device& from, const Device& to)
 {

@@ -16,12 +16,12 @@
 class SocketView : public DeviceView
 {
 public:
-    SocketView(const Socket & socket_p, const ViewResources & vRes_p);
+    SocketView(std::shared_ptr<const Socket> socket_p, const ViewResources & vRes_p);
     virtual ~SocketView() {}
     virtual void Draw(sf::RenderTarget & rt);
-    virtual bool IsDead() const {return socket_m.IsDead();}
+    //virtual bool IsDead() const {return socket_m.IsDead();}
 private:
-    const Socket & socket_m;
+    std::weak_ptr<const Socket> socket_m;
     sf::CircleShape shape;
 };
 

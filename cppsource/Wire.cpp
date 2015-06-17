@@ -8,8 +8,8 @@
 #include "Wire.hpp"
 #include "Device.hpp" //to get its position
 
-Wire::Wire(Device & from_p, Device & to_p)
-    :from(from_p), to(to_p), weight(1), firing(false)
+Wire::Wire(Device & from_p, Device & to_p, signed weight_p)
+    :from(from_p), to(to_p), weight(weight_p), firing(false)
 {}
 
 bool Wire::operator==(const Wire& rhs) const

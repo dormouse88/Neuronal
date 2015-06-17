@@ -10,7 +10,7 @@
 
 #include "Model.hpp"
 #include "View.hpp"
-#include "AbstractFactory.hpp"
+#include "FactoryBase.hpp"
 #include "DeviceCon.hpp"
 #include "WireCon.hpp"
 
@@ -19,8 +19,9 @@ class Controller
 public:
     Controller(Model & model_p, View & view_p);
     Controller(const Controller&) = delete;
+    void DebugInfo();
     bool HandleInput();
-    void SetFactory(std::shared_ptr<AbstractFactory> f) {theFactory = f;}
+    void SetFactory(std::shared_ptr<FactoryBase> f) {theFactory = f;}
 
     std::shared_ptr<DeviceCon> GetDevice(std::shared_ptr<Device> d);
     std::shared_ptr<WireCon> GetWire(std::shared_ptr<Wire> w);
@@ -32,7 +33,7 @@ public:
 private:
     Model & theModel;
     View & theView;
-    std::shared_ptr<AbstractFactory> theFactory;
+    std::shared_ptr<FactoryBase> theFactory;
 
     std::vector<std::shared_ptr<DeviceCon> > deviceCons;
     std::vector<std::shared_ptr<WireCon> > wireCons;    

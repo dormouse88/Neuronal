@@ -8,10 +8,8 @@
 #include "Neuron.hpp"
 #include "Wire.hpp"
 
-const int INITIAL_THRESHOLD = 1;
-
-Neuron::Neuron(sf::Vector2i pos_p)
-    :Device(pos_p), threshold(INITIAL_THRESHOLD), receivedCharge(0)
+Neuron::Neuron(int serial_p, sf::Vector2i pos_p, int threshold_p)
+    :Device(serial_p, pos_p), threshold(threshold_p), receivedCharge(0)
 {}
 
 void Neuron::ReceiveCharge(int weight)

@@ -8,20 +8,21 @@
 #ifndef WIRECON_HPP
 #define	WIRECON_HPP
 
+#include <memory>
 #include "GobjectCon.hpp"
 #include "Wire.hpp"
 
 class WireCon : public GobjectCon
 {
 public:
-    WireCon(Wire & wire_p);
+    WireCon(std::shared_ptr<Wire> wire_p);
     virtual ~WireCon() {}
 
     virtual void Handle(int code);
-    virtual const Wire& GetWire() const { return wire_m; }
-    virtual bool IsDead() const {return wire_m.IsDead();}
+    virtual std::shared_ptr<const Wire> GetWire() const { return wire_m.lock(); }
+    virtual bool IsDead() const { std::shared_ptr<const Wire> sh {wire_m.lock() } ; if (!sh) return true; return sh->IsDead();}
 private:
-    Wire & wire_m;
+    std::weak_ptr<Wire> wire_m;
 };
 
 #endif	/* WIRECON_HPP */

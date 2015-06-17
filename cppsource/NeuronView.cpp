@@ -15,7 +15,7 @@ const sf::Vector2f NEURON_OFFSET { (GRID_SIZE - NEURON_SIZE)/2.f };
 const sf::Vector2f THRESHOLD_OFFSET { NEURON_OFFSET.x + 18.f, NEURON_OFFSET.y + 2.f };
 
 
-NeuronView::NeuronView(const Neuron & neuron_p, const ViewResources & vRes_p)
+NeuronView::NeuronView(std::shared_ptr<const Neuron> neuron_p, const ViewResources & vRes_p)
     :DeviceView(neuron_p),
      neuron_m(neuron_p),
      shape( NEURON_SIZE )
@@ -31,16 +31,19 @@ NeuronView::NeuronView(const Neuron & neuron_p, const ViewResources & vRes_p)
 
 void NeuronView::Draw(sf::RenderTarget & rt)
 {
-    UpdatePos();
-    shape.setPosition( actualPos + NEURON_OFFSET );
-    if (neuron_m.GetFiring()) shape.setFillColor(sf::Color::Green);
-    else shape.setFillColor(sf::Color::Blue);
-    rt.draw(shape);
+    std::shared_ptr<const Neuron> m {neuron_m.lock()};
+    if (m) {
+        UpdatePos();
+        shape.setPosition( actualPos + NEURON_OFFSET );
+        if (m->GetFiring()) shape.setFillColor(sf::Color::Green);
+        else shape.setFillColor(sf::Color::Blue);
+        rt.draw(shape);
 
-        //I would've used std::to_string() here but for a MinGW bug
-        std::ostringstream ss;
-        ss << neuron_m.GetThreshold();
-    thresholdText.setString(ss.str());
-    thresholdText.setPosition( actualPos + THRESHOLD_OFFSET );
-    rt.draw(thresholdText);
+            //I would've used std::to_string() here but for a MinGW bug
+            std::ostringstream ss;
+            ss << m->GetThreshold();
+        thresholdText.setString(ss.str());
+        thresholdText.setPosition( actualPos + THRESHOLD_OFFSET );
+        rt.draw(thresholdText);
+    }
 }
