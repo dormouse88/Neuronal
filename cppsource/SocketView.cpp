@@ -23,8 +23,7 @@ void SocketView::Draw(sf::RenderTarget & rt)
     if (m) {
         UpdatePos();
         shape.setPosition( actualPos + SOCKET_OFFSET );
-        if (m->GetFiring()) shape.setFillColor(sf::Color::Green);
-        else shape.setFillColor(sf::Color::Blue);
+        shape.setFillColor(sf::Color::Black);
         rt.draw(shape);
     }
 }

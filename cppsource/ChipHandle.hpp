@@ -9,26 +9,24 @@
 #define	CHIPHANDLE_HPP
 
 #include <memory>
-#include <vector>
 #include <string>
-#include <SFML/System.hpp>  //for sf::Vector
-#include "Gobject.hpp"
+
+#include "Device.hpp"
+#include "Wirable.hpp"
 #include "ChipPlan.hpp"
 
-class ChipHandle : public Gobject
+class ChipHandle : public Device
 {
 public:
-    ChipHandle(int serial_p, sf::Vector2i pos_p) :pos(pos_p), serial(serial_p) {}
+    ChipHandle(int serial_p, sf::Vector2i pos_p) :Device(serial_p, pos_p) {}
     virtual ~ChipHandle() {}
-    bool operator==(const ChipHandle& rhs) const    { return this == &rhs; }
-
-    sf::Vector2i GetPosition() const            {return pos;}
-    void SetPosition(sf::Vector2i p)            {pos = p;}
-    int GetSerial() const                       {return serial;}
+    virtual std::string SerialName() const { return "HAND";}
+    virtual void ReceiveCharge(bool charge, int weight, int slot);
+    void StepOut(bool charge, int slot);
+    virtual void LogicAct();
+    virtual void LogicCalculate();
 
 private:
-    int serial;
-    sf::Vector2i pos;
     std::shared_ptr<ChipPlan> plan;
 };
 

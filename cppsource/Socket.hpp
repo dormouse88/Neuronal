@@ -9,6 +9,7 @@
 #define	SOCKET_HPP
 
 #include "Device.hpp"
+#include "Wirable.hpp"
 
 class Socket : public Device
 {
@@ -17,9 +18,8 @@ public:
     virtual ~Socket() {;}
 
     virtual std::string SerialName() const { return "SOCK";}
-    virtual bool IsInstant() {return true;}
-    virtual void ReceiveCharge(int weight);
-    virtual void PushCharge();
+    virtual void ReceiveCharge(bool charge, int weight, int slot);
+    virtual bool CanRegisterIn(int slot) const;
 private:
 };
 

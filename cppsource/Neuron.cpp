@@ -9,24 +9,20 @@
 #include "Wire.hpp"
 
 Neuron::Neuron(int serial_p, sf::Vector2i pos_p, int threshold_p)
-    :Device(serial_p, pos_p), threshold(threshold_p), receivedCharge(0)
+    :Device(serial_p, pos_p), firing(false), threshold(threshold_p), receivedCharge(0)
 {}
 
-void Neuron::ReceiveCharge(int weight)
+void Neuron::ReceiveCharge(bool charge, int weight, int slot)
 {
-    receivedCharge += weight;
+    if (charge) receivedCharge += weight;
 }
 
-void Neuron::PushCharge()
+void Neuron::LogicAct()
 {
-    for (auto & w: outWires)
-    {
-        if (auto notDead = w.lock())
-            notDead->ReceiveCharge(GetFiring());
-    }
+    PushCharge(GetFiring(), 0);
 }
 
-void Neuron::CalculateFiring()
+void Neuron::LogicCalculate()
 {
     if (receivedCharge >= threshold) SetFiring(true);
     else SetFiring(false);

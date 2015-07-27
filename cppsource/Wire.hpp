@@ -9,27 +9,30 @@
 #define	WIRE_HPP
 
 #include "Gobject.hpp"
-class Device;
+class Wirable;
 
 class Wire : public Gobject
 {
 public:
-    Wire(Device & from_p, Device & to_p, signed weight_p);
+    Wire(Wirable & from_p, Wirable & to_p, signed weight_p);
     bool operator==(const Wire& rhs) const;
 
-    void PushCharge();
     void ReceiveCharge(bool f);
     
     bool GetFiring() const {return firing;}
     int GetWeight() const {return weight;}
     void SetWeight(int w) {weight = w;}
 
-    const Device& GetFrom() const {return from; }
-    const Device& GetTo() const {return to; }
+    const Wirable& GetFrom() const {return from; }
+    const int GetFromSlot() const {return fromSlot; }
+    const Wirable& GetTo() const {return to; }
+    const int GetToSlot() const {return toSlot; }
     
 private:
-    Device& from;
-    Device& to;
+    Wirable& from;
+    int fromSlot;
+    Wirable& to;
+    int toSlot;
     signed weight;
     bool firing;
 };

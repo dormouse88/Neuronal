@@ -9,21 +9,43 @@
 #include "Wire.hpp"
 
 Socket::Socket(int serial, sf::Vector2i pos_p)
-    :Device(serial, pos_p, 1, -1)
+    :Device(serial, pos_p)
 {}
 
-
-void Socket::ReceiveCharge(int weight)
+void Socket::ReceiveCharge(bool charge, int weight, int slot)
 {
-    SetFiring(weight);
-    PushCharge();
+    PushCharge(charge, 0);
 }
 
-void Socket::PushCharge()
+bool Socket::CanRegisterIn(int slot) const
 {
-    for (auto & w: outWires)
-    {
-        if (auto notDead = w.lock())
-            notDead->ReceiveCharge(GetFiring());
-    }
+    CleanWireVectors();
+    return inWires.size() == 0 ? true : false;
 }
+
+
+//Gonna try having ChipPlan inherit from Wirable and not bother with these classes...
+
+//class BeginBar : public Device, public Wirable
+//{
+//public:
+//    virtual bool CanRegisterIn(int slot) const { return false; }
+//    virtual void ReceiveCharge(bool charge, int weight, int slot) { throw; }
+//    void BeginCharge(bool charge, int slot);
+//};
+//void BeginBar::BeginCharge(bool charge, int slot)
+//{
+//    PushCharge(charge, slot);
+//}
+//
+//class EndBar : public Device, public Wirable
+//{
+//public:
+//    virtual bool CanRegisterOut(int slot) const { return false; }
+//    virtual void ReceiveCharge(bool charge, int weight, int slot);
+//};
+//void EndBar::ReceiveCharge(bool charge, int weight, int slot)
+//{
+//    plan->EndCharge(charge, slot);
+//}
+

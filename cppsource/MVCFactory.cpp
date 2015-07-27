@@ -71,9 +71,28 @@ void MVCFactory::RemoveDevice(std::shared_ptr<Device> device)
     }
 }
 
-void MVCFactory::AddWire(Device & from, Device & to, signed weight)
+void MVCFactory::AddHandle(int serial, sf::Vector2i pos)
 {
-    if (model.IsWiringFree(from, to) and from.CanAcceptOutput() and to.CanAcceptInput())
+    if (serial == 0) serial = model.GetFreeSerial();
+    if (model.IsPositionFree(pos) and model.IsSerialFree(serial))
+    {
+        //auto mp = std::make_shared<ChipHandle> (serial, pos);
+        //model.ImportDevice(mp);
+//        auto vp = std::make_shared<NeuronView> (mp, vRes);
+//        view.ImportDevice(vp);
+//        auto cp = std::make_shared<NeuronCon> (mp);
+//        controller.ImportDevice(cp);
+    }
+}
+
+void MVCFactory::AddPlan()
+{
+    //auto mp = std::make_shared<ChipPlan> ();
+}
+
+void MVCFactory::AddWire(Wirable & from, int fromSlot, Wirable & to, int toSlot, signed weight)
+{
+    if (model.IsWiringFree(from, fromSlot, to, toSlot) and from.CanRegisterOut(fromSlot) and to.CanRegisterIn(toSlot)) //change IsWiringFree() to include fromSlot and toSlot parameters
     {
         auto mp = std::make_shared<Wire> (from, to, weight);
         from.RegisterOut(mp);
@@ -85,12 +104,12 @@ void MVCFactory::AddWire(Device & from, Device & to, signed weight)
         controller.ImportWire(cp);
     }
 }
-void MVCFactory::AddWire(int from, int to, signed weight)
-{
-    auto f = model.GetDevice(from);
-    auto t = model.GetDevice(to);
-    if (f && t) AddWire(*f, *t, weight);
-}
+//void MVCFactory::AddWire(int from, int fromSlot, int to, int toSlot, signed weight)
+//{
+//    auto f = model.GetDevice(from);
+//    auto t = model.GetDevice(to);
+//    if (f && t) AddWire(*f, fromSlot, *t, toSlot, weight);
+//}
 void MVCFactory::RemoveWire(std::shared_ptr<Wire> wire)
 {
     if (wire != nullptr) {

@@ -27,8 +27,10 @@ public:
     virtual void AddNeuron(int serial, sf::Vector2i pos, int threshold);
     virtual void AddSocket(int serial, sf::Vector2i pos);
     virtual void RemoveDevice(std::shared_ptr<Device> device);
-    virtual void AddWire(Device & from, Device & to, signed weight);
-    virtual void AddWire(int from, int to, signed weight);
+    virtual void AddHandle(int serial, sf::Vector2i pos);
+    virtual void AddPlan();
+    virtual void AddWire(Wirable & from, int fromSlot, Wirable & to, int toSlot, signed weight);
+    //virtual void AddWire(int from, int fromSlot, int to, int toSlot, signed weight);
     virtual void RemoveWire(std::shared_ptr<Wire> wire);
 private:
     Model & model;
