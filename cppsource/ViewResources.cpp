@@ -12,6 +12,13 @@ ViewResources::ViewResources()
     font.loadFromFile("resources/sansation.ttf");
 }
 
+const ViewResources & ViewResources::GetInstance()
+{
+    static ViewResources * instance = new ViewResources();
+    return *instance;
+}
+
+
 
 //Helper Functions
 sf::Vector2i mapCoordsToGrid(const sf::Vector2f & point)

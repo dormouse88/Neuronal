@@ -8,8 +8,24 @@
 #ifndef NEURON_HPP
 #define	NEURON_HPP
 
+#include <SFML/Graphics.hpp>
+#include "ViewResources.hpp"
 #include "Device.hpp"
-#include "Wirable.hpp"
+class Neuron;
+
+class NeuronView : public DeviceView
+{
+public:
+    NeuronView(const Neuron & n);
+    virtual ~NeuronView() {}
+
+    void Draw(sf::RenderTarget & rt, const Neuron & n);
+private:
+    sf::RectangleShape shape;
+    sf::Text thresholdText;
+};
+
+
 
 class Neuron : public Device
 {
@@ -27,10 +43,15 @@ public:
     int GetThreshold() const {return threshold;}
     void ModifyThreshold(int v) {threshold += v;}
 
+    virtual sf::Vector2f GetWireAttachPos(WireAttachSide was) const override;
+    virtual void Draw(sf::RenderTarget & rt) override;
+    virtual void Handle(int code) override;
+    
 private:
     bool firing;
     int threshold;
     int receivedCharge;
+    NeuronView v;
 };
 
 #endif	/* NEURON_HPP */

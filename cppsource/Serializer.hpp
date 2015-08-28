@@ -11,21 +11,22 @@
 #include <memory>
 #include <vector>
 #include "../external/pugixml-1.6/src/pugixml.hpp"
-#include "FactoryBase.hpp"
+#include "BlobFactory.hpp"
 #include "Device.hpp"
 #include "Wire.hpp"
+#include "ChipPlan.hpp"
 
 class Serializer
 {
 public:
     Serializer();
     ~Serializer() {}
-    void SaveFile(std::vector<std::shared_ptr<Device> > &devices, std::vector<std::shared_ptr<Wire> > &wires);
-    void LoadFile(std::shared_ptr<FactoryBase> factory_p);
+    void SaveFile(std::shared_ptr<ChipPlan> plan);
+    void LoadFile(BlobFactory & factory_p, int planID);
 private:
     void OpenFile(pugi::xml_document & doc);
-    void SaveNode(pugi::xml_node & doc, std::vector<std::shared_ptr<Device> > &devices, std::vector<std::shared_ptr<Wire> > &wires);
-    void LoadNode(pugi::xml_node & doc, std::shared_ptr<FactoryBase> factory);
+    void SaveNode(pugi::xml_node & doc, std::shared_ptr<ChipPlan> plan_p);
+    void LoadNode(pugi::xml_node & doc, BlobFactory & factory_p, int planID);
 };
 
 #endif	/* SERIALIZER_HPP */

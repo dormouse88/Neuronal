@@ -7,30 +7,41 @@
 
 #include "Controller.hpp"
 
-Controller::Controller(Model & model_p, View & view_p)
-    :theModel(model_p), theView(view_p), mouseCursorSet(false)
+Controller::Controller(BlobFactory & factory_p, Model & model_p, View & view_p)
+    :theFactory(factory_p), theModel(model_p), theView(view_p), mouseCursorSet(false)
 {}
 
 void Controller::DebugInfo()
 {
-    std::cout << "--CONT: " << "DEVI: " << deviceCons.size() << ", WIRE: " << wireCons.size() << std::endl;
+    //std::cout << "--CONT: " << "DEVI: " << deviceCons.size() << ", WIRE: " << wireCons.size() << std::endl;
 }
 
 bool Controller::HandleInput()
 {
-    //cursor selected objects...
-    sf::Vector2i cursor1pos = mapCoordsToGrid(theView.GetCursorOnePos());
-    sf::Vector2i cursor2pos = mapCoordsToGrid(theView.GetCursorTwoPos());
-    std::shared_ptr<Device> device1 = theModel.GetDevice( cursor1pos );
-    std::shared_ptr<Device> device2 = theModel.GetDevice( cursor2pos );
-    std::shared_ptr<DeviceCon> dc1 = nullptr;
-    if (device1) dc1 = GetDevice(device1);
-    std::shared_ptr<DeviceCon> dc2 = nullptr;
-    if (device2) dc2 = GetDevice(device2);
+    std::shared_ptr<sf::Vector2i> pos1 = nullptr;
+    std::shared_ptr<sf::Vector2i> pos2 = nullptr;
+    std::shared_ptr<Device> device1 = nullptr;
+    std::shared_ptr<Device> device2 = nullptr;
     std::shared_ptr<Wire> wire1 = nullptr;
-    if (device1 and device2) wire1 = theModel.GetWire(*device1, *device2);
-    std::shared_ptr<WireCon> wc1 = nullptr;
-    if (wire1) wc1 = GetWire(wire1);
+    //Update handles...
+    auto activePlan = theView.GetActivePlan().lock();
+    if (activePlan) {
+        if (theView.cursorOne.active) {
+            pos1 = std::make_shared<sf::Vector2i> ( theView.cursorOne.GetGridPos() );
+        }
+        if (theView.cursorTwo.active) {
+            pos2 = std::make_shared<sf::Vector2i> ( theView.cursorTwo.GetGridPos() );
+        }
+        if (pos1) {
+            device1 = activePlan->GetDevice( *pos1 );
+        }
+        if (pos2) {
+            device2 = activePlan->GetDevice( *pos2 );
+        }
+        if (device1 and device2) {
+            wire1 = activePlan->GetWire(*device1, *device2);
+        }
+    }
     
     bool quitYet = false;
     sf::Event event;
@@ -51,13 +62,13 @@ bool Controller::HandleInput()
             {
                 sf::Vector2i pixelPos(event.mouseButton.x, event.mouseButton.y);
                 sf::Vector2f worldPos = theView.GetWindow().mapPixelToCoords(pixelPos);
-                theView.SetCursorOnePos(worldPos);
+                theView.cursorOne.SetWorldPos(worldPos);
             }
             if (event.mouseButton.button == sf::Mouse::Right)
             {
                 sf::Vector2i pixelPos(event.mouseButton.x, event.mouseButton.y);
                 sf::Vector2f worldPos = theView.GetWindow().mapPixelToCoords(pixelPos);
-                theView.SetCursorTwoPos(worldPos);
+                theView.cursorTwo.SetWorldPos(worldPos);
             }
         }
         if (event.type == sf::Event::MouseWheelMoved)
@@ -79,61 +90,51 @@ bool Controller::HandleInput()
             if (event.key.code == sf::Keyboard::N)
             {
                 if (event.key.shift == false) {
-                    theFactory->AddNeuron( 0, cursor1pos, 1 );
+                    if (pos1) theFactory.AddNeuron(activePlan, 0, *pos1, 1 );
                 }
                 else {
-                    theFactory->RemoveDevice( device1 );
+                    if (device1) theFactory.RemoveDevice(activePlan, device1);
                 }
+            }
+            if (event.key.code == sf::Keyboard::J)
+            {
+                if (pos1) theFactory.AddSocket(activePlan, 0, *pos1 );
             }
             if (event.key.code == sf::Keyboard::H)
             {
-                theFactory->AddSocket( 0, cursor1pos );
+                if (pos1) theFactory.AddHandle(activePlan, 0, *pos1 );
             }
             if (event.key.code == sf::Keyboard::B)
             {
                 if (event.key.shift == false) {
-                    if (device1 != nullptr and device2 != nullptr) {
-                        theFactory->AddWire( *device1, *device2, 1 );
-                    }
+                    if (device1 and device2) theFactory.AddWire(activePlan, *device1, 0, *device2, 0, 1 ); //hack (fromSlot + toSlot zeroed)
                 }
                 else {
-                    if (wire1 != nullptr) {
-                        theFactory->RemoveWire( wire1 );
-                    }
+                    if (wire1) theFactory.RemoveWire(activePlan, wire1 );
                 }
             }
             if (event.key.code == sf::Keyboard::A) {
-                if (dc1 != nullptr) {
-                    dc1->Handle(1);
-                }
+                if (device1) device1->Handle(1);
             }
             if (event.key.code == sf::Keyboard::Z) {
-                if (dc1 != nullptr) {
-                    dc1->Handle(2);
-                }
+                if (device1) device1->Handle(2);
             }
             if (event.key.code == sf::Keyboard::S) {
-                if (wc1 != nullptr) {
-                    wc1->Handle(1);
-                }
+                if (wire1) wire1->Handle(1);
             }
             if (event.key.code == sf::Keyboard::X) {
-                if (wc1 != nullptr) {
-                    wc1->Handle(2);
-                }
+                if (wire1) wire1->Handle(2);
             }
             if (event.key.code == sf::Keyboard::M) {
-                if (device1 != nullptr) {
-                    theModel.SetPosition( *device1, cursor2pos );
-                }
+                if (device1 and pos2) activePlan->SetPosition( *device1, *pos2 );
             }
             if (event.key.code == sf::Keyboard::Q)
             {
-                theModel.SaveXML();
+                //theSerializer->Save(activePlan);
             }
             if (event.key.code == sf::Keyboard::W)
             {
-                theModel.LoadXML();
+                //theSerializer->Load(activePlan);
             }
             if (event.key.code == sf::Keyboard::E)
             {
@@ -168,40 +169,32 @@ bool Controller::HandleInput()
     return quitYet;
 }
 
-
-std::shared_ptr<DeviceCon> Controller::GetDevice(std::shared_ptr<Device> d)
-{
-    for (auto &c: deviceCons) {
-        if (d == c->GetDevice()) return c;
-    }
-    return nullptr;
-}
-std::shared_ptr<WireCon> Controller::GetWire(std::shared_ptr<Wire> w)
-{
-    for (auto &c: wireCons) {
-        if (w == c->GetWire()) return c;
-    }
-    return nullptr;
-}
-
-
-void Controller::ImportDevice(std::shared_ptr<DeviceCon> device)
-{
-    deviceCons.emplace_back(device);
-}
-void Controller::ExpelDevices()
-{
-    auto return_func = [] (std::shared_ptr<DeviceCon> eachDevice) {return eachDevice->IsDead();};
-    auto new_end = std::remove_if(std::begin(deviceCons), std::end(deviceCons), return_func );
-    deviceCons.erase(new_end, std::end(deviceCons) );
-}
-void Controller::ImportWire(std::shared_ptr<WireCon> wire)
-{
-    wireCons.emplace_back(wire);
-}
-void Controller::ExpelWires()
-{
-    auto remove_func = [] (std::shared_ptr<WireCon> eachWire) {return eachWire->IsDead();};
-    auto new_end = std::remove_if(std::begin(wireCons), std::end(wireCons), remove_func);
-    wireCons.erase(new_end, std::end(wireCons) );
-}
+//if (plan)
+//{
+//    saveXML
+//    if (pos1)
+//    {
+//        device-add
+//        if (device1)
+//        {
+//            device-del
+//            device-mod
+//            loadXML;
+//            if (pos2)
+//            {
+//                move
+//                if (device2)
+//                {
+//                    add-wire
+//                    if (wire1)
+//                    {
+//                        wire-del
+//                        wire-mod
+//                    }//wire1
+//                }//device2
+//            }//pos2
+//        }//device1
+//    }//pos1
+//}//plan
+//logic
+//debug

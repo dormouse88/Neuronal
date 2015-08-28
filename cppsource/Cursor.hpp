@@ -10,18 +10,23 @@
 
 #include <SFML/Graphics.hpp>
 #include "ViewResources.hpp"
-//#include "Neuron.cpp"//
 
 class Cursor
 {
 public:
     Cursor(sf::Color color = sf::Color::Yellow);
     void Draw(sf::RenderTarget & rt);
-    sf::Vector2f GetPos() const { return representation.getPosition(); }
-    void SetPos(sf::Vector2f p) { representation.setPosition(p); }
+
+    sf::Vector2f GetWorldPos() const { if (!active) throw; return mapGridToCoords(m_pos); }
+    sf::Vector2i GetGridPos() const { if (!active) throw; return m_pos; }
+    void SetWorldPos(sf::Vector2f worldPos) { m_pos = mapCoordsToGrid(worldPos); active=true;}
+    void SetGridPos(sf::Vector2i gridPos) { m_pos = gridPos; active=true;}
+
 private:
+    sf::Vector2i m_pos;
     sf::RectangleShape representation;
-    //Neuron * neuron;//
+public:
+    bool active;
 };
 
 #endif	/* CURSOR_HPP */

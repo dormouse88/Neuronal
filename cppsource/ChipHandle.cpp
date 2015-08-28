@@ -7,11 +7,25 @@
 
 #include "ChipHandle.hpp"
 
-//ChipHandle::ChipHandle() {}
+const sf::Vector2f RECTANGLE { 90.f, 65.f };
+const sf::Vector2f MAIN_OFFSET { (GRID_SIZE - RECTANGLE)/2.f };
+const sf::Vector2f THRESHOLD_OFFSET { MAIN_OFFSET.x + 18.f, MAIN_OFFSET.y + 2.f };
+
+const sf::Vector2f WIRE_IN_OFFSET { MAIN_OFFSET };
+const sf::Vector2f WIRE_OUT_OFFSET { MAIN_OFFSET + RECTANGLE };
+
+
+ChipHandle::ChipHandle(int serial_p, sf::Vector2i pos_p)
+    :Device(serial_p, pos_p), DeviceView( GetWorldPos() ), shape( RECTANGLE )
+{
+    shape.setOutlineColor(sf::Color::White);
+    shape.setOutlineThickness(3);
+}
+
 
 void ChipHandle::ReceiveCharge(bool charge, int weight, int slot)
 {
-    plan->StepIn(charge, slot);
+    if (plan) plan->StepIn(charge, slot);
 }
 
 void ChipHandle::StepOut(bool charge, int slot)
@@ -21,10 +35,37 @@ void ChipHandle::StepOut(bool charge, int slot)
 
 void ChipHandle::LogicAct()
 {
-    plan->PassOnAct();
+    if (plan) plan->PassOnAct();
 }
 void ChipHandle::LogicCalculate()
 {
-    plan->PassOnCalculate();
+    if (plan) plan->PassOnCalculate();
 }
 
+
+sf::Vector2f ChipHandle::GetWireAttachPos(WireAttachSide was) const
+{
+    sf::Vector2f wirePos;
+    if (was == WireAttachSide::IN) {
+        wirePos = GetWorldPos() + WIRE_IN_OFFSET;
+    }
+    else {
+        wirePos = GetWorldPos() + WIRE_OUT_OFFSET;
+    }
+    return wirePos;
+}
+
+void ChipHandle::Draw(sf::RenderTarget & rt)
+{
+    UpdatePos(GetWorldPos());
+    shape.setPosition( actualPos + MAIN_OFFSET );
+    shape.setFillColor(sf::Color::Yellow);
+    rt.draw(shape);
+}
+
+void ChipHandle::Handle(int code)
+{
+    if (code == 1) {
+        ;
+    }
+}

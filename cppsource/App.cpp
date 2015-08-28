@@ -9,14 +9,12 @@
 #include <iostream> //del
 
 App::App()
-    :model(),
+    :factory(),
+    serializer(),
+    model(),
     view(model),
-    controller(model, view)
-{
-    factory = std::make_shared<MVCFactory> (model, view, controller);
-    controller.SetFactory(factory);
-    model.SetFactory(factory);
-}
+    controller(factory, model, view)
+{}
 
 void App::Run()
 {

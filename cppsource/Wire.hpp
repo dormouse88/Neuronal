@@ -8,6 +8,24 @@
 #ifndef WIRE_HPP
 #define	WIRE_HPP
 
+#include <SFML/Graphics.hpp>
+#include "ViewResources.hpp"
+class Wire;
+
+class WireView
+{
+public:
+    WireView(const Wire & wire_p);
+    void Draw(sf::RenderTarget & rt, const Wire & w);
+
+private:
+    sf::Text weightText;
+};
+
+
+
+
+
 #include "Gobject.hpp"
 class Wirable;
 
@@ -15,7 +33,9 @@ class Wire : public Gobject
 {
 public:
     Wire(Wirable & from_p, Wirable & to_p, signed weight_p);
-    bool operator==(const Wire& rhs) const;
+    //bool operator==(const Wire& rhs) const;
+
+    virtual std::string SerialName() const { return "WIRE";}
 
     void ReceiveCharge(bool f);
     
@@ -28,6 +48,8 @@ public:
     const Wirable& GetTo() const {return to; }
     const int GetToSlot() const {return toSlot; }
     
+    virtual void Draw(sf::RenderTarget & rt) override;
+    virtual void Handle(int code) override;
 private:
     Wirable& from;
     int fromSlot;
@@ -35,6 +57,7 @@ private:
     int toSlot;
     signed weight;
     bool firing;
+    WireView v;
 };
 
 #endif	/* WIRE_HPP */

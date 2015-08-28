@@ -6,6 +6,7 @@
  */
 
 #include "Wirable.hpp"
+#include "Wire.hpp"
 
 //bool Wirable::CanRegisterIn() const
 //{
@@ -34,7 +35,7 @@ void Wirable::PushCharge(bool firing, int slot)
     for (auto & w: outWires)
     {
         if (auto notDead = w.lock()) {
-            if (notDead->fromSlot == slot or slot == 0) {
+            if (notDead->GetFromSlot() == slot or slot == 0) {
                 notDead->ReceiveCharge(firing);
             }
         }

@@ -9,8 +9,8 @@
 #include "ChipHandle.hpp"
 
 ChipPlan::ChipPlan()
-{
-}
+    :Wirable()
+{}
 
 void ChipPlan::ReceiveCharge(bool charge, int weight, int slot)
 {
@@ -37,7 +37,7 @@ void ChipPlan::PassOnCalculate()
 
 void ChipPlan::SetPosition(Device & d, sf::Vector2i newPos)
 {
-    if (IsPositionFree(newPos)) d.SetPosition( newPos );
+    if (IsPositionFree(newPos)) d.SetPosInPlan( newPos );
 }
 int ChipPlan::GetFreeSerial() const
 {
@@ -56,7 +56,7 @@ bool ChipPlan::IsSerialFree(int serial) const
 bool ChipPlan::IsPositionFree(sf::Vector2i pos) const
 {
     for (const auto & x : devices) {
-        if (x->GetPosition() == pos) return false;
+        if (x->GetPosInPlan() == pos) return false;
     }
     return true;
 }
@@ -79,11 +79,27 @@ void ChipPlan::ImportWire(std::shared_ptr<Wire> wire)
     wires.emplace_back(wire);
 }
 
+void ChipPlan::CleanVectors()
+{
+    {
+        auto remove_func = [] (std::shared_ptr<Device> eachDevice) {return eachDevice->IsDead();};
+        auto new_end = std::remove_if(std::begin(devices), std::end(devices), remove_func );
+        devices.erase(new_end, std::end(devices) );
+    }
+    {
+        auto remove_func = [] (std::shared_ptr<Wire> eachWire) {return eachWire->IsDead();};
+        auto new_end = std::remove_if(std::begin(wires), std::end(wires), remove_func);
+        wires.erase(new_end, std::end(wires) );
+    }
+}
+
+
+
 std::shared_ptr<Device> ChipPlan::GetDevice(sf::Vector2i pos)
 {
     //check against siblings
     for (auto & x: devices) {
-        if (pos == x->GetPosition()) {
+        if (pos == x->GetPosInPlan()) {
             return x;
         }
     }
@@ -117,3 +133,31 @@ std::vector<std::shared_ptr<Wire> > ChipPlan::GetWires(std::shared_ptr<Wirable> 
     return ret_vec;
 }
 
+
+sf::Vector2f ChipPlan::GetWireAttachPos(WireAttachSide was) const
+{
+    sf::Vector2f wirePos;
+    //erm......
+    return wirePos;
+}
+
+
+void ChipPlan::Draw(sf::RenderTarget & rt)
+{
+    //(Plan should draw itself here)
+    
+    for (auto & w: wires)
+    {
+        w->Draw(rt);
+    }
+    for (auto & x: devices)
+    {
+        x->Draw(rt);
+    }
+}
+void ChipPlan::Handle(int code)
+{
+    if (code == 1) {
+        ;
+    }
+}

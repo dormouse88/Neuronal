@@ -14,10 +14,12 @@ const sf::Vector2f GRID_SIZE { 115.f, 75.f };
 
 class ViewResources
 {
+private:
+    ViewResources();  //singleton
 public:
-    ViewResources();
     ViewResources(const ViewResources&) = delete;
 
+    static const ViewResources & GetInstance();
     sf::Font font;
 };
 
