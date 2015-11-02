@@ -42,16 +42,56 @@ void BlobFactory::AddHandle(std::shared_ptr<ChipPlan> plan, int serial, sf::Vect
     }
 }
 
-void BlobFactory::AddPlan()
+std::shared_ptr<ChipPlan> BlobFactory::AddPlan()
 {
-    //auto mp = std::make_shared<ChipPlan> ();
+    return std::make_shared<ChipPlan> ();
+}
+
+
+
+void BlobFactory::AddWire(std::shared_ptr<ChipPlan> plan, Wirable & from, Wirable & to, signed weight)
+{
+    int fromSlot = 0;
+    int toSlot = 0;
+    
+    //First Initialize toSlot to the first available valid number.
+    if (to.IsSlotted(SlottedSide::IN)) {
+        for (int i = 1; true; i++)
+        {
+            if (to.CanRegisterIn(i))
+            {
+                toSlot = i;
+                break;
+            }
+            //(this loop is hacky. If a Wirable won't register anything in, the loop will stick forever.)
+            if (i > 200) throw "Unable to assign a slot";
+        }
+    }
+
+    //Then Initialize fromSlot by incrementing fromSlot to not clash with an existing identical wire (with the already determined toSlot value).
+    if (from.IsSlotted(SlottedSide::OUT)) {
+        for (int i = 1; true; i++)
+        {
+            if (from.CanRegisterOut(i) and (from.HasWireTo(fromSlot, to, toSlot) == false))
+            {
+                fromSlot = i;
+                break;
+            }
+            //(this loop is hacky. If a Wirable won't register anything in, the loop will stick forever.)
+            if (i > 200) throw "Unable to assign a slot";
+        }
+    }
+    
+    AddWire(plan, from, fromSlot, to, toSlot, weight);
 }
 
 void BlobFactory::AddWire(std::shared_ptr<ChipPlan> plan, Wirable & from, int fromSlot, Wirable & to, int toSlot, signed weight)
-{
-    if (plan->IsWiringFree(from, fromSlot, to, toSlot) and from.CanRegisterOut(fromSlot) and to.CanRegisterIn(toSlot))
+{    
+    //WAS plan->IsWiringFree(from, fromSlot, to, toSlot)
+    //if the wire will be valid...
+    if (from.HasWireTo(fromSlot, to, toSlot) == false and from.CanRegisterOut(fromSlot) and to.CanRegisterIn(toSlot))
     {
-        auto mp = std::make_shared<Wire> (from, to, weight);
+        auto mp = std::make_shared<Wire> (from, fromSlot, to, toSlot, weight);
         from.RegisterOut(mp);
         to.RegisterIn(mp);
         plan->ImportWire(mp);

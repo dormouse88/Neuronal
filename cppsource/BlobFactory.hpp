@@ -18,17 +18,18 @@ class BlobFactory
 {
 public:
     BlobFactory();
-    virtual ~BlobFactory() {}
+    ~BlobFactory() {}
 
-    virtual void AddNeuron(std::shared_ptr<ChipPlan> plan, int serial, sf::Vector2i pos, int threshold);
-    virtual void AddSocket(std::shared_ptr<ChipPlan> plan, int serial, sf::Vector2i pos);
-    virtual void AddHandle(std::shared_ptr<ChipPlan> plan, int serial, sf::Vector2i pos);
-    virtual void AddPlan();
-    virtual void AddWire(std::shared_ptr<ChipPlan> plan, Wirable & from, int fromSlot, Wirable & to, int toSlot, signed weight);
-    //virtual void AddWire(int from, int fromSlot, int to, int toSlot, signed weight);
+    void AddNeuron(std::shared_ptr<ChipPlan> plan, int serial, sf::Vector2i pos, int threshold);
+    void AddSocket(std::shared_ptr<ChipPlan> plan, int serial, sf::Vector2i pos);
+    void AddHandle(std::shared_ptr<ChipPlan> plan, int serial, sf::Vector2i pos);
+    std::shared_ptr<ChipPlan> AddPlan();
+    void AddWire(std::shared_ptr<ChipPlan> plan, Wirable & from, Wirable & to, signed weight);
+    void AddWire(std::shared_ptr<ChipPlan> plan, Wirable & from, int fromSlot, Wirable & to, int toSlot, signed weight);
+    //void AddWire(int from, int fromSlot, int to, int toSlot, signed weight);
 
-    virtual void RemoveDevice(std::shared_ptr<ChipPlan> plan, std::shared_ptr<Device> device);
-    virtual void RemoveWire(std::shared_ptr<ChipPlan> plan, std::shared_ptr<Wire> wire);
+    void RemoveDevice(std::shared_ptr<ChipPlan> plan, std::shared_ptr<Device> device);
+    void RemoveWire(std::shared_ptr<ChipPlan> plan, std::shared_ptr<Wire> wire);
 private:
 };
 

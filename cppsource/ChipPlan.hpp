@@ -24,7 +24,8 @@ public:
 
     virtual std::string SerialName() const { return "PLAN";}
 
-    virtual void ReceiveCharge(bool charge, int weight, int slot);
+    virtual void ReceiveCharge(bool charge, int weight, int slot) override;
+    virtual bool IsSlotted(SlottedSide) const override              {return true;}
 
     void StepIn(bool charge, int slot);
     void PassOnAct();
@@ -35,7 +36,7 @@ public:
     int GetFreeSerial() const;
     bool IsSerialFree(int serial) const;
     bool IsPositionFree(sf::Vector2i pos) const;
-    bool IsWiringFree(Wirable & from, int fromSlot, Wirable & to, int toSlot) const;
+    //RED//bool IsWiringFree(Wirable & from, int fromSlot, Wirable & to, int toSlot) const;
 
     void ImportDevice(std::shared_ptr<Device> device);
     void ImportWire(std::shared_ptr<Wire> wire);

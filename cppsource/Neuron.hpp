@@ -35,6 +35,7 @@ public:
 
     virtual std::string SerialName() const { return "NEUR";}
     virtual void ReceiveCharge(bool charge, int weight, int slot);
+    virtual bool IsWeightedIn() const override              {return true;}
     virtual void LogicAct();
     virtual void LogicCalculate();
 

@@ -28,6 +28,29 @@ void ChipHandle::ReceiveCharge(bool charge, int weight, int slot)
     if (plan) plan->StepIn(charge, slot);
 }
 
+bool ChipHandle::IsSlotted(SlottedSide) const
+{
+    return true;
+}
+
+bool ChipHandle::CanRegisterIn(int slot) const
+{
+    CleanWireVectors();
+    for (auto w: inWires) {
+        if (w.lock()->GetToSlot() == slot) return false;
+    }
+    return true;
+}
+bool ChipHandle::CanRegisterOut(int slot) const
+{
+    CleanWireVectors();
+    for (auto w: outWires) {
+        if (w.lock()->GetFromSlot() == slot) return false;
+    }
+    return true;
+}
+
+
 void ChipHandle::StepOut(bool charge, int slot)
 {
     PushCharge(charge, slot);

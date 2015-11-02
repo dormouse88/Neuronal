@@ -8,7 +8,8 @@
 #ifndef VIEW_HPP
 #define	VIEW_HPP
 
-#include <vector>
+#include <memory>
+#include <stack>
 #include <SFML/Graphics.hpp>
 #include "ViewResources.hpp"
 #include "Model.hpp"
@@ -28,10 +29,13 @@ public:
     void Zoom(float zoomFactor);
     void Pan(sf::Vector2f moveBy);
     void Resize(sf::Vector2f newSize);
+    
+    void PopPlan()                                  {if (activePlan.size() > 1) activePlan.pop();}
+    void PushPlan(std::weak_ptr<ChipPlan> plan)     {activePlan.push(plan);}
 
     sf::RenderWindow & GetWindow()          {return window;}
     sf::View & GetMainView()                {return mainView;}
-    std::weak_ptr<ChipPlan> GetActivePlan() {return activePlan;}
+    std::weak_ptr<ChipPlan> GetActivePlan() {return activePlan.top();}
     
 private:
     sf::RenderWindow window;
@@ -39,7 +43,7 @@ private:
     sf::View barView;
 
     const Model & theModel;
-    std::weak_ptr<ChipPlan> activePlan;
+    std::stack< std::weak_ptr<ChipPlan> > activePlan;
 
 public:
     Cursor cursorOne;

@@ -24,7 +24,7 @@ public:
 protected:
     void UpdatePos(sf::Vector2f targetPos)
     {
-        actualPos += (targetPos - actualPos) * 0.003f;
+        actualPos += (targetPos - actualPos) * 0.08f;
     }
     sf::Vector2f actualPos;
 };

@@ -22,10 +22,19 @@ WireView::WireView(const Wire & wire_p)
     weightText.setFont(ViewResources::GetInstance().font);
     weightText.setCharacterSize(18);
     weightText.setColor(sf::Color::Red);
+
+    fromSlotText.setFont(ViewResources::GetInstance().font);
+    fromSlotText.setCharacterSize(18);
+    fromSlotText.setColor(sf::Color::Cyan);
+
+    toSlotText.setFont(ViewResources::GetInstance().font);
+    toSlotText.setCharacterSize(18);
+    toSlotText.setColor(sf::Color::Magenta);
 }
 
 void WireView::Draw(sf::RenderTarget & rt, const Wire & w)
 {
+    //The Line...
     sf::Color colFrom;
     sf::Color colTo;
     if (w.GetFiring()) {
@@ -46,30 +55,46 @@ void WireView::Draw(sf::RenderTarget & rt, const Wire & w)
     line.push_back( sf::Vertex( w.GetTo().GetWireAttachPos(WireAttachSide::IN), colTo ) );
     rt.draw(&line[0], line.size(), sf::LinesStrip);
 
-        //I would've used std::to_string() here but for a MinGW bug
+    //The Text...
+    //(I would've used std::to_string() here rather than a stringstream but for a MinGW bug)
+    if (w.GetTo().IsWeightedIn()) {
         std::ostringstream ss;
         ss << w.GetWeight();
-    weightText.setString(ss.str());
-    weightText.setPosition( line[1].position - (line[1].position - line[0].position)*0.45f );
-    rt.draw(weightText);
+        weightText.setString(ss.str());
+        weightText.setPosition( line[1].position - (line[1].position - line[0].position)*0.45f );
+        rt.draw(weightText);
+    }
+
+    if (w.GetFrom().IsSlotted(SlottedSide::OUT)) {
+        std::ostringstream ss;
+        ss << w.GetFromSlot();
+        fromSlotText.setString(ss.str());
+        fromSlotText.setPosition( line[1].position - (line[1].position - line[0].position)*0.75f );
+        rt.draw(fromSlotText);
+    }
+
+    if (w.GetTo().IsSlotted(SlottedSide::IN)) {
+        std::ostringstream ss;
+        ss << w.GetToSlot();
+        toSlotText.setString(ss.str());
+        toSlotText.setPosition( line[1].position - (line[1].position - line[0].position)*0.25f );
+        rt.draw(toSlotText);
+    }
 }
 
 
 
 /**
  * CLASS Wire
- * @param from_p what the wire is coming from
- * @param to_p what the wire is going to
- * @param weight_p 
+ * @param from_p reference to Wirable object the wire is coming from
+ * @param fromSlot_p
+ * @param to_p reference to Wirable object the wire is going to
+ * @param toSlot_p
+ * @param weight_p
  */
-Wire::Wire(Wirable & from_p, Wirable & to_p, signed weight_p)
-    :v(*this), from(from_p), to(to_p), weight(weight_p), firing(false), fromSlot(0), toSlot(0)
+Wire::Wire(Wirable & from_p, int fromSlot_p, Wirable & to_p, int toSlot_p, signed weight_p)
+    :v(*this), from(from_p), fromSlot(fromSlot_p), to(to_p), toSlot(toSlot_p), weight(weight_p), firing(false)
 {}
-
-//bool Wire::operator==(const Wire& rhs) const
-//{
-//    return this == &rhs;
-//}
 
 void Wire::ReceiveCharge(bool f)
 {

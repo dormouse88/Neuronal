@@ -15,11 +15,12 @@ View::View(Model & model_p)
     cursorOne(),
     cursorTwo(sf::Color::Cyan)
 {
+    window.setVerticalSyncEnabled(true);
     mainView.setViewport(sf::FloatRect(0.f, 0.f, 1.f, 0.8f));
     barView.setViewport(sf::FloatRect(0.f, 0.8f, 1.f, 0.2f));
     window.setView(mainView);
     
-    activePlan = model_p.GetBasePlan();
+    activePlan.push( model_p.GetBasePlan() );
 }
 
 void View::DebugInfo()
@@ -48,7 +49,7 @@ void View::Draw()
 
     
     window.setView(mainView);
-    auto ap = activePlan.lock();
+    auto ap = GetActivePlan().lock();
     if (ap) ap->Draw(window);
     
     cursorTwo.Draw(window);

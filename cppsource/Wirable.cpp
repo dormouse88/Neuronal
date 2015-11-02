@@ -8,16 +8,17 @@
 #include "Wirable.hpp"
 #include "Wire.hpp"
 
-//bool Wirable::CanRegisterIn() const
-//{
-//    CleanWireVectors();
-//    return inLimit  >  inWires.size() or  inLimit==-1 ? true : false;
-//}
-//bool Wirable::CanRegisterOut() const
-//{
-//    CleanWireVectors();
-//    return outLimit > outWires.size() or outLimit==-1 ? true : false;
-//}
+
+bool Wirable::HasWireTo(int fromSlot, Wirable & to, int toSlot) const
+{
+    for (const auto w: outWires) {
+        auto wire = w.lock();
+        if (wire) {
+            if ( (wire->GetFromSlot() == fromSlot) and (&wire->GetTo() == &to) and (wire->GetToSlot() == toSlot) ) return true;
+        }
+    }
+    return false;
+}
 
 void Wirable::CleanWireVectors() const //this method is necessary since the limits work by checking vector size.
 {

@@ -60,14 +60,15 @@ bool ChipPlan::IsPositionFree(sf::Vector2i pos) const
     }
     return true;
 }
-bool ChipPlan::IsWiringFree(Wirable & from, int fromSlot, Wirable & to, int toSlot) const
-{
-    //check against siblings
-    for (const auto & x: wires) {
-        if ( (&x->GetFrom() == &from and x->GetFromSlot() == fromSlot) and (&x->GetTo() == &to and x->GetToSlot() == toSlot) ) return false;
-    }
-    return true;
-}
+//RED
+//bool ChipPlan::IsWiringFree(Wirable & from, int fromSlot, Wirable & to, int toSlot) const
+//{
+//    //check against siblings
+//    for (const auto & x: wires) {
+//        if ( (&x->GetFrom() == &from and x->GetFromSlot() == fromSlot) and (&x->GetTo() == &to and x->GetToSlot() == toSlot) ) return false;
+//    }
+//    return true;
+//}
 
 
 void ChipPlan::ImportDevice(std::shared_ptr<Device> device)
@@ -145,6 +146,7 @@ sf::Vector2f ChipPlan::GetWireAttachPos(WireAttachSide was) const
 void ChipPlan::Draw(sf::RenderTarget & rt)
 {
     //(Plan should draw itself here)
+    //carry_on_here//
     
     for (auto & w: wires)
     {

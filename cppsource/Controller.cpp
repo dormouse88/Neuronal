@@ -107,7 +107,7 @@ bool Controller::HandleInput()
             if (event.key.code == sf::Keyboard::B)
             {
                 if (event.key.shift == false) {
-                    if (device1 and device2) theFactory.AddWire(activePlan, *device1, 0, *device2, 0, 1 ); //hack (fromSlot + toSlot zeroed)
+                    if (device1 and device2) theFactory.AddWire(activePlan, *device1, *device2, 1 );
                 }
                 else {
                     if (wire1) theFactory.RemoveWire(activePlan, wire1 );
@@ -124,6 +124,20 @@ bool Controller::HandleInput()
             }
             if (event.key.code == sf::Keyboard::X) {
                 if (wire1) wire1->Handle(2);
+            }
+            if (event.key.code == sf::Keyboard::D) {
+                if (device1) {
+                    std::shared_ptr<ChipHandle> handle = std::dynamic_pointer_cast<ChipHandle>(device1);
+                    if (handle) {
+                        if (handle->GetPlan() == nullptr) {
+                            handle->SetPlan( theFactory.AddPlan() );
+                        }
+                        theView.PushPlan( handle->GetPlan() );
+                    }
+                }
+            }
+            if (event.key.code == sf::Keyboard::C) {
+                theView.PopPlan();
             }
             if (event.key.code == sf::Keyboard::M) {
                 if (device1 and pos2) activePlan->SetPosition( *device1, *pos2 );

@@ -20,6 +20,8 @@ public:
 
 private:
     sf::Text weightText;
+    sf::Text fromSlotText;
+    sf::Text toSlotText;
 };
 
 
@@ -32,8 +34,7 @@ class Wirable;
 class Wire : public Gobject
 {
 public:
-    Wire(Wirable & from_p, Wirable & to_p, signed weight_p);
-    //bool operator==(const Wire& rhs) const;
+    Wire(Wirable & from_p, int fromSlot_p, Wirable & to_p, int toSlot_p, signed weight_p);
 
     virtual std::string SerialName() const { return "WIRE";}
 
