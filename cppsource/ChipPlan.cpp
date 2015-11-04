@@ -15,8 +15,26 @@ ChipPlan::ChipPlan()
 void ChipPlan::ReceiveCharge(bool charge, int weight, int slot)
 {
     auto notDead = referer.lock();
-    notDead->StepOut(charge, slot);
+    if (notDead) notDead->StepOut(charge, slot);
 }
+
+bool ChipPlan::CanRegisterIn(int slot) const
+{
+    CleanWireVectors();
+    for (auto w: inWires) {
+        if (w.lock()->GetToSlot() == slot) return false;
+    }
+    return true;
+}
+bool ChipPlan::CanRegisterOut(int slot) const
+{
+    CleanWireVectors();
+    for (auto w: outWires) {
+        if (w.lock()->GetFromSlot() == slot) return false;
+    }
+    return true;
+}
+
 
 void ChipPlan::StepIn(bool charge, int slot)
 {
@@ -114,6 +132,13 @@ std::shared_ptr<Device> ChipPlan::GetDevice(int serial)
         }
     }
 }
+
+/**
+ * Returns the wire (or a null pointer) between two passed-in devices.
+ * @param from device
+ * @param to device
+ * @return 
+ */
 std::shared_ptr<Wire> ChipPlan::GetWire(const Wirable& from, const Wirable& to)
 {
     for (auto & x: wires) {
@@ -123,6 +148,14 @@ std::shared_ptr<Wire> ChipPlan::GetWire(const Wirable& from, const Wirable& to)
     }
     return nullptr;
 }
+
+/**
+ * Returns a vector of all the wires attached to the passed-in device.
+ * @param wirable the device
+ * @param from include wires coming from this device
+ * @param to include wires going into this device 
+ * @return 
+ */
 std::vector<std::shared_ptr<Wire> > ChipPlan::GetWires(std::shared_ptr<Wirable> wirable, bool from, bool to)
 {
     std::vector<std::shared_ptr<Wire> > ret_vec;
@@ -139,6 +172,10 @@ sf::Vector2f ChipPlan::GetWireAttachPos(WireAttachSide was) const
 {
     sf::Vector2f wirePos;
     //erm......
+    if (was == WireAttachSide::IN)
+        { wirePos.x = 800.f; wirePos.y = 400.f; }
+    if (was == WireAttachSide::OUT)
+        { wirePos.x = 0.f; wirePos.y = 0.f; }
     return wirePos;
 }
 

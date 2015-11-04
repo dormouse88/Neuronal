@@ -23,7 +23,7 @@ public:
     void AddNeuron(std::shared_ptr<ChipPlan> plan, int serial, sf::Vector2i pos, int threshold);
     void AddSocket(std::shared_ptr<ChipPlan> plan, int serial, sf::Vector2i pos);
     void AddHandle(std::shared_ptr<ChipPlan> plan, int serial, sf::Vector2i pos);
-    std::shared_ptr<ChipPlan> AddPlan();
+    std::shared_ptr<ChipPlan> AddPlan(std::shared_ptr<ChipHandle> handle);
     void AddWire(std::shared_ptr<ChipPlan> plan, Wirable & from, Wirable & to, signed weight);
     void AddWire(std::shared_ptr<ChipPlan> plan, Wirable & from, int fromSlot, Wirable & to, int toSlot, signed weight);
     //void AddWire(int from, int fromSlot, int to, int toSlot, signed weight);

@@ -20,28 +20,38 @@ bool Controller::HandleInput()
 {
     std::shared_ptr<sf::Vector2i> pos1 = nullptr;
     std::shared_ptr<sf::Vector2i> pos2 = nullptr;
+    std::shared_ptr<Wirable> wirable1 = nullptr;
+    std::shared_ptr<Wirable> wirable2 = nullptr;
     std::shared_ptr<Device> device1 = nullptr;
     std::shared_ptr<Device> device2 = nullptr;
     std::shared_ptr<Wire> wire1 = nullptr;
+        
     //Update handles...
     auto activePlan = theView.GetActivePlan().lock();
     if (activePlan) {
         if (theView.cursorOne.active) {
             pos1 = std::make_shared<sf::Vector2i> ( theView.cursorOne.GetGridPos() );
+            device1 = activePlan->GetDevice( *pos1 );
+            wirable1 = device1;
+        }
+        else {
+            wirable1 = activePlan;
         }
         if (theView.cursorTwo.active) {
             pos2 = std::make_shared<sf::Vector2i> ( theView.cursorTwo.GetGridPos() );
-        }
-        if (pos1) {
-            device1 = activePlan->GetDevice( *pos1 );
-        }
-        if (pos2) {
             device2 = activePlan->GetDevice( *pos2 );
+            wirable2 = device2;
         }
-        if (device1 and device2) {
-            wire1 = activePlan->GetWire(*device1, *device2);
+        else {
+            wirable2 = activePlan;
+        }
+        if (wirable1 and wirable2) {
+            wire1 = activePlan->GetWire(*wirable1, *wirable2);
         }
     }
+    theView.device1 = device1;
+    theView.device2 = device2;
+    theView.wire1 = wire1;
     
     bool quitYet = false;
     sf::Event event;
@@ -107,7 +117,7 @@ bool Controller::HandleInput()
             if (event.key.code == sf::Keyboard::B)
             {
                 if (event.key.shift == false) {
-                    if (device1 and device2) theFactory.AddWire(activePlan, *device1, *device2, 1 );
+                    if (wirable1 and wirable2) theFactory.AddWire(activePlan, *wirable1, *wirable2, 1 );
                 }
                 else {
                     if (wire1) theFactory.RemoveWire(activePlan, wire1 );
@@ -119,24 +129,30 @@ bool Controller::HandleInput()
             if (event.key.code == sf::Keyboard::Z) {
                 if (device1) device1->Handle(2);
             }
-            if (event.key.code == sf::Keyboard::S) {
+            if (event.key.code == sf::Keyboard::D) {
                 if (wire1) wire1->Handle(1);
             }
-            if (event.key.code == sf::Keyboard::X) {
+            if (event.key.code == sf::Keyboard::C) {
                 if (wire1) wire1->Handle(2);
             }
-            if (event.key.code == sf::Keyboard::D) {
+            if (event.key.code == sf::Keyboard::F) {
+                if (wire1) wire1->Handle(3);
+            }
+            if (event.key.code == sf::Keyboard::V) {
+                if (wire1) wire1->Handle(4);
+            }
+            if (event.key.code == sf::Keyboard::S) {
                 if (device1) {
                     std::shared_ptr<ChipHandle> handle = std::dynamic_pointer_cast<ChipHandle>(device1);
                     if (handle) {
                         if (handle->GetPlan() == nullptr) {
-                            handle->SetPlan( theFactory.AddPlan() );
+                            handle->SetPlan( theFactory.AddPlan(handle) );
                         }
                         theView.PushPlan( handle->GetPlan() );
                     }
                 }
             }
-            if (event.key.code == sf::Keyboard::C) {
+            if (event.key.code == sf::Keyboard::X) {
                 theView.PopPlan();
             }
             if (event.key.code == sf::Keyboard::M) {
@@ -150,6 +166,14 @@ bool Controller::HandleInput()
             {
                 //theSerializer->Load(activePlan);
             }
+            if (event.key.code == sf::Keyboard::LBracket)
+            {
+                theView.cursorOne.active = false;
+            }
+            if (event.key.code == sf::Keyboard::RBracket)
+            {
+                theView.cursorTwo.active = false;
+            }
             if (event.key.code == sf::Keyboard::E)
             {
                 theModel.DebugInfo();
@@ -159,6 +183,18 @@ bool Controller::HandleInput()
             if (event.key.code == sf::Keyboard::Space)
             {
                 theModel.Logic();
+            }
+            if (event.key.code == sf::Keyboard::Num1)
+            {
+                theView.SetHighlightingMode(1);
+            }
+            if (event.key.code == sf::Keyboard::Num2)
+            {
+                theView.SetHighlightingMode(2);
+            }
+            if (event.key.code == sf::Keyboard::Num3)
+            {
+                theView.SetHighlightingMode(3);
             }
         }
     } //(while events)

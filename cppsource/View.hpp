@@ -29,6 +29,7 @@ public:
     void Zoom(float zoomFactor);
     void Pan(sf::Vector2f moveBy);
     void Resize(sf::Vector2f newSize);
+    void SetHighlightingMode(int x) {highlightingMode = x;}
     
     void PopPlan()                                  {if (activePlan.size() > 1) activePlan.pop();}
     void PushPlan(std::weak_ptr<ChipPlan> plan)     {activePlan.push(plan);}
@@ -40,14 +41,21 @@ public:
 private:
     sf::RenderWindow window;
     sf::View mainView;
-    sf::View barView;
+    sf::View mainOverlay;
+    sf::View barOverlay;
+
+    sf::RectangleShape overlayBox;
 
     const Model & theModel;
     std::stack< std::weak_ptr<ChipPlan> > activePlan;
 
+    int highlightingMode;
 public:
     Cursor cursorOne;
     Cursor cursorTwo;
+    std::weak_ptr<Device> device1;
+    std::weak_ptr<Device> device2;
+    std::weak_ptr<Wire> wire1;
 };
 
 #endif	/* VIEW_HPP */

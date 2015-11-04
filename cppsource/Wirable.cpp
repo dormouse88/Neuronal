@@ -9,12 +9,14 @@
 #include "Wire.hpp"
 
 
-bool Wirable::HasWireTo(int fromSlot, Wirable & to, int toSlot) const
+bool Wirable::HasWireTo(int fromSlot, Wirable & to, int toSlot) const //slot parameters are now redundant
 {
     for (const auto w: outWires) {
         auto wire = w.lock();
         if (wire) {
-            if ( (wire->GetFromSlot() == fromSlot) and (&wire->GetTo() == &to) and (wire->GetToSlot() == toSlot) ) return true;
+            //old version that allowed identically located wires with different slots...
+            //if ( (wire->GetFromSlot() == fromSlot) and (&wire->GetTo() == &to) and (wire->GetToSlot() == toSlot) ) return true;
+            if ( &wire->GetTo() == &to ) return true;
         }
     }
     return false;

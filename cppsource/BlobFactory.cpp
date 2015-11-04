@@ -42,54 +42,60 @@ void BlobFactory::AddHandle(std::shared_ptr<ChipPlan> plan, int serial, sf::Vect
     }
 }
 
-std::shared_ptr<ChipPlan> BlobFactory::AddPlan()
+std::shared_ptr<ChipPlan> BlobFactory::AddPlan(std::shared_ptr<ChipHandle> handle)
 {
-    return std::make_shared<ChipPlan> ();
+    auto plan = std::make_shared<ChipPlan> ();
+    plan->RegisterReferer(handle);
+    return plan;
 }
 
 
 
 void BlobFactory::AddWire(std::shared_ptr<ChipPlan> plan, Wirable & from, Wirable & to, signed weight)
 {
+    static const int SLOT_MAX = 99;
+    
     int fromSlot = 0;
     int toSlot = 0;
     
-    //First Initialize toSlot to the first available valid number.
-    if (to.IsSlotted(SlottedSide::IN)) {
-        for (int i = 1; true; i++)
+    //Initialize toSlot to the first available valid number.
+    if (to.IsSlotted(SlottedSide::IN))
+    {
+        toSlot = -1;
+        for (int i = 1; i<=SLOT_MAX; i++)
         {
             if (to.CanRegisterIn(i))
             {
                 toSlot = i;
                 break;
             }
-            //(this loop is hacky. If a Wirable won't register anything in, the loop will stick forever.)
-            if (i > 200) throw "Unable to assign a slot";
         }
     }
 
-    //Then Initialize fromSlot by incrementing fromSlot to not clash with an existing identical wire (with the already determined toSlot value).
-    if (from.IsSlotted(SlottedSide::OUT)) {
-        for (int i = 1; true; i++)
+    //Initialize fromSlot to the first available valid number.
+    if (from.IsSlotted(SlottedSide::OUT))
+    {
+        fromSlot = -1;
+        for (int i = 1; i<=SLOT_MAX; i++)
         {
-            if (from.CanRegisterOut(i) and (from.HasWireTo(fromSlot, to, toSlot) == false))
+            if (from.CanRegisterOut(i))
             {
                 fromSlot = i;
                 break;
             }
-            //(this loop is hacky. If a Wirable won't register anything in, the loop will stick forever.)
-            if (i > 200) throw "Unable to assign a slot";
         }
     }
     
-    AddWire(plan, from, fromSlot, to, toSlot, weight);
+    if (fromSlot != -1 and toSlot != -1) {
+        AddWire(plan, from, fromSlot, to, toSlot, weight);
+    }
 }
 
 void BlobFactory::AddWire(std::shared_ptr<ChipPlan> plan, Wirable & from, int fromSlot, Wirable & to, int toSlot, signed weight)
 {    
     //WAS plan->IsWiringFree(from, fromSlot, to, toSlot)
     //if the wire will be valid...
-    if (from.HasWireTo(fromSlot, to, toSlot) == false and from.CanRegisterOut(fromSlot) and to.CanRegisterIn(toSlot))
+    if (from.HasWireTo(fromSlot, to, toSlot) == false and from.CanRegisterOut(fromSlot) and to.CanRegisterIn(toSlot) and &from != &to)
     {
         auto mp = std::make_shared<Wire> (from, fromSlot, to, toSlot, weight);
         from.RegisterOut(mp);
@@ -97,12 +103,6 @@ void BlobFactory::AddWire(std::shared_ptr<ChipPlan> plan, Wirable & from, int fr
         plan->ImportWire(mp);
     }
 }
-//void MVCFactory::AddWire(int from, int fromSlot, int to, int toSlot, signed weight)
-//{
-//    auto f = model.GetDevice(from);
-//    auto t = model.GetDevice(to);
-//    if (f && t) AddWire(*f, fromSlot, *t, toSlot, weight);
-//}
 
 void BlobFactory::RemoveDevice(std::shared_ptr<ChipPlan> plan, std::shared_ptr<Device> device)
 {

@@ -9,6 +9,7 @@
 #define	VIEWRESOURCES_HPP
 
 #include <SFML/Graphics.hpp>
+#include <SFML/System.hpp>
 
 const sf::Vector2f GRID_SIZE { 115.f, 75.f };
 
@@ -21,6 +22,7 @@ public:
 
     static const ViewResources & GetInstance();
     sf::Font font;
+    sf::Clock clock;
 };
 
 

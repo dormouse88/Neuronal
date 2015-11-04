@@ -17,11 +17,13 @@ class WireView
 public:
     WireView(const Wire & wire_p);
     void Draw(sf::RenderTarget & rt, const Wire & w);
-
 private:
     sf::Text weightText;
+    sf::RectangleShape weightTextBoard;
     sf::Text fromSlotText;
+    sf::RectangleShape fromSlotTextBoard;
     sf::Text toSlotText;
+    sf::RectangleShape toSlotTextBoard;
 };
 
 
@@ -51,6 +53,7 @@ public:
     
     virtual void Draw(sf::RenderTarget & rt) override;
     virtual void Handle(int code) override;
+
 private:
     Wirable& from;
     int fromSlot;

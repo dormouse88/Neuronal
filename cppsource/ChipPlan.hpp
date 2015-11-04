@@ -20,13 +20,15 @@ class ChipPlan : public Wirable, public Gobject
 {
 public:
     ChipPlan();
+    void RegisterReferer(std::shared_ptr<ChipHandle> handle) { referer = handle; }
     virtual ~ChipPlan() {}
 
     virtual std::string SerialName() const { return "PLAN";}
-
     virtual void ReceiveCharge(bool charge, int weight, int slot) override;
     virtual bool IsSlotted(SlottedSide) const override              {return true;}
-
+    virtual bool CanRegisterIn(int slot) const override;
+    virtual bool CanRegisterOut(int slot) const override;
+    
     void StepIn(bool charge, int slot);
     void PassOnAct();
     void PassOnCalculate();

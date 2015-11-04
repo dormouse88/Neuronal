@@ -24,15 +24,15 @@ NeuronView::NeuronView(const Neuron & n)
     
     thresholdText.setFont(ViewResources::GetInstance().font);
     //thresholdText.setCharacterSize(20);
-    thresholdText.setColor(sf::Color::Red);
+    thresholdText.setColor(sf::Color::Green);
 }
 
 void NeuronView::Draw(sf::RenderTarget & rt, const Neuron & n)
 {
     UpdatePos(n.GetWorldPos());
     shape.setPosition( actualPos + MAIN_OFFSET );
-    if (n.GetFiring()) shape.setFillColor(sf::Color::Green);
-    else shape.setFillColor(sf::Color::Blue);
+    if (n.GetFiring()) shape.setFillColor(sf::Color::Red);
+    else shape.setFillColor(sf::Color(50,50,200) );
     rt.draw(shape);
 
         //I would've used std::to_string() here but for a MinGW bug
