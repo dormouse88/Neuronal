@@ -1,24 +1,24 @@
 /* 
- * File:   Socket.hpp
+ * File:   Jumper.hpp
  * Author: Dormouse
  *
  * Created on 06 April 2015, 19:34
  */
 
-#ifndef SOCKET_HPP
-#define	SOCKET_HPP
+#ifndef JUMPER_HPP
+#define	JUMPER_HPP
 
 #include <SFML/Graphics.hpp>
 #include "ViewResources.hpp"
 #include "Device.hpp"
-class Socket;
+class Jumper;
 
-class SocketView : public DeviceView
+class JumperView : public DeviceView
 {
 public:
-    SocketView(const Socket & socket_p);
-    virtual ~SocketView() {}
-    void Draw(sf::RenderTarget & rt, const Socket & s);
+    JumperView(const Jumper & socket_p);
+    virtual ~JumperView() {}
+    void Draw(sf::RenderTarget & rt, const Jumper & s);
 
 private:
     sf::CircleShape shape;
@@ -28,13 +28,13 @@ private:
 
 
 
-class Socket : public Device
+class Jumper : public Device
 {
 public:
-    Socket(int serial, sf::Vector2i pos_p);
-    virtual ~Socket() {;}
+    Jumper(int serial, sf::Vector2i pos_p);
+    virtual ~Jumper() {;}
 
-    virtual std::string SerialName() const { return "SOCK";}
+    virtual std::string SerialName() const { return "JUMP";}
     virtual void ReceiveCharge(bool charge, int weight, int slot);
     virtual bool CanRegisterIn(int slot) const;
     
@@ -42,8 +42,8 @@ public:
     virtual void Draw(sf::RenderTarget & rt) override;
     virtual void Handle(int code) override;
 private:
-    SocketView v;
+    JumperView v;
 };
 
-#endif	/* SOCKET_HPP */
+#endif	/* JUMPER_HPP */
 

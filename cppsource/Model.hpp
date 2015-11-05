@@ -19,6 +19,7 @@ public:
     void DebugInfo();
     void Logic();
     
+    void SetBasePlan(std::shared_ptr<ChipPlan> newPlan) {basePlan = newPlan;}
     std::shared_ptr<ChipPlan> GetBasePlan() {return basePlan;}
 private:
     std::shared_ptr<ChipPlan> basePlan;

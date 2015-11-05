@@ -22,39 +22,36 @@ void BlobFactory::AddNeuron(std::shared_ptr<ChipPlan> plan, int serial, sf::Vect
     }
 }
 
-void BlobFactory::AddSocket(std::shared_ptr<ChipPlan> plan, int serial, sf::Vector2i pos)
+void BlobFactory::AddJumper(std::shared_ptr<ChipPlan> plan, int serial, sf::Vector2i pos)
 {
     if (serial == 0) serial = plan->GetFreeSerial();
     if (plan->IsPositionFree(pos) and plan->IsSerialFree(serial))
     {
-        auto mp = std::make_shared<Socket> (serial, pos);
+        auto mp = std::make_shared<Jumper> (serial, pos);
         plan->ImportDevice(mp);
     }
 }
 
-void BlobFactory::AddHandle(std::shared_ptr<ChipPlan> plan, int serial, sf::Vector2i pos)
+std::shared_ptr<ChipHandle> BlobFactory::AddHandle(std::shared_ptr<ChipPlan> plan, int serial, sf::Vector2i pos)
 {
+    std::shared_ptr<ChipHandle> ret = nullptr;
     if (serial == 0) serial = plan->GetFreeSerial();
     if (plan->IsPositionFree(pos) and plan->IsSerialFree(serial))
     {
-        auto mp = std::make_shared<ChipHandle> (serial, pos);
-        plan->ImportDevice(mp);
+        auto handle = std::make_shared<ChipHandle> (serial, pos);
+        auto subPlan = std::make_shared<ChipPlan> ();
+        subPlan->RegisterReferer(handle);
+        handle->SetPlan( subPlan );
+        
+        plan->ImportDevice(handle);
+        ret = handle;
     }
+    return ret;
 }
-
-std::shared_ptr<ChipPlan> BlobFactory::AddPlan(std::shared_ptr<ChipHandle> handle)
-{
-    auto plan = std::make_shared<ChipPlan> ();
-    plan->RegisterReferer(handle);
-    return plan;
-}
-
 
 
 void BlobFactory::AddWire(std::shared_ptr<ChipPlan> plan, Wirable & from, Wirable & to, signed weight)
 {
-    static const int SLOT_MAX = 99;
-    
     int fromSlot = 0;
     int toSlot = 0;
     

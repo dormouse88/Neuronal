@@ -8,11 +8,11 @@
 #ifndef APP_HPP
 #define	APP_HPP
 
+#include "BlobFactory.hpp"
 #include "Model.hpp"
 #include "View.hpp"
-#include "Controller.hpp"
-#include "BlobFactory.hpp"
 #include "Serializer.hpp"
+#include "Controller.hpp"
 
 class App
 {
@@ -21,9 +21,9 @@ public:
     void Run();
 private:
     BlobFactory factory;
-    Serializer serializer;
     Model model;
     View view;
+    Serializer serializer;
     Controller controller;
 };
 

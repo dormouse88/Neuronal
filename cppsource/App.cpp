@@ -10,10 +10,10 @@
 
 App::App()
     :factory(),
-    serializer(),
     model(),
     view(model),
-    controller(factory, model, view)
+    serializer(),
+    controller(factory, serializer, model, view)
 {}
 
 void App::Run()

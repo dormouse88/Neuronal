@@ -7,8 +7,8 @@
 
 #include "Controller.hpp"
 
-Controller::Controller(BlobFactory & factory_p, Model & model_p, View & view_p)
-    :theFactory(factory_p), theModel(model_p), theView(view_p), mouseCursorSet(false)
+Controller::Controller(BlobFactory & factory_p, Serializer & serializer_p, Model & model_p, View & view_p)
+    :theFactory(factory_p), theSerializer(serializer_p), theModel(model_p), theView(view_p), mouseCursorSet(false)
 {}
 
 void Controller::DebugInfo()
@@ -53,6 +53,7 @@ bool Controller::HandleInput()
     theView.device2 = device2;
     theView.wire1 = wire1;
     
+    //the event loop...
     bool quitYet = false;
     sf::Event event;
     while (theView.GetWindow().pollEvent(event))
@@ -108,11 +109,11 @@ bool Controller::HandleInput()
             }
             if (event.key.code == sf::Keyboard::J)
             {
-                if (pos1) theFactory.AddSocket(activePlan, 0, *pos1 );
+                if (pos1) theFactory.AddJumper(activePlan, 0, *pos1 );
             }
             if (event.key.code == sf::Keyboard::H)
             {
-                if (pos1) theFactory.AddHandle(activePlan, 0, *pos1 );
+                if (pos1) theFactory.AddHandle(activePlan, 0, *pos1);
             }
             if (event.key.code == sf::Keyboard::B)
             {
@@ -145,9 +146,6 @@ bool Controller::HandleInput()
                 if (device1) {
                     std::shared_ptr<ChipHandle> handle = std::dynamic_pointer_cast<ChipHandle>(device1);
                     if (handle) {
-                        if (handle->GetPlan() == nullptr) {
-                            handle->SetPlan( theFactory.AddPlan(handle) );
-                        }
                         theView.PushPlan( handle->GetPlan() );
                     }
                 }
@@ -160,11 +158,31 @@ bool Controller::HandleInput()
             }
             if (event.key.code == sf::Keyboard::Q)
             {
-                //theSerializer->Save(activePlan);
+                theSerializer.SaveFile(activePlan);
             }
             if (event.key.code == sf::Keyboard::W)
             {
-                //theSerializer->Load(activePlan);
+                auto loadedPlan = theSerializer.LoadFile(theFactory, theView.xmlPlan);
+                if (loadedPlan)
+                {
+                    auto handle = activePlan->GetReferer();
+                    if (handle) {
+                        handle->SetPlan(loadedPlan);
+                        loadedPlan->RegisterReferer(handle);
+                    }
+                    if (theModel.GetBasePlan() == activePlan) {
+                        theModel.SetBasePlan(loadedPlan);
+                    }
+                    theView.SetActivePlan(loadedPlan);
+                }
+            }
+            if (event.key.code == sf::Keyboard::Dash)
+            {
+                theView.xmlPlan -= 1;
+            }
+            if (event.key.code == sf::Keyboard::Equal)
+            {
+                theView.xmlPlan += 1;
             }
             if (event.key.code == sf::Keyboard::LBracket)
             {

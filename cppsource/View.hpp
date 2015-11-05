@@ -37,6 +37,7 @@ public:
     sf::RenderWindow & GetWindow()          {return window;}
     sf::View & GetMainView()                {return mainView;}
     std::weak_ptr<ChipPlan> GetActivePlan() {return activePlan.top();}
+    void SetActivePlan(std::weak_ptr<ChipPlan> p) {activePlan.top() = p;}
     
 private:
     sf::RenderWindow window;
@@ -45,6 +46,7 @@ private:
     sf::View barOverlay;
 
     sf::RectangleShape overlayBox;
+    sf::Text planNumText;
 
     const Model & theModel;
     std::stack< std::weak_ptr<ChipPlan> > activePlan;
@@ -56,6 +58,7 @@ public:
     std::weak_ptr<Device> device1;
     std::weak_ptr<Device> device2;
     std::weak_ptr<Wire> wire1;
+    int xmlPlan;
 };
 
 #endif	/* VIEW_HPP */

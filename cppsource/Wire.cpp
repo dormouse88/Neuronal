@@ -9,6 +9,7 @@
 
 #include "Wirable.hpp"
 #include <sstream>
+#include <cassert>
 
 const float BACKBOARD_PADDING = 4.f;
 const sf::Color BACKBOARD_FILLCOLOR {20,20,20};
@@ -168,19 +169,19 @@ void Wire::Handle(int code)
     if (code == 1)
     {
         if (GetFrom().IsSlotted(SlottedSide::OUT)) {
-            fromSlot += 1;
+            SlotCycle(1, true);
         }
     }
     if (code == 2)
     {
         if (GetFrom().IsSlotted(SlottedSide::OUT)) {
-            fromSlot -= 1;
+            SlotCycle(-1, true);
         }
     }
     if (code == 3)
     {
         if (GetTo().IsSlotted(SlottedSide::IN)) {
-            toSlot += 1;
+            SlotCycle(1, false);
         }
         else {
             SetWeight( GetWeight() + 1);
@@ -189,10 +190,27 @@ void Wire::Handle(int code)
     if (code == 4)
     {
         if (GetTo().IsSlotted(SlottedSide::IN)) {
-            toSlot -= 1;
+            SlotCycle(-1, false);
         }
         else {
             SetWeight( GetWeight() - 1);
         }
     }
+}
+
+void Wire::SlotCycle(int step, bool fromSide)
+{
+    assert(step == -1 or step == 1);
+    int & chosenSlot = fromSide == true ? fromSlot : toSlot;
+    int newSlot = chosenSlot;
+    bool acceptNewSlot = false;
+    while (newSlot + step >= 1 and newSlot + step <= SLOT_MAX and not acceptNewSlot)
+    {
+        newSlot += step;
+        if ( (fromSide and from.CanRegisterOut(newSlot)) or (!fromSide and to.CanRegisterIn(newSlot)) )
+        {
+            acceptNewSlot = true;
+        }
+    }
+    if (acceptNewSlot) chosenSlot = newSlot;
 }

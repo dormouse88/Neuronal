@@ -10,6 +10,9 @@
 
 #include <SFML/Graphics.hpp>
 #include "ViewResources.hpp"
+
+const int SLOT_MAX = 99;
+
 class Wire;
 
 class WireView
@@ -54,6 +57,7 @@ public:
     virtual void Draw(sf::RenderTarget & rt) override;
     virtual void Handle(int code) override;
 
+    void SlotCycle(int step, bool fromSide);
 private:
     Wirable& from;
     int fromSlot;

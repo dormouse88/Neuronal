@@ -2,21 +2,48 @@
 <FIRE>
 	Cheese
 </FIRE>
-<PLAN>
-	<NEUR x="-2" y="4" thr="1" i="3" />
-	<NEUR x="2" y="2" thr="2" i="4" />
-	<NEUR x="3" y="1" thr="4" i="5" />
-	<NEUR x="4" y="2" thr="0" i="6" />
-	<NEUR x="-1" y="2" thr="4" i="7" />
-	<NEUR x="0" y="0" thr="6" i="1" />
-	<NEUR x="1" y="1" thr="-1" i="2" />
-	<WIRE f="3" t="4" w="1" />
-	<WIRE f="4" t="5" w="4" />
-	<WIRE f="5" t="6" w="1" />
-	<WIRE f="6" t="3" w="1" />
-	<WIRE f="7" t="2" w="-2" />
-	<WIRE f="1" t="2" w="3" />
-	<WIRE f="3" t="7" w="4" />
-	<WIRE f="7" t="1" w="1" />
-	<WIRE f="2" t="4" w="1" />
+<PLAN_DB HIGHEST_ID="5" />
+<PLAN i="1">
+	<NEUR i="1" x="0" y="3" thr="1" />
+	<NEUR i="2" x="3" y="2" thr="1" />
+	<JUMP i="3" x="3" y="5" />
+	<WIRE f="1" t="2" w="1" fs="0" ts="0" />
+	<WIRE f="1" t="3" w="1" fs="0" ts="0" />
 </PLAN>
+<PLAN i="2">
+	<NEUR i="1" x="0" y="3" thr="1" />
+	<NEUR i="2" x="3" y="2" thr="1" />
+	<NEUR i="4" x="-2" y="3" thr="1" />
+	<JUMP i="3" x="3" y="5" />
+	<HAND i="5" x="-2" y="5" link="1" />
+	<JUMP i="6" x="0" y="5" />
+	<JUMP i="7" x="1" y="1" />
+	<JUMP i="8" x="0" y="1" />
+	<WIRE f="1" t="2" w="1" fs="0" ts="0" />
+	<WIRE f="1" t="3" w="1" fs="0" ts="0" />
+	<WIRE f="4" t="1" w="1" fs="0" ts="0" />
+	<WIRE f="8" t="7" w="1" fs="0" ts="0" />
+	<WIRE f="7" t="0" w="1" fs="0" ts="1" />
+	<WIRE f="0" t="8" w="1" fs="1" ts="0" />
+</PLAN>
+<PLAN i="3">
+	<NEUR i="1" x="0" y="3" thr="1" />
+	<NEUR i="2" x="3" y="2" thr="1" />
+	<NEUR i="4" x="-2" y="3" thr="1" />
+	<JUMP i="3" x="3" y="5" />
+	<WIRE f="1" t="2" w="1" fs="0" ts="0" />
+	<WIRE f="1" t="3" w="1" fs="0" ts="0" />
+	<WIRE f="4" t="1" w="1" fs="0" ts="0" />
+</PLAN>
+<PLAN i="4">
+	<NEUR i="1" x="-1" y="2" thr="1" />
+	<NEUR i="2" x="0" y="3" thr="1" />
+	<NEUR i="3" x="1" y="4" thr="1" />
+	<NEUR i="4" x="2" y="4" thr="1" />
+	<NEUR i="5" x="3" y="4" thr="1" />
+	<NEUR i="6" x="4" y="3" thr="1" />
+	<NEUR i="7" x="5" y="2" thr="1" />
+	<NEUR i="8" x="1" y="-2" thr="1" />
+	<NEUR i="9" x="3" y="-2" thr="1" />
+</PLAN>
+<PLAN i="5" />

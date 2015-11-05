@@ -131,6 +131,7 @@ std::shared_ptr<Device> ChipPlan::GetDevice(int serial)
             return x;
         }
     }
+    return nullptr;
 }
 
 /**

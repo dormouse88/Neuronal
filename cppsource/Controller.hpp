@@ -11,17 +11,19 @@
 #include "Model.hpp"
 #include "View.hpp"
 #include "BlobFactory.hpp"
+#include "Serializer.hpp"
 
 class Controller
 {
 public:
-    Controller(BlobFactory & factory_p, Model & model_p, View & view_p);
+    Controller(BlobFactory & factory_p, Serializer & serializer_p, Model & model_p, View & view_p);
     Controller(const Controller&) = delete;
     void DebugInfo();
     bool HandleInput();
 
 private:
     BlobFactory & theFactory;
+    Serializer & theSerializer;
     Model & theModel;
     View & theView;
 

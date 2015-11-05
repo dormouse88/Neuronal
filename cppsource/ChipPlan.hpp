@@ -21,6 +21,7 @@ class ChipPlan : public Wirable, public Gobject
 public:
     ChipPlan();
     void RegisterReferer(std::shared_ptr<ChipHandle> handle) { referer = handle; }
+    std::shared_ptr<ChipHandle> GetReferer() {return referer.lock();}
     virtual ~ChipPlan() {}
 
     virtual std::string SerialName() const { return "PLAN";}
@@ -57,6 +58,7 @@ private:
     std::weak_ptr<ChipHandle> referer;  //need to be able to pass charge back out
     std::vector<std::shared_ptr<Device> > devices;
     std::vector<std::shared_ptr<Wire> > wires;
+    friend class Serializer;
 };
 #endif	/* CHIPPLAN_HPP */
 
