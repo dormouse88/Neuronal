@@ -17,7 +17,7 @@ void BlobFactory::AddNeuron(std::shared_ptr<ChipPlan> plan, int serial, sf::Vect
     if (serial == 0) serial = plan->GetFreeSerial();
     if (plan->IsPositionFree(pos) and plan->IsSerialFree(serial))
     {
-        auto mp = std::make_shared<Neuron> (serial, pos, threshold);
+        auto mp = std::make_shared<Neuron> (serial, pos, threshold, plan);
         plan->ImportDevice(mp);
     }
 }
@@ -27,7 +27,7 @@ void BlobFactory::AddJumper(std::shared_ptr<ChipPlan> plan, int serial, sf::Vect
     if (serial == 0) serial = plan->GetFreeSerial();
     if (plan->IsPositionFree(pos) and plan->IsSerialFree(serial))
     {
-        auto mp = std::make_shared<Jumper> (serial, pos);
+        auto mp = std::make_shared<Jumper> (serial, pos, plan);
         plan->ImportDevice(mp);
     }
 }
@@ -38,7 +38,7 @@ std::shared_ptr<ChipHandle> BlobFactory::AddHandle(std::shared_ptr<ChipPlan> pla
     if (serial == 0) serial = plan->GetFreeSerial();
     if (plan->IsPositionFree(pos) and plan->IsSerialFree(serial))
     {
-        auto handle = std::make_shared<ChipHandle> (serial, pos);
+        auto handle = std::make_shared<ChipHandle> (serial, pos, plan);
         auto subPlan = std::make_shared<ChipPlan> ();
         subPlan->RegisterReferer(handle);
         handle->SetPlan( subPlan );
@@ -90,34 +90,13 @@ void BlobFactory::AddWire(std::shared_ptr<ChipPlan> plan, Wirable & from, Wirabl
 
 void BlobFactory::AddWire(std::shared_ptr<ChipPlan> plan, Wirable & from, int fromSlot, Wirable & to, int toSlot, signed weight)
 {    
-    //WAS plan->IsWiringFree(from, fromSlot, to, toSlot)
     //if the wire will be valid...
     if (from.HasWireTo(fromSlot, to, toSlot) == false and from.CanRegisterOut(fromSlot) and to.CanRegisterIn(toSlot) and &from != &to)
     {
-        auto mp = std::make_shared<Wire> (from, fromSlot, to, toSlot, weight);
+        auto mp = std::make_shared<Wire> (from, fromSlot, to, toSlot, weight, plan);
         from.RegisterOut(mp);
         to.RegisterIn(mp);
         plan->ImportWire(mp);
-    }
-}
-
-void BlobFactory::RemoveDevice(std::shared_ptr<ChipPlan> plan, std::shared_ptr<Device> device)
-{
-    if (plan and device) {
-        for (auto w : plan->GetWires(device, true, true))
-        {
-            w->Zingaya();
-        }
-        device->Zingaya();
-        plan->CleanVectors();
-    }
-}
-
-void BlobFactory::RemoveWire(std::shared_ptr<ChipPlan> plan, std::shared_ptr<Wire> wire)
-{
-    if (wire != nullptr) {
-        wire->Zingaya();
-        plan->CleanVectors();
     }
 }
 

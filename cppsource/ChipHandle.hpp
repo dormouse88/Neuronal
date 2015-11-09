@@ -17,7 +17,7 @@
 class ChipHandle : public Device, public DeviceView
 {
 public:
-    ChipHandle(int serial_p, sf::Vector2i pos_p);
+    ChipHandle(int serial_p, sf::Vector2i pos_p, std::shared_ptr<ChipPlan> cont);
     virtual ~ChipHandle() {}
     virtual std::string SerialName() const override { return "HAND";}
     
@@ -30,7 +30,7 @@ public:
     virtual void LogicAct() override;
     virtual void LogicCalculate() override;
     
-    void SetPlan(std::shared_ptr<ChipPlan> newPlan)     {plan = newPlan;}
+    void SetPlan(std::shared_ptr<ChipPlan> newPlan)     {plan = newPlan; SetModified();}
     std::shared_ptr<ChipPlan> GetPlan()                 {return plan;}
 
     virtual sf::Vector2f GetWireAttachPos(WireAttachSide was) const override;
@@ -39,6 +39,7 @@ public:
 private:
     std::shared_ptr<ChipPlan> plan;
     sf::RectangleShape shape;
+    sf::Text planNumText;
 };
 
 #endif	/* CHIPHANDLE_HPP */

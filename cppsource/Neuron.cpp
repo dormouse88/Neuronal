@@ -54,8 +54,8 @@ void NeuronView::Draw(sf::RenderTarget & rt, const Neuron & n)
  * @param pos_p
  * @param threshold_p
  */
-Neuron::Neuron(int serial_p, sf::Vector2i pos_p, int threshold_p)
-    :Device(serial_p, pos_p), firing(false), threshold(threshold_p), receivedCharge(0), v(*this)
+Neuron::Neuron(int serial_p, sf::Vector2i pos_p, int threshold_p, std::shared_ptr<ChipPlan> cont)
+    :Device(serial_p, pos_p, cont), firing(false), threshold(threshold_p), receivedCharge(0), v(*this)
 {}
 
 void Neuron::ReceiveCharge(bool charge, int weight, int slot)

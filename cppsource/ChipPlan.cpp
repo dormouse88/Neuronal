@@ -9,7 +9,7 @@
 #include "ChipHandle.hpp"
 
 ChipPlan::ChipPlan()
-    :Wirable()
+    :Wirable(), planID(0), modified(false)
 {}
 
 void ChipPlan::ReceiveCharge(bool charge, int weight, int slot)
@@ -56,6 +56,7 @@ void ChipPlan::PassOnCalculate()
 void ChipPlan::SetPosition(Device & d, sf::Vector2i newPos)
 {
     if (IsPositionFree(newPos)) d.SetPosInPlan( newPos );
+    SetModified();
 }
 int ChipPlan::GetFreeSerial() const
 {
@@ -78,26 +79,37 @@ bool ChipPlan::IsPositionFree(sf::Vector2i pos) const
     }
     return true;
 }
-//RED
-//bool ChipPlan::IsWiringFree(Wirable & from, int fromSlot, Wirable & to, int toSlot) const
-//{
-//    //check against siblings
-//    for (const auto & x: wires) {
-//        if ( (&x->GetFrom() == &from and x->GetFromSlot() == fromSlot) and (&x->GetTo() == &to and x->GetToSlot() == toSlot) ) return false;
-//    }
-//    return true;
-//}
-
 
 void ChipPlan::ImportDevice(std::shared_ptr<Device> device)
 {
     devices.emplace_back(device);
+    SetModified();
 }
 void ChipPlan::ImportWire(std::shared_ptr<Wire> wire)
 {
     wires.emplace_back(wire);
+    SetModified();
 }
-
+void ChipPlan::RemoveDevice(std::shared_ptr<Device> device)
+{
+    if (device) {
+        for (auto w : GetWires(device, true, true))
+        {
+            w->Zingaya();
+        }
+        device->Zingaya();
+        CleanVectors();
+        SetModified();
+    }
+}
+void ChipPlan::RemoveWire(std::shared_ptr<Wire> wire)
+{
+    if (wire) {
+        wire->Zingaya();
+        CleanVectors();
+        SetModified();
+    }
+}
 void ChipPlan::CleanVectors()
 {
     {
@@ -111,6 +123,17 @@ void ChipPlan::CleanVectors()
         wires.erase(new_end, std::end(wires) );
     }
 }
+
+void ChipPlan::SetModified()
+{
+    if (not modified)
+    {
+        auto refLock = referer.lock();
+        if (refLock) refLock->SetModified();
+        modified = true;
+    }
+}
+
 
 
 
@@ -195,9 +218,9 @@ void ChipPlan::Draw(sf::RenderTarget & rt)
         x->Draw(rt);
     }
 }
-void ChipPlan::Handle(int code)
-{
-    if (code == 1) {
-        ;
-    }
-}
+//void ChipPlan::Handle(int code)
+//{
+//    if (code == 1) {
+//        ;
+//    }
+//}

@@ -2,13 +2,15 @@
  * File:   Gobject.hpp
  * Author: Dormouse
  *
- * Created on 16 January 2015, 17:57
+ * Created on 09 November 2015, 16:52
  */
 
 #ifndef GOBJECT_HPP
 #define	GOBJECT_HPP
 
+#include <memory>
 #include <SFML/Graphics.hpp>
+class ChipPlan;  //fwd dec
 
 class Drawable
 {
@@ -30,13 +32,18 @@ public:
 class Gobject: public Drawable, public Responsive
 {
 public:
-    Gobject() :dead(false) {}
+    Gobject(std::shared_ptr<ChipPlan> cont)
+        :container(cont), dead(false)
+        
+    {}
     virtual ~Gobject() = 0;
     virtual std::string SerialName() const = 0;
     void Zingaya() {dead = true;}
     bool IsDead() const {return dead;}
+    void SetModified();
 private:
     bool dead;
+    std::weak_ptr<ChipPlan> container;
 };
 
 inline Gobject::~Gobject() {}

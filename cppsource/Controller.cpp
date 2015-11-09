@@ -104,7 +104,7 @@ bool Controller::HandleInput()
                     if (pos1) theFactory.AddNeuron(activePlan, 0, *pos1, 1 );
                 }
                 else {
-                    if (device1) theFactory.RemoveDevice(activePlan, device1);
+                    if (device1) activePlan->RemoveDevice(device1);
                 }
             }
             if (event.key.code == sf::Keyboard::J)
@@ -121,26 +121,26 @@ bool Controller::HandleInput()
                     if (wirable1 and wirable2) theFactory.AddWire(activePlan, *wirable1, *wirable2, 1 );
                 }
                 else {
-                    if (wire1) theFactory.RemoveWire(activePlan, wire1 );
+                    if (wire1) activePlan->RemoveWire( wire1 );
                 }
             }
             if (event.key.code == sf::Keyboard::A) {
-                if (device1) device1->Handle(1);
+                if (device1) device1->Handle(1); activePlan->SetModified();
             }
             if (event.key.code == sf::Keyboard::Z) {
-                if (device1) device1->Handle(2);
+                if (device1) device1->Handle(2); activePlan->SetModified();
             }
             if (event.key.code == sf::Keyboard::D) {
-                if (wire1) wire1->Handle(1);
+                if (wire1) wire1->Handle(1); activePlan->SetModified();
             }
             if (event.key.code == sf::Keyboard::C) {
-                if (wire1) wire1->Handle(2);
+                if (wire1) wire1->Handle(2); activePlan->SetModified();
             }
             if (event.key.code == sf::Keyboard::F) {
-                if (wire1) wire1->Handle(3);
+                if (wire1) wire1->Handle(3); activePlan->SetModified();
             }
             if (event.key.code == sf::Keyboard::V) {
-                if (wire1) wire1->Handle(4);
+                if (wire1) wire1->Handle(4); activePlan->SetModified();
             }
             if (event.key.code == sf::Keyboard::S) {
                 if (device1) {

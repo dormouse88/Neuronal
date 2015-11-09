@@ -11,13 +11,18 @@
 
 const sf::FloatRect MAIN_VIEWPORT {0.f, 0.f, 1.f, 0.8f};
 const sf::FloatRect BAR_VIEWPORT {0.f, 0.8f, 1.f, 0.2f};
+const int BAR_HEIGHT = 180.f;
+//This is all very shonky. Need to consider what is flexible and what is fixed on screen.
+const sf::Vector2i INITIAL_WINDOW_SIZE { 1400, 900 };
+const sf::Vector2f INITIAL_MAINVIEW_SIZE { (float)INITIAL_WINDOW_SIZE.x, (float)INITIAL_WINDOW_SIZE.y - BAR_HEIGHT };
 
 View::View(Model & model_p)
    :theModel(model_p),
-    window(sf::VideoMode(1400, 900), "Neuronal"),
-    mainView(sf::Vector2f(250.f, 200.f), sf::Vector2f(1400.f, 720.f) ),
-    barOverlay(sf::FloatRect{0.f,0.f, 1400.f, 180.f}),
-    overlayBox(sf::Vector2f{1400.f, 720.f} ),
+    window(sf::VideoMode(INITIAL_WINDOW_SIZE.x, INITIAL_WINDOW_SIZE.y), "Neuronal"),
+    mainView(sf::Vector2f{250.f, 200.f}, INITIAL_MAINVIEW_SIZE ),
+    mainOverlay(sf::FloatRect{0.f,0.f, INITIAL_MAINVIEW_SIZE.x, INITIAL_MAINVIEW_SIZE.y}),
+    barOverlay(sf::FloatRect{0.f,0.f, INITIAL_MAINVIEW_SIZE.x, BAR_HEIGHT}),
+    mainOverlayBox(sf::Vector2f{1400.f, 720.f} ),
     cursorOne(),
     cursorTwo(sf::Color::Cyan),
     highlightingMode(1),
@@ -74,8 +79,8 @@ void View::Draw()
         if (highlightingMode != 1)
         {
             window.setView(mainOverlay);
-            overlayBox.setFillColor( sf::Color{0,0,0,210} );
-            window.draw(overlayBox);
+            mainOverlayBox.setFillColor( sf::Color{0,0,0,210} );
+            window.draw(mainOverlayBox);
             window.setView(mainView);
         }
         if (highlightingMode == 2)
@@ -119,7 +124,7 @@ void View::Pan(sf::Vector2f moveBy)
 }
 void View::Resize(sf::Vector2f newSize)
 {
-    mainView.setSize(newSize);
+    mainView.setSize( sf::Vector2f{newSize.x * MAIN_VIEWPORT.width, newSize.y * MAIN_VIEWPORT.height} ); //This is all very shonky. Need to consider what is flexible and what is fixed on screen.
     window.setView(mainView);
 }
 

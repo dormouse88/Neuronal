@@ -8,10 +8,12 @@
 #ifndef DEVICE_HPP
 #define	DEVICE_HPP
 
+#include <memory>
 #include <SFML/System.hpp>  //for sf::Vector
 #include "Wirable.hpp"
 #include "Gobject.hpp"
 #include "ViewResources.hpp"
+class ChipPlan; //fwd dec
 
 class DeviceView
 {
@@ -35,14 +37,14 @@ protected:
 class Device : public Wirable, public Gobject
 {
 public:
-    Device(int serial_p, sf::Vector2i pos_p)
-        :serial(serial_p), pos(pos_p)
+    Device(int serial_p, sf::Vector2i pos_p, std::shared_ptr<ChipPlan> cont)
+        :Gobject(cont), serial(serial_p), pos(pos_p)
         {}
     virtual ~Device() {}
 
     virtual void LogicAct() {}
     virtual void LogicCalculate() {}
-    
+
     sf::Vector2f GetWorldPos() const
     {
         sf::Vector2f planPos { 0.0f, 0.0f };
@@ -57,6 +59,7 @@ public:
 private:
     sf::Vector2i pos;
     int serial;
+    
 };
 
 #endif	/* DEVICE_HPP */

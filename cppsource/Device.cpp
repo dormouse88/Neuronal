@@ -6,3 +6,4 @@
  */
 
 #include "Device.hpp"
+

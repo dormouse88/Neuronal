@@ -34,8 +34,8 @@ void JumperView::Draw(sf::RenderTarget & rt, const Jumper & s)
 
 #include "Wire.hpp"
 
-Jumper::Jumper(int serial, sf::Vector2i pos_p)
-    :Device(serial, pos_p), v(*this)
+Jumper::Jumper(int serial, sf::Vector2i pos_p, std::shared_ptr<ChipPlan> cont)
+    :Device(serial, pos_p, cont), v(*this)
 {}
 
 void Jumper::ReceiveCharge(bool charge, int weight, int slot)

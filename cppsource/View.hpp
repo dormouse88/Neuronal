@@ -45,7 +45,7 @@ private:
     sf::View mainOverlay;
     sf::View barOverlay;
 
-    sf::RectangleShape overlayBox;
+    sf::RectangleShape mainOverlayBox;
     sf::Text planNumText;
 
     const Model & theModel;

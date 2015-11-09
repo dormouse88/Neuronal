@@ -6,20 +6,24 @@
  */
 
 #include "ChipHandle.hpp"
+#include "miscUtil.hpp"
 
 const sf::Vector2f RECTANGLE { 90.f, 65.f };
 const sf::Vector2f MAIN_OFFSET { (GRID_SIZE - RECTANGLE)/2.f };
-const sf::Vector2f THRESHOLD_OFFSET { MAIN_OFFSET.x + 18.f, MAIN_OFFSET.y + 2.f };
+const sf::Vector2f PLANID_OFFSET { MAIN_OFFSET.x + 18.f, MAIN_OFFSET.y + 2.f };
 
 const sf::Vector2f WIRE_IN_OFFSET { MAIN_OFFSET };
 const sf::Vector2f WIRE_OUT_OFFSET { MAIN_OFFSET + RECTANGLE };
 
 
-ChipHandle::ChipHandle(int serial_p, sf::Vector2i pos_p)
-    :Device(serial_p, pos_p), DeviceView( GetWorldPos() ), shape( RECTANGLE )
+ChipHandle::ChipHandle(int serial_p, sf::Vector2i pos_p, std::shared_ptr<ChipPlan> cont)
+    :Device(serial_p, pos_p, cont), DeviceView( GetWorldPos() ), shape( RECTANGLE )
 {
     shape.setOutlineColor(sf::Color::White);
     shape.setOutlineThickness(3);
+    planNumText.setFont(ViewResources::GetInstance().font);
+    planNumText.setCharacterSize(30);
+    planNumText.setColor(sf::Color::Black);
 }
 
 
@@ -83,7 +87,12 @@ void ChipHandle::Draw(sf::RenderTarget & rt)
     UpdatePos(GetWorldPos());
     shape.setPosition( actualPos + MAIN_OFFSET );
     shape.setFillColor(sf::Color::Yellow);
+    std::string text = patch::to_string( plan->GetPlanID() );
+    if (plan->IsModified()) text.append("*");
+    planNumText.setString( text );
+    planNumText.setPosition( actualPos + PLANID_OFFSET );
     rt.draw(shape);
+    rt.draw(planNumText);
 }
 
 void ChipHandle::Handle(int code)

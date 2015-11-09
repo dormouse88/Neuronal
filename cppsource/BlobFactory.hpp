@@ -28,8 +28,6 @@ public:
     void AddWire(std::shared_ptr<ChipPlan> plan, Wirable & from, int fromSlot, Wirable & to, int toSlot, signed weight);
     //void AddWire(int from, int fromSlot, int to, int toSlot, signed weight);
 
-    void RemoveDevice(std::shared_ptr<ChipPlan> plan, std::shared_ptr<Device> device);
-    void RemoveWire(std::shared_ptr<ChipPlan> plan, std::shared_ptr<Wire> wire);
 private:
 };
 

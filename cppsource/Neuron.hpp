@@ -30,7 +30,7 @@ private:
 class Neuron : public Device
 {
 public:
-    Neuron(int serial_p, sf::Vector2i pos_p, int threshold_p);
+    Neuron(int serial_p, sf::Vector2i pos_p, int threshold_p, std::shared_ptr<ChipPlan> cont);
     virtual ~Neuron() {;}
 
     virtual std::string SerialName() const { return "NEUR";}

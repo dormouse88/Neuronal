@@ -31,7 +31,7 @@ private:
 class Jumper : public Device
 {
 public:
-    Jumper(int serial, sf::Vector2i pos_p);
+    Jumper(int serial, sf::Vector2i pos_p, std::shared_ptr<ChipPlan> cont);
     virtual ~Jumper() {;}
 
     virtual std::string SerialName() const { return "JUMP";}
