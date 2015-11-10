@@ -54,7 +54,7 @@ void WireView::Draw(sf::RenderTarget & rt, const Wire & w)
     }
     else {
         colFrom = sf::Color(70,70,70);  //(40,40,40);
-        colTo = sf::Color(200,200,200);   //(210,210,210);
+        colTo = sf::Color(180,180,180);   //(210,210,210);
     }
     std::vector<sf::Vertex> line;
     sf::Vector2f posFrom = w.GetFrom().GetWireAttachPos(WireAttachSide::OUT);
@@ -75,7 +75,7 @@ void WireView::Draw(sf::RenderTarget & rt, const Wire & w)
         //fmod(t*x, y) + z //pulse every x seconds, along y% of the line. z is length of the pulse as line %.
         float linePoint1 = fmod(t.asSeconds() *1.0, 0.9f) + 0.1f ;
         float linePoint2 = fmod(t.asSeconds() *1.0, 0.9f) ;
-        pulse.push_back( sf::Vertex( posFrom + linePoint1 * (posTo - posFrom), sf::Color(105,105,105) * colTo ) );
+        pulse.push_back( sf::Vertex( posFrom + linePoint1 * (posTo - posFrom), sf::Color(175,175,175) * colTo ) );
         pulse.push_back( sf::Vertex( posFrom + linePoint2 * (posTo - posFrom), sf::Color(0,0,0) ) );
         rt.draw(&pulse[0], pulse.size(), sf::LinesStrip, sf::RenderStates(sf::BlendAdd));
     }

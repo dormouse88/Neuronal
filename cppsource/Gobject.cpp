@@ -14,3 +14,8 @@ void Gobject::SetModified()
     auto c = container.lock();
     if (c) c->SetModified();
 }
+
+std::shared_ptr<ChipPlan> Gobject::GetContainer()
+{
+    return container.lock();
+}

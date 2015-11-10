@@ -19,8 +19,34 @@ Cursor::Cursor(sf::Color color)
 void Cursor::Draw(sf::RenderTarget & rt)
 {
     if (active) {
-        representation.setPosition( mapGridToCoords(m_pos) );
+        representation.setPosition( GetWorldPos() );
         rt.draw(representation, sf::RenderStates(sf::BlendAdd));
     }
 }
 
+sf::Vector2f Cursor::GetWorldPos() const
+{
+    if (!active) throw;
+    auto p = m_plan.lock();
+    if (p) return p->MapGridToCoords(m_pos);
+    throw;
+}
+sf::Vector2i Cursor::GetGridPos() const
+{
+    if (!active) throw;
+    return m_pos;
+}
+void Cursor::SetWorldPos(sf::Vector2f worldPos, std::shared_ptr<ChipPlan> plan)
+{
+    auto b = plan->GetPaddedBound();
+    if (b)
+    {
+        if (b->contains(worldPos))
+        {
+            m_plan = plan;
+            m_pos = plan->MapCoordsToGrid(worldPos);
+            active=true;
+        }
+        else active=false;
+    }
+}

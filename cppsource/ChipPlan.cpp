@@ -195,19 +195,65 @@ std::vector<std::shared_ptr<Wire> > ChipPlan::GetWires(std::shared_ptr<Wirable> 
 sf::Vector2f ChipPlan::GetWireAttachPos(WireAttachSide was) const
 {
     sf::Vector2f wirePos;
-    //erm......
-    if (was == WireAttachSide::IN)
-        { wirePos.x = 800.f; wirePos.y = 400.f; }
-    if (was == WireAttachSide::OUT)
-        { wirePos.x = 0.f; wirePos.y = 0.f; }
+    auto bound = GetPaddedBound();
+    if (bound)
+    {
+        //Because ChipPlans are wired internally, the wires come OUT of the left...
+        if (was == WireAttachSide::OUT)
+        {
+            wirePos.x = bound->left;
+        }
+        if (was == WireAttachSide::IN)
+        {
+            wirePos.x = bound->left + bound->width;
+        }
+        wirePos.y = bound->top + (0.5 * bound->height);
+    }
     return wirePos;
 }
 
+std::shared_ptr<sf::FloatRect> ChipPlan::GetPaddedBound() const
+{
+    std::shared_ptr<sf::FloatRect> paddedBox = nullptr;
+    if (devices.size() > 0)
+    {
+        auto firstPos = devices.at(0)->GetPosInPlan();
+        int rleft = firstPos.x;
+        int rright = firstPos.x;
+        int rtop = firstPos.y;
+        int rbottom = firstPos.y;
+        for (auto & x: devices)
+        {
+            sf::Vector2i p = x->GetPosInPlan();
+            if (p.x < rleft) rleft = p.x;
+            if (p.x > rright) rright = p.x;
+            if (p.y < rtop) rtop = p.y;
+            if (p.y > rbottom) rbottom = p.y;
+        }
+        sf::IntRect innerBound { rleft, rtop, rright - rleft + 1, rbottom - rtop + 1};
+        sf::IntRect paddedBound { innerBound.left -2, innerBound.top -2, innerBound.width +4, innerBound.height +4 };
+        paddedBox = std::make_shared<sf::FloatRect> ( MapGridToCoords( sf::Vector2i{paddedBound.left, paddedBound.top} ), MapGridToCoords( sf::Vector2i{paddedBound.width, paddedBound.height} ) );
+    }
+    else
+    {
+        paddedBox = std::make_shared<sf::FloatRect> ( MapGridToCoords(sf::Vector2i{-1,-1}), MapGridToCoords(sf::Vector2i{2,2}) );
+    }
+    return paddedBox;
+}
 
 void ChipPlan::Draw(sf::RenderTarget & rt)
 {
-    //(Plan should draw itself here)
-    //carry_on_here//
+    auto pB = GetPaddedBound();
+    if (pB)
+    {
+        sf::RectangleShape planBox;
+        planBox.setFillColor( sf::Color{50,0,0} );
+        planBox.setOutlineColor( sf::Color{95,95,95} );
+        planBox.setOutlineThickness(3.f);
+        planBox.setPosition( sf::Vector2f{pB->left, pB->top} );
+        planBox.setSize( sf::Vector2f{pB->width, pB->height} );
+        rt.draw(planBox);
+    }
     
     for (auto & w: wires)
     {
@@ -218,9 +264,20 @@ void ChipPlan::Draw(sf::RenderTarget & rt)
         x->Draw(rt);
     }
 }
-//void ChipPlan::Handle(int code)
-//{
-//    if (code == 1) {
-//        ;
-//    }
-//}
+
+
+sf::Vector2i ChipPlan::MapCoordsToGrid(const sf::Vector2f & point) const
+{
+    return sf::Vector2i{
+        static_cast<int>(floorf(point.x / GRID_SIZE.x)),
+        static_cast<int>(floorf(point.y / GRID_SIZE.y))
+    };
+}
+
+sf::Vector2f ChipPlan::MapGridToCoords(const sf::Vector2i & point) const
+{
+    return sf::Vector2f{
+        point.x * GRID_SIZE.x,
+        point.y * GRID_SIZE.y
+    };
+}

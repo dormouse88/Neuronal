@@ -57,8 +57,12 @@ public:
     std::vector<std::shared_ptr<Wire> > GetWires(std::shared_ptr<Wirable> device, bool from, bool to); 
 
     virtual sf::Vector2f GetWireAttachPos(WireAttachSide was) const override;
-    virtual void Draw(sf::RenderTarget & rt);// override;
-//    virtual void Handle(int code) override;
+    std::shared_ptr<sf::FloatRect> GetPaddedBound() const;
+    virtual void Draw(sf::RenderTarget & rt);
+    
+    sf::Vector2i MapCoordsToGrid(const sf::Vector2f & point) const;
+    sf::Vector2f MapGridToCoords(const sf::Vector2i & point) const;
+
 private:
     int planID;
     std::weak_ptr<ChipHandle> referer;  //need to be able to pass charge back out

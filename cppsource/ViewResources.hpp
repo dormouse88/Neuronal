@@ -26,9 +26,9 @@ public:
 };
 
 
-
-sf::Vector2i mapCoordsToGrid(const sf::Vector2f & point);
-sf::Vector2f mapGridToCoords(const sf::Vector2i & point);
+//RED
+//sf::Vector2i mapCoordsToGrid(const sf::Vector2f & point);
+//sf::Vector2f mapGridToCoords(const sf::Vector2i & point);
 
 
 

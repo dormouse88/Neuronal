@@ -19,6 +19,9 @@ public:
     Controller(BlobFactory & factory_p, Serializer & serializer_p, Model & model_p, View & view_p);
     Controller(const Controller&) = delete;
     void DebugInfo();
+    bool ReplaceActivePlan(std::shared_ptr<ChipPlan> newPlan, std::shared_ptr<ChipPlan> activePlan);
+    bool WipePlan(std::shared_ptr<ChipPlan> activePlan, bool forced);
+    bool LoadPlan(int num, std::shared_ptr<ChipPlan> activePlan);
     bool HandleInput();
 
 private:

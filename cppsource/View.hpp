@@ -29,15 +29,16 @@ public:
     void Zoom(float zoomFactor);
     void Pan(sf::Vector2f moveBy);
     void Resize(sf::Vector2f newSize);
+    void Clamp();
     void SetHighlightingMode(int x) {highlightingMode = x;}
     
-    void PopPlan()                                  {if (activePlan.size() > 1) activePlan.pop();}
-    void PushPlan(std::weak_ptr<ChipPlan> plan)     {activePlan.push(plan);}
+    void PopPlan()                                  {if (activePlan.size() > 1) activePlan.pop(); Clamp(); cursorOne.active = false; cursorTwo.active = false;}
+    void PushPlan(std::weak_ptr<ChipPlan> plan)     {activePlan.push(plan); Clamp(); cursorOne.active = false; cursorTwo.active = false;}
 
     sf::RenderWindow & GetWindow()          {return window;}
     sf::View & GetMainView()                {return mainView;}
     std::weak_ptr<ChipPlan> GetActivePlan() {return activePlan.top();}
-    void SetActivePlan(std::weak_ptr<ChipPlan> p) {activePlan.top() = p;}
+    void SetActivePlan(std::weak_ptr<ChipPlan> p) {activePlan.top() = p; Clamp(); cursorOne.active = false; cursorTwo.active = false;}
     
 private:
     sf::RenderWindow window;

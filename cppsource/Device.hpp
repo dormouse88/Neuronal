@@ -45,14 +45,7 @@ public:
     virtual void LogicAct() {}
     virtual void LogicCalculate() {}
 
-    sf::Vector2f GetWorldPos() const
-    {
-        sf::Vector2f planPos { 0.0f, 0.0f };
-        //If subplans are to be visible when viewing parent plans then
-        //later versions will need to factor in the accumulated plan offsets.
-        sf::Vector2f devicePos = planPos + mapGridToCoords(GetPosInPlan());
-        return devicePos;
-    }
+    sf::Vector2f GetWorldPos() const;
     sf::Vector2i GetPosInPlan() const            {return pos;}
     void SetPosInPlan(sf::Vector2i p)            {pos = p;}
     int GetSerial() const                       {return serial;}

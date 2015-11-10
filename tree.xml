@@ -2,7 +2,7 @@
 <FIRE>
 	Cheese
 </FIRE>
-<PLAN_DB HIGHEST_ID="222" />
+<PLAN_DB HIGHEST_ID="228" />
 <PLAN i="1">
 	<NEUR i="1" x="0" y="3" thr="1" />
 	<NEUR i="2" x="3" y="2" thr="1" />
@@ -4036,4 +4036,52 @@
 </PLAN>
 <PLAN i="222">
 	<HAND i="1" x="1" y="2" link="8" />
+</PLAN>
+<PLAN i="223">
+	<HAND i="1" x="-1" y="2" link="224" />
+	<HAND i="2" x="0" y="2" link="225" />
+	<HAND i="3" x="1" y="2" link="226" />
+	<HAND i="4" x="2" y="2" link="0" />
+</PLAN>
+<PLAN i="224">
+	<NEUR i="2" x="-2" y="0" thr="1" />
+	<NEUR i="1" x="-2" y="2" thr="0" />
+	<JUMP i="3" x="-4" y="1" />
+	<WIRE f="1" t="0" w="1" fs="0" ts="2" />
+	<WIRE f="2" t="0" w="1" fs="0" ts="1" />
+	<WIRE f="3" t="2" w="1" fs="0" ts="0" />
+	<WIRE f="3" t="1" w="1" fs="0" ts="0" />
+	<WIRE f="0" t="3" w="1" fs="1" ts="0" />
+</PLAN>
+<PLAN i="225">
+	<NEUR i="1" x="-4" y="1" thr="0" />
+	<JUMP i="2" x="-4" y="0" />
+	<NEUR i="3" x="-2" y="0" thr="1" />
+	<NEUR i="4" x="-2" y="2" thr="0" />
+	<WIRE f="1" t="2" w="1" fs="0" ts="0" />
+	<WIRE f="2" t="1" w="-1" fs="0" ts="0" />
+	<WIRE f="1" t="3" w="1" fs="0" ts="0" />
+	<WIRE f="1" t="4" w="-1" fs="0" ts="0" />
+	<WIRE f="3" t="0" w="1" fs="0" ts="1" />
+	<WIRE f="4" t="0" w="1" fs="0" ts="2" />
+</PLAN>
+<PLAN i="226">
+	<NEUR i="1" x="-1" y="1" thr="0" />
+	<NEUR i="2" x="1" y="0" thr="0" />
+	<NEUR i="3" x="1" y="2" thr="1" />
+	<WIRE f="1" t="2" w="-1" fs="0" ts="0" />
+	<WIRE f="1" t="3" w="1" fs="0" ts="0" />
+	<WIRE f="2" t="0" w="1" fs="0" ts="1" />
+	<WIRE f="3" t="0" w="1" fs="0" ts="2" />
+</PLAN>
+<PLAN i="227">
+	<NEUR i="1" x="-1" y="0" thr="1" />
+	<JUMP i="2" x="0" y="1" />
+	<HAND i="3" x="-2" y="1" link="228" />
+</PLAN>
+<PLAN i="228">
+	<JUMP i="1" x="-1" y="0" />
+	<JUMP i="2" x="0" y="-1" />
+	<JUMP i="3" x="-2" y="-1" />
+	<HAND i="4" x="-2" y="0" link="6" />
 </PLAN>

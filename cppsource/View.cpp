@@ -8,6 +8,7 @@
 #include "miscUtil.hpp"
 #include "View.hpp"
 #include <iostream>
+#include "ChipHandle.hpp"
 
 const sf::FloatRect MAIN_VIEWPORT {0.f, 0.f, 1.f, 0.8f};
 const sf::FloatRect BAR_VIEWPORT {0.f, 0.8f, 1.f, 0.2f};
@@ -19,7 +20,7 @@ const sf::Vector2f INITIAL_MAINVIEW_SIZE { (float)INITIAL_WINDOW_SIZE.x, (float)
 View::View(Model & model_p)
    :theModel(model_p),
     window(sf::VideoMode(INITIAL_WINDOW_SIZE.x, INITIAL_WINDOW_SIZE.y), "Neuronal"),
-    mainView(sf::Vector2f{250.f, 200.f}, INITIAL_MAINVIEW_SIZE ),
+    mainView(sf::Vector2f{0.f, 0.f}, INITIAL_MAINVIEW_SIZE ),
     mainOverlay(sf::FloatRect{0.f,0.f, INITIAL_MAINVIEW_SIZE.x, INITIAL_MAINVIEW_SIZE.y}),
     barOverlay(sf::FloatRect{0.f,0.f, INITIAL_MAINVIEW_SIZE.x, BAR_HEIGHT}),
     mainOverlayBox(sf::Vector2f{1400.f, 720.f} ),
@@ -52,23 +53,6 @@ void View::Draw()
 {
     window.clear();
     
-    //Bar Port...
-    window.setView(barOverlay);
-//    sf::RectangleShape bar;
-//    bar.setSize( sf::Vector2f{ barView.getViewport().width, barView.getViewport().height } );
-//    bar.setPosition( sf::Vector2f{ barView.getViewport().left, barView.getViewport().top } );
-//    bar.setFillColor(sf::Color::Blue);
-    sf::VertexArray lines(sf::Quads, 4);
-    lines[0].position = sf::Vector2f(0, 0);
-    lines[1].position = sf::Vector2f(1400, 0);
-    lines[2].position = sf::Vector2f(1400, 180);
-    lines[3].position = sf::Vector2f(0, 180);
-    lines[0].color = sf::Color::Red;
-    lines[2].color = sf::Color::Yellow;
-    window.draw(lines);
-    planNumText.setString(patch::to_string(xmlPlan) );
-    window.draw(planNumText);
-    
     //Main Port...
     window.setView(mainView);
     auto ap = GetActivePlan().lock();
@@ -76,13 +60,16 @@ void View::Draw()
     {
         ap->Draw(window);
 
-        if (highlightingMode != 1)
+        if (highlightingMode != 1)  //dim everything that's been drawn so far...
         {
             window.setView(mainOverlay);
             mainOverlayBox.setFillColor( sf::Color{0,0,0,210} );
             window.draw(mainOverlayBox);
             window.setView(mainView);
         }
+        cursorTwo.Draw(window);
+        cursorOne.Draw(window);
+        //draw selected Gobjects again in full brightness...
         if (highlightingMode == 2)
         {
             auto d1 = device1.lock();
@@ -103,29 +90,107 @@ void View::Draw()
                 }
             }
         }
-
     
     }
-    cursorTwo.Draw(window);
-    cursorOne.Draw(window);
+
+
+    //Bar Port...
+    window.setView(barOverlay);
+    sf::RectangleShape bar;
+    bar.setSize( barOverlay.getSize() );
+    bar.setPosition( barOverlay.getCenter() - barOverlay.getSize()/2.f );
+    bar.setFillColor(sf::Color::Blue);
+    window.draw(bar);
+//    sf::VertexArray lines(sf::Quads, 4);
+//    lines[0].position = sf::Vector2f(0, 0);
+//    lines[1].position = sf::Vector2f(1400, 0);
+//    lines[2].position = sf::Vector2f(1400, 180);
+//    lines[3].position = sf::Vector2f(0, 180);
+//    lines[0].color = sf::Color::Red;
+//    lines[2].color = sf::Color::Yellow;
+//    window.draw(lines);
+    
+    //Create a string to represent the stack of plans...
+    std::string planNumStr;
+    std::shared_ptr<ChipPlan> cont = ap;
+    std::shared_ptr<ChipHandle> ref = nullptr;
+    while (cont)
+    {
+        //(the string is written in reverse using insert(0,"") to prepend to make the active plan come last)
+        if (cont->IsModified()) planNumStr.insert(0, "*");
+        planNumStr.insert(0, patch::to_string( cont->GetPlanID() ) );
+        //Step out a layer...
+        ref = cont->GetReferer();
+        if (ref) {
+            cont = ref->GetContainer();
+            if (cont) {
+                planNumStr.insert(0, " > ");
+            }
+        }
+        else
+        {
+            cont = nullptr;
+        }
+    }
+    planNumText.setString( planNumStr );
+    window.draw(planNumText);
 
     window.display();
+    window.setView(mainView);
 }
 
 void View::Zoom(float zoomFactor)
 {
     mainView.zoom( zoomFactor );
+    Clamp();
     window.setView(mainView);
 }
 void View::Pan(sf::Vector2f moveBy)
 {
     mainView.move(moveBy);
+    Clamp();
     window.setView(mainView);
 }
 void View::Resize(sf::Vector2f newSize)
 {
     mainView.setSize( sf::Vector2f{newSize.x * MAIN_VIEWPORT.width, newSize.y * MAIN_VIEWPORT.height} ); //This is all very shonky. Need to consider what is flexible and what is fixed on screen.
+    Clamp();
     window.setView(mainView);
 }
 
-
+void View::Clamp()
+{
+    auto activePlan = GetActivePlan().lock();
+    if (activePlan)
+    {
+        auto b = activePlan->GetPaddedBound();
+        if (b)
+        {
+            auto center = mainView.getCenter();
+            auto viewSize = mainView.getSize();
+            auto size = viewSize - sf::Vector2f{120.f, 120.f};
+            auto tl = center - (size/2.f);
+            bool oversizedX = (b->width > size.x) ? true : false;
+            bool oversizedY = (b->height > size.y) ? true : false;
+            if (oversizedX) {
+                if (tl.x          < b->left)            tl.x = b->left;
+                if (tl.x + size.x > b->left + b->width) tl.x = b->left + b->width - size.x;
+            }
+            else {
+                if (tl.x          > b->left)            tl.x = b->left;
+                if (tl.x + size.x < b->left + b->width) tl.x = b->left + b->width - size.x;
+            }
+            if (oversizedY) {
+                if (tl.y          < b->top)             tl.y = b->top;
+                if (tl.y + size.y > b->top + b->height) tl.y = b->top + b->height - size.y;
+            }
+            else {
+                if (tl.y          > b->top)             tl.y = b->top;
+                if (tl.y + size.y < b->top + b->height) tl.y = b->top + b->height - size.y;
+            }
+            mainView.setCenter(tl + (size/2.f) );
+        }
+    }
+    
+    
+}

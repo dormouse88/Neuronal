@@ -41,8 +41,10 @@ public:
     void Zingaya() {dead = true;}
     bool IsDead() const {return dead;}
     void SetModified();
+    std::shared_ptr<ChipPlan> GetContainer();
 private:
     bool dead;
+protected:
     std::weak_ptr<ChipPlan> container;
 };
 

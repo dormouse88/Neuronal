@@ -16,6 +16,48 @@ void Controller::DebugInfo()
     //std::cout << "--CONT: " << "DEVI: " << deviceCons.size() << ", WIRE: " << wireCons.size() << std::endl;
 }
 
+bool Controller::ReplaceActivePlan(std::shared_ptr<ChipPlan> newPlan, std::shared_ptr<ChipPlan> activePlan)
+{
+    if (newPlan)
+    {
+        auto handle = activePlan->GetReferer();
+        //Basically, if (not the basePlan)...
+        if (handle) {
+            handle->SetPlan(newPlan);
+            newPlan->RegisterReferer(handle);
+        }
+        //Pretty much the other case: if (it is the basePlan)...
+        if (theModel.GetBasePlan() == activePlan) {
+            theModel.SetBasePlan(newPlan);
+        }
+        //Finally update the view to point to the new plan...
+        theView.SetActivePlan(newPlan);
+        return true;
+    }
+    return false;
+}
+bool Controller::WipePlan(std::shared_ptr<ChipPlan> activePlan, bool forced)
+{
+    if (forced or not activePlan->IsModified())
+    {
+        auto emptyPlan = std::make_shared<ChipPlan>();
+        if (ReplaceActivePlan(emptyPlan, activePlan)) return true;
+    }
+    return false;
+}
+bool Controller::LoadPlan(int num, std::shared_ptr<ChipPlan> activePlan)
+{
+    if (not activePlan->IsModified())
+    {
+        //This could all surely be better done...
+        //Perhaps if the model acted as a referer for the base plan by the model implementing a Referer interface?
+        auto loadedPlan = theSerializer.LoadFile(theFactory, num);
+        if (ReplaceActivePlan(loadedPlan, activePlan)) return true;
+    }
+    return false;
+}
+
+
 bool Controller::HandleInput()
 {
     std::shared_ptr<sf::Vector2i> pos1 = nullptr;
@@ -73,13 +115,13 @@ bool Controller::HandleInput()
             {
                 sf::Vector2i pixelPos(event.mouseButton.x, event.mouseButton.y);
                 sf::Vector2f worldPos = theView.GetWindow().mapPixelToCoords(pixelPos);
-                theView.cursorOne.SetWorldPos(worldPos);
+                theView.cursorOne.SetWorldPos(worldPos, activePlan);
             }
             if (event.mouseButton.button == sf::Mouse::Right)
             {
                 sf::Vector2i pixelPos(event.mouseButton.x, event.mouseButton.y);
                 sf::Vector2f worldPos = theView.GetWindow().mapPixelToCoords(pixelPos);
-                theView.cursorTwo.SetWorldPos(worldPos);
+                theView.cursorTwo.SetWorldPos(worldPos, activePlan);
             }
         }
         if (event.type == sf::Event::MouseWheelMoved)
@@ -162,27 +204,15 @@ bool Controller::HandleInput()
             }
             if (event.key.code == sf::Keyboard::W)
             {
-                auto loadedPlan = theSerializer.LoadFile(theFactory, theView.xmlPlan);
-                if (loadedPlan)
-                {
-                    auto handle = activePlan->GetReferer();
-                    if (handle) {
-                        handle->SetPlan(loadedPlan);
-                        loadedPlan->RegisterReferer(handle);
-                    }
-                    if (theModel.GetBasePlan() == activePlan) {
-                        theModel.SetBasePlan(loadedPlan);
-                    }
-                    theView.SetActivePlan(loadedPlan);
-                }
+                WipePlan(activePlan, event.key.shift and event.key.control);
             }
             if (event.key.code == sf::Keyboard::Dash)
             {
-                theView.xmlPlan -= 1;
+                if ( LoadPlan(activePlan->GetPlanID() - 1, activePlan) ) theView.xmlPlan -= 1;
             }
             if (event.key.code == sf::Keyboard::Equal)
             {
-                theView.xmlPlan += 1;
+                if ( LoadPlan(activePlan->GetPlanID() + 1, activePlan) ) theView.xmlPlan += 1;
             }
             if (event.key.code == sf::Keyboard::LBracket)
             {
