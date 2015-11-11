@@ -9,7 +9,7 @@
 #include "miscUtil.hpp"
 
 const sf::Vector2f RECTANGLE { 90.f, 65.f };
-const sf::Vector2f MAIN_OFFSET { (GRID_SIZE - RECTANGLE)/2.f };
+const sf::Vector2f MAIN_OFFSET {0.f, 0.f}; // { (GRID_SIZE - RECTANGLE)/2.f };
 const sf::Vector2f PLANID_OFFSET { MAIN_OFFSET.x + 18.f, MAIN_OFFSET.y + 2.f };
 
 const sf::Vector2f WIRE_IN_OFFSET { MAIN_OFFSET };
@@ -17,7 +17,7 @@ const sf::Vector2f WIRE_OUT_OFFSET { MAIN_OFFSET + RECTANGLE };
 
 
 ChipHandle::ChipHandle(int serial_p, sf::Vector2i pos_p, std::shared_ptr<ChipPlan> cont)
-    :Device(serial_p, pos_p, cont), DeviceView( GetWorldPos() ), shape( RECTANGLE )
+    :Device(serial_p, pos_p, cont), DeviceView( GetPFPos() ), shape( RECTANGLE )
 {
     shape.setOutlineColor(sf::Color::White);
     shape.setOutlineThickness(3);
@@ -74,23 +74,23 @@ sf::Vector2f ChipHandle::GetWireAttachPos(WireAttachSide was) const
 {
     sf::Vector2f wirePos;
     if (was == WireAttachSide::IN) {
-        wirePos = GetWorldPos() + WIRE_IN_OFFSET;
+        wirePos = GetPFPos() + (GetPFSize() - RECTANGLE)/2.f + WIRE_IN_OFFSET;
     }
     else {
-        wirePos = GetWorldPos() + WIRE_OUT_OFFSET;
+        wirePos = GetPFPos() + (GetPFSize() - RECTANGLE)/2.f + WIRE_OUT_OFFSET;
     }
     return wirePos;
 }
 
 void ChipHandle::Draw(sf::RenderTarget & rt)
 {
-    UpdatePos(GetWorldPos());
-    shape.setPosition( actualPos + MAIN_OFFSET );
+    UpdatePos( CalculateOffset(RECTANGLE) );
+    shape.setPosition( perceivedPos );
     shape.setFillColor(sf::Color::Yellow);
     std::string text = patch::to_string( plan->GetPlanID() );
     if (plan->IsModified()) text.append("*");
     planNumText.setString( text );
-    planNumText.setPosition( actualPos + PLANID_OFFSET );
+    planNumText.setPosition( perceivedPos + PLANID_OFFSET );
     rt.draw(shape);
     rt.draw(planNumText);
 }

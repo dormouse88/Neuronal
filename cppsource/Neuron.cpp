@@ -6,41 +6,47 @@
  */
 
 #include "Neuron.hpp"
+#include "miscUtil.hpp"
 #include <sstream>
 
 const sf::Vector2f RECTANGLE { 70.f, 40.f };
-const sf::Vector2f MAIN_OFFSET { (GRID_SIZE - RECTANGLE)/2.f };
-const sf::Vector2f THRESHOLD_OFFSET { MAIN_OFFSET.x + 18.f, MAIN_OFFSET.y + 2.f };
+const sf::Vector2f MAIN_OFFSET {0.f, 0.f}; // { (GRID_SIZE - RECTANGLE)/2.f };
+const sf::Vector2f RECEIVED_OFFSET { MAIN_OFFSET.x + 4.f, MAIN_OFFSET.y + 2.f };
+const sf::Vector2f THRESHOLD_OFFSET { MAIN_OFFSET.x + 24.f, MAIN_OFFSET.y + 2.f };
 
 const sf::Vector2f WIRE_IN_OFFSET { MAIN_OFFSET };
 const sf::Vector2f WIRE_OUT_OFFSET { MAIN_OFFSET + RECTANGLE };
 
 NeuronView::NeuronView(const Neuron & n)
-    :DeviceView(n.GetWorldPos()),
+    :DeviceView(n.GetPFPos()),
      shape( RECTANGLE )
 {
     shape.setOutlineColor(sf::Color::White);
     shape.setOutlineThickness(2);
     
     thresholdText.setFont(ViewResources::GetInstance().font);
-    //thresholdText.setCharacterSize(20);
+    thresholdText.setCharacterSize(30);
     thresholdText.setColor(sf::Color::Green);
+
+    receivedText.setFont(ViewResources::GetInstance().font);
+    receivedText.setCharacterSize(15);
+    receivedText.setColor(sf::Color{100,100,100} );
 }
 
 void NeuronView::Draw(sf::RenderTarget & rt, const Neuron & n)
 {
-    UpdatePos(n.GetWorldPos());
-    shape.setPosition( actualPos + MAIN_OFFSET );
+    UpdatePos( n.CalculateOffset(RECTANGLE) );
+    shape.setPosition( perceivedPos );
     if (n.GetFiring()) shape.setFillColor(sf::Color::Red);
     else shape.setFillColor(sf::Color(50,50,200) );
     rt.draw(shape);
 
-        //I would've used std::to_string() here but for a MinGW bug
-        std::ostringstream ss;
-        ss << n.GetThreshold();
-    thresholdText.setString(ss.str());
-    thresholdText.setPosition( actualPos + THRESHOLD_OFFSET );
+    thresholdText.setString( patch::to_string( n.GetThreshold() ) );
+    thresholdText.setPosition( perceivedPos + THRESHOLD_OFFSET );
     rt.draw(thresholdText);
+    receivedText.setString( patch::to_string( n.GetReceivedCharge() ) );
+    receivedText.setPosition( perceivedPos + RECEIVED_OFFSET );
+    rt.draw(receivedText);
 }
 
 
@@ -79,10 +85,10 @@ sf::Vector2f Neuron::GetWireAttachPos(WireAttachSide was) const
 {
     sf::Vector2f wirePos;
     if (was == WireAttachSide::IN) {
-        wirePos = GetWorldPos() + WIRE_IN_OFFSET;
+        wirePos = CalculateOffset(RECTANGLE) + WIRE_IN_OFFSET;
     }
     else {
-        wirePos = GetWorldPos() + WIRE_OUT_OFFSET;
+        wirePos = CalculateOffset(RECTANGLE) + WIRE_OUT_OFFSET;
     }
     return wirePos;
 }

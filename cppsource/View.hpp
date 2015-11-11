@@ -32,13 +32,13 @@ public:
     void Clamp();
     void SetHighlightingMode(int x) {highlightingMode = x;}
     
-    void PopPlan()                                  {if (activePlan.size() > 1) activePlan.pop(); Clamp(); cursorOne.active = false; cursorTwo.active = false;}
-    void PushPlan(std::weak_ptr<ChipPlan> plan)     {activePlan.push(plan); Clamp(); cursorOne.active = false; cursorTwo.active = false;}
+    void PopPlan()                                  {if (activePlan.size() > 1) activePlan.pop(); Clamp(); cursorOne.Nullify(); cursorTwo.Nullify();}
+    void PushPlan(std::weak_ptr<ChipPlan> plan)     {activePlan.push(plan); Clamp(); cursorOne.Nullify(); cursorTwo.Nullify();}
 
     sf::RenderWindow & GetWindow()          {return window;}
     sf::View & GetMainView()                {return mainView;}
     std::weak_ptr<ChipPlan> GetActivePlan() {return activePlan.top();}
-    void SetActivePlan(std::weak_ptr<ChipPlan> p) {activePlan.top() = p; Clamp(); cursorOne.active = false; cursorTwo.active = false;}
+    void SetActivePlan(std::weak_ptr<ChipPlan> p) {activePlan.top() = p; Clamp(); cursorOne.Nullify(); cursorTwo.Nullify();}
     
 private:
     sf::RenderWindow window;

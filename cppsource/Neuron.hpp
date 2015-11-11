@@ -23,6 +23,7 @@ public:
 private:
     sf::RectangleShape shape;
     sf::Text thresholdText;
+    sf::Text receivedText;
 };
 
 
@@ -42,6 +43,7 @@ public:
     bool GetFiring() const                      {return firing;}
     void SetFiring(bool f)                      {firing = f;}
     int GetThreshold() const {return threshold;}
+    int GetReceivedCharge() const {return receivedCharge;}
     void ModifyThreshold(int v) {threshold += v;}
 
     virtual sf::Vector2f GetWireAttachPos(WireAttachSide was) const override;

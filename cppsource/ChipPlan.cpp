@@ -7,10 +7,16 @@
 
 #include "ChipPlan.hpp"
 #include "ChipHandle.hpp"
+#include <cassert>
 
 ChipPlan::ChipPlan()
     :Wirable(), planID(0), modified(false)
-{}
+{
+    //dummy data for testing...
+    xPansions.Insert( 4,2 );
+    xPansions.Insert( -4,4 );
+    yPansions.Insert( -2,2 );
+}
 
 void ChipPlan::ReceiveCharge(bool charge, int weight, int slot)
 {
@@ -55,7 +61,7 @@ void ChipPlan::PassOnCalculate()
 
 void ChipPlan::SetPosition(Device & d, sf::Vector2i newPos)
 {
-    if (IsPositionFree(newPos)) d.SetPosInPlan( newPos );
+    if (IsPositionFree(newPos)) d.SetPIPos( newPos );
     SetModified();
 }
 int ChipPlan::GetFreeSerial() const
@@ -75,7 +81,7 @@ bool ChipPlan::IsSerialFree(int serial) const
 bool ChipPlan::IsPositionFree(sf::Vector2i pos) const
 {
     for (const auto & x : devices) {
-        if (x->GetPosInPlan() == pos) return false;
+        if (x->GetPIPos() == pos) return false;
     }
     return true;
 }
@@ -141,7 +147,7 @@ std::shared_ptr<Device> ChipPlan::GetDevice(sf::Vector2i pos)
 {
     //check against siblings
     for (auto & x: devices) {
-        if (pos == x->GetPosInPlan()) {
+        if (pos == x->GetPIPos()) {
             return x;
         }
     }
@@ -214,32 +220,37 @@ sf::Vector2f ChipPlan::GetWireAttachPos(WireAttachSide was) const
 
 std::shared_ptr<sf::FloatRect> ChipPlan::GetPaddedBound() const
 {
-    std::shared_ptr<sf::FloatRect> paddedBox = nullptr;
+    sf::Vector2i tl;
+    sf::Vector2i br;
+    sf::Vector2i tl_padded;
+    sf::Vector2i br_padded;
     if (devices.size() > 0)
     {
-        auto firstPos = devices.at(0)->GetPosInPlan();
-        int rleft = firstPos.x;
-        int rright = firstPos.x;
-        int rtop = firstPos.y;
-        int rbottom = firstPos.y;
+        //set initial values
+        auto firstPos = devices.at(0)->GetPIPos();
+        tl = firstPos;
+        br = firstPos;
         for (auto & x: devices)
         {
-            sf::Vector2i p = x->GetPosInPlan();
-            if (p.x < rleft) rleft = p.x;
-            if (p.x > rright) rright = p.x;
-            if (p.y < rtop) rtop = p.y;
-            if (p.y > rbottom) rbottom = p.y;
+            sf::Vector2i p = x->GetPIPos();
+            if (p.x < tl.x) tl.x = p.x;
+            if (p.x > br.x) br.x = p.x;
+            if (p.y < tl.y) tl.y = p.y;
+            if (p.y > br.y) br.y = p.y;
         }
-        sf::IntRect innerBound { rleft, rtop, rright - rleft + 1, rbottom - rtop + 1};
-        sf::IntRect paddedBound { innerBound.left -2, innerBound.top -2, innerBound.width +4, innerBound.height +4 };
-        paddedBox = std::make_shared<sf::FloatRect> ( MapGridToCoords( sf::Vector2i{paddedBound.left, paddedBound.top} ), MapGridToCoords( sf::Vector2i{paddedBound.width, paddedBound.height} ) );
+        tl_padded = tl - sf::Vector2i{ 2, 2 };
+        br_padded = br + sf::Vector2i{ 2, 2 };
     }
-    else
+    else //in the case of an empty plan...
     {
-        paddedBox = std::make_shared<sf::FloatRect> ( MapGridToCoords(sf::Vector2i{-1,-1}), MapGridToCoords(sf::Vector2i{2,2}) );
+        tl_padded = sf::Vector2i{-1,-1};
+        br_padded = sf::Vector2i{ 1, 1};
     }
-    return paddedBox;
+    sf::Vector2f tl_f { MapPItoPF(tl_padded) };
+    sf::Vector2f br_f { MapPItoPF(br_padded) + GetPFSize(br_padded) };
+    return std::make_shared<sf::FloatRect> ( tl_f , br_f - tl_f );
 }
+
 
 void ChipPlan::Draw(sf::RenderTarget & rt)
 {
@@ -266,18 +277,41 @@ void ChipPlan::Draw(sf::RenderTarget & rt)
 }
 
 
-sf::Vector2i ChipPlan::MapCoordsToGrid(const sf::Vector2f & point) const
+
+/**
+ * Maps a PlanFloat coord to a PlanInt coord
+ * @param point
+ * @return 
+ */
+sf::Vector2i ChipPlan::MapPFtoPI(const sf::Vector2f & point) const
 {
-    return sf::Vector2i{
+    sf::Vector2i dumb {
         static_cast<int>(floorf(point.x / GRID_SIZE.x)),
         static_cast<int>(floorf(point.y / GRID_SIZE.y))
     };
+    return sf::Vector2i {
+        xPansions.MapDumbToSmart( dumb.x ),
+        yPansions.MapDumbToSmart( dumb.y )
+    };
 }
 
-sf::Vector2f ChipPlan::MapGridToCoords(const sf::Vector2i & point) const
+/**
+ * Maps a PlanInt coord to a PlanFloat coord
+ * @param point
+ * @return 
+ */
+sf::Vector2f ChipPlan::MapPItoPF(const sf::Vector2i & point) const
 {
     return sf::Vector2f{
-        point.x * GRID_SIZE.x,
-        point.y * GRID_SIZE.y
+        (xPansions.MapSmartToDumb(point.x)) * GRID_SIZE.x,
+        (yPansions.MapSmartToDumb(point.y)) * GRID_SIZE.y
+    };
+}
+
+sf::Vector2f ChipPlan::GetPFSize(const sf::Vector2i & point) const
+{
+    return sf::Vector2f{
+        GRID_SIZE.x * xPansions.GetSize(point.x),
+        GRID_SIZE.y * yPansions.GetSize(point.y)
     };
 }

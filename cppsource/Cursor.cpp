@@ -6,47 +6,36 @@
  */
 
 #include "Cursor.hpp"
+#include <cassert>
+#include "ChipPlan.hpp"
+
 
 Cursor::Cursor(sf::Color color)
-    :active(false), m_pos(sf::Vector2i{0, 0})
+    :pposPtr(nullptr)
 {
     representation.setFillColor(sf::Color::Transparent);
     representation.setOutlineColor( color );
     representation.setOutlineThickness(2.5f);
-    representation.setSize( GRID_SIZE );
 }
 
 void Cursor::Draw(sf::RenderTarget & rt)
 {
-    if (active) {
-        representation.setPosition( GetWorldPos() );
+    auto ppos = GetPlanPos();
+    if (ppos) {
+        representation.setPosition( ppos->GetPFPos() );
+        representation.setSize( ppos->GetPFSize() );
         rt.draw(representation, sf::RenderStates(sf::BlendAdd));
     }
 }
 
-sf::Vector2f Cursor::GetWorldPos() const
+void Cursor::SetPFPos(sf::Vector2f newPos, std::shared_ptr<ChipPlan> newPlan)
 {
-    if (!active) throw;
-    auto p = m_plan.lock();
-    if (p) return p->MapGridToCoords(m_pos);
-    throw;
-}
-sf::Vector2i Cursor::GetGridPos() const
-{
-    if (!active) throw;
-    return m_pos;
-}
-void Cursor::SetWorldPos(sf::Vector2f worldPos, std::shared_ptr<ChipPlan> plan)
-{
-    auto b = plan->GetPaddedBound();
-    if (b)
+    auto b = newPlan->GetPaddedBound();
+    assert(b);
+    if (b->contains(newPos))
     {
-        if (b->contains(worldPos))
-        {
-            m_plan = plan;
-            m_pos = plan->MapCoordsToGrid(worldPos);
-            active=true;
-        }
-        else active=false;
+        pposPtr = std::make_shared<PlanPos>( newPos, newPlan );
     }
+    else pposPtr = nullptr;
 }
+

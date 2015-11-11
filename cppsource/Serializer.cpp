@@ -68,8 +68,8 @@ void Serializer::SaveNode(pugi::xml_node & doc, std::shared_ptr<ChipPlan> plan_p
                 auto n = std::dynamic_pointer_cast<Neuron>(d);
                 pugi::xml_node dev = plan.append_child("NEUR");
                 dev.append_attribute("i").set_value(d->GetSerial() );
-                dev.append_attribute("x").set_value(d->GetPosInPlan().x);
-                dev.append_attribute("y").set_value(d->GetPosInPlan().y);
+                dev.append_attribute("x").set_value(d->GetPIPos().x);
+                dev.append_attribute("y").set_value(d->GetPIPos().y);
                 dev.append_attribute("thr").set_value(n->GetThreshold() );
             }
             else if (d->SerialName() == "HAND")
@@ -80,8 +80,8 @@ void Serializer::SaveNode(pugi::xml_node & doc, std::shared_ptr<ChipPlan> plan_p
                 if (p) SaveNode(doc, p);
                 pugi::xml_node dev = plan.append_child("HAND");
                 dev.append_attribute("i").set_value(d->GetSerial() );
-                dev.append_attribute("x").set_value(d->GetPosInPlan().x);
-                dev.append_attribute("y").set_value(d->GetPosInPlan().y);
+                dev.append_attribute("x").set_value(d->GetPIPos().x);
+                dev.append_attribute("y").set_value(d->GetPIPos().y);
                 int pID = 0;
                 if (p) pID = p->planID;
                 dev.append_attribute("link").set_value(pID);
@@ -90,8 +90,8 @@ void Serializer::SaveNode(pugi::xml_node & doc, std::shared_ptr<ChipPlan> plan_p
             {
                 pugi::xml_node dev = plan.append_child("JUMP");
                 dev.append_attribute("i").set_value(d->GetSerial() );
-                dev.append_attribute("x").set_value(d->GetPosInPlan().x);
-                dev.append_attribute("y").set_value(d->GetPosInPlan().y);
+                dev.append_attribute("x").set_value(d->GetPIPos().x);
+                dev.append_attribute("y").set_value(d->GetPIPos().y);
             }
         }
         for (auto w: plan_p->wires) {

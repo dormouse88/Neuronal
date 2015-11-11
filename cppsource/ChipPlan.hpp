@@ -15,6 +15,7 @@
 class ChipHandle;
 #include "Device.hpp"
 #include "Wire.hpp"
+#include "Pansions.hpp"
 
 class ChipPlan : public Wirable//, public Gobject
 {
@@ -60,8 +61,9 @@ public:
     std::shared_ptr<sf::FloatRect> GetPaddedBound() const;
     virtual void Draw(sf::RenderTarget & rt);
     
-    sf::Vector2i MapCoordsToGrid(const sf::Vector2f & point) const;
-    sf::Vector2f MapGridToCoords(const sf::Vector2i & point) const;
+    sf::Vector2i MapPFtoPI(const sf::Vector2f & point) const;
+    sf::Vector2f MapPItoPF(const sf::Vector2i & point) const;
+    sf::Vector2f GetPFSize(const sf::Vector2i & point) const;
 
 private:
     int planID;
@@ -69,7 +71,11 @@ private:
     std::vector<std::shared_ptr<Device> > devices;
     std::vector<std::shared_ptr<Wire> > wires;
     bool modified;
+    Pansions xPansions;
+    Pansions yPansions;
+
     friend class Serializer;
+    
 };
 #endif	/* CHIPPLAN_HPP */
 

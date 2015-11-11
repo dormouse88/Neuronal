@@ -18,6 +18,8 @@ void Controller::DebugInfo()
 
 bool Controller::ReplaceActivePlan(std::shared_ptr<ChipPlan> newPlan, std::shared_ptr<ChipPlan> activePlan)
 {
+    //This could all surely be better done...
+    //Perhaps if the model acted as a referer for the base plan by the model implementing a Referer interface?
     if (newPlan)
     {
         auto handle = activePlan->GetReferer();
@@ -49,8 +51,6 @@ bool Controller::LoadPlan(int num, std::shared_ptr<ChipPlan> activePlan)
 {
     if (not activePlan->IsModified())
     {
-        //This could all surely be better done...
-        //Perhaps if the model acted as a referer for the base plan by the model implementing a Referer interface?
         auto loadedPlan = theSerializer.LoadFile(theFactory, num);
         if (ReplaceActivePlan(loadedPlan, activePlan)) return true;
     }
@@ -71,16 +71,16 @@ bool Controller::HandleInput()
     //Update handles...
     auto activePlan = theView.GetActivePlan().lock();
     if (activePlan) {
-        if (theView.cursorOne.active) {
-            pos1 = std::make_shared<sf::Vector2i> ( theView.cursorOne.GetGridPos() );
+        pos1 = theView.cursorOne.GetPIPos();
+        if (pos1) {
             device1 = activePlan->GetDevice( *pos1 );
             wirable1 = device1;
         }
         else {
             wirable1 = activePlan;
         }
-        if (theView.cursorTwo.active) {
-            pos2 = std::make_shared<sf::Vector2i> ( theView.cursorTwo.GetGridPos() );
+        pos2 = theView.cursorTwo.GetPIPos();
+        if (pos2) {
             device2 = activePlan->GetDevice( *pos2 );
             wirable2 = device2;
         }
@@ -115,13 +115,13 @@ bool Controller::HandleInput()
             {
                 sf::Vector2i pixelPos(event.mouseButton.x, event.mouseButton.y);
                 sf::Vector2f worldPos = theView.GetWindow().mapPixelToCoords(pixelPos);
-                theView.cursorOne.SetWorldPos(worldPos, activePlan);
+                theView.cursorOne.SetPFPos(worldPos, activePlan);
             }
             if (event.mouseButton.button == sf::Mouse::Right)
             {
                 sf::Vector2i pixelPos(event.mouseButton.x, event.mouseButton.y);
                 sf::Vector2f worldPos = theView.GetWindow().mapPixelToCoords(pixelPos);
-                theView.cursorTwo.SetWorldPos(worldPos, activePlan);
+                theView.cursorTwo.SetPFPos(worldPos, activePlan);
             }
         }
         if (event.type == sf::Event::MouseWheelMoved)
@@ -216,11 +216,11 @@ bool Controller::HandleInput()
             }
             if (event.key.code == sf::Keyboard::LBracket)
             {
-                theView.cursorOne.active = false;
+                theView.cursorOne.Nullify();
             }
             if (event.key.code == sf::Keyboard::RBracket)
             {
-                theView.cursorTwo.active = false;
+                theView.cursorTwo.Nullify();
             }
             if (event.key.code == sf::Keyboard::E)
             {
