@@ -36,8 +36,12 @@ public:
     virtual sf::Vector2f GetWireAttachPos(WireAttachSide was) const override;
     virtual void Draw(sf::RenderTarget & rt) override;
     virtual void Handle(int code) override;
+
+    virtual VectorDumb GetPlodedSize();
+    void SetExploded(bool yes);
 private:
     std::shared_ptr<ChipPlan> plan;
+    bool exploded;
     sf::RectangleShape shape;
     sf::Text planNumText;
 };

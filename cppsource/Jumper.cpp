@@ -15,7 +15,7 @@ const sf::Vector2f WIRE_IN_OFFSET { MAIN_OFFSET + sf::Vector2f{ 0.f, RADIUS} };
 const sf::Vector2f WIRE_OUT_OFFSET { MAIN_OFFSET + sf::Vector2f{RADIUS * 2.f, RADIUS} };
 
 JumperView::JumperView(const Jumper & jumper_p)
-    :DeviceView(jumper_p.GetPFPos()), shape( RADIUS )
+    :DeviceView(jumper_p.GetWorldPos()), shape( RADIUS )
 {
     shape.setFillColor( sf::Color{0,170,0} );
     shape.setOutlineColor( sf::Color{255,255,255} );

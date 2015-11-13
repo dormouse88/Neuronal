@@ -17,7 +17,7 @@ const sf::Vector2f WIRE_OUT_OFFSET { MAIN_OFFSET + RECTANGLE };
 
 
 ChipHandle::ChipHandle(int serial_p, sf::Vector2i pos_p, std::shared_ptr<ChipPlan> cont)
-    :Device(serial_p, pos_p, cont), DeviceView( GetPFPos() ), shape( RECTANGLE )
+    :Device(serial_p, pos_p, cont), DeviceView( GetWorldPos() ), exploded(false), shape( RECTANGLE )
 {
     shape.setOutlineColor(sf::Color::White);
     shape.setOutlineThickness(3);
@@ -74,30 +74,74 @@ sf::Vector2f ChipHandle::GetWireAttachPos(WireAttachSide was) const
 {
     sf::Vector2f wirePos;
     if (was == WireAttachSide::IN) {
-        wirePos = GetPFPos() + (GetPFSize() - RECTANGLE)/2.f + WIRE_IN_OFFSET;
+        wirePos = GetWorldPos() + (GetWorldSizeOfCell() - RECTANGLE)/2.f + WIRE_IN_OFFSET;
     }
     else {
-        wirePos = GetPFPos() + (GetPFSize() - RECTANGLE)/2.f + WIRE_OUT_OFFSET;
+        wirePos = GetWorldPos() + (GetWorldSizeOfCell() - RECTANGLE)/2.f + WIRE_OUT_OFFSET;
     }
     return wirePos;
 }
 
 void ChipHandle::Draw(sf::RenderTarget & rt)
 {
-    UpdatePos( CalculateOffset(RECTANGLE) );
-    shape.setPosition( perceivedPos );
-    shape.setFillColor(sf::Color::Yellow);
-    std::string text = patch::to_string( plan->GetPlanID() );
-    if (plan->IsModified()) text.append("*");
-    planNumText.setString( text );
-    planNumText.setPosition( perceivedPos + PLANID_OFFSET );
-    rt.draw(shape);
-    rt.draw(planNumText);
+    if (exploded)
+    {
+        sf::View outerView { rt.getView() };
+        sf::View subView { outerView };
+//        VectorWorld topLeft = plan->GetGrid()->MapSmartToWorld( plan->GetSmartBound().tl );
+        RectWorld embed { plan->GetWorldPaddedBound(1) };
+        VectorWorld topLeft { embed.left, embed.top };
+        subView.move( topLeft - GetWorldPos() );
+        rt.setView(subView);
+        plan->SubDraw(rt);
+        rt.setView(outerView);
+    }
+    else
+    {
+        UpdatePos( CalculateOffset(RECTANGLE) );
+        shape.setPosition( perceivedPos );
+        shape.setFillColor(sf::Color::Yellow);
+        std::string text = patch::to_string( plan->GetPlanID() );
+        if (plan->IsModified()) text.append("*");
+        planNumText.setString( text );
+        planNumText.setPosition( perceivedPos + PLANID_OFFSET );
+        rt.draw(shape);
+        rt.draw(planNumText);
+    }
 }
 
 void ChipHandle::Handle(int code)
 {
     if (code == 1) {
-        ;
+        SetExploded(true);
+    }
+    if (code == 2) {
+        SetExploded(false);
+    }
+}
+
+VectorDumb ChipHandle::GetPlodedSize()
+{
+    if (exploded)
+    {
+        return plan->GetDumbSize(1);
+    }
+    else return VectorDumb{1,1};
+}
+
+void ChipHandle::SetExploded(bool yes)
+{
+    if (not exploded and yes)
+    {
+        if (not plan->IsEmpty())
+        {
+            exploded = true;
+            GetContainer()->PlodeRefresh(GetSmartPos());
+        }
+    }
+    else if (exploded and not yes)
+    {
+        exploded = false;
+        GetContainer()->PlodeRefresh(GetSmartPos());
     }
 }

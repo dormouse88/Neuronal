@@ -59,16 +59,11 @@ void WireView::Draw(sf::RenderTarget & rt, const Wire & w)
     std::vector<sf::Vertex> line;
     sf::Vector2f posFrom = w.GetFrom().GetWireAttachPos(WireAttachSide::OUT);
     line.push_back( sf::Vertex( posFrom, colFrom ) );
-//RED// No longer possible to have self looping wires...
-//    if ( &w.GetFrom() == &w.GetTo())
-//    {
-//        line.push_back( sf::Vertex( w.GetFrom().GetWireAttachPos(WireAttachSide::OUT) + WIRE_LOOP1_OFFSET, colTo ) ); //WireAttachSide::OUT is a temporary hack
-//        line.push_back( sf::Vertex( w.GetTo().GetWireAttachPos(WireAttachSide::OUT)   + WIRE_LOOP2_OFFSET, colTo ) );
-//    }
     sf::Vector2f posTo = w.GetTo().GetWireAttachPos(WireAttachSide::IN);
     line.push_back( sf::Vertex(posTo, colTo ) );
     rt.draw(&line[0], line.size(), sf::LinesStrip);
-    //the pulse...
+
+    //The pulse...
     if (line.size() == 2) {
         std::vector<sf::Vertex> pulse;
         sf::Time t = ViewResources::GetInstance().clock.getElapsedTime();
@@ -81,13 +76,9 @@ void WireView::Draw(sf::RenderTarget & rt, const Wire & w)
     }
 
     //The Text...
-    //(I would've used std::to_string() here rather than a stringstream but for a MinGW bug)
     if (w.GetTo().IsWeightedIn()) {
-        std::ostringstream ss;
-        ss << w.GetWeight();
-        weightText.setString(ss.str());
-
         //align text on wire...
+        weightText.setString( patch::to_string(w.GetWeight()) );
         sf::Vector2f pointOnWire { line[1].position - (line[1].position - line[0].position)*0.45f };
         sf::FloatRect loc{ weightText.getLocalBounds() };
         sf::Vector2f textCentreOffset { -loc.width/2.f, -loc.top-loc.height/2.f };
@@ -103,11 +94,8 @@ void WireView::Draw(sf::RenderTarget & rt, const Wire & w)
     }
 
     if (w.GetFrom().IsSlotted(SlottedSide::OUT)) {
-        std::ostringstream ss;
-        ss << w.GetFromSlot();
-        fromSlotText.setString(ss.str());
-        
         //align text on wire...
+        fromSlotText.setString( patch::to_string(w.GetFromSlot()) );
         sf::Vector2f pointOnWire { line[1].position - (line[1].position - line[0].position)*0.75f };
         sf::FloatRect loc{ fromSlotText.getLocalBounds() };
         sf::Vector2f textCentreOffset { -loc.width/2.f, -loc.top-loc.height/2.f };
@@ -123,11 +111,8 @@ void WireView::Draw(sf::RenderTarget & rt, const Wire & w)
     }
 
     if (w.GetTo().IsSlotted(SlottedSide::IN)) {
-        std::ostringstream ss;
-        ss << w.GetToSlot();
-        toSlotText.setString(ss.str());
-        
         //align text on wire...
+        toSlotText.setString( patch::to_string(w.GetToSlot()) );
         sf::Vector2f pointOnWire { line[1].position - (line[1].position - line[0].position)*0.25f };
         sf::FloatRect loc{ toSlotText.getLocalBounds() };
         sf::Vector2f textCentreOffset { -loc.width/2.f, -loc.top-loc.height/2.f };

@@ -18,7 +18,7 @@ const sf::Vector2f WIRE_IN_OFFSET { MAIN_OFFSET };
 const sf::Vector2f WIRE_OUT_OFFSET { MAIN_OFFSET + RECTANGLE };
 
 NeuronView::NeuronView(const Neuron & n)
-    :DeviceView(n.GetPFPos()),
+    :DeviceView(n.GetWorldPos()),
      shape( RECTANGLE )
 {
     shape.setOutlineColor(sf::Color::White);

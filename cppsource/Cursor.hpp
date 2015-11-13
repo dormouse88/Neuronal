@@ -22,7 +22,7 @@ public:
 
     std::shared_ptr<const PlanPos> GetPlanPos() const         {return pposPtr;}
     //std::shared_ptr<sf::Vector2f> GetPFPos() const            {if (pposPtr) return std::make_shared<sf::Vector2f>(pposPtr->GetPFPos()); else return nullptr;}
-    std::shared_ptr<sf::Vector2i> GetPIPos() const            {if (pposPtr) return std::make_shared<sf::Vector2i>(pposPtr->GetPIPos()); else return nullptr;}
+    std::shared_ptr<sf::Vector2i> GetPIPos() const            {if (pposPtr) return std::make_shared<sf::Vector2i>(pposPtr->GetSmartPos()); else return nullptr;}
     void SetPFPos(sf::Vector2f newPos, std::shared_ptr<ChipPlan> newPlan);
     void Nullify()                                            {pposPtr = nullptr;}
 

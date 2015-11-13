@@ -2,7 +2,7 @@
 <FIRE>
 	Cheese
 </FIRE>
-<PLAN_DB HIGHEST_ID="229" />
+<PLAN_DB HIGHEST_ID="231" />
 <PLAN i="1">
 	<NEUR i="1" x="0" y="3" thr="1" />
 	<NEUR i="2" x="3" y="2" thr="1" />
@@ -4090,4 +4090,27 @@
 	<NEUR i="2" x="2" y="0" thr="1" />
 	<NEUR i="3" x="3" y="0" thr="1" />
 	<NEUR i="4" x="5" y="0" thr="1" />
+</PLAN>
+<PLAN i="230">
+	<NEUR i="1" x="-1" y="1" thr="1" />
+	<NEUR i="2" x="-2" y="0" thr="1" />
+	<NEUR i="3" x="0" y="-1" thr="1" />
+	<HAND i="4" x="1" y="-1" link="2" />
+	<JUMP i="5" x="1" y="2" />
+	<JUMP i="6" x="3" y="-1" />
+	<HAND i="7" x="1" y="-2" link="4" />
+</PLAN>
+<PLAN i="231">
+	<HAND i="1" x="-1" y="1" link="211" />
+	<HAND i="2" x="-5" y="0" link="23" />
+	<NEUR i="3" x="0" y="-1" thr="1" />
+	<JUMP i="4" x="1" y="-1" />
+	<NEUR i="5" x="2" y="-3" thr="1" />
+	<NEUR i="6" x="-2" y="-3" thr="1" />
+	<HAND i="7" x="-3" y="-1" link="9" />
+	<HAND i="8" x="-5" y="-3" link="9" />
+	<HAND i="9" x="-5" y="2" link="10" />
+	<HAND i="10" x="-7" y="4" link="1" />
+	<HAND i="11" x="-9" y="-1" link="3" />
+	<JUMP i="12" x="-7" y="6" />
 </PLAN>

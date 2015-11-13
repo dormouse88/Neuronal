@@ -22,19 +22,18 @@ void Cursor::Draw(sf::RenderTarget & rt)
 {
     auto ppos = GetPlanPos();
     if (ppos) {
-        representation.setPosition( ppos->GetPFPos() );
-        representation.setSize( ppos->GetPFSize() );
+        representation.setPosition( ppos->GetWorldPos() );
+        representation.setSize( ppos->GetWorldSizeOf() );
         rt.draw(representation, sf::RenderStates(sf::BlendAdd));
     }
 }
 
 void Cursor::SetPFPos(sf::Vector2f newPos, std::shared_ptr<ChipPlan> newPlan)
 {
-    auto b = newPlan->GetPaddedBound();
-    assert(b);
-    if (b->contains(newPos))
+    auto b = newPlan->GetWorldPaddedBound(2);
+    if (b.contains(newPos))
     {
-        pposPtr = std::make_shared<PlanPos>( newPos, newPlan );
+        pposPtr = std::make_shared<PlanPos>( newPos, newPlan->GetGrid() );
     }
     else pposPtr = nullptr;
 }

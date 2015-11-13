@@ -38,21 +38,21 @@ protected:
 class Device : public Wirable, public Gobject
 {
 public:
-    Device(int serial_p, sf::Vector2i pos_p, std::shared_ptr<ChipPlan> cont)
-        :Gobject(cont), serial(serial_p), ppos(pos_p, cont)
-        {}
+    Device(int serial_p, VectorSmart pos_p, std::shared_ptr<ChipPlan> cont);
     virtual ~Device() {}
 
     virtual void LogicAct() {}
     virtual void LogicCalculate() {}
 
-    sf::Vector2f GetPFPos() const            {return ppos.GetPFPos();}
-    sf::Vector2f GetPFSize() const           {return ppos.GetPFSize();}
-    sf::Vector2i GetPIPos() const            {return ppos.GetPIPos();}
-    sf::Vector2f CalculateOffset(sf::Vector2f objectSize) const
-        { return sf::Vector2f { GetPFPos() + (GetPFSize() - objectSize)/2.f }; }
-    void SetPIPos(sf::Vector2i p)            {ppos.SetPos(p);}
-    int GetSerial() const                       {return serial;}
+    virtual sf::Vector2i GetPlodedSize() { return sf::Vector2i {1, 1}; }
+    VectorWorld CalculateOffset(VectorWorld objectSize) const;
+
+    VectorWorld GetWorldPos() const             {return ppos.GetWorldPos();}
+    VectorWorld GetWorldSizeOfCell() const      {return ppos.GetWorldSizeOf();}
+    VectorSmart GetSmartPos() const             {return ppos.GetSmartPos();}
+    void SetPos(VectorSmart p)                  {ppos.SetPos(p);}
+
+    int GetSerial() const                   {return serial;}
 private:
     PlanPos ppos;
     int serial;

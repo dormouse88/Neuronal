@@ -8,7 +8,7 @@
 #include "Pansions.hpp"
 #include <cassert>
 
-int Pansions::MapDumbToSmart(int dumb) const
+Smart Pansions::MapDumbToSmart(Dumb dumb) const
 {
     //Iterate thru the Pansions in order from zero
     //At each one, test if dumbInt can be reached without expanding it:
@@ -25,55 +25,69 @@ int Pansions::MapDumbToSmart(int dumb) const
     bool done = false;
     int smart;
     
-    auto it = pansions.begin();
-    while (it != pansions.end() and not done)
+    if (dumb >= 0)
     {
-        //Only positive number expansions matter...
-        if (dumb >= 0 and it->first >= 0) {
-            //prior to the expansion...
-            if (totalAdditions + it->first > dumb) {
-                smart = dumb - totalAdditions;
-                done = true;
+        auto it = pansions.begin();
+        while (it != pansions.end() and not done)
+        {
+            //Consider only the positive number expansions...
+            if (it->first >= 0)
+            {
+                //prior to the expansion...
+                if (totalAdditions + it->first > dumb) {
+                    smart = dumb - totalAdditions;
+                    done = true;
+                }
+                //inside the expansion...
+                else if (totalAdditions + it->first + (it->second - 1) >= dumb) {
+                    smart = it->first;
+                    done = true;
+                }
+                //after the expansion...
+                else {
+                    totalAdditions += (it->second - 1);
+                }
             }
-            //inside the expansion...
-            else if (totalAdditions + it->first + (it->second - 1) >= dumb) {
-                smart = it->first;
-                done = true;
-            }
-            //after the expansion...
-            else {
-                totalAdditions += (it->second - 1);
-            }
+            ++it;
         }
-        //Or only negative number expansions matter...
-        if (dumb < 0 and it->first < 0) {
-            //prior to the expansion...
-            if (totalAdditions + it->first < dumb) {
-                smart = dumb - totalAdditions;
-                done = true;
-            }
-            //inside the expansion...
-            else if (totalAdditions + it->first - (it->second - 1) <= dumb ) {
-                smart = it->first;
-                done = true;
-            }
-            //after the expansion...
-            else {
-                totalAdditions -= (it->second - 1);
-            }
-        }
-        ++it;
     }
+    if (dumb < 0) //('else' basically)
+    {
+        auto it = pansions.rbegin();
+        while (it != pansions.rend() and not done)
+        {
+            //Consider only the negative number expansions...
+            if (it->first < 0)
+            {
+                //prior to the expansion...
+                if (totalAdditions + it->first < dumb) {
+                    smart = dumb - totalAdditions;
+                    done = true;
+                }
+                //inside the expansion...
+                else if (totalAdditions + it->first - (it->second - 1) <= dumb ) {
+                    smart = it->first;
+                    done = true;
+                }
+                //after the expansion...
+                else {
+                    totalAdditions -= (it->second - 1);
+                }
+            }
+            ++it;
+        }
+    }
+    
     if (not done and dumb >= 0) smart = dumb - totalAdditions;
     if (not done and dumb <  0) smart = dumb - totalAdditions;
     return smart;
 }
 
-int Pansions::MapSmartToDumb(int smart) const
+Dumb Pansions::MapSmartToDumb(Smart smart) const
 {
     int totalAdditions = 0;
     for (auto p: pansions) {
-        if (p.first > 0 and p.first < smart) {
+        if (p.first >= 0 and p.first < smart) {
             totalAdditions += p.second - 1;
         }
         if (p.first < 0 and p.first >= smart) {
@@ -83,20 +97,20 @@ int Pansions::MapSmartToDumb(int smart) const
     return smart + totalAdditions;
 }
 
-int Pansions::GetSize(int smart) const
+Dumb Pansions::GetSize(Smart loc) const
 {
-    if (pansions.count(smart))
+    if (pansions.count(loc))
     {
-        return pansions.at(smart);
+        return pansions.at(loc);
     }
     else return 1;
 }
 
-void Pansions::Insert(int smart, int size)
+void Pansions::SetSize(Smart loc, Dumb size)
 {
     assert(size > 0);
-    pansions.erase(smart);
+    pansions.erase(loc);
     if (size != 1) {
-        pansions.insert( {smart, size} );
+        pansions.insert( {loc, size} );
     }
 }

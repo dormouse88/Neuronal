@@ -163,33 +163,30 @@ void View::Clamp()
     auto activePlan = GetActivePlan().lock();
     if (activePlan)
     {
-        auto b = activePlan->GetPaddedBound();
-        if (b)
-        {
-            auto center = mainView.getCenter();
-            auto viewSize = mainView.getSize();
-            auto size = viewSize - sf::Vector2f{120.f, 120.f};
-            auto tl = center - (size/2.f);
-            bool oversizedX = (b->width > size.x) ? true : false;
-            bool oversizedY = (b->height > size.y) ? true : false;
-            if (oversizedX) {
-                if (tl.x          < b->left)            tl.x = b->left;
-                if (tl.x + size.x > b->left + b->width) tl.x = b->left + b->width - size.x;
-            }
-            else {
-                if (tl.x          > b->left)            tl.x = b->left;
-                if (tl.x + size.x < b->left + b->width) tl.x = b->left + b->width - size.x;
-            }
-            if (oversizedY) {
-                if (tl.y          < b->top)             tl.y = b->top;
-                if (tl.y + size.y > b->top + b->height) tl.y = b->top + b->height - size.y;
-            }
-            else {
-                if (tl.y          > b->top)             tl.y = b->top;
-                if (tl.y + size.y < b->top + b->height) tl.y = b->top + b->height - size.y;
-            }
-            mainView.setCenter(tl + (size/2.f) );
+        auto b = activePlan->GetWorldPaddedBound(2);
+        auto center = mainView.getCenter();
+        auto viewSize = mainView.getSize();
+        auto size = viewSize - sf::Vector2f{120.f, 120.f};
+        auto tl = center - (size/2.f);
+        bool oversizedX = (b.width > size.x) ? true : false;
+        bool oversizedY = (b.height > size.y) ? true : false;
+        if (oversizedX) {
+            if (tl.x          < b.left)            tl.x = b.left;
+            if (tl.x + size.x > b.left + b.width) tl.x = b.left + b.width - size.x;
         }
+        else {
+            if (tl.x          > b.left)            tl.x = b.left;
+            if (tl.x + size.x < b.left + b.width) tl.x = b.left + b.width - size.x;
+        }
+        if (oversizedY) {
+            if (tl.y          < b.top)             tl.y = b.top;
+            if (tl.y + size.y > b.top + b.height) tl.y = b.top + b.height - size.y;
+        }
+        else {
+            if (tl.y          > b.top)             tl.y = b.top;
+            if (tl.y + size.y < b.top + b.height) tl.y = b.top + b.height - size.y;
+        }
+        mainView.setCenter(tl + (size/2.f) );
     }
     
     

@@ -9,6 +9,7 @@
 #define	WIRE_HPP
 
 #include <SFML/Graphics.hpp>
+#include "miscUtil.hpp"
 #include "ViewResources.hpp"
 
 const int SLOT_MAX = 99;

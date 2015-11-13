@@ -6,40 +6,112 @@
  */
 
 #include "PlanPos.hpp"
+#include "ViewResources.hpp" //for GRID_SIZE
 
-#include "ChipPlan.hpp"
 
-PlanPos::PlanPos(sf::Vector2i newPos, std::shared_ptr<ChipPlan> newPlan)
+VectorDumb PlanGrid::MapSmartToDumb(VectorSmart point) const
+{
+    return VectorDumb {
+        xPansions.MapSmartToDumb(point.x),
+        yPansions.MapSmartToDumb(point.y)
+    };
+}
+VectorSmart PlanGrid::MapDumbToSmart(VectorDumb dumb) const
+{
+    return VectorSmart {
+        xPansions.MapDumbToSmart( dumb.x ),
+        yPansions.MapDumbToSmart( dumb.y )
+    };
+}
+
+VectorWorld PlanGrid::MapDumbToWorld(VectorDumb dumb) const
+{
+    return VectorWorld {
+        dumb.x * GRID_SIZE.x,
+        dumb.y * GRID_SIZE.y
+    };
+}
+VectorDumb PlanGrid::MapWorldToDumb(VectorWorld world) const
+{
+    return VectorDumb {
+        static_cast<int>(floorf(world.x / GRID_SIZE.x)),
+        static_cast<int>(floorf(world.y / GRID_SIZE.y))
+    };
+}
+
+VectorWorld PlanGrid::MapSmartToWorld(VectorSmart smart) const
+{
+    return MapDumbToWorld( MapSmartToDumb(smart) );
+}
+VectorSmart PlanGrid::MapWorldtoSmart(VectorWorld world) const
+{
+    return MapDumbToSmart( MapWorldToDumb(world) );
+}
+
+
+
+VectorDumb PlanGrid::DumbSizeOf(VectorSmart point) const
+{
+    return VectorDumb {
+        xPansions.GetSize(point.x),
+        yPansions.GetSize(point.y)
+    };
+}
+VectorWorld PlanGrid::WorldSizeOf(VectorSmart point) const
+{
+    VectorDumb dumb { DumbSizeOf(point) };
+    return VectorWorld {
+        dumb.x * GRID_SIZE.x,
+        dumb.y * GRID_SIZE.y
+    };
+}
+
+
+
+
+
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+
+
+
+
+PlanPos::PlanPos(VectorSmart newPos, std::shared_ptr<PlanGrid> newGrid)
     :pos(newPos)
-    ,plan(newPlan)
+    ,planGrid(newGrid)
 {}
 
-PlanPos::PlanPos(sf::Vector2f newPos, std::shared_ptr<ChipPlan> newPlan)
-    :pos( newPlan->MapPFtoPI(newPos) )
-    ,plan(newPlan)
+PlanPos::PlanPos(VectorWorld newPos, std::shared_ptr<PlanGrid> newGrid)
+    :pos( newGrid->MapWorldtoSmart(newPos) )
+    ,planGrid(newGrid)
 {}
 
-sf::Vector2i PlanPos::GetPIPos() const
+VectorSmart PlanPos::GetSmartPos() const
 {
     return pos;
 }
-sf::Vector2f PlanPos::GetPFPos() const
+VectorWorld PlanPos::GetWorldPos() const
 {
-    return plan->MapPItoPF(pos);
+    return planGrid->MapSmartToWorld(pos);
 }
-sf::Vector2f PlanPos::GetPFSize() const
+VectorWorld PlanPos::GetWorldSizeOf() const
 {
-    return plan->GetPFSize(pos);
+    return planGrid->WorldSizeOf(pos);
 }
-void PlanPos::SetPlan(std::shared_ptr<ChipPlan> newPlan)
+void PlanPos::SetPlan(std::shared_ptr<PlanGrid> newGrid)
 {
-    plan = newPlan;
+    planGrid = newGrid;
 }
-void PlanPos::SetPos(sf::Vector2i newPos)
+void PlanPos::SetPos(VectorSmart newPos)
 {
     pos = newPos;
 }
 void PlanPos::SetPos(sf::Vector2f newPos)
 {
-    pos = plan->MapPFtoPI(newPos);
+    pos = planGrid->MapWorldtoSmart(newPos);
 }

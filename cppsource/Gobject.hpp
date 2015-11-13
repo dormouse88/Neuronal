@@ -44,7 +44,6 @@ public:
     std::shared_ptr<ChipPlan> GetContainer();
 private:
     bool dead;
-protected:
     std::weak_ptr<ChipPlan> container;
 };
 

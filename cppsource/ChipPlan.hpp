@@ -15,9 +15,9 @@
 class ChipHandle;
 #include "Device.hpp"
 #include "Wire.hpp"
-#include "Pansions.hpp"
+#include "PlanPos.hpp"
 
-class ChipPlan : public Wirable//, public Gobject
+class ChipPlan : public Wirable
 {
 public:
     ChipPlan();
@@ -52,30 +52,32 @@ public:
     bool IsModified() {return modified;}
     bool IsEmpty() {return devices.empty() and wires.empty();}
     
-    std::shared_ptr<Device> GetDevice(sf::Vector2i pos);
+    std::shared_ptr<PlanGrid> GetGrid() {return planGrid;}
+    std::shared_ptr<Device> GetDevice(VectorSmart pos);
     std::shared_ptr<Device> GetDevice(int serial);
     std::shared_ptr<Wire> GetWire(const Wirable& from, const Wirable& to);
     std::vector<std::shared_ptr<Wire> > GetWires(std::shared_ptr<Wirable> device, bool from, bool to); 
 
-    virtual sf::Vector2f GetWireAttachPos(WireAttachSide was) const override;
-    std::shared_ptr<sf::FloatRect> GetPaddedBound() const;
-    virtual void Draw(sf::RenderTarget & rt);
+    virtual VectorWorld GetWireAttachPos(WireAttachSide was) const override;
     
-    sf::Vector2i MapPFtoPI(const sf::Vector2f & point) const;
-    sf::Vector2f MapPItoPF(const sf::Vector2i & point) const;
-    sf::Vector2f GetPFSize(const sf::Vector2i & point) const;
+    PairVector<Smart> GetSmartBound() const;
+    VectorDumb GetDumbSize(int thickness) const;
+    PairVector<Dumb> GetDumbPaddedBound(int thickness) const;
+    RectWorld GetWorldPaddedBound(int thickness) const;
+    void PlodeRefresh(sf::Vector2i point);
+    
+    void SubDraw(sf::RenderTarget & rt);
+    void Draw(sf::RenderTarget & rt);
 
 private:
     int planID;
+    std::shared_ptr<PlanGrid> planGrid;
     std::weak_ptr<ChipHandle> referer;  //need to be able to pass charge back out
     std::vector<std::shared_ptr<Device> > devices;
     std::vector<std::shared_ptr<Wire> > wires;
     bool modified;
-    Pansions xPansions;
-    Pansions yPansions;
-
-    friend class Serializer;
     
+    friend class Serializer;
 };
 #endif	/* CHIPPLAN_HPP */
 

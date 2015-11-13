@@ -10,13 +10,8 @@
 #include <cassert>
 
 ChipPlan::ChipPlan()
-    :Wirable(), planID(0), modified(false)
-{
-    //dummy data for testing...
-    xPansions.Insert( 4,2 );
-    xPansions.Insert( -4,4 );
-    yPansions.Insert( -2,2 );
-}
+    :Wirable(), planID(0), modified(false), planGrid(std::make_shared<PlanGrid>())
+{}
 
 void ChipPlan::ReceiveCharge(bool charge, int weight, int slot)
 {
@@ -61,7 +56,7 @@ void ChipPlan::PassOnCalculate()
 
 void ChipPlan::SetPosition(Device & d, sf::Vector2i newPos)
 {
-    if (IsPositionFree(newPos)) d.SetPIPos( newPos );
+    if (IsPositionFree(newPos)) d.SetPos( newPos );
     SetModified();
 }
 int ChipPlan::GetFreeSerial() const
@@ -81,7 +76,7 @@ bool ChipPlan::IsSerialFree(int serial) const
 bool ChipPlan::IsPositionFree(sf::Vector2i pos) const
 {
     for (const auto & x : devices) {
-        if (x->GetPIPos() == pos) return false;
+        if (x->GetSmartPos() == pos) return false;
     }
     return true;
 }
@@ -143,11 +138,10 @@ void ChipPlan::SetModified()
 
 
 
-std::shared_ptr<Device> ChipPlan::GetDevice(sf::Vector2i pos)
+std::shared_ptr<Device> ChipPlan::GetDevice(VectorSmart pos)
 {
-    //check against siblings
     for (auto & x: devices) {
-        if (pos == x->GetPIPos()) {
+        if (pos == x->GetSmartPos()) {
             return x;
         }
     }
@@ -198,74 +192,113 @@ std::vector<std::shared_ptr<Wire> > ChipPlan::GetWires(std::shared_ptr<Wirable> 
 }
 
 
-sf::Vector2f ChipPlan::GetWireAttachPos(WireAttachSide was) const
+VectorWorld ChipPlan::GetWireAttachPos(WireAttachSide was) const
 {
     sf::Vector2f wirePos;
-    auto bound = GetPaddedBound();
-    if (bound)
+    auto bound = GetWorldPaddedBound(2);
+    //Because ChipPlans are wired internally, the wires come OUT of the left...
+    if (was == WireAttachSide::OUT)
     {
-        //Because ChipPlans are wired internally, the wires come OUT of the left...
-        if (was == WireAttachSide::OUT)
-        {
-            wirePos.x = bound->left;
-        }
-        if (was == WireAttachSide::IN)
-        {
-            wirePos.x = bound->left + bound->width;
-        }
-        wirePos.y = bound->top + (0.5 * bound->height);
+        wirePos.x = bound.left;
     }
+    if (was == WireAttachSide::IN)
+    {
+        wirePos.x = bound.left + bound.width;
+    }
+    wirePos.y = bound.top + (0.5 * bound.height);
     return wirePos;
 }
 
-std::shared_ptr<sf::FloatRect> ChipPlan::GetPaddedBound() const
+PairVector<Smart> ChipPlan::GetSmartBound() const
 {
-    sf::Vector2i tl;
-    sf::Vector2i br;
-    sf::Vector2i tl_padded;
-    sf::Vector2i br_padded;
+    PairVector<Smart> pvs;
     if (devices.size() > 0)
     {
         //set initial values
-        auto firstPos = devices.at(0)->GetPIPos();
-        tl = firstPos;
-        br = firstPos;
+        VectorSmart firstPos = devices.at(0)->GetSmartPos();
+        VectorSmart tl = firstPos;
+        VectorSmart br = firstPos;
         for (auto & x: devices)
         {
-            sf::Vector2i p = x->GetPIPos();
+            VectorSmart p = x->GetSmartPos();
             if (p.x < tl.x) tl.x = p.x;
             if (p.x > br.x) br.x = p.x;
             if (p.y < tl.y) tl.y = p.y;
             if (p.y > br.y) br.y = p.y;
         }
-        tl_padded = tl - sf::Vector2i{ 2, 2 };
-        br_padded = br + sf::Vector2i{ 2, 2 };
+        pvs.tl = tl;
+        pvs.br = br;
+        pvs.valid = true;
     }
-    else //in the case of an empty plan...
+    return pvs;
+}
+
+VectorDumb ChipPlan::GetDumbSize(int thickness) const
+{
+    PairVector<Smart> pvs { GetSmartBound() };
+    if (pvs.valid) {
+        VectorDumb tl = planGrid->MapSmartToDumb(pvs.tl);
+        VectorDumb br = planGrid->MapSmartToDumb(pvs.br);
+        return VectorDumb { br - tl + VectorDumb{1,1} + VectorDumb{thickness *2, thickness*2} } ;
+    }
+    else return VectorDumb {0,0};
+}
+
+PairVector<Dumb> ChipPlan::GetDumbPaddedBound(int thickness) const
+{
+    PairVector<Smart> pvs = GetSmartBound();
+    if (pvs.valid) {
+        pvs.AddPadding(pvs, thickness);
+    }
+    else {
+        pvs.tl = VectorSmart { -1,-1 };
+        pvs.br = VectorSmart {  1, 1 };
+        pvs.valid = true;
+    }
+    VectorDumb tl { planGrid->MapSmartToDumb(pvs.tl) };
+    VectorDumb br { planGrid->MapSmartToDumb(pvs.br) };
+    return PairVector<Dumb> { tl , br };
+}
+
+RectWorld ChipPlan::GetWorldPaddedBound(int thickness) const
+{
+    PairVector<Smart> pvs = GetSmartBound();
+    if (pvs.valid) {
+        pvs.AddPadding(pvs, thickness);
+    }
+    else {
+        pvs.tl = VectorSmart { -1,-1 };
+        pvs.br = VectorSmart {  1, 1 };
+        pvs.valid = true;
+    }
+    VectorWorld tl { planGrid->MapSmartToWorld(pvs.tl) };
+    VectorWorld br { planGrid->MapSmartToWorld(pvs.br) + planGrid->WorldSizeOf(pvs.br) };
+    return RectWorld { tl , br - tl };
+}    
+
+
+void ChipPlan::PlodeRefresh(sf::Vector2i point)
+{
+    int xMaxSize = 1;
+    int yMaxSize = 1;
+    for (auto & d: devices)
     {
-        tl_padded = sf::Vector2i{-1,-1};
-        br_padded = sf::Vector2i{ 1, 1};
+        if (d->GetSmartPos().x == point.x)
+        {
+            if ( d->GetPlodedSize().x > xMaxSize) xMaxSize = d->GetPlodedSize().x;
+        }
+        if (d->GetSmartPos().y == point.y)
+        {
+            if ( d->GetPlodedSize().y > yMaxSize) yMaxSize = d->GetPlodedSize().y;
+        }
     }
-    sf::Vector2f tl_f { MapPItoPF(tl_padded) };
-    sf::Vector2f br_f { MapPItoPF(br_padded) + GetPFSize(br_padded) };
-    return std::make_shared<sf::FloatRect> ( tl_f , br_f - tl_f );
+    planGrid->SetSizeX(point.x, xMaxSize);
+    planGrid->SetSizeY(point.y, yMaxSize);
 }
 
 
-void ChipPlan::Draw(sf::RenderTarget & rt)
+void ChipPlan::SubDraw(sf::RenderTarget & rt)
 {
-    auto pB = GetPaddedBound();
-    if (pB)
-    {
-        sf::RectangleShape planBox;
-        planBox.setFillColor( sf::Color{50,0,0} );
-        planBox.setOutlineColor( sf::Color{95,95,95} );
-        planBox.setOutlineThickness(3.f);
-        planBox.setPosition( sf::Vector2f{pB->left, pB->top} );
-        planBox.setSize( sf::Vector2f{pB->width, pB->height} );
-        rt.draw(planBox);
-    }
-    
     for (auto & w: wires)
     {
         w->Draw(rt);
@@ -276,42 +309,17 @@ void ChipPlan::Draw(sf::RenderTarget & rt)
     }
 }
 
-
-
-/**
- * Maps a PlanFloat coord to a PlanInt coord
- * @param point
- * @return 
- */
-sf::Vector2i ChipPlan::MapPFtoPI(const sf::Vector2f & point) const
+void ChipPlan::Draw(sf::RenderTarget & rt)
 {
-    sf::Vector2i dumb {
-        static_cast<int>(floorf(point.x / GRID_SIZE.x)),
-        static_cast<int>(floorf(point.y / GRID_SIZE.y))
-    };
-    return sf::Vector2i {
-        xPansions.MapDumbToSmart( dumb.x ),
-        yPansions.MapDumbToSmart( dumb.y )
-    };
+    auto pB = GetWorldPaddedBound(2);
+    sf::RectangleShape planBox;
+    planBox.setFillColor( sf::Color{50,0,0} );
+    planBox.setOutlineColor( sf::Color{95,95,95} );
+    planBox.setOutlineThickness(3.f);
+    planBox.setPosition( sf::Vector2f{pB.left, pB.top} );
+    planBox.setSize( sf::Vector2f{pB.width, pB.height} );
+    rt.draw(planBox);
+
+    SubDraw(rt);
 }
 
-/**
- * Maps a PlanInt coord to a PlanFloat coord
- * @param point
- * @return 
- */
-sf::Vector2f ChipPlan::MapPItoPF(const sf::Vector2i & point) const
-{
-    return sf::Vector2f{
-        (xPansions.MapSmartToDumb(point.x)) * GRID_SIZE.x,
-        (yPansions.MapSmartToDumb(point.y)) * GRID_SIZE.y
-    };
-}
-
-sf::Vector2f ChipPlan::GetPFSize(const sf::Vector2i & point) const
-{
-    return sf::Vector2f{
-        GRID_SIZE.x * xPansions.GetSize(point.x),
-        GRID_SIZE.y * yPansions.GetSize(point.y)
-    };
-}

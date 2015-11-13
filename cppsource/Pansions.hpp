@@ -10,13 +10,16 @@
 
 #include <map>
 
+typedef int Smart;
+typedef int Dumb;
+
 class Pansions
 {
 public:
-    int MapSmartToDumb(int point) const;
-    int MapDumbToSmart(int dumb) const;
-    int GetSize(int smart) const;
-    void Insert(int smart, int size);
+    Smart MapDumbToSmart(Dumb dumb) const;
+    Dumb MapSmartToDumb(Smart smart) const;
+    Dumb GetSize(Smart loc) const;
+    void SetSize(Smart loc, Dumb size);
 private:
     std::map<int, int> pansions;
 };
