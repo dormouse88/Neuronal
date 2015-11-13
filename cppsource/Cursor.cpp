@@ -30,7 +30,7 @@ void Cursor::Draw(sf::RenderTarget & rt)
 
 void Cursor::SetPFPos(sf::Vector2f newPos, std::shared_ptr<ChipPlan> newPlan)
 {
-    auto b = newPlan->GetWorldPaddedBound(2);
+    auto b = newPlan->GetWorldBound();
     if (b.contains(newPos))
     {
         pposPtr = std::make_shared<PlanPos>( newPos, newPlan->GetGrid() );

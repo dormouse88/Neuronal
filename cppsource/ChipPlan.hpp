@@ -60,12 +60,27 @@ public:
 
     virtual VectorWorld GetWireAttachPos(WireAttachSide was) const override;
     
-    PairVector<Smart> GetSmartBound() const;
-    VectorDumb GetDumbSize(int thickness) const;
-    PairVector<Dumb> GetDumbPaddedBound(int thickness) const;
-    RectWorld GetWorldPaddedBound(int thickness) const;
-    void PlodeRefresh(sf::Vector2i point);
+    PlanRect GetSmartInnerBound() const;  //used internally by getdumbsize and getworldpaddedbound
+//    VectorDumb GetDumbSize(int thickness) const; //for get ploded size
+    //PairVector<Dumb> GetDumbPaddedBound(int thickness) const;
+//    RectWorld GetWorldPaddedBound(int thickness) const;  //for cursor and view clamping and handle view setting
+
+    RectDumb GetDumbBound() const
+    {
+        auto pr = GetSmartInnerBound();
+        return pr.AddPadding(padding).GetRectDumb();
+        //else return RectDumb {-padding,-padding,padding*2,padding*2};
+    }
+    RectWorld GetWorldBound() const
+    {
+        auto pr = GetSmartInnerBound();
+        return pr.AddPadding(padding).GetRectWorld();
+    }
     
+    void SetPadding(int thickness) {padding = thickness;}
+    void PlodeRefresh(VectorSmart point);
+    
+    void DrawParts(sf::RenderTarget & rt);
     void SubDraw(sf::RenderTarget & rt);
     void Draw(sf::RenderTarget & rt);
 
@@ -76,6 +91,7 @@ private:
     std::vector<std::shared_ptr<Device> > devices;
     std::vector<std::shared_ptr<Wire> > wires;
     bool modified;
+    int padding;
     
     friend class Serializer;
 };

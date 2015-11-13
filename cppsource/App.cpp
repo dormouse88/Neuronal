@@ -6,7 +6,6 @@
  */
 
 #include "App.hpp"
-#include <iostream> //del
 
 App::App()
     :factory(),

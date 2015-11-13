@@ -48,7 +48,6 @@ struct PairVector
 };
 
 
-
 class PlanGrid
 {
 public:
@@ -79,18 +78,53 @@ private:
 class PlanPos
 {
 public:
+    PlanPos();
     PlanPos(VectorSmart, std::shared_ptr<PlanGrid>);
     PlanPos(VectorWorld, std::shared_ptr<PlanGrid>);
-    VectorSmart GetSmartPos() const;
-    VectorWorld GetWorldPos() const;
-    VectorWorld GetWorldSizeOf() const;
-    void SetPlan(std::shared_ptr<PlanGrid>);
+
+    void SetGrid(std::shared_ptr<PlanGrid>);
+    bool IsValid();
+
     void SetPos(VectorSmart);
+    void SetPosDumb(VectorDumb);
     void SetPos(VectorWorld);
+
+    VectorSmart GetSmartPos() const;
+    VectorDumb GetDumbPos() const;
+    VectorWorld GetWorldPos() const;
+    
+    VectorDumb GetDumbSizeOf() const;
+    VectorWorld GetWorldSizeOf() const;
 private:
     VectorSmart pos;
     std::shared_ptr<PlanGrid> planGrid;
 };
+
+struct PlanRect
+{
+    PlanRect() :valid(false) {}
+    PlanRect(PlanPos tl_, PlanPos br_)
+            :tl(tl_), br(br_), valid(true) {}
+    PlanRect AddPadding(int thickness)
+    {
+        tl.SetPos( tl.GetSmartPos() - sf::Vector2i{ thickness, thickness } );
+        br.SetPos( br.GetSmartPos() + sf::Vector2i{ thickness, thickness } );
+        return *this;
+    }
+    RectDumb GetRectDumb() const
+    {
+        return RectDumb {tl.GetDumbPos(), br.GetDumbPos() - tl.GetDumbPos() + br.GetDumbSizeOf() };
+    }
+    RectWorld GetRectWorld() const
+    {
+        return RectWorld {tl.GetWorldPos(), br.GetWorldPos() - tl.GetWorldPos() + br.GetWorldSizeOf() };
+    }
+    void SetGrid(std::shared_ptr<PlanGrid> newGrid) { tl.SetGrid(newGrid); br.SetGrid(newGrid); }
+    PlanPos tl;
+    PlanPos br;
+    bool valid;
+};
+
 
 #endif	/* PLANPOS_HPP */
 

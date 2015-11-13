@@ -79,7 +79,9 @@ VectorWorld PlanGrid::WorldSizeOf(VectorSmart point) const
 
 
 
-
+PlanPos::PlanPos()
+    :planGrid(nullptr)
+{}
 
 PlanPos::PlanPos(VectorSmart newPos, std::shared_ptr<PlanGrid> newGrid)
     :pos(newPos)
@@ -91,27 +93,57 @@ PlanPos::PlanPos(VectorWorld newPos, std::shared_ptr<PlanGrid> newGrid)
     ,planGrid(newGrid)
 {}
 
-VectorSmart PlanPos::GetSmartPos() const
-{
-    return pos;
-}
-VectorWorld PlanPos::GetWorldPos() const
-{
-    return planGrid->MapSmartToWorld(pos);
-}
-VectorWorld PlanPos::GetWorldSizeOf() const
-{
-    return planGrid->WorldSizeOf(pos);
-}
-void PlanPos::SetPlan(std::shared_ptr<PlanGrid> newGrid)
+void PlanPos::SetGrid(std::shared_ptr<PlanGrid> newGrid)
 {
     planGrid = newGrid;
 }
+
+bool PlanPos::IsValid()
+{
+    if (planGrid) return true;
+    else return false;
+}
+
 void PlanPos::SetPos(VectorSmart newPos)
 {
+    if (not planGrid) throw "no Grid";
     pos = newPos;
 }
-void PlanPos::SetPos(sf::Vector2f newPos)
+void PlanPos::SetPosDumb(VectorDumb newPos)
 {
+    if (not planGrid) throw "no Grid";
+    pos = planGrid->MapDumbToSmart(newPos);
+}
+void PlanPos::SetPos(VectorWorld newPos)
+{
+    if (not planGrid) throw "no Grid";
     pos = planGrid->MapWorldtoSmart(newPos);
 }
+
+VectorSmart PlanPos::GetSmartPos() const
+{
+    if (not planGrid) throw "no Grid";
+    return pos;
+}
+VectorDumb PlanPos::GetDumbPos() const
+{
+    if (not planGrid) throw "no Grid";
+    return planGrid->MapSmartToDumb(pos);
+}
+VectorWorld PlanPos::GetWorldPos() const
+{
+    if (not planGrid) throw "no Grid";
+    return planGrid->MapSmartToWorld(pos);
+}
+
+VectorDumb PlanPos::GetDumbSizeOf() const
+{
+    if (not planGrid) throw "no Grid";
+    return planGrid->DumbSizeOf(pos);
+}
+VectorWorld PlanPos::GetWorldSizeOf() const
+{
+    if (not planGrid) throw "no Grid";
+    return planGrid->WorldSizeOf(pos);
+}
+

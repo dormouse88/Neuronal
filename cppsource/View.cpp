@@ -163,7 +163,7 @@ void View::Clamp()
     auto activePlan = GetActivePlan().lock();
     if (activePlan)
     {
-        auto b = activePlan->GetWorldPaddedBound(2);
+        auto b = activePlan->GetWorldBound();
         auto center = mainView.getCenter();
         auto viewSize = mainView.getSize();
         auto size = viewSize - sf::Vector2f{120.f, 120.f};

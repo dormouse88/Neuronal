@@ -12,8 +12,8 @@ const sf::Vector2f RECTANGLE { 90.f, 65.f };
 const sf::Vector2f MAIN_OFFSET {0.f, 0.f}; // { (GRID_SIZE - RECTANGLE)/2.f };
 const sf::Vector2f PLANID_OFFSET { MAIN_OFFSET.x + 18.f, MAIN_OFFSET.y + 2.f };
 
-const sf::Vector2f WIRE_IN_OFFSET { MAIN_OFFSET };
-const sf::Vector2f WIRE_OUT_OFFSET { MAIN_OFFSET + RECTANGLE };
+const sf::Vector2f WIRE_IN_OFFSET { MAIN_OFFSET.x, MAIN_OFFSET.y + RECTANGLE.y/2.f };
+const sf::Vector2f WIRE_OUT_OFFSET { MAIN_OFFSET.x + RECTANGLE.x, MAIN_OFFSET.y + RECTANGLE.y/2.f };
 
 
 ChipHandle::ChipHandle(int serial_p, sf::Vector2i pos_p, std::shared_ptr<ChipPlan> cont)
@@ -73,11 +73,25 @@ void ChipHandle::LogicCalculate()
 sf::Vector2f ChipHandle::GetWireAttachPos(WireAttachSide was) const
 {
     sf::Vector2f wirePos;
-    if (was == WireAttachSide::IN) {
-        wirePos = GetWorldPos() + (GetWorldSizeOfCell() - RECTANGLE)/2.f + WIRE_IN_OFFSET;
+    if (exploded)
+    {
+        RectWorld planBound { plan->GetWorldBound() };
+        VectorWorld objectSize { planBound.width, planBound.height };
+        if (was == WireAttachSide::IN) {
+            wirePos = CalculateOffset(objectSize) + VectorWorld {objectSize.x *.0f, objectSize.y *.5f };
+        }
+        else {
+            wirePos = CalculateOffset(objectSize) + VectorWorld {objectSize.x *1.f, objectSize.y *.5f };
+        }
     }
-    else {
-        wirePos = GetWorldPos() + (GetWorldSizeOfCell() - RECTANGLE)/2.f + WIRE_OUT_OFFSET;
+    else
+    {
+        if (was == WireAttachSide::IN) {
+            wirePos = CalculateOffset(RECTANGLE) + WIRE_IN_OFFSET;
+        }
+        else {
+            wirePos = CalculateOffset(RECTANGLE) + WIRE_OUT_OFFSET;
+        }
     }
     return wirePos;
 }
@@ -88,10 +102,13 @@ void ChipHandle::Draw(sf::RenderTarget & rt)
     {
         sf::View outerView { rt.getView() };
         sf::View subView { outerView };
-//        VectorWorld topLeft = plan->GetGrid()->MapSmartToWorld( plan->GetSmartBound().tl );
-        RectWorld embed { plan->GetWorldPaddedBound(1) };
-        VectorWorld topLeft { embed.left, embed.top };
-        subView.move( topLeft - GetWorldPos() );
+        {
+            RectWorld planBound { plan->GetWorldBound() };
+            VectorWorld planTopLeft { planBound.left, planBound.top };
+            VectorWorld objectSize {planBound.width, planBound.height};
+            UpdatePos( CalculateOffset(objectSize) );
+            subView.move( planTopLeft - perceivedPos );
+        }
         rt.setView(subView);
         plan->SubDraw(rt);
         rt.setView(outerView);
@@ -124,7 +141,7 @@ VectorDumb ChipHandle::GetPlodedSize()
 {
     if (exploded)
     {
-        return plan->GetDumbSize(1);
+        return VectorDumb{ plan->GetDumbBound().width, plan->GetDumbBound().height };
     }
     else return VectorDumb{1,1};
 }

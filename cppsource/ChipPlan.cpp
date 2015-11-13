@@ -10,7 +10,7 @@
 #include <cassert>
 
 ChipPlan::ChipPlan()
-    :Wirable(), planID(0), modified(false), planGrid(std::make_shared<PlanGrid>())
+    :Wirable(), planID(0), modified(false), padding(1), planGrid(std::make_shared<PlanGrid>())
 {}
 
 void ChipPlan::ReceiveCharge(bool charge, int weight, int slot)
@@ -56,8 +56,11 @@ void ChipPlan::PassOnCalculate()
 
 void ChipPlan::SetPosition(Device & d, sf::Vector2i newPos)
 {
+    auto oldPos = d.GetSmartPos();
     if (IsPositionFree(newPos)) d.SetPos( newPos );
     SetModified();
+    PlodeRefresh(oldPos);
+    PlodeRefresh(newPos);
 }
 int ChipPlan::GetFreeSerial() const
 {
@@ -195,7 +198,10 @@ std::vector<std::shared_ptr<Wire> > ChipPlan::GetWires(std::shared_ptr<Wirable> 
 VectorWorld ChipPlan::GetWireAttachPos(WireAttachSide was) const
 {
     sf::Vector2f wirePos;
-    auto bound = GetWorldPaddedBound(2);
+    //SHOULD THE PLAN BOUND BE USED OR THE CELL BOUND THAT CONTAINS IT?
+    //DO SUBPLANS ALWAYS USE UP ALL THE AVAILABLE SPACE?
+    //ID SUGGEST NOT
+    auto bound = GetWorldBound();
     //Because ChipPlans are wired internally, the wires come OUT of the left...
     if (was == WireAttachSide::OUT)
     {
@@ -209,9 +215,9 @@ VectorWorld ChipPlan::GetWireAttachPos(WireAttachSide was) const
     return wirePos;
 }
 
-PairVector<Smart> ChipPlan::GetSmartBound() const
+PlanRect ChipPlan::GetSmartInnerBound() const
 {
-    PairVector<Smart> pvs;
+    PlanRect pr;
     if (devices.size() > 0)
     {
         //set initial values
@@ -226,58 +232,66 @@ PairVector<Smart> ChipPlan::GetSmartBound() const
             if (p.y < tl.y) tl.y = p.y;
             if (p.y > br.y) br.y = p.y;
         }
-        pvs.tl = tl;
-        pvs.br = br;
-        pvs.valid = true;
-    }
-    return pvs;
-}
-
-VectorDumb ChipPlan::GetDumbSize(int thickness) const
-{
-    PairVector<Smart> pvs { GetSmartBound() };
-    if (pvs.valid) {
-        VectorDumb tl = planGrid->MapSmartToDumb(pvs.tl);
-        VectorDumb br = planGrid->MapSmartToDumb(pvs.br);
-        return VectorDumb { br - tl + VectorDumb{1,1} + VectorDumb{thickness *2, thickness*2} } ;
-    }
-    else return VectorDumb {0,0};
-}
-
-PairVector<Dumb> ChipPlan::GetDumbPaddedBound(int thickness) const
-{
-    PairVector<Smart> pvs = GetSmartBound();
-    if (pvs.valid) {
-        pvs.AddPadding(pvs, thickness);
+        pr.SetGrid(planGrid);
+        pr.tl.SetPos(tl);
+        pr.br.SetPos(br);
+        pr.valid = true;
     }
     else {
-        pvs.tl = VectorSmart { -1,-1 };
-        pvs.br = VectorSmart {  1, 1 };
-        pvs.valid = true;
+        pr.SetGrid(planGrid);
+        pr.tl.SetPos( VectorSmart{} );
+        pr.br.SetPos( VectorSmart{} );
+        pr.valid = false;
     }
-    VectorDumb tl { planGrid->MapSmartToDumb(pvs.tl) };
-    VectorDumb br { planGrid->MapSmartToDumb(pvs.br) };
-    return PairVector<Dumb> { tl , br };
+    return pr;
 }
 
-RectWorld ChipPlan::GetWorldPaddedBound(int thickness) const
-{
-    PairVector<Smart> pvs = GetSmartBound();
-    if (pvs.valid) {
-        pvs.AddPadding(pvs, thickness);
-    }
-    else {
-        pvs.tl = VectorSmart { -1,-1 };
-        pvs.br = VectorSmart {  1, 1 };
-        pvs.valid = true;
-    }
-    VectorWorld tl { planGrid->MapSmartToWorld(pvs.tl) };
-    VectorWorld br { planGrid->MapSmartToWorld(pvs.br) + planGrid->WorldSizeOf(pvs.br) };
-    return RectWorld { tl , br - tl };
-}    
+//VectorDumb ChipPlan::GetDumbSize(int thickness) const
+//{
+//    PlanRect pr { GetSmartInnerBound() };
+//    if (pr.valid) {
+//        VectorDumb tl = pr.tl.GetDumbPos();
+//        VectorDumb br = pr.br.GetDumbPos();
+//        return VectorDumb { br - tl + pr.br.GetDumbSizeOf() +  VectorDumb{thickness *2*0, thickness*2*0} } ;
+//    }
+//    else return VectorDumb {0,0};
+//}
+
+//PairVector<Dumb> ChipPlan::GetDumbPaddedBound(int thickness) const
+//{
+//    PairVector<Smart> pvs = GetSmartBound();
+//    if (pvs.valid) {
+//        pvs.AddPadding(pvs, thickness);
+//    }
+//    else {
+//        pvs.tl = VectorSmart { -1,-1 };
+//        pvs.br = VectorSmart {  1, 1 };
+//        pvs.valid = true;
+//    }
+//    VectorDumb tl { planGrid->MapSmartToDumb(pvs.tl) };
+//    VectorDumb br { planGrid->MapSmartToDumb(pvs.br) };
+//    return PairVector<Dumb> { tl , br };
+//}
+
+//RectWorld ChipPlan::GetWorldPaddedBound(int thickness) const
+//{
+//    PlanRect pr = GetSmartInnerBound();
+//    if (pr.valid) {
+//        pr.AddPadding(0); //thickness
+//    }
+//    else {
+//        pr.SetGrid(planGrid);
+//        pr.tl.SetPos( VectorSmart { -1,-1 } );
+//        pr.br.SetPos( VectorSmart {  1, 1 } );
+//        pr.valid = true;
+//    }
+//    VectorWorld tl = pr.tl.GetWorldPos();
+//    VectorWorld br = pr.br.GetWorldPos() + pr.br.GetWorldSizeOf();
+//    return RectWorld { tl , br - tl };
+//}    
 
 
-void ChipPlan::PlodeRefresh(sf::Vector2i point)
+void ChipPlan::PlodeRefresh(VectorSmart point)
 {
     int xMaxSize = 1;
     int yMaxSize = 1;
@@ -294,10 +308,17 @@ void ChipPlan::PlodeRefresh(sf::Vector2i point)
     }
     planGrid->SetSizeX(point.x, xMaxSize);
     planGrid->SetSizeY(point.y, yMaxSize);
+
+    //Plode refresh recursively back to base plan...
+    auto refLock = referer.lock();
+    if (refLock) {
+        auto cont = refLock->GetContainer();
+        cont->PlodeRefresh( refLock->GetSmartPos() );
+    }
 }
 
 
-void ChipPlan::SubDraw(sf::RenderTarget & rt)
+void ChipPlan::DrawParts(sf::RenderTarget & rt)
 {
     for (auto & w: wires)
     {
@@ -309,9 +330,30 @@ void ChipPlan::SubDraw(sf::RenderTarget & rt)
     }
 }
 
+void ChipPlan::SubDraw(sf::RenderTarget & rt)
+{
+    auto pB = GetWorldBound();
+    sf::RectangleShape planBox;
+    planBox.setFillColor( sf::Color{0,50,0} );
+    planBox.setOutlineColor( sf::Color{95,95,95} );
+    planBox.setOutlineThickness(3.f);
+    planBox.setPosition( sf::Vector2f{pB.left, pB.top} );
+    planBox.setSize( sf::Vector2f{pB.width, pB.height} );
+    rt.draw(planBox);
+    
+    sf::Text planNumText;
+    planNumText.setFont( ViewResources::GetInstance().font );
+    planNumText.setString( patch::to_string(GetPlanID()) );
+    planNumText.setColor( sf::Color::Cyan );
+    planNumText.setPosition(pB.left + pB.width/2.f, pB.top + pB.height - 40.f );
+    rt.draw(planNumText);
+    
+    DrawParts(rt);
+}
+
 void ChipPlan::Draw(sf::RenderTarget & rt)
 {
-    auto pB = GetWorldPaddedBound(2);
+    auto pB = GetWorldBound();
     sf::RectangleShape planBox;
     planBox.setFillColor( sf::Color{50,0,0} );
     planBox.setOutlineColor( sf::Color{95,95,95} );
@@ -320,6 +362,6 @@ void ChipPlan::Draw(sf::RenderTarget & rt)
     planBox.setSize( sf::Vector2f{pB.width, pB.height} );
     rt.draw(planBox);
 
-    SubDraw(rt);
+    DrawParts(rt);
 }
 
