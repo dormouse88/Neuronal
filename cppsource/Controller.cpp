@@ -60,8 +60,8 @@ bool Controller::LoadPlan(int num, std::shared_ptr<ChipPlan> activePlan)
 
 bool Controller::HandleInput()
 {
-    std::shared_ptr<sf::Vector2i> pos1 = nullptr;
-    std::shared_ptr<sf::Vector2i> pos2 = nullptr;
+    std::shared_ptr<const PlanPos> pos1 = nullptr;
+    std::shared_ptr<const PlanPos> pos2 = nullptr;
     std::shared_ptr<Wirable> wirable1 = nullptr;
     std::shared_ptr<Wirable> wirable2 = nullptr;
     std::shared_ptr<Device> device1 = nullptr;
@@ -71,17 +71,17 @@ bool Controller::HandleInput()
     //Update handles...
     auto activePlan = theView.GetActivePlan().lock();
     if (activePlan) {
-        pos1 = theView.cursorOne.GetPIPos();
+        pos1 = theView.cursorOne.GetPlanPos();
         if (pos1) {
-            device1 = activePlan->GetDevice( *pos1 );
+            device1 = activePlan->GetDevice( pos1->GetSmartPos() );
             wirable1 = device1;
         }
         else {
             wirable1 = activePlan;
         }
-        pos2 = theView.cursorTwo.GetPIPos();
+        pos2 = theView.cursorTwo.GetPlanPos();
         if (pos2) {
-            device2 = activePlan->GetDevice( *pos2 );
+            device2 = activePlan->GetDevice( pos2->GetSmartPos() );
             wirable2 = device2;
         }
         else {
@@ -111,17 +111,39 @@ bool Controller::HandleInput()
         //Mouse Events
         if (event.type == sf::Event::MouseButtonPressed)
         {
+            //Check if clicked pos is inside plan boundary...
+//            auto b = activePlan->GetWorldBound();
+//            if (b.contains(newPos))
+
             if (event.mouseButton.button == sf::Mouse::Left)
             {
                 sf::Vector2i pixelPos(event.mouseButton.x, event.mouseButton.y);
                 sf::Vector2f worldPos = theView.GetWindow().mapPixelToCoords(pixelPos);
-                theView.cursorOne.SetPFPos(worldPos, activePlan);
+                theView.cursorOne.SetPosWorld(worldPos, activePlan->GetGrid());
             }
             if (event.mouseButton.button == sf::Mouse::Right)
             {
                 sf::Vector2i pixelPos(event.mouseButton.x, event.mouseButton.y);
                 sf::Vector2f worldPos = theView.GetWindow().mapPixelToCoords(pixelPos);
-                theView.cursorTwo.SetPFPos(worldPos, activePlan);
+//                theView.cursorTwo.SetPosWorld(worldPos, activePlan->GetGrid());
+
+                //Experimental SubPlan selection with cursor...
+                auto p = std::make_shared<PlanPos> ();//worldPos, activePlan->GetGrid() );
+                p->SetGrid(activePlan->GetGrid());
+                p->SetPosWorld(worldPos);
+                auto d = activePlan->GetDevice(p->GetSmartPos());
+                if (d){
+                    auto h = std::dynamic_pointer_cast<ChipHandle>(d);
+                    if (h) {
+                        if (h->GetPlodedSize().x > 1) {
+                            p->SetGrid( h->GetPlan()->GetGrid() );
+                            p->SetPosWorld( worldPos );
+                        }
+                    }
+                }
+                theView.cursorTwo.SetPlanPos(p);
+                
+                
             }
         }
         if (event.type == sf::Event::MouseWheelMoved)
@@ -143,7 +165,7 @@ bool Controller::HandleInput()
             if (event.key.code == sf::Keyboard::N)
             {
                 if (event.key.shift == false) {
-                    if (pos1) theFactory.AddNeuron(activePlan, 0, *pos1, 1 );
+                    if (pos1) theFactory.AddNeuron(activePlan, 0, pos1->GetSmartPos(), 1 );
                 }
                 else {
                     if (device1) activePlan->RemoveDevice(device1);
@@ -151,11 +173,11 @@ bool Controller::HandleInput()
             }
             if (event.key.code == sf::Keyboard::J)
             {
-                if (pos1) theFactory.AddJumper(activePlan, 0, *pos1 );
+                if (pos1) theFactory.AddJumper(activePlan, 0, pos1->GetSmartPos() );
             }
             if (event.key.code == sf::Keyboard::H)
             {
-                if (pos1) theFactory.AddHandle(activePlan, 0, *pos1);
+                if (pos1) theFactory.AddHandle(activePlan, 0, pos1->GetSmartPos() );
             }
             if (event.key.code == sf::Keyboard::B)
             {
@@ -196,7 +218,7 @@ bool Controller::HandleInput()
                 theView.PopPlan();
             }
             if (event.key.code == sf::Keyboard::M) {
-                if (device1 and pos2) activePlan->SetPosition( *device1, *pos2 );
+                if (device1 and pos2) activePlan->SetPosition( *device1, pos2->GetSmartPos() );
             }
             if (event.key.code == sf::Keyboard::Q)
             {

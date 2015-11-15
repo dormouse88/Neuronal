@@ -23,29 +23,29 @@ typedef sf::Rect<Dumb> RectDumb;
 typedef sf::Rect<Smart> RectSmart;
 typedef sf::Rect<World> RectWorld;
 
-template <class T>
-struct PairVector
-{
-    PairVector() :valid(false) {}
-    PairVector(sf::Vector2<T> tl_, sf::Vector2<T> br_)
-            :tl(tl_), br(br_), valid(true)
-    {}
-// Size is problematic across ints and floats...
-//    sf::Rect<T> GetRect()
+//template <class T>
+//struct PairVector
+//{
+//    PairVector() :valid(false) {}
+//    PairVector(sf::Vector2<T> tl_, sf::Vector2<T> br_)
+//            :tl(tl_), br(br_), valid(true)
+//    {}
+//// Size is problematic across ints and floats...
+////    sf::Rect<T> GetRect()
+////    {
+////        return valid ? sf::Rect<T> {tl, br-tl + sf::Vector2<T>{1,1} } : sf::Rect<T> { tl, sf::Vector2<T>{0,0} };
+////    }
+//    PairVector<T> AddPadding(PairVector<T> & pvs, int thickness)
 //    {
-//        return valid ? sf::Rect<T> {tl, br-tl + sf::Vector2<T>{1,1} } : sf::Rect<T> { tl, sf::Vector2<T>{0,0} };
+//        pvs.tl -= sf::Vector2i{ thickness, thickness };
+//        pvs.br += sf::Vector2i{ thickness, thickness };
+//        return *this;
 //    }
-    PairVector<T> AddPadding(PairVector<T> & pvs, int thickness)
-    {
-        pvs.tl -= sf::Vector2i{ thickness, thickness };
-        pvs.br += sf::Vector2i{ thickness, thickness };
-        return *this;
-    }
-
-    sf::Vector2<T> tl;
-    sf::Vector2<T> br;
-    bool valid;
-};
+//
+//    sf::Vector2<T> tl;
+//    sf::Vector2<T> br;
+//    bool valid;
+//};
 
 
 class PlanGrid
@@ -66,7 +66,11 @@ public:
 
     void SetSizeX(Smart loc, Dumb size)     { xPansions.SetSize(loc, size); }
     void SetSizeY(Smart loc, Dumb size)     { yPansions.SetSize(loc, size); }
+    
+    void SetOffset(VectorWorld o)           { offset = o; }
+    VectorWorld GetOffset() const           {return offset;}
 private:
+    VectorWorld offset;
     Pansions xPansions;
     Pansions yPansions;
 };
@@ -83,11 +87,11 @@ public:
     PlanPos(VectorWorld, std::shared_ptr<PlanGrid>);
 
     void SetGrid(std::shared_ptr<PlanGrid>);
-    bool IsValid();
+    bool IsValid() const;
 
-    void SetPos(VectorSmart);
+    void SetPosSmart(VectorSmart);
     void SetPosDumb(VectorDumb);
-    void SetPos(VectorWorld);
+    void SetPosWorld(VectorWorld);
 
     VectorSmart GetSmartPos() const;
     VectorDumb GetDumbPos() const;
@@ -107,8 +111,8 @@ struct PlanRect
             :tl(tl_), br(br_), valid(true) {}
     PlanRect AddPadding(int thickness)
     {
-        tl.SetPos( tl.GetSmartPos() - sf::Vector2i{ thickness, thickness } );
-        br.SetPos( br.GetSmartPos() + sf::Vector2i{ thickness, thickness } );
+        tl.SetPosSmart( tl.GetSmartPos() - sf::Vector2i{ thickness, thickness } );
+        br.SetPosSmart( br.GetSmartPos() + sf::Vector2i{ thickness, thickness } );
         return *this;
     }
     RectDumb GetRectDumb() const

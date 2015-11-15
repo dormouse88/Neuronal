@@ -50,7 +50,7 @@ public:
     VectorWorld GetWorldPos() const             {return ppos.GetWorldPos();}
     VectorWorld GetWorldSizeOfCell() const      {return ppos.GetWorldSizeOf();}
     VectorSmart GetSmartPos() const             {return ppos.GetSmartPos();}
-    void SetPos(VectorSmart p)                  {ppos.SetPos(p);}
+    void SetPos(VectorSmart p)                  {ppos.SetPosSmart(p);}
 
     int GetSerial() const                   {return serial;}
 private:

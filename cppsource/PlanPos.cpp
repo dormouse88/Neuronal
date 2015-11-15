@@ -29,13 +29,14 @@ VectorWorld PlanGrid::MapDumbToWorld(VectorDumb dumb) const
     return VectorWorld {
         dumb.x * GRID_SIZE.x,
         dumb.y * GRID_SIZE.y
-    };
+    } + offset;
 }
 VectorDumb PlanGrid::MapWorldToDumb(VectorWorld world) const
 {
+    VectorWorld moved { world - offset };
     return VectorDumb {
-        static_cast<int>(floorf(world.x / GRID_SIZE.x)),
-        static_cast<int>(floorf(world.y / GRID_SIZE.y))
+        static_cast<int>(floorf(moved.x / GRID_SIZE.x)),
+        static_cast<int>(floorf(moved.y / GRID_SIZE.y))
     };
 }
 
@@ -98,13 +99,13 @@ void PlanPos::SetGrid(std::shared_ptr<PlanGrid> newGrid)
     planGrid = newGrid;
 }
 
-bool PlanPos::IsValid()
+bool PlanPos::IsValid() const
 {
     if (planGrid) return true;
     else return false;
 }
 
-void PlanPos::SetPos(VectorSmart newPos)
+void PlanPos::SetPosSmart(VectorSmart newPos)
 {
     if (not planGrid) throw "no Grid";
     pos = newPos;
@@ -114,7 +115,7 @@ void PlanPos::SetPosDumb(VectorDumb newPos)
     if (not planGrid) throw "no Grid";
     pos = planGrid->MapDumbToSmart(newPos);
 }
-void PlanPos::SetPos(VectorWorld newPos)
+void PlanPos::SetPosWorld(VectorWorld newPos)
 {
     if (not planGrid) throw "no Grid";
     pos = planGrid->MapWorldtoSmart(newPos);

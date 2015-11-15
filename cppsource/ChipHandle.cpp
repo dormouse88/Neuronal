@@ -100,18 +100,16 @@ void ChipHandle::Draw(sf::RenderTarget & rt)
 {
     if (exploded)
     {
-        sf::View outerView { rt.getView() };
-        sf::View subView { outerView };
-        {
-            RectWorld planBound { plan->GetWorldBound() };
-            VectorWorld planTopLeft { planBound.left, planBound.top };
-            VectorWorld objectSize {planBound.width, planBound.height};
-            UpdatePos( CalculateOffset(objectSize) );
-            subView.move( planTopLeft - perceivedPos );
-        }
-        rt.setView(subView);
+        //Refresh Plan Offset...
+        plan->GetGrid()->SetOffset( VectorWorld{0.f, 0.f} );
+        RectWorld innerPlanBound { plan->GetWorldBound() };
+        VectorWorld innerPlanTopLeft { innerPlanBound.left, innerPlanBound.top };
+        VectorWorld innerPlanSize {innerPlanBound.width, innerPlanBound.height};
+        VectorWorld outerTopLeftPos = CalculateOffset(innerPlanSize);
+        VectorWorld offsetFromZero = outerTopLeftPos - innerPlanTopLeft;
+        plan->GetGrid()->SetOffset( offsetFromZero );
+        
         plan->SubDraw(rt);
-        rt.setView(outerView);
     }
     else
     {

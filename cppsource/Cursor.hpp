@@ -21,9 +21,10 @@ public:
     void Draw(sf::RenderTarget & rt);
 
     std::shared_ptr<const PlanPos> GetPlanPos() const         {return pposPtr;}
-    //std::shared_ptr<sf::Vector2f> GetPFPos() const            {if (pposPtr) return std::make_shared<sf::Vector2f>(pposPtr->GetPFPos()); else return nullptr;}
-    std::shared_ptr<sf::Vector2i> GetPIPos() const            {if (pposPtr) return std::make_shared<sf::Vector2i>(pposPtr->GetSmartPos()); else return nullptr;}
-    void SetPFPos(sf::Vector2f newPos, std::shared_ptr<ChipPlan> newPlan);
+    void SetPlanPos(std::shared_ptr<PlanPos> ppos)            {pposPtr = ppos;}
+
+    void SetPosSmart(VectorSmart, std::shared_ptr<PlanGrid>);
+    void SetPosWorld(VectorWorld, std::shared_ptr<PlanGrid>);
     void Nullify()                                            {pposPtr = nullptr;}
 
 private:

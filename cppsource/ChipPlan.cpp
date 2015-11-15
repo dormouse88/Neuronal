@@ -233,14 +233,14 @@ PlanRect ChipPlan::GetSmartInnerBound() const
             if (p.y > br.y) br.y = p.y;
         }
         pr.SetGrid(planGrid);
-        pr.tl.SetPos(tl);
-        pr.br.SetPos(br);
+        pr.tl.SetPosSmart(tl);
+        pr.br.SetPosSmart(br);
         pr.valid = true;
     }
     else {
         pr.SetGrid(planGrid);
-        pr.tl.SetPos( VectorSmart{} );
-        pr.br.SetPos( VectorSmart{} );
+        pr.tl.SetPosSmart( VectorSmart{} );
+        pr.br.SetPosSmart( VectorSmart{} );
         pr.valid = false;
     }
     return pr;

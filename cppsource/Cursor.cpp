@@ -28,13 +28,15 @@ void Cursor::Draw(sf::RenderTarget & rt)
     }
 }
 
-void Cursor::SetPFPos(sf::Vector2f newPos, std::shared_ptr<ChipPlan> newPlan)
+void Cursor::SetPosSmart(VectorSmart newPos, std::shared_ptr<PlanGrid> newGrid)
 {
-    auto b = newPlan->GetWorldBound();
-    if (b.contains(newPos))
+    pposPtr = std::make_shared<PlanPos>( newPos, newGrid );
+}
+void Cursor::SetPosWorld(VectorWorld newPos, std::shared_ptr<PlanGrid> newGrid)
+{
     {
-        pposPtr = std::make_shared<PlanPos>( newPos, newPlan->GetGrid() );
+        pposPtr = std::make_shared<PlanPos>( newPos, newGrid );
     }
-    else pposPtr = nullptr;
+//    else pposPtr = nullptr;
 }
 
