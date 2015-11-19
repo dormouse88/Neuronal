@@ -9,8 +9,8 @@
 #include "ChipHandle.hpp"
 #include <cassert>
 
-ChipPlan::ChipPlan()
-    :Wirable(), planID(0), modified(false), padding(1), planGrid(std::make_shared<PlanGrid>())
+ChipPlan::ChipPlan(std::shared_ptr<PlanGrid> g)
+    :Wirable(), planID(0), modified(false), padding(1), planGrid(g)
 {}
 
 void ChipPlan::ReceiveCharge(bool charge, int weight, int slot)
@@ -198,9 +198,6 @@ std::vector<std::shared_ptr<Wire> > ChipPlan::GetWires(std::shared_ptr<Wirable> 
 VectorWorld ChipPlan::GetWireAttachPos(WireAttachSide was) const
 {
     sf::Vector2f wirePos;
-    //SHOULD THE PLAN BOUND BE USED OR THE CELL BOUND THAT CONTAINS IT?
-    //DO SUBPLANS ALWAYS USE UP ALL THE AVAILABLE SPACE?
-    //ID SUGGEST NOT
     auto bound = GetWorldBound();
     //Because ChipPlans are wired internally, the wires come OUT of the left...
     if (was == WireAttachSide::OUT)
@@ -246,49 +243,16 @@ PlanRect ChipPlan::GetSmartInnerBound() const
     return pr;
 }
 
-//VectorDumb ChipPlan::GetDumbSize(int thickness) const
-//{
-//    PlanRect pr { GetSmartInnerBound() };
-//    if (pr.valid) {
-//        VectorDumb tl = pr.tl.GetDumbPos();
-//        VectorDumb br = pr.br.GetDumbPos();
-//        return VectorDumb { br - tl + pr.br.GetDumbSizeOf() +  VectorDumb{thickness *2*0, thickness*2*0} } ;
-//    }
-//    else return VectorDumb {0,0};
-//}
-
-//PairVector<Dumb> ChipPlan::GetDumbPaddedBound(int thickness) const
-//{
-//    PairVector<Smart> pvs = GetSmartBound();
-//    if (pvs.valid) {
-//        pvs.AddPadding(pvs, thickness);
-//    }
-//    else {
-//        pvs.tl = VectorSmart { -1,-1 };
-//        pvs.br = VectorSmart {  1, 1 };
-//        pvs.valid = true;
-//    }
-//    VectorDumb tl { planGrid->MapSmartToDumb(pvs.tl) };
-//    VectorDumb br { planGrid->MapSmartToDumb(pvs.br) };
-//    return PairVector<Dumb> { tl , br };
-//}
-
-//RectWorld ChipPlan::GetWorldPaddedBound(int thickness) const
-//{
-//    PlanRect pr = GetSmartInnerBound();
-//    if (pr.valid) {
-//        pr.AddPadding(0); //thickness
-//    }
-//    else {
-//        pr.SetGrid(planGrid);
-//        pr.tl.SetPos( VectorSmart { -1,-1 } );
-//        pr.br.SetPos( VectorSmart {  1, 1 } );
-//        pr.valid = true;
-//    }
-//    VectorWorld tl = pr.tl.GetWorldPos();
-//    VectorWorld br = pr.br.GetWorldPos() + pr.br.GetWorldSizeOf();
-//    return RectWorld { tl , br - tl };
-//}    
+RectDumb ChipPlan::GetDumbBound() const
+{
+    auto pr = GetSmartInnerBound();
+    return pr.AddPadding(padding).GetRectDumb();
+}
+RectWorld ChipPlan::GetWorldBound() const
+{
+    auto pr = GetSmartInnerBound();
+    return pr.AddPadding(padding).GetRectWorld();
+}
 
 
 void ChipPlan::PlodeRefresh(VectorSmart point)

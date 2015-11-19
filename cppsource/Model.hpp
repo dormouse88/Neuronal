@@ -9,6 +9,8 @@
 #define	MODEL_HPP
 
 #include <memory>
+#include "BlobFactory.hpp"
+#include "Serializer.hpp"
 #include "ChipPlan.hpp"
 
 class Model

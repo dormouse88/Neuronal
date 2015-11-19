@@ -9,11 +9,11 @@
 #include "miscUtil.hpp"
 
 const sf::Vector2f RECTANGLE { 90.f, 65.f };
-const sf::Vector2f MAIN_OFFSET {0.f, 0.f}; // { (GRID_SIZE - RECTANGLE)/2.f };
-const sf::Vector2f PLANID_OFFSET { MAIN_OFFSET.x + 18.f, MAIN_OFFSET.y + 2.f };
 
-const sf::Vector2f WIRE_IN_OFFSET { MAIN_OFFSET.x, MAIN_OFFSET.y + RECTANGLE.y/2.f };
-const sf::Vector2f WIRE_OUT_OFFSET { MAIN_OFFSET.x + RECTANGLE.x, MAIN_OFFSET.y + RECTANGLE.y/2.f };
+const sf::Vector2f PLANID_OFFSET { 18.f, 2.f };
+
+const sf::Vector2f WIRE_IN_OFFSET  { RECTANGLE.x * 0.f, RECTANGLE.y *.5f };
+const sf::Vector2f WIRE_OUT_OFFSET { RECTANGLE.x * 1.f, RECTANGLE.y *.5f };
 
 
 ChipHandle::ChipHandle(int serial_p, sf::Vector2i pos_p, std::shared_ptr<ChipPlan> cont)
@@ -128,7 +128,8 @@ void ChipHandle::Draw(sf::RenderTarget & rt)
 void ChipHandle::Handle(int code)
 {
     if (code == 1) {
-        SetExploded(true);
+        if (IsExploded()) SetExploded(false);
+        else SetExploded(true);
     }
     if (code == 2) {
         SetExploded(false);
@@ -144,11 +145,16 @@ VectorDumb ChipHandle::GetPlodedSize()
     else return VectorDumb{1,1};
 }
 
+bool ChipHandle::IsExploded()
+{
+    return exploded;
+}
+
 void ChipHandle::SetExploded(bool yes)
 {
     if (not exploded and yes)
     {
-        if (not plan->IsEmpty())
+        if (true)//not plan->IsEmpty())
         {
             exploded = true;
             GetContainer()->PlodeRefresh(GetSmartPos());

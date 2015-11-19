@@ -105,7 +105,7 @@ Dumb Pansions::GetSize(Smart loc) const
     }
     else return 1;
 }
-#include <iostream>
+
 void Pansions::SetSize(Smart loc, Dumb size)
 {
     assert(size > 0);
@@ -113,6 +113,4 @@ void Pansions::SetSize(Smart loc, Dumb size)
     if (size != 1) {
         pansions.insert( {loc, size} );
     }
-    std::cout << "Pans: " << this << std::endl;
-    for (auto dbg: pansions) std::cout << dbg.first << "   " << dbg.second << std::endl;
 }

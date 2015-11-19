@@ -9,9 +9,9 @@
 
 App::App()
     :factory(),
+    serializer(),
     model(),
     view(model),
-    serializer(),
     controller(factory, serializer, model, view)
 {}
 

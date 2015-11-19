@@ -38,6 +38,7 @@ public:
     virtual void Handle(int code) override;
 
     virtual VectorDumb GetPlodedSize();
+    bool IsExploded();
     void SetExploded(bool yes);
 private:
     std::shared_ptr<ChipPlan> plan;

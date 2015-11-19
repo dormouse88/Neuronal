@@ -21,9 +21,9 @@ public:
     void Run();
 private:
     BlobFactory factory;
+    Serializer serializer;
     Model model;
     View view;
-    Serializer serializer;
     Controller controller;
 };
 

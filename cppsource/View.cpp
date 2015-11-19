@@ -24,8 +24,8 @@ View::View(Model & model_p)
     mainOverlay(sf::FloatRect{0.f,0.f, INITIAL_MAINVIEW_SIZE.x, INITIAL_MAINVIEW_SIZE.y}),
     barOverlay(sf::FloatRect{0.f,0.f, INITIAL_MAINVIEW_SIZE.x, BAR_HEIGHT}),
     mainOverlayBox(sf::Vector2f{1400.f, 720.f} ),
-    cursorOne(),
-    cursorTwo(sf::Color::Cyan),
+    cursorOne(model_p.GetBasePlan()),
+    cursorTwo(model_p.GetBasePlan(), sf::Color::Cyan),
     highlightingMode(1),
     xmlPlan(1)
 {

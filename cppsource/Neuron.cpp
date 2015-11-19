@@ -6,16 +6,14 @@
  */
 
 #include "Neuron.hpp"
-#include "miscUtil.hpp"
-#include <sstream>
+#include "ChipPlan.hpp"  //to call SetModified()
 
 const sf::Vector2f RECTANGLE { 70.f, 40.f };
-const sf::Vector2f MAIN_OFFSET {0.f, 0.f}; // { (GRID_SIZE - RECTANGLE)/2.f };
-const sf::Vector2f RECEIVED_OFFSET { MAIN_OFFSET.x + 4.f, MAIN_OFFSET.y + 2.f };
-const sf::Vector2f THRESHOLD_OFFSET { MAIN_OFFSET.x + 24.f, MAIN_OFFSET.y + 2.f };
+const sf::Vector2f RECEIVED_OFFSET { 4.f, 2.f };
+const sf::Vector2f THRESHOLD_OFFSET { 24.f, 2.f };
 
-const sf::Vector2f WIRE_IN_OFFSET { MAIN_OFFSET };
-const sf::Vector2f WIRE_OUT_OFFSET { MAIN_OFFSET + RECTANGLE };
+const sf::Vector2f WIRE_IN_OFFSET { };
+const sf::Vector2f WIRE_OUT_OFFSET { RECTANGLE };
 
 NeuronView::NeuronView(const Neuron & n)
     :DeviceView(n.GetWorldPos()),
@@ -98,4 +96,5 @@ void Neuron::Handle(int code)
 {
     if (code == 1) { ModifyThreshold(1); }
     if (code == 2) { ModifyThreshold(-1); }
+    GetContainer()->SetModified();
 }

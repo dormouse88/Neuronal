@@ -17,20 +17,43 @@ class ChipPlan;
 class Cursor
 {
 public:
-    Cursor(sf::Color color = sf::Color::Yellow);
+    Cursor(std::shared_ptr<ChipPlan> p, sf::Color color = sf::Color::Yellow);
     void Draw(sf::RenderTarget & rt);
 
-    std::shared_ptr<const PlanPos> GetPlanPos() const         {return pposPtr;}
-    void SetPlanPos(std::shared_ptr<PlanPos> ppos)            {pposPtr = ppos;}
-
-    void SetPosSmart(VectorSmart, std::shared_ptr<PlanGrid>);
-    void SetPosWorld(VectorWorld, std::shared_ptr<PlanGrid>);
-    void Nullify()                                            {pposPtr = nullptr;}
-
+    PlanPos GetPlanPos() const;
+    void Nullify()                                            {ppos.SetPlanOnly();}
+    void SetPosWorld(VectorWorld);  //, std::shared_ptr<PlanGrid>
+    
 private:
-    std::shared_ptr<PlanPos> pposPtr;
+    PlanPos ppos;
     sf::RectangleShape representation;
 };
+
+
+  //Backup class//
+//class Cursor
+//{
+//public:
+//    Cursor(sf::Color color = sf::Color::Yellow);
+//    void Draw(sf::RenderTarget & rt);
+//
+//    std::shared_ptr<PlanPos> GetPlanPos() const;
+//    //void SetPlanPos(std::shared_ptr<PlanPos> ppos)            {pposPtr = ppos;}
+//
+//    //void SetPosSmart(VectorSmart, std::shared_ptr<PlanGrid>);
+//    //void SetPosWorld(VectorWorld, std::shared_ptr<PlanGrid>);
+//
+//    void Nullify()                                            {posPtr = nullptr;}
+////    void SetPosPlanOnly(std::shared_ptr<ChipPlan> p)          { planPtr = p; posPtr = nullptr;}
+////    void SetPosSmart(VectorSmart, std::shared_ptr<ChipPlan>);
+//    void SetPosWorld(VectorWorld, std::shared_ptr<ChipPlan>);
+//    
+//private:
+//    std::shared_ptr<ChipPlan> planPtr;
+//    std::shared_ptr<VectorSmart> posPtr;
+//    sf::RectangleShape representation;
+//};
+
 
 #endif	/* CURSOR_HPP */
 

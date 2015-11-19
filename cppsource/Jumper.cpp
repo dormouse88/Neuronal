@@ -9,10 +9,9 @@
 
 const float RADIUS {9.f};
 const sf::Vector2f RECTANGLE { RADIUS * 2, RADIUS * 2 };
-const sf::Vector2f MAIN_OFFSET {}; //{ (GRID_SIZE/2.f) - sf::Vector2f(RADIUS, RADIUS) };
 
-const sf::Vector2f WIRE_IN_OFFSET { MAIN_OFFSET + sf::Vector2f{ 0.f, RADIUS} };
-const sf::Vector2f WIRE_OUT_OFFSET { MAIN_OFFSET + sf::Vector2f{RADIUS * 2.f, RADIUS} };
+const sf::Vector2f WIRE_IN_OFFSET { sf::Vector2f{ 0.f, RADIUS} };
+const sf::Vector2f WIRE_OUT_OFFSET { sf::Vector2f{RADIUS * 2.f, RADIUS} };
 
 JumperView::JumperView(const Jumper & jumper_p)
     :DeviceView(jumper_p.GetWorldPos()), shape( RADIUS )

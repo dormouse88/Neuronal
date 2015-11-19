@@ -13,7 +13,6 @@ BlobFactory::BlobFactory()
 
 void BlobFactory::AddNeuron(std::shared_ptr<ChipPlan> plan, int serial, sf::Vector2i pos, int threshold)
 {
-    std::cout << "AddNeuron called" << std::endl;
     if (serial == 0) serial = plan->GetFreeSerial();
     if (plan->IsPositionFree(pos) and plan->IsSerialFree(serial))
     {
@@ -39,7 +38,7 @@ std::shared_ptr<ChipHandle> BlobFactory::AddHandle(std::shared_ptr<ChipPlan> pla
     if (plan->IsPositionFree(pos) and plan->IsSerialFree(serial))
     {
         auto handle = std::make_shared<ChipHandle> (serial, pos, plan);
-        auto subPlan = std::make_shared<ChipPlan> ();
+        auto subPlan = MakePlan();
         subPlan->RegisterReferer(handle);
         handle->SetPlan( subPlan );
         
@@ -49,6 +48,13 @@ std::shared_ptr<ChipHandle> BlobFactory::AddHandle(std::shared_ptr<ChipPlan> pla
     return ret;
 }
 
+std::shared_ptr<ChipPlan> BlobFactory::MakePlan()
+{
+    auto g = std::make_shared<PlanGrid>();
+    auto p = std::make_shared<ChipPlan>(g);
+    g->RegisterPlan(p);
+    return p;
+}
 
 void BlobFactory::AddWire(std::shared_ptr<ChipPlan> plan, Wirable & from, Wirable & to, signed weight)
 {

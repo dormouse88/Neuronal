@@ -6,18 +6,12 @@
  */
 
 #include "Wire.hpp"
-
-#include "Wirable.hpp"
-#include <sstream>
+#include "ChipPlan.hpp"  //to call SetModified()
+#include "Wirable.hpp"  //to use all the functions via 'to' and 'from'
 #include <cassert>
 
 const float BACKBOARD_PADDING = 4.f;
 const sf::Color BACKBOARD_FILLCOLOR {20,20,20};
-
-//RED const sf::Vector2f WIRE_FROM_OFFSET  { GRID_SIZE / 2.f + sf::Vector2f(+28.f, +8.f) };
-//RED const sf::Vector2f WIRE_LOOP1_OFFSET { GRID_SIZE / 2.f + sf::Vector2f(+20.f, -30.f) };
-//RED const sf::Vector2f WIRE_LOOP2_OFFSET { GRID_SIZE / 2.f + sf::Vector2f(-30.f, -30.f) };
-//RED const sf::Vector2f WIRE_TO_OFFSET    { GRID_SIZE / 2.f + sf::Vector2f(-28.f, -8.f) };
 
 WireView::WireView(const Wire & wire_p)
 {
@@ -181,6 +175,7 @@ void Wire::Handle(int code)
             SetWeight( GetWeight() - 1);
         }
     }
+    GetContainer()->SetModified();
 }
 
 void Wire::SlotCycle(int step, bool fromSide)

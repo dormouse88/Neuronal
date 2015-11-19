@@ -9,6 +9,7 @@
 #define	NEURON_HPP
 
 #include <SFML/Graphics.hpp>
+#include "miscUtil.hpp"
 #include "ViewResources.hpp"
 #include "Device.hpp"
 class Neuron;

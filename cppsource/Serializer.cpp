@@ -125,7 +125,8 @@ std::shared_ptr<ChipPlan> Serializer::LoadNode(pugi::xml_node & doc, BlobFactory
     
     if (xmlPlan)
     {
-        memPlan = std::make_shared<ChipPlan> ();
+//        memPlan = std::make_shared<ChipPlan> ();
+        memPlan = factory_p.MakePlan();
         memPlan->planID = planID;
         for (pugi::xml_node device = xmlPlan.child("HAND"); device; device = device.next_sibling("HAND"))
         {

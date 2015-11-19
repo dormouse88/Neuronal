@@ -10,7 +10,7 @@
 
 Model::Model()
 {
-    basePlan = std::make_shared<ChipPlan>();
+    basePlan = BlobFactory::MakePlan();
 }
 
 void Model::DebugInfo()

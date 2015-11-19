@@ -15,12 +15,13 @@
 class ChipHandle;
 #include "Device.hpp"
 #include "Wire.hpp"
+#include "PlanGrid.hpp"
 #include "PlanPos.hpp"
 
 class ChipPlan : public Wirable
 {
 public:
-    ChipPlan();
+    ChipPlan(std::shared_ptr<PlanGrid> g);
     void RegisterReferer(std::shared_ptr<ChipHandle> handle) { referer = handle; }
     std::shared_ptr<ChipHandle> GetReferer() {return referer.lock();}
     virtual ~ChipPlan() {}
@@ -60,22 +61,9 @@ public:
 
     virtual VectorWorld GetWireAttachPos(WireAttachSide was) const override;
     
-    PlanRect GetSmartInnerBound() const;  //used internally by getdumbsize and getworldpaddedbound
-//    VectorDumb GetDumbSize(int thickness) const; //for get ploded size
-    //PairVector<Dumb> GetDumbPaddedBound(int thickness) const;
-//    RectWorld GetWorldPaddedBound(int thickness) const;  //for cursor and view clamping and handle view setting
-
-    RectDumb GetDumbBound() const
-    {
-        auto pr = GetSmartInnerBound();
-        return pr.AddPadding(padding).GetRectDumb();
-        //else return RectDumb {-padding,-padding,padding*2,padding*2};
-    }
-    RectWorld GetWorldBound() const
-    {
-        auto pr = GetSmartInnerBound();
-        return pr.AddPadding(padding).GetRectWorld();
-    }
+    PlanRect GetSmartInnerBound() const;
+    RectDumb GetDumbBound() const;
+    RectWorld GetWorldBound() const;
     
     void SetPadding(int thickness) {padding = thickness;}
     void PlodeRefresh(VectorSmart point);
