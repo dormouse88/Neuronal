@@ -10,11 +10,10 @@
 
 #include <memory>
 #include <string>
-
 #include "Device.hpp"
 #include "ChipPlan.hpp"
 
-class ChipHandle : public Device, public DeviceView
+class ChipHandle : public Device, public DeviceView, public RefererInterface
 {
 public:
     ChipHandle(int serial_p, sf::Vector2i pos_p, std::shared_ptr<ChipPlan> cont);
@@ -26,9 +25,12 @@ public:
     virtual bool IsSlotted(SlottedSide) const override;
     virtual bool CanRegisterIn(int slot) const override;
     virtual bool CanRegisterOut(int slot) const override;
-    void StepOut(bool charge, int slot);
     virtual void LogicAct() override;
     virtual void LogicCalculate() override;
+
+    virtual void StepOut(bool charge, int slot) override;
+    virtual void SetModified() override;
+    virtual void SwapIn(std::shared_ptr<ChipPlan>) override;
     
     void SetPlan(std::shared_ptr<ChipPlan> newPlan)     {plan = newPlan; SetModified();}
     std::shared_ptr<ChipPlan> GetPlan()                 {return plan;}

@@ -9,7 +9,7 @@
 
 
 PlanPos::PlanPos()
-    :planGrid(nullptr)
+    :planGrid()
 {}
 
 PlanPos::PlanPos(std::shared_ptr<PlanGrid> newGrid)
@@ -41,7 +41,7 @@ void PlanPos::SetGrid(std::shared_ptr<PlanGrid> newGrid)
 
 bool PlanPos::IsValid() const
 {
-    if (planGrid) return true;
+    if (planGrid.lock()) return true;
     else return false;
 }
 bool PlanPos::IsPlanOnly() const
@@ -60,47 +60,53 @@ void PlanPos::SetPlanOnly()
 
 void PlanPos::SetPosSmart(VectorSmart newPos)
 {
-//    if (not planGrid) throw "SetPosSmart: no Grid";
     pos = newPos;
     planOnly = false;
 }
 void PlanPos::SetPosDumb(VectorDumb newPos)
 {
-//    if (not planGrid) throw "SetPosDumb: no Grid";
-    pos = planGrid->MapDumbToSmart(newPos);
+    pos = planGrid.lock()->MapDumbToSmart(newPos);
     planOnly = false;
 }
 void PlanPos::SetPosWorld(VectorWorld newPos)
 {
-//    if (not planGrid) throw "SetPosWorld: no Grid";
-    pos = planGrid->MapWorldtoSmart(newPos);
+    pos = planGrid.lock()->MapWorldtoSmart(newPos);
     planOnly = false;
 }
 
 VectorSmart PlanPos::GetSmartPos() const
 {
-//    if (not planGrid) throw "SetSmartPos: no Grid";
     return pos;
 }
 VectorDumb PlanPos::GetDumbPos() const
 {
-//    if (not planGrid) throw "GetDumbPos: no Grid";
-    return planGrid->MapSmartToDumb(pos);
+    return planGrid.lock()->MapSmartToDumb(pos);
 }
 VectorWorld PlanPos::GetWorldPos() const
 {
-//    if (not planGrid) throw "GetWorldPos: no Grid";
-    return planGrid->MapSmartToWorld(pos);
+    return planGrid.lock()->MapSmartToWorld(pos);
 }
 
 VectorDumb PlanPos::GetDumbSizeOf() const
 {
-//    if (not planGrid) throw "GetDumbSizeOf: no Grid";
-    return planGrid->DumbSizeOf(pos);
+    return planGrid.lock()->DumbSizeOf(pos);
 }
 VectorWorld PlanPos::GetWorldSizeOf() const
 {
-//    if (not planGrid) throw "GetWorldSizeOf: no Grid";
-    return planGrid->WorldSizeOf(pos);
+    return planGrid.lock()->WorldSizeOf(pos);
 }
 
+
+
+
+bool operator==(const PlanPos& lhs, const PlanPos& rhs)
+{
+    return lhs.pos == rhs.pos && lhs.planGrid.lock() == rhs.planGrid.lock() && lhs.planOnly == rhs.planOnly;
+}
+
+
+
+bool operator==(const PlanRect& lhs, const PlanRect& rhs)
+{
+    return lhs.br == rhs.br && lhs.tl == rhs.tl && lhs.valid == rhs.valid;
+}

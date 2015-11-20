@@ -38,12 +38,12 @@ void Serializer::SaveFile(std::shared_ptr<ChipPlan> plan)
     }
 }
 
-std::shared_ptr<ChipPlan> Serializer::LoadFile(BlobFactory & factory_p, int planID)
+std::shared_ptr<ChipPlan> Serializer::LoadFile(int planID)
 {
     pugi::xml_document doc;
     OpenFile(doc);
     if(doc) {
-        return LoadNode(doc, factory_p, planID);
+        return LoadNode(doc, planID);
     }
 }
 
@@ -115,7 +115,7 @@ void Serializer::SaveNode(pugi::xml_node & doc, std::shared_ptr<ChipPlan> plan_p
     plan_p->modified = false;
 }
 
-std::shared_ptr<ChipPlan> Serializer::LoadNode(pugi::xml_node & doc, BlobFactory & factory_p, int planID)
+std::shared_ptr<ChipPlan> Serializer::LoadNode(pugi::xml_node & doc, int planID)
 {
     std::shared_ptr<ChipPlan> memPlan = nullptr;
     
@@ -126,7 +126,7 @@ std::shared_ptr<ChipPlan> Serializer::LoadNode(pugi::xml_node & doc, BlobFactory
     if (xmlPlan)
     {
 //        memPlan = std::make_shared<ChipPlan> ();
-        memPlan = factory_p.MakePlan();
+        memPlan = BlobFactory::MakePlan();
         memPlan->planID = planID;
         for (pugi::xml_node device = xmlPlan.child("HAND"); device; device = device.next_sibling("HAND"))
         {
@@ -134,10 +134,10 @@ std::shared_ptr<ChipPlan> Serializer::LoadNode(pugi::xml_node & doc, BlobFactory
             int link { device.attribute("link").as_int() };
             int serial { device.attribute("i").as_int() };
             //creates handle with default empty plan...
-            auto handle = factory_p.AddHandle(memPlan, serial, pos);
+            auto handle = BlobFactory::AddHandle(memPlan, serial, pos);
             //Recursively load subplans and assign them...
             if (link != 0) {
-                auto subPlan = LoadNode(doc, factory_p, link);
+                auto subPlan = LoadNode(doc, link);
                 handle->SetPlan(subPlan);
                 subPlan->RegisterReferer(handle);
             }
@@ -147,13 +147,13 @@ std::shared_ptr<ChipPlan> Serializer::LoadNode(pugi::xml_node & doc, BlobFactory
             sf::Vector2i pos { device.attribute("x").as_int(), device.attribute("y").as_int() };
             int threshold { device.attribute("thr").as_int() };
             int serial { device.attribute("i").as_int() };
-            factory_p.AddNeuron(memPlan, serial, pos, threshold);
+            BlobFactory::AddNeuron(memPlan, serial, pos, threshold);
         }
         for (pugi::xml_node device = xmlPlan.child("JUMP"); device; device = device.next_sibling("JUMP"))
         {
             sf::Vector2i pos { device.attribute("x").as_int(), device.attribute("y").as_int() };
             int serial { device.attribute("i").as_int() };
-            factory_p.AddJumper(memPlan, serial, pos);
+            BlobFactory::AddJumper(memPlan, serial, pos);
         }
         for (pugi::xml_node wire = xmlPlan.child("WIRE"); wire; wire = wire.next_sibling("WIRE"))
         {
@@ -167,7 +167,7 @@ std::shared_ptr<ChipPlan> Serializer::LoadNode(pugi::xml_node & doc, BlobFactory
             if (from != 0) fromDev = memPlan->GetDevice(from);
             std::shared_ptr<Wirable> toDev = memPlan;
             if (to != 0) toDev = memPlan->GetDevice(to);
-            factory_p.AddWire(memPlan, *fromDev, fromSlot, *toDev, toSlot, weight);
+            BlobFactory::AddWire(memPlan, *fromDev, fromSlot, *toDev, toSlot, weight);
         }
         memPlan->modified = false;
     }//if (xmlPlan)

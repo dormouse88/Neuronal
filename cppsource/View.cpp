@@ -9,6 +9,7 @@
 #include "View.hpp"
 #include <iostream>
 #include "ChipHandle.hpp"
+#include "ChipPlan.hpp"
 
 const sf::FloatRect MAIN_VIEWPORT {0.f, 0.f, 1.f, 0.8f};
 const sf::FloatRect BAR_VIEWPORT {0.f, 0.8f, 1.f, 0.2f};
@@ -24,8 +25,8 @@ View::View(Model & model_p)
     mainOverlay(sf::FloatRect{0.f,0.f, INITIAL_MAINVIEW_SIZE.x, INITIAL_MAINVIEW_SIZE.y}),
     barOverlay(sf::FloatRect{0.f,0.f, INITIAL_MAINVIEW_SIZE.x, BAR_HEIGHT}),
     mainOverlayBox(sf::Vector2f{1400.f, 720.f} ),
-    cursorOne(model_p.GetBasePlan()),
-    cursorTwo(model_p.GetBasePlan(), sf::Color::Cyan),
+    cursorOne(model_p.GetBasePlan()->GetGrid()),
+    cursorTwo(model_p.GetBasePlan()->GetGrid(), sf::Color::Cyan),
     highlightingMode(1),
     xmlPlan(1)
 {
@@ -40,12 +41,7 @@ View::View(Model & model_p)
     planNumText.setPosition(30.f, 30.f);
     planNumText.setColor( sf::Color::Green );
     
-    activePlan.push( model_p.GetBasePlan() );
-}
-
-void View::DebugInfo()
-{
-    //std::cout << "-VIEW: " << "DEVI: " << deviceViews.size() << ", WIRE: " << wireViews.size() << std::endl;
+    viewBasePlan = model_p.GetBasePlan();
 }
 
 
@@ -55,7 +51,7 @@ void View::Draw()
     
     //Main Port...
     window.setView(mainView);
-    auto ap = GetActivePlan().lock();
+    auto ap = GetViewBasePlan();
     if (ap)
     {
         ap->Draw(window);
@@ -120,7 +116,7 @@ void View::Draw()
         if (cont->IsModified()) planNumStr.insert(0, "*");
         planNumStr.insert(0, patch::to_string( cont->GetPlanID() ) );
         //Step out a layer...
-        ref = cont->GetReferer();
+        ref = cont->GetHandle();
         if (ref) {
             cont = ref->GetContainer();
             if (cont) {
@@ -157,17 +153,22 @@ void View::Resize(sf::Vector2f newSize)
     Clamp();
     window.setView(mainView);
 }
+void View::CentreOn(VectorWorld point)
+{
+    mainView.setCenter(point);
+}
+
 
 void View::Clamp()
 {
-    auto activePlan = GetActivePlan().lock();
-    if (activePlan)
+    auto clampPlan = cursorOne.GetPlanPos().GetPlan();  //GetViewBasePlan();
+    if (clampPlan)
     {
-        auto b = activePlan->GetWorldBound();
+        RectWorld b = clampPlan->GetWorldBound();
         auto center = mainView.getCenter();
         auto viewSize = mainView.getSize();
-        auto size = viewSize - sf::Vector2f{120.f, 120.f};
-        auto tl = center - (size/2.f);
+        VectorWorld size = viewSize - VectorWorld{120.f, 120.f};
+        VectorWorld tl = center - (size/2.f);
         bool oversizedX = (b.width > size.x) ? true : false;
         bool oversizedY = (b.height > size.y) ? true : false;
         if (oversizedX) {
@@ -188,6 +189,4 @@ void View::Clamp()
         }
         mainView.setCenter(tl + (size/2.f) );
     }
-    
-    
 }

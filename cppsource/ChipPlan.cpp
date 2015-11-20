@@ -11,7 +11,24 @@
 
 ChipPlan::ChipPlan(std::shared_ptr<PlanGrid> g)
     :Wirable(), planID(0), modified(false), padding(1), planGrid(g)
-{}
+{
+    RecalculateSmartInnerBound();
+}
+
+void ChipPlan::RegisterReferer(std::shared_ptr<RefererInterface> ref)
+{
+    referer = ref;
+}
+std::shared_ptr<RefererInterface> ChipPlan::GetReferer()
+{
+    return referer.lock();
+}
+std::shared_ptr<ChipHandle> ChipPlan::GetHandle()
+{
+    return std::dynamic_pointer_cast<ChipHandle>( referer.lock() );
+}
+
+
 
 void ChipPlan::ReceiveCharge(bool charge, int weight, int slot)
 {
@@ -54,10 +71,10 @@ void ChipPlan::PassOnCalculate()
 /////////////////////////////
 
 
-void ChipPlan::SetPosition(Device & d, sf::Vector2i newPos)
+void ChipPlan::SetPosition(Device & d, VectorSmart newPos)
 {
     auto oldPos = d.GetSmartPos();
-    if (IsPositionFree(newPos)) d.SetPos( newPos );
+    if (IsPositionFree(newPos)) d.SetPosSmart( newPos );
     SetModified();
     PlodeRefresh(oldPos);
     PlodeRefresh(newPos);
@@ -76,7 +93,7 @@ bool ChipPlan::IsSerialFree(int serial) const
     }
     return true;
 }
-bool ChipPlan::IsPositionFree(sf::Vector2i pos) const
+bool ChipPlan::IsPositionFree(VectorSmart pos) const
 {
     for (const auto & x : devices) {
         if (x->GetSmartPos() == pos) return false;
@@ -130,6 +147,8 @@ void ChipPlan::CleanVectors()
 
 void ChipPlan::SetModified()
 {
+    RecalculateSmartInnerBound();
+    
     if (not modified)
     {
         auto refLock = referer.lock();
@@ -212,7 +231,7 @@ VectorWorld ChipPlan::GetWireAttachPos(WireAttachSide was) const
     return wirePos;
 }
 
-PlanRect ChipPlan::GetSmartInnerBound() const
+void ChipPlan::RecalculateSmartInnerBound()
 {
     PlanRect pr;
     if (devices.size() > 0)
@@ -240,9 +259,16 @@ PlanRect ChipPlan::GetSmartInnerBound() const
         pr.br.SetPosSmart( VectorSmart{} );
         pr.valid = false;
     }
-    return pr;
+    if (not (pr == smartInnerBound))
+    {
+        smartInnerBound = pr;
+        PlodeRefresh();
+    }
 }
-
+PlanRect ChipPlan::GetSmartInnerBound() const
+{
+    return smartInnerBound;
+}
 RectDumb ChipPlan::GetDumbBound() const
 {
     auto pr = GetSmartInnerBound();
@@ -272,15 +298,19 @@ void ChipPlan::PlodeRefresh(VectorSmart point)
     }
     planGrid->SetSizeX(point.x, xMaxSize);
     planGrid->SetSizeY(point.y, yMaxSize);
+    //Propagate recursively...
+    PlodeRefresh();
+}
 
+void ChipPlan::PlodeRefresh()
+{
     //Plode refresh recursively back to base plan...
-    auto refLock = referer.lock();
+    auto refLock = GetHandle();
     if (refLock) {
         auto cont = refLock->GetContainer();
         cont->PlodeRefresh( refLock->GetSmartPos() );
     }
 }
-
 
 void ChipPlan::DrawParts(sf::RenderTarget & rt)
 {
@@ -298,7 +328,10 @@ void ChipPlan::SubDraw(sf::RenderTarget & rt)
 {
     auto pB = GetWorldBound();
     sf::RectangleShape planBox;
-    planBox.setFillColor( sf::Color{0,50,0} );
+    int randr = (GetPlanID() * 20000) % 255 + 30;
+    int randb = (GetPlanID() * 22000) % 255 + 30;
+    int randg = (GetPlanID() * 25000) % 255 + 30;
+    planBox.setFillColor( sf::Color{randr,randb,randg} * sf::Color{50,50,50} );
     planBox.setOutlineColor( sf::Color{95,95,95} );
     planBox.setOutlineThickness(3.f);
     planBox.setPosition( sf::Vector2f{pB.left, pB.top} );
@@ -317,15 +350,125 @@ void ChipPlan::SubDraw(sf::RenderTarget & rt)
 
 void ChipPlan::Draw(sf::RenderTarget & rt)
 {
-    auto pB = GetWorldBound();
-    sf::RectangleShape planBox;
-    planBox.setFillColor( sf::Color{50,0,0} );
-    planBox.setOutlineColor( sf::Color{95,95,95} );
-    planBox.setOutlineThickness(3.f);
-    planBox.setPosition( sf::Vector2f{pB.left, pB.top} );
-    planBox.setSize( sf::Vector2f{pB.width, pB.height} );
-    rt.draw(planBox);
+    SubDraw(rt);
+//    auto pB = GetWorldBound();
+//    sf::RectangleShape planBox;
+//    int randr = (GetPlanID() * 20000) % 255;
+//    int randb = (GetPlanID() * 22000) % 255;
+//    int randg = (GetPlanID() * 25000) % 255;
+//    planBox.setFillColor( sf::Color{randr,randb,randg} * sf::Color{50,50,50} );
+//    planBox.setOutlineColor( sf::Color{95,95,95} );
+//    planBox.setOutlineThickness(3.f);
+//    planBox.setPosition( sf::Vector2f{pB.left, pB.top} );
+//    planBox.setSize( sf::Vector2f{pB.width, pB.height} );
+//    rt.draw(planBox);
+//
+//    DrawParts(rt);
+}
 
-    DrawParts(rt);
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////namespace
+
+std::shared_ptr<Device> ChipPlanFunc::GetDevice(PlanPos pos)
+{
+    if (pos.IsLocated()) return pos.GetPlan()->GetDevice(pos.GetSmartPos());
+    else return nullptr;
+}
+std::shared_ptr<Wirable> ChipPlanFunc::GetWirable(PlanPos pos)
+{
+    if (pos.IsLocated()) return GetDevice(pos);
+    else return pos.GetPlan();
+}
+std::shared_ptr<Wire> ChipPlanFunc::GetWire(PlanPos pos1, PlanPos pos2)
+{
+    if (pos1.GetGrid() == pos2.GetGrid())
+    {
+        auto w1 = GetWirable(pos1);
+        auto w2 = GetWirable(pos2);
+        if (w1 and w2) return pos1.GetPlan()->GetWire(*w1, *w2);
+    }
+    return nullptr;
+}
+
+bool ChipPlanFunc::IsPositionFree(PlanPos pos)
+{
+    return pos.GetPlan()->IsPositionFree(pos.GetSmartPos());
+}
+void ChipPlanFunc::SetPosition(PlanPos dPos, PlanPos toPos)
+{
+    if (dPos.IsLocated() and toPos.IsLocated() and dPos.GetGrid() == toPos.GetGrid())
+    {
+        auto d = GetDevice(dPos);
+        if (d) toPos.GetPlan()->SetPosition(*d, toPos.GetSmartPos());
+    }
+}
+
+void ChipPlanFunc::DeviceHandle(PlanPos pos, int code)
+{
+    std::shared_ptr<Device> d = nullptr;
+    if (pos.IsLocated())
+    {
+        d = GetDevice(pos);
+    }
+    else
+    {
+        d = pos.GetPlan()->GetHandle();
+    }
+    if (d) d->Handle(code);
+}
+void ChipPlanFunc::WireHandle(PlanPos pos1, PlanPos pos2, int code)
+{
+    auto w = GetWire(pos1, pos2);
+    if (w) w->Handle(code);
+}
+
+bool ChipPlanFunc::MatchOnPlan(PlanPos & pos1, PlanPos & pos2)
+{
+    PlanPos np1 { pos1.GetGrid() };
+    PlanPos np2 { pos2.GetGrid() };
+
+    if (pos1.IsLocated()) {
+        np1.SetPosSmart( pos1.GetSmartPos() );
+    }
+    if (pos2.IsLocated()) {
+        np2.SetPosSmart( pos2.GetSmartPos() );
+    }
+    
+    std::shared_ptr<ChipHandle> ref1 = nullptr;
+    if (not pos1.IsLocated()) ref1 = pos1.GetPlan()->GetHandle();
+    std::shared_ptr<ChipHandle> ref2 = nullptr;
+    if (not pos2.IsLocated()) ref2 = pos2.GetPlan()->GetHandle();
+    if (pos1.GetPlan() == pos2.GetPlan())
+    {
+        //pos1 - pos2
+    }
+    else if (ref1 and ref1->GetContainer() == pos2.GetPlan())
+    {
+        //ref1 - pos2
+        np1.SetGrid( ref1->GetContainer()->GetGrid() );
+        np1.SetPosSmart( ref1->GetSmartPos() );
+    }
+    else if (ref2 and pos1.GetPlan() == ref2->GetContainer())
+    {
+        //pos1 - ref2
+        np2.SetGrid( ref2->GetContainer()->GetGrid() );
+        np2.SetPosSmart( ref2->GetSmartPos() );
+    }
+    else if (ref1 and ref2 and ref1->GetContainer() == ref2->GetContainer())
+    {
+        //ref1 - ref2
+        np1.SetGrid( ref1->GetContainer()->GetGrid() );
+        np1.SetPosSmart( ref1->GetSmartPos() );
+        np2.SetGrid( ref2->GetContainer()->GetGrid() );
+        np2.SetPosSmart( ref2->GetSmartPos() );
+    }
+    else
+    {
+        return false;
+    }
+    pos1 = np1;
+    pos2 = np2;
+    return true;
 }
 

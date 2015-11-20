@@ -12,23 +12,27 @@
 #include <vector>
 #include "Gobject.hpp"
 #include "Wirable.hpp"
-class ChipHandle;
 #include "Device.hpp"
 #include "Wire.hpp"
 #include "PlanGrid.hpp"
 #include "PlanPos.hpp"
+#include "RefererInterface.hpp"
+class ChipHandle;
+
 
 class ChipPlan : public Wirable
 {
 public:
     ChipPlan(std::shared_ptr<PlanGrid> g);
-    void RegisterReferer(std::shared_ptr<ChipHandle> handle) { referer = handle; }
-    std::shared_ptr<ChipHandle> GetReferer() {return referer.lock();}
     virtual ~ChipPlan() {}
+
+    void RegisterReferer(std::shared_ptr<RefererInterface> ref);
+    std::shared_ptr<RefererInterface> GetReferer();
+    std::shared_ptr<ChipHandle> GetHandle();
 
     virtual std::string SerialName() const { return "PLAN";}
     virtual void ReceiveCharge(bool charge, int weight, int slot) override;
-    virtual bool IsSlotted(SlottedSide) const override              {return true;}
+    virtual bool IsSlotted(SlottedSide) const override                                                  {return true;}
     virtual bool CanRegisterIn(int slot) const override;
     virtual bool CanRegisterOut(int slot) const override;
     
@@ -37,11 +41,11 @@ public:
     void PassOnCalculate();
 
 
-    void SetPosition(Device & d, sf::Vector2i newPos);
+    void SetPosition(Device & d, VectorSmart newPos);
     int GetFreeSerial() const;
     bool IsSerialFree(int serial) const;
-    bool IsPositionFree(sf::Vector2i pos) const;
-    int GetPlanID() {return planID;}
+    bool IsPositionFree(VectorSmart pos) const;
+    int GetPlanID()                                                                                     {return planID;}
 
     void ImportDevice(std::shared_ptr<Device> device);
     void ImportWire(std::shared_ptr<Wire> wire);
@@ -50,10 +54,10 @@ public:
     void CleanVectors();
 
     void SetModified();
-    bool IsModified() {return modified;}
-    bool IsEmpty() {return devices.empty() and wires.empty();}
+    bool IsModified()                                                                                   {return modified;}
+    bool IsEmpty()                                                                                      {return devices.empty() and wires.empty();}
     
-    std::shared_ptr<PlanGrid> GetGrid() {return planGrid;}
+    std::shared_ptr<PlanGrid> GetGrid()                                                                 {return planGrid;}
     std::shared_ptr<Device> GetDevice(VectorSmart pos);
     std::shared_ptr<Device> GetDevice(int serial);
     std::shared_ptr<Wire> GetWire(const Wirable& from, const Wirable& to);
@@ -61,12 +65,14 @@ public:
 
     virtual VectorWorld GetWireAttachPos(WireAttachSide was) const override;
     
+    void RecalculateSmartInnerBound();
     PlanRect GetSmartInnerBound() const;
     RectDumb GetDumbBound() const;
     RectWorld GetWorldBound() const;
     
-    void SetPadding(int thickness) {padding = thickness;}
+    void SetPadding(int thickness)                                                                      {padding = thickness;}
     void PlodeRefresh(VectorSmart point);
+    void PlodeRefresh();
     
     void DrawParts(sf::RenderTarget & rt);
     void SubDraw(sf::RenderTarget & rt);
@@ -75,13 +81,31 @@ public:
 private:
     int planID;
     std::shared_ptr<PlanGrid> planGrid;
-    std::weak_ptr<ChipHandle> referer;  //need to be able to pass charge back out
+    std::weak_ptr<RefererInterface> referer;
     std::vector<std::shared_ptr<Device> > devices;
     std::vector<std::shared_ptr<Wire> > wires;
     bool modified;
     int padding;
+    PlanRect smartInnerBound;
     
     friend class Serializer;
 };
+
+namespace ChipPlanFunc
+{
+    std::shared_ptr<Device> GetDevice(PlanPos pos);
+    std::shared_ptr<Wirable> GetWirable(PlanPos pos);
+    std::shared_ptr<Wire> GetWire(PlanPos pos1, PlanPos pos2);
+    bool IsPositionFree(PlanPos pos);
+    void SetPosition(PlanPos dPos, PlanPos toPos);
+
+    void DeviceHandle(PlanPos pos, int code);
+    void WireHandle(PlanPos pos1, PlanPos pos2, int code);
+    bool MatchOnPlan(PlanPos & pos1, PlanPos & pos2);
+}
+
+
+
+
 #endif	/* CHIPPLAN_HPP */
 

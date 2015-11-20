@@ -9,7 +9,6 @@
 #define	VIEW_HPP
 
 #include <memory>
-#include <stack>
 #include <SFML/Graphics.hpp>
 #include "ViewResources.hpp"
 #include "Model.hpp"
@@ -22,23 +21,18 @@ public:
     View(Model & model_p);
     View(const View&) = delete;
     ~View() {}
-    void DebugInfo();
     
     void Draw();
 
     void Zoom(float zoomFactor);
     void Pan(sf::Vector2f moveBy);
     void Resize(sf::Vector2f newSize);
+    void CentreOn(VectorWorld point);
     void Clamp();
-    void SetHighlightingMode(int x) {highlightingMode = x;}
+    void SetHighlightingMode(int x)             { highlightingMode = x; }
     
-    void PopPlan()                                  {} //{if (activePlan.size() > 1) activePlan.pop(); Clamp(); cursorOne.Nullify(); cursorTwo.Nullify();}
-    void PushPlan(std::weak_ptr<ChipPlan> plan)     {} //{activePlan.push(plan); Clamp(); cursorOne.Nullify(); cursorTwo.Nullify();}
-
-    sf::RenderWindow & GetWindow()          {return window;}
-    sf::View & GetMainView()                {return mainView;}
-    std::weak_ptr<ChipPlan> GetActivePlan() {return activePlan.top();}
-    void SetActivePlan(std::weak_ptr<ChipPlan> p) {}//{activePlan.top() = p; Clamp(); cursorOne.Nullify(); cursorTwo.Nullify();}
+    sf::RenderWindow & GetWindow()                  {return window;}
+    std::shared_ptr<ChipPlan> GetViewBasePlan()     {return viewBasePlan.lock();}
     
 private:
     sf::RenderWindow window;
@@ -50,7 +44,7 @@ private:
     sf::Text planNumText;
 
     const Model & theModel;
-    std::stack< std::weak_ptr<ChipPlan> > activePlan;
+    std::weak_ptr<ChipPlan> viewBasePlan;
 
     int highlightingMode;
 public:

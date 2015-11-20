@@ -22,11 +22,11 @@ public:
     Serializer();
     ~Serializer() {}
     void SaveFile(std::shared_ptr<ChipPlan> plan);
-    std::shared_ptr<ChipPlan> LoadFile(BlobFactory & factory_p, int planID);
+    std::shared_ptr<ChipPlan> LoadFile(int planID);
 private:
     void OpenFile(pugi::xml_document & doc);
     void SaveNode(pugi::xml_node & doc, std::shared_ptr<ChipPlan> plan_p);
-    std::shared_ptr<ChipPlan> LoadNode(pugi::xml_node & doc, BlobFactory & factory_p, int planID);
+    std::shared_ptr<ChipPlan> LoadNode(pugi::xml_node & doc, int planID);
 };
 
 #endif	/* SERIALIZER_HPP */

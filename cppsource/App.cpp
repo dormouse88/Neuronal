@@ -8,11 +8,9 @@
 #include "App.hpp"
 
 App::App()
-    :factory(),
-    serializer(),
-    model(),
+    :model(),
     view(model),
-    controller(factory, serializer, model, view)
+    controller(model, view)
 {}
 
 void App::Run()

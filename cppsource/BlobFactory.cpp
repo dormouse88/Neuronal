@@ -8,30 +8,46 @@
 #include "BlobFactory.hpp"
 #include <iostream>
 
-BlobFactory::BlobFactory()
-{}
-
-void BlobFactory::AddNeuron(std::shared_ptr<ChipPlan> plan, int serial, sf::Vector2i pos, int threshold)
+std::shared_ptr<Neuron> BlobFactory::AddNeuron(PlanPos pos)
+{
+    if (pos.IsLocated()) return AddNeuron(pos.GetPlan(), 0, pos.GetSmartPos(), 1);
+    else return nullptr;
+}
+std::shared_ptr<Neuron> BlobFactory::AddNeuron(std::shared_ptr<ChipPlan> plan, int serial, VectorSmart pos, int threshold)
 {
     if (serial == 0) serial = plan->GetFreeSerial();
     if (plan->IsPositionFree(pos) and plan->IsSerialFree(serial))
     {
         auto mp = std::make_shared<Neuron> (serial, pos, threshold, plan);
         plan->ImportDevice(mp);
+        return mp;
     }
+    return nullptr;
 }
 
-void BlobFactory::AddJumper(std::shared_ptr<ChipPlan> plan, int serial, sf::Vector2i pos)
+std::shared_ptr<Jumper> BlobFactory::AddJumper(PlanPos pos)
+{
+    if (pos.IsLocated()) return AddJumper(pos.GetPlan(), 0, pos.GetSmartPos());
+    else return nullptr;
+}
+std::shared_ptr<Jumper> BlobFactory::AddJumper(std::shared_ptr<ChipPlan> plan, int serial, VectorSmart pos)
 {
     if (serial == 0) serial = plan->GetFreeSerial();
     if (plan->IsPositionFree(pos) and plan->IsSerialFree(serial))
     {
         auto mp = std::make_shared<Jumper> (serial, pos, plan);
         plan->ImportDevice(mp);
+        return mp;
     }
+    return nullptr;
 }
 
-std::shared_ptr<ChipHandle> BlobFactory::AddHandle(std::shared_ptr<ChipPlan> plan, int serial, sf::Vector2i pos)
+std::shared_ptr<ChipHandle> BlobFactory::AddHandle(PlanPos pos)
+{
+    if (pos.IsLocated()) return AddHandle(pos.GetPlan(), 0, pos.GetSmartPos());
+    else return nullptr;
+}
+std::shared_ptr<ChipHandle> BlobFactory::AddHandle(std::shared_ptr<ChipPlan> plan, int serial, VectorSmart pos)
 {
     std::shared_ptr<ChipHandle> ret = nullptr;
     if (serial == 0) serial = plan->GetFreeSerial();
@@ -56,7 +72,24 @@ std::shared_ptr<ChipPlan> BlobFactory::MakePlan()
     return p;
 }
 
-void BlobFactory::AddWire(std::shared_ptr<ChipPlan> plan, Wirable & from, Wirable & to, signed weight)
+
+std::shared_ptr<Wire> BlobFactory::AddWire(PlanPos pos1, PlanPos pos2)
+{
+    if (ChipPlanFunc::MatchOnPlan(pos1, pos2))
+    {
+        std::shared_ptr<ChipPlan> plan = pos1.GetPlan();
+        std::shared_ptr<Wirable> w1 = ChipPlanFunc::GetWirable( pos1 );
+        std::shared_ptr<Wirable> w2 = ChipPlanFunc::GetWirable( pos2 );
+
+        if (w1 and w2)
+        {
+            return AddWire(plan, *w1, *w2, 1);
+        }
+    }
+    return nullptr;
+}
+
+std::shared_ptr<Wire> BlobFactory::AddWire(std::shared_ptr<ChipPlan> plan, Wirable & from, Wirable & to, signed weight)
 {
     int fromSlot = 0;
     int toSlot = 0;
@@ -90,11 +123,12 @@ void BlobFactory::AddWire(std::shared_ptr<ChipPlan> plan, Wirable & from, Wirabl
     }
     
     if (fromSlot != -1 and toSlot != -1) {
-        AddWire(plan, from, fromSlot, to, toSlot, weight);
+        return AddWire(plan, from, fromSlot, to, toSlot, weight);
     }
+    return nullptr;
 }
 
-void BlobFactory::AddWire(std::shared_ptr<ChipPlan> plan, Wirable & from, int fromSlot, Wirable & to, int toSlot, signed weight)
+std::shared_ptr<Wire> BlobFactory::AddWire(std::shared_ptr<ChipPlan> plan, Wirable & from, int fromSlot, Wirable & to, int toSlot, signed weight)
 {    
     //if the wire will be valid...
     if (from.HasWireTo(fromSlot, to, toSlot) == false and from.CanRegisterOut(fromSlot) and to.CanRegisterIn(toSlot) and &from != &to)
@@ -103,6 +137,28 @@ void BlobFactory::AddWire(std::shared_ptr<ChipPlan> plan, Wirable & from, int fr
         from.RegisterOut(mp);
         to.RegisterIn(mp);
         plan->ImportWire(mp);
+        return mp;
     }
+    return nullptr;
 }
 
+
+void BlobFactory::RemoveDevice(PlanPos pos)
+{
+    std::shared_ptr<Device> d = ChipPlanFunc::GetDevice(pos);
+    if (d) pos.GetPlan()->RemoveDevice(d);
+}
+
+void BlobFactory::RemoveWire(PlanPos pos1, PlanPos pos2)
+{
+    ChipPlanFunc::MatchOnPlan(pos1, pos2);
+    std::shared_ptr<ChipPlan> plan = pos1.GetPlan();
+    std::shared_ptr<Wirable> w1 = ChipPlanFunc::GetWirable( pos1 );
+    std::shared_ptr<Wirable> w2 = ChipPlanFunc::GetWirable( pos2 );
+    
+    if (w1 and w2)
+    {
+        auto wire = plan->GetWire(*w1, *w2);
+        if (wire) plan->RemoveWire(wire);
+    }
+}

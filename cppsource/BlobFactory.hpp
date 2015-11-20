@@ -14,20 +14,24 @@
 #include "ChipHandle.hpp"
 #include "ChipPlan.hpp"
 
-class BlobFactory
+namespace BlobFactory
 {
-public:
-    BlobFactory();
-    ~BlobFactory() {}
+    std::shared_ptr<Neuron>     AddNeuron(PlanPos pos);
+    std::shared_ptr<Neuron>     AddNeuron(std::shared_ptr<ChipPlan> plan, int serial, VectorSmart pos, int threshold);
+    std::shared_ptr<Jumper>     AddJumper(PlanPos pos);
+    std::shared_ptr<Jumper>     AddJumper(std::shared_ptr<ChipPlan> plan, int serial, VectorSmart pos);
+    std::shared_ptr<ChipHandle> AddHandle(PlanPos pos);
+    std::shared_ptr<ChipHandle> AddHandle(std::shared_ptr<ChipPlan> plan, int serial, VectorSmart pos);
+    
+    std::shared_ptr<ChipPlan>   MakePlan();
+    
+    std::shared_ptr<Wire>       AddWire(PlanPos pos1, PlanPos pos2);
+    std::shared_ptr<Wire>       AddWire(std::shared_ptr<ChipPlan> plan, Wirable & from, Wirable & to, signed weight);
+    std::shared_ptr<Wire>       AddWire(std::shared_ptr<ChipPlan> plan, Wirable & from, int fromSlot, Wirable & to, int toSlot, signed weight);
 
-    void AddNeuron(std::shared_ptr<ChipPlan> plan, int serial, sf::Vector2i pos, int threshold);
-    void AddJumper(std::shared_ptr<ChipPlan> plan, int serial, sf::Vector2i pos);
-    std::shared_ptr<ChipHandle> AddHandle(std::shared_ptr<ChipPlan> plan, int serial, sf::Vector2i pos);
-    static std::shared_ptr<ChipPlan> MakePlan();
-    void AddWire(std::shared_ptr<ChipPlan> plan, Wirable & from, Wirable & to, signed weight);
-    void AddWire(std::shared_ptr<ChipPlan> plan, Wirable & from, int fromSlot, Wirable & to, int toSlot, signed weight);
+    void RemoveDevice(PlanPos pos);
+    void RemoveWire(PlanPos pos1, PlanPos pos2);
 
-private:
 };
 
 #endif	/* BLOBFACTORY_HPP */

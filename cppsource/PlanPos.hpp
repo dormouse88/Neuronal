@@ -19,8 +19,8 @@ public:
     PlanPos(VectorSmart, std::shared_ptr<PlanGrid>);
     PlanPos(VectorWorld, std::shared_ptr<PlanGrid>);
 
-    std::shared_ptr<PlanGrid> GetGrid() { return planGrid; }
-    std::shared_ptr<ChipPlan> GetPlan() { return planGrid->GetPlan(); }
+    std::shared_ptr<PlanGrid> GetGrid() { return planGrid.lock(); }
+    std::shared_ptr<ChipPlan> GetPlan() { auto l = planGrid.lock(); return l ? l->GetPlan() : nullptr; }
     void SetGrid(std::shared_ptr<PlanGrid>);
     
     bool IsValid() const;
@@ -40,10 +40,13 @@ public:
     VectorWorld GetWorldSizeOf() const;
 private:
     VectorSmart pos;
-    std::shared_ptr<PlanGrid> planGrid;
+    std::weak_ptr<PlanGrid> planGrid;
     bool planOnly;
+
+    friend bool operator== (const PlanPos& lhs, const PlanPos& rhs);
 };
 
+bool operator==(const PlanPos& lhs, const PlanPos& rhs);
 
 
 struct PlanRect
@@ -78,6 +81,7 @@ struct PlanRect
     bool valid;
 };
 
+bool operator==(const PlanRect& lhs, const PlanRect& rhs);
 
 #endif	/* PLANPOS_HPP */
 

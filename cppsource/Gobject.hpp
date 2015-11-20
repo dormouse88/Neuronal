@@ -40,7 +40,7 @@ public:
     virtual std::string SerialName() const = 0;
     void Zingaya() {dead = true;}
     bool IsDead() const {return dead;}
-    void SetModified();
+    //void SetModified();
     std::shared_ptr<ChipPlan> GetContainer();
 private:
     bool dead;

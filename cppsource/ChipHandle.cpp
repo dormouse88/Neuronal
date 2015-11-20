@@ -54,12 +54,6 @@ bool ChipHandle::CanRegisterOut(int slot) const
     return true;
 }
 
-
-void ChipHandle::StepOut(bool charge, int slot)
-{
-    PushCharge(charge, slot);
-}
-
 void ChipHandle::LogicAct()
 {
     if (plan) plan->PassOnAct();
@@ -67,6 +61,25 @@ void ChipHandle::LogicAct()
 void ChipHandle::LogicCalculate()
 {
     if (plan) plan->PassOnCalculate();
+}
+
+void ChipHandle::StepOut(bool charge, int slot)
+{
+    PushCharge(charge, slot);
+}
+
+void ChipHandle::SetModified()
+{
+    auto cont = GetContainer();
+    if (cont) cont->SetModified();
+}
+
+void ChipHandle::SwapIn(std::shared_ptr<ChipPlan> p)
+{
+    auto smart_this = plan->GetReferer();
+    SetPlan(p);
+    p->RegisterReferer( smart_this );
+    p->PlodeRefresh();
 }
 
 

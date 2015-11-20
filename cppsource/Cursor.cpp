@@ -11,9 +11,9 @@
 #include "ChipHandle.hpp"
 
 
-Cursor::Cursor(std::shared_ptr<ChipPlan> p, sf::Color color)
+Cursor::Cursor(std::shared_ptr<PlanGrid> g, sf::Color color)
 {
-    ppos.SetGrid(p->GetGrid());
+    ppos.SetGrid(g);
     representation.setFillColor(sf::Color::Transparent);
     representation.setOutlineColor( color );
     representation.setOutlineThickness(2.5f);
@@ -43,29 +43,9 @@ void Cursor::Draw(sf::RenderTarget & rt)
 PlanPos Cursor::GetPlanPos() const
 {
     return ppos;
-//    return posPtr ? std::make_shared<PlanPos>(*posPtr, planPtr->GetGrid()) : nullptr;
 }
 
-
-//void Cursor::SetPosSmart(VectorSmart newPos, std::shared_ptr<PlanGrid> newGrid)
-//{
-//    pposPtr = std::make_shared<PlanPos>( newPos, newGrid );
-//}
-
-//void Cursor::SetPosWorld(VectorWorld newPos, std::shared_ptr<PlanGrid> newGrid)
-//{
-//    {
-//        pposPtr = std::make_shared<PlanPos>( newPos, newGrid );
-//    }
-//}
-
-//void Cursor::SetPosSmart(VectorSmart point, std::shared_ptr<ChipPlan> plan)
-//{
-//    planPtr = plan;
-//    posPtr = std::make_shared<VectorSmart>(point);
-//}
-
-void Cursor::SetPosWorld(VectorWorld point) //, std::shared_ptr<PlanGrid> grid
+void Cursor::SetPosWorld(VectorWorld point)
 {
     //Check if clicked pos is inside contextPlan boundary...
     auto b = ppos.GetGrid()->GetPlan()->GetWorldBound();
@@ -96,7 +76,7 @@ void Cursor::SetPosWorld(VectorWorld point) //, std::shared_ptr<PlanGrid> grid
         }
         else
         {
-            auto ref = ppos.GetGrid()->GetPlan()->GetReferer();
+            auto ref = ppos.GetGrid()->GetPlan()->GetHandle();
             if (ref)
             {
                 ppos.SetGrid( ref->GetContainer()->GetGrid() );
@@ -115,76 +95,4 @@ void Cursor::SetPosWorld(VectorWorld point) //, std::shared_ptr<PlanGrid> grid
         }
     }
 }
-
-
-
-
-
-
-//Backup//
-//void Cursor::SetPosWorld(VectorWorld point, std::shared_ptr<ChipPlan> plan)
-//{
-//    if (planPtr == nullptr)
-//    {
-//        planPtr = plan;
-//        Nullify();
-//    }
-////    if (pposPtr) { assert(planPtr->GetGrid() == pposPtr->GetGrid() ); }
-//
-////    auto p = std::make_shared<PlanPos> ();
-//    
-//    //Check if clicked pos is inside contextPlan boundary...
-//    auto b = planPtr->GetWorldBound();
-//    if (b.contains(point)) //(inside current context plan)
-//    {
-////                        p->SetGrid(planPtr->GetGrid());
-////                        p->SetPosWorld(point);
-////                        SetPlanPos(p);
-//        
-//        posPtr = std::make_shared<VectorSmart> ( planPtr->GetGrid()->MapWorldtoSmart(point) );
-//        
-//        //select subPlan where possible...
-//        auto d = planPtr->GetDevice(*posPtr);//or GetPlanPos()->GetSmartPos());
-//        if (d)
-//        {
-//            auto h = std::dynamic_pointer_cast<ChipHandle>(d);
-//            if (h)
-//            {
-//                if (h->GetPlodedSize().x > 1)
-//                {
-//                    planPtr = h->GetPlan();
-//                    Nullify();
-//                    //p->SetGrid( planPtr->GetGrid() );
-//                    //p->SetPosWorld( point );
-//                    //SetPlanPos(p);
-//                }
-//            }
-//        }
-//    }
-//    else //(not inside current context plan)
-//    {
-//        if (posPtr) {
-//            posPtr = nullptr;
-//        }
-//        else {
-//            auto ref = planPtr->GetReferer();
-//            if (ref)
-//            {
-//                planPtr = ref->GetContainer();
-//                auto ob = planPtr->GetWorldBound();
-//                if (ob.contains(point))
-//                {
-////                                p->SetGrid(planPtr->GetGrid());
-////                                p->SetPosWorld( point );
-////                                SetPlanPos(p);
-//                    posPtr = std::make_shared<VectorSmart> ( planPtr->GetGrid()->MapWorldtoSmart(point) );
-//                }
-//                else
-//                {
-//                    Nullify();
-//                }
-//            }
-//        }
-//    }
-//}
 
