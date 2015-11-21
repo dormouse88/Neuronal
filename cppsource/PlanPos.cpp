@@ -52,7 +52,7 @@ bool PlanPos::IsLocated() const
 {
     return not planOnly;
 }
-void PlanPos::SetPlanOnly()
+void PlanPos::Dislocate()
 {
     planOnly = true;
 }

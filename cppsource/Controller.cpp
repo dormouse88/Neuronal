@@ -14,14 +14,14 @@ Controller::Controller(Model & model_p, View & view_p)
 
 bool Controller::HandleInput()
 {
-    PlanPos pos1 = theView.cursorOne.GetPlanPos();
-    PlanPos pos2 = theView.cursorTwo.GetPlanPos();
-    
     //the event loop...
     bool quitYet = false;
     sf::Event event;
     while (theView.GetWindow().pollEvent(event))
     {
+        PlanPos pos1 = theView.cursorOne.GetPlanPos();
+        PlanPos pos2 = theView.cursorTwo.GetPlanPos();
+        
         if (event.type == sf::Event::Closed)
             quitYet = true;
         if (event.type == sf::Event::Resized)
@@ -140,11 +140,11 @@ bool Controller::HandleInput()
             }
             if (event.key.code == sf::Keyboard::LBracket)
             {
-                theView.cursorOne.NullifyLocation();
+                theView.cursorOne.Dislocate();
             }
             if (event.key.code == sf::Keyboard::RBracket)
             {
-                theView.cursorTwo.NullifyLocation();
+                theView.cursorTwo.Dislocate();
             }
             if (event.key.code == sf::Keyboard::Space)
             {

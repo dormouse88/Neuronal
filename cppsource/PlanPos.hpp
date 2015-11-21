@@ -26,7 +26,7 @@ public:
     bool IsValid() const;
     bool IsPlanOnly() const;
     bool IsLocated() const;
-    void SetPlanOnly();
+    void Dislocate();
 
     void SetPosSmart(VectorSmart);
     void SetPosDumb(VectorDumb);

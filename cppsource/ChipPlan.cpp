@@ -328,10 +328,10 @@ void ChipPlan::SubDraw(sf::RenderTarget & rt)
 {
     auto pB = GetWorldBound();
     sf::RectangleShape planBox;
-    int randr = (GetPlanID() * 20000) % 255 + 30;
-    int randb = (GetPlanID() * 22000) % 255 + 30;
-    int randg = (GetPlanID() * 25000) % 255 + 30;
-    planBox.setFillColor( sf::Color{randr,randb,randg} * sf::Color{50,50,50} );
+    sf::Uint8 randr = ((GetPlanID()+ 130) * 20000) % 255;
+    sf::Uint8 randb = ((GetPlanID()+ 130) * 22000) % 255;
+    sf::Uint8 randg = ((GetPlanID()+ 130) * 25000) % 255;
+    planBox.setFillColor( sf::Color{randr,randb,randg} * sf::Color{70,70,70} );
     planBox.setOutlineColor( sf::Color{95,95,95} );
     planBox.setOutlineThickness(3.f);
     planBox.setPosition( sf::Vector2f{pB.left, pB.top} );
@@ -340,7 +340,7 @@ void ChipPlan::SubDraw(sf::RenderTarget & rt)
     
     sf::Text planNumText;
     planNumText.setFont( ViewResources::GetInstance().font );
-    planNumText.setString( patch::to_string(GetPlanID()) );
+    planNumText.setString( patch::to_string(GetPlanID()).append( IsModified() ? "*" : "") );
     planNumText.setColor( sf::Color::Cyan );
     planNumText.setPosition(pB.left + pB.width/2.f, pB.top + pB.height - 40.f );
     rt.draw(planNumText);
@@ -351,20 +351,8 @@ void ChipPlan::SubDraw(sf::RenderTarget & rt)
 void ChipPlan::Draw(sf::RenderTarget & rt)
 {
     SubDraw(rt);
-//    auto pB = GetWorldBound();
-//    sf::RectangleShape planBox;
-//    int randr = (GetPlanID() * 20000) % 255;
-//    int randb = (GetPlanID() * 22000) % 255;
-//    int randg = (GetPlanID() * 25000) % 255;
-//    planBox.setFillColor( sf::Color{randr,randb,randg} * sf::Color{50,50,50} );
-//    planBox.setOutlineColor( sf::Color{95,95,95} );
-//    planBox.setOutlineThickness(3.f);
-//    planBox.setPosition( sf::Vector2f{pB.left, pB.top} );
-//    planBox.setSize( sf::Vector2f{pB.width, pB.height} );
-//    rt.draw(planBox);
-//
-//    DrawParts(rt);
 }
+
 
 
 
@@ -419,8 +407,11 @@ void ChipPlanFunc::DeviceHandle(PlanPos pos, int code)
 }
 void ChipPlanFunc::WireHandle(PlanPos pos1, PlanPos pos2, int code)
 {
-    auto w = GetWire(pos1, pos2);
-    if (w) w->Handle(code);
+    if (MatchOnPlan(pos1, pos2))
+    {
+        auto w = GetWire(pos1, pos2);
+        if (w) w->Handle(code);
+    }
 }
 
 bool ChipPlanFunc::MatchOnPlan(PlanPos & pos1, PlanPos & pos2)

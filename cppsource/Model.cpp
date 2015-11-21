@@ -53,9 +53,12 @@ std::shared_ptr<ChipPlan> Model::LoadPlan(int num, std::shared_ptr<ChipPlan> pla
     if (not plan->IsModified())
     {
         auto loadedPlan = serializer.LoadFile(num);
-        auto ref = plan->GetReferer();
-        if (ref) ref->SwapIn(loadedPlan);
-        return loadedPlan;
+        if (loadedPlan)
+        {
+            auto ref = plan->GetReferer();
+            if (ref) ref->SwapIn(loadedPlan);
+            return loadedPlan;
+        }
     }
     return nullptr;
 }

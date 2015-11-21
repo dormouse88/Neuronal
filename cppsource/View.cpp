@@ -31,6 +31,7 @@ View::View(Model & model_p)
     xmlPlan(1)
 {
     window.setVerticalSyncEnabled(true);
+    //window.setFramerateLimit(3);
     mainView.setViewport(MAIN_VIEWPORT);
     mainOverlay.setViewport(MAIN_VIEWPORT);
     barOverlay.setViewport(BAR_VIEWPORT);
@@ -47,6 +48,9 @@ View::View(Model & model_p)
 
 void View::Draw()
 {
+    cursorOne.Revalidate();
+    cursorTwo.Revalidate();
+    
     window.clear();
     
     //Main Port...
@@ -161,7 +165,7 @@ void View::CentreOn(VectorWorld point)
 
 void View::Clamp()
 {
-    auto clampPlan = cursorOne.GetPlanPos().GetPlan();  //GetViewBasePlan();
+    auto clampPlan = GetViewBasePlan(); //cursorOne.GetPlanPos().GetPlan();
     if (clampPlan)
     {
         RectWorld b = clampPlan->GetWorldBound();

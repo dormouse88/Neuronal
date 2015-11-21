@@ -20,10 +20,11 @@ public:
     Cursor(std::shared_ptr<PlanGrid> g, sf::Color color = sf::Color::Yellow);
     void Draw(sf::RenderTarget & rt);
 
-    PlanPos GetPlanPos() const;
+    PlanPos GetPlanPos() const                                  { return ppos; }
+    void Dislocate()                                            { ppos.Dislocate(); }
     void SetGridOnly(std::shared_ptr<PlanGrid> g)               { ppos.SetGrid(g); }
-    void NullifyLocation()                                      { ppos.SetPlanOnly(); }
     void SetPosWorld(VectorWorld);
+    void Revalidate();
     
 private:
     PlanPos ppos;
