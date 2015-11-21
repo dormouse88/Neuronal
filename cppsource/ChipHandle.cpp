@@ -88,7 +88,7 @@ sf::Vector2f ChipHandle::GetWireAttachPos(WireAttachSide was) const
     sf::Vector2f wirePos;
     if (exploded)
     {
-        RectWorld planBound { plan->GetWorldBound() };
+        RectWorld planBound { plan->GetWorldPaddedBound() };
         VectorWorld objectSize { planBound.width, planBound.height };
         if (was == WireAttachSide::IN) {
             wirePos = CalculateOffset(objectSize) + VectorWorld {objectSize.x *.0f, objectSize.y *.5f };
@@ -115,7 +115,7 @@ void ChipHandle::Draw(sf::RenderTarget & rt)
     {
         //Refresh Plan Offset...
         plan->GetGrid()->SetOffset( VectorWorld{0.f, 0.f} );
-        RectWorld innerPlanBound { plan->GetWorldBound() };
+        RectWorld innerPlanBound { plan->GetWorldPaddedBound() };
         VectorWorld innerPlanTopLeft { innerPlanBound.left, innerPlanBound.top };
         VectorWorld innerPlanSize {innerPlanBound.width, innerPlanBound.height};
         VectorWorld outerTopLeftPos = CalculateOffset(innerPlanSize);
@@ -153,7 +153,7 @@ VectorDumb ChipHandle::GetPlodedSize()
 {
     if (exploded)
     {
-        return VectorDumb{ plan->GetDumbBound().width, plan->GetDumbBound().height };
+        return VectorDumb{ plan->GetDumbPaddedBound().width, plan->GetDumbPaddedBound().height };
     }
     else return VectorDumb{1,1};
 }

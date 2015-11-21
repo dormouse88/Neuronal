@@ -19,6 +19,7 @@
 #include "RefererInterface.hpp"
 class ChipHandle;
 
+const sf::Vector2f GRABBER_SIZE { GRID_SIZE * 0.5f };
 
 class ChipPlan : public Wirable
 {
@@ -67,13 +68,17 @@ public:
     
     void RecalculateSmartInnerBound();
     PlanRect GetSmartInnerBound() const;
-    RectDumb GetDumbBound() const;
-    RectWorld GetWorldBound() const;
+    PlanRect GetSmartPaddedBound() const;
+    RectDumb GetDumbPaddedBound() const;
+    RectWorld GetWorldPaddedBound() const;
     
     void SetPadding(int thickness)                                                                      {padding = thickness;}
     void PlodeRefresh(VectorSmart point);
     void PlodeRefresh();
     
+    void DrawBox(sf::RenderTarget & rt);
+    void DrawTitle(sf::RenderTarget & rt);
+    void DrawGridLines(sf::RenderTarget & rt);
     void DrawParts(sf::RenderTarget & rt);
     void SubDraw(sf::RenderTarget & rt);
     void Draw(sf::RenderTarget & rt);

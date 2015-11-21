@@ -31,7 +31,7 @@ void Cursor::Draw(sf::RenderTarget & rt)
         }
         else
         {
-            auto b = ppos.GetPlan()->GetWorldBound();
+            auto b = ppos.GetPlan()->GetWorldPaddedBound();
             representation.setPosition( b.left, b.top );
             representation.setSize( sf::Vector2f { b.width, b.height } );
             rt.draw(representation, sf::RenderStates(sf::BlendAdd));
@@ -42,7 +42,7 @@ void Cursor::Draw(sf::RenderTarget & rt)
 void Cursor::SetPosWorld(VectorWorld point)
 {
     //Check if clicked pos is inside contextPlan boundary...
-    auto b = ppos.GetPlan()->GetWorldBound();
+    RectWorld b = ppos.GetPlan()->GetWorldPaddedBound();
     bool done = false;
 
     while (not b.contains(point) and not done)
@@ -52,7 +52,7 @@ void Cursor::SetPosWorld(VectorWorld point)
         {
             ppos.SetGrid( ref->GetContainer()->GetGrid() );
             ppos.SetPosSmart( ref->GetSmartPos() );
-            b = ppos.GetPlan()->GetWorldBound();
+            b = ppos.GetPlan()->GetWorldPaddedBound();
         }
         else done = true;
     }
@@ -72,8 +72,15 @@ void Cursor::SetPosWorld(VectorWorld point)
         }
         else done = true;
     }
-    b = ppos.GetPlan()->GetWorldBound();
-    if (not b.contains(ppos.GetWorldPos()) ) ppos.Dislocate();
+    b = ppos.GetPlan()->GetWorldPaddedBound();
+    //if point is between Plan and its Handle...
+    if (not b.contains(point) ) ppos.Dislocate(); //ppos.GetWorldPos()
+    //if point is on a Grabber (cornerBox)...
+    RectWorld cb = { b.left, b.top, GRABBER_SIZE.x, GRABBER_SIZE.y };
+    if (cb.contains(point) ) ppos.Dislocate();
+    cb.left = b.left + b.width - GRABBER_SIZE.x;
+    cb.top = b.top + b.height - GRABBER_SIZE.y;
+    if (cb.contains(point) ) ppos.Dislocate();
 }
 
 

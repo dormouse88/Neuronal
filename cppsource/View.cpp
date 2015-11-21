@@ -168,7 +168,7 @@ void View::Clamp()
     auto clampPlan = GetViewBasePlan(); //cursorOne.GetPlanPos().GetPlan();
     if (clampPlan)
     {
-        RectWorld b = clampPlan->GetWorldBound();
+        RectWorld b = clampPlan->GetWorldPaddedBound();
         auto center = mainView.getCenter();
         auto viewSize = mainView.getSize();
         VectorWorld size = viewSize - VectorWorld{120.f, 120.f};

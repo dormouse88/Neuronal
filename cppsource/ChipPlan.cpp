@@ -10,7 +10,7 @@
 #include <cassert>
 
 ChipPlan::ChipPlan(std::shared_ptr<PlanGrid> g)
-    :Wirable(), planID(0), modified(false), padding(1), planGrid(g)
+    :Wirable(), planID(0), modified(false), padding(2), planGrid(g)
 {
     RecalculateSmartInnerBound();
 }
@@ -217,7 +217,7 @@ std::vector<std::shared_ptr<Wire> > ChipPlan::GetWires(std::shared_ptr<Wirable> 
 VectorWorld ChipPlan::GetWireAttachPos(WireAttachSide was) const
 {
     sf::Vector2f wirePos;
-    auto bound = GetWorldBound();
+    auto bound = GetWorldPaddedBound();
     //Because ChipPlans are wired internally, the wires come OUT of the left...
     if (was == WireAttachSide::OUT)
     {
@@ -269,15 +269,20 @@ PlanRect ChipPlan::GetSmartInnerBound() const
 {
     return smartInnerBound;
 }
-RectDumb ChipPlan::GetDumbBound() const
+PlanRect ChipPlan::GetSmartPaddedBound() const
 {
-    auto pr = GetSmartInnerBound();
-    return pr.AddPadding(padding).GetRectDumb();
+    PlanRect b = smartInnerBound; //make a copy (AddPadding is not const so can't be called on the member)
+    return b.AddPadding(padding);
 }
-RectWorld ChipPlan::GetWorldBound() const
+RectDumb ChipPlan::GetDumbPaddedBound() const
 {
-    auto pr = GetSmartInnerBound();
-    return pr.AddPadding(padding).GetRectWorld();
+    auto pr = GetSmartPaddedBound();
+    return pr.GetRectDumb();
+}
+RectWorld ChipPlan::GetWorldPaddedBound() const
+{
+    auto pr = GetSmartPaddedBound();
+    return pr.GetRectWorld();
 }
 
 
@@ -312,6 +317,70 @@ void ChipPlan::PlodeRefresh()
     }
 }
 
+void ChipPlan::DrawBox(sf::RenderTarget & rt)
+{
+    sf::Color randCol {
+         static_cast<sf::Uint8>( ((GetPlanID()+ 130) * 20000) % 255 )
+        ,static_cast<sf::Uint8>( ((GetPlanID()+ 130) * 22000) % 255 )
+        ,static_cast<sf::Uint8>( ((GetPlanID()+ 130) * 25000) % 255 )
+    };
+    if (IsEmpty()) randCol = sf::Color::Black;
+    auto pB = GetWorldPaddedBound();
+    sf::RectangleShape planBox;
+    planBox.setFillColor( randCol * sf::Color{70,70,70} );
+    planBox.setOutlineColor( sf::Color{95,95,95} );
+    planBox.setOutlineThickness(6.f);
+    planBox.setPosition( sf::Vector2f{pB.left, pB.top} );
+    planBox.setSize( sf::Vector2f{pB.width, pB.height} );
+    rt.draw(planBox);
+    
+    //Grabber
+    sf::RectangleShape cornerBox;
+    cornerBox.setSize( GRABBER_SIZE );
+    cornerBox.setPosition( planBox.getPosition() );
+    cornerBox.setFillColor( sf::Color{95,95,95} );
+    rt.draw(cornerBox);
+    cornerBox.setSize( GRABBER_SIZE );
+    cornerBox.setPosition( pB.left + pB.width - GRABBER_SIZE.x, pB.top + pB.height - GRABBER_SIZE.y );
+    rt.draw(cornerBox);
+}
+void ChipPlan::DrawTitle(sf::RenderTarget & rt)
+{
+    auto pB = GetWorldPaddedBound();
+    sf::Text planNumText;
+    planNumText.setFont( ViewResources::GetInstance().font );
+    planNumText.setString( patch::to_string(GetPlanID()).append( IsModified() ? "*" : "") );
+    planNumText.setColor( sf::Color::Cyan );
+    planNumText.setPosition(pB.left + pB.width/2.f, pB.top + pB.height - 40.f );
+    rt.draw(planNumText);
+}
+
+void ChipPlan::DrawGridLines(sf::RenderTarget & rt)
+{
+    if (IsEmpty()) return;
+    sf::Color lineCol {14,24,34};
+    auto pB = GetWorldPaddedBound();
+    PlanRect r = GetSmartPaddedBound();
+    for (int i = r.tl.GetSmartPos().y + 1; i <= r.br.GetSmartPos().y; i++)
+    {
+        std::vector<sf::Vertex> line;
+        sf::Vector2f posFrom    { pB.left, planGrid->MapSmartToWorld({0,i}).y };
+        line.push_back( sf::Vertex( posFrom, lineCol ) );
+        sf::Vector2f posTo      { pB.left + pB.width, planGrid->MapSmartToWorld({0,i}).y }; 
+        line.push_back( sf::Vertex(posTo, lineCol ) );
+        rt.draw(&line[0], line.size(), sf::Lines, sf::RenderStates(sf::BlendAdd));
+    }
+    for (int i = r.tl.GetSmartPos().x + 1; i <= r.br.GetSmartPos().x; i++)
+    {
+        std::vector<sf::Vertex> line;
+        sf::Vector2f posFrom    { planGrid->MapSmartToWorld({i,0}).x, pB.top };
+        line.push_back( sf::Vertex( posFrom, lineCol ) );
+        sf::Vector2f posTo      { planGrid->MapSmartToWorld({i,0}).x, pB.top + pB.height }; 
+        line.push_back( sf::Vertex(posTo, lineCol ) );
+        rt.draw(&line[0], line.size(), sf::Lines, sf::RenderStates(sf::BlendAdd));
+    }
+}
+
 void ChipPlan::DrawParts(sf::RenderTarget & rt)
 {
     for (auto & w: wires)
@@ -326,25 +395,9 @@ void ChipPlan::DrawParts(sf::RenderTarget & rt)
 
 void ChipPlan::SubDraw(sf::RenderTarget & rt)
 {
-    auto pB = GetWorldBound();
-    sf::RectangleShape planBox;
-    sf::Uint8 randr = ((GetPlanID()+ 130) * 20000) % 255;
-    sf::Uint8 randb = ((GetPlanID()+ 130) * 22000) % 255;
-    sf::Uint8 randg = ((GetPlanID()+ 130) * 25000) % 255;
-    planBox.setFillColor( sf::Color{randr,randb,randg} * sf::Color{70,70,70} );
-    planBox.setOutlineColor( sf::Color{95,95,95} );
-    planBox.setOutlineThickness(3.f);
-    planBox.setPosition( sf::Vector2f{pB.left, pB.top} );
-    planBox.setSize( sf::Vector2f{pB.width, pB.height} );
-    rt.draw(planBox);
-    
-    sf::Text planNumText;
-    planNumText.setFont( ViewResources::GetInstance().font );
-    planNumText.setString( patch::to_string(GetPlanID()).append( IsModified() ? "*" : "") );
-    planNumText.setColor( sf::Color::Cyan );
-    planNumText.setPosition(pB.left + pB.width/2.f, pB.top + pB.height - 40.f );
-    rt.draw(planNumText);
-    
+    DrawBox(rt);
+    DrawGridLines(rt);
+    DrawTitle(rt);
     DrawParts(rt);
 }
 
@@ -385,10 +438,13 @@ bool ChipPlanFunc::IsPositionFree(PlanPos pos)
 }
 void ChipPlanFunc::SetPosition(PlanPos dPos, PlanPos toPos)
 {
-    if (dPos.IsLocated() and toPos.IsLocated() and dPos.GetGrid() == toPos.GetGrid())
+    if ( MatchOnPlan(dPos, toPos) )
     {
-        auto d = GetDevice(dPos);
-        if (d) toPos.GetPlan()->SetPosition(*d, toPos.GetSmartPos());
+        if ( dPos.IsLocated() and toPos.IsLocated() )
+        {
+            auto d = GetDevice(dPos);
+            if (d) toPos.GetPlan()->SetPosition(*d, toPos.GetSmartPos());
+        }
     }
 }
 
