@@ -15,12 +15,105 @@
 
 const char XML_FILE_NAME [] = "tree.xml";
 
-Serializer::Serializer()
-{}
+const int NAME_MAX_LENGTH = 30;
+const std::string AUTO_NAME_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
-void Serializer::OpenFile(pugi::xml_document & doc)
+Serializer::Serializer()
+    :doc()
 {
-    pugi::xml_parse_result result = doc.load_file(XML_FILE_NAME);
+    srand(time(nullptr));
+    OpenFile(doc, XML_FILE_NAME);
+}
+
+
+std::shared_ptr<ChipPlan> Serializer::LoadPlan(int planID)
+{
+    return LoadPlanParts(planID);
+}
+
+void Serializer::SavePlan(std::shared_ptr<ChipPlan> plan)
+{
+    int oldID = plan->GetPlanID();
+    std::string oldName = GetName( oldID );
+    SavePlanParts(plan);
+    if (not oldName.empty()) {
+        RemoveName(oldID);
+        AddName(plan->GetPlanID(), oldName);
+    }
+    else {
+        AddAutoName(plan->GetPlanID());
+    }
+    doc.save_file(XML_FILE_NAME);
+}
+
+void Serializer::SavePlanAsNew(std::shared_ptr<ChipPlan> plan)
+{
+    SavePlanParts(plan);
+    AddAutoName(plan->GetPlanID());
+    doc.save_file(XML_FILE_NAME);
+}
+
+std::string Serializer::GetName(int planID)
+{
+    pugi::xml_node xmlPlan = GetNodeByID(planID);
+    if (xmlPlan) {
+        return xmlPlan.attribute("n").as_string();
+    }
+    else return "";
+}
+
+void Serializer::RemoveName(int planID)
+{
+    pugi::xml_node p = GetNodeByID(planID);
+    if (p) doc.child("NAMES").remove_child(p);
+}
+
+void Serializer::AddName(int planID, std::string name)
+{
+    if (not GetNodeByID(planID) and not GetNodeByName(name)) {
+        pugi::xml_node names = doc.child("NAMES");
+        pugi::xml_node entry = names.append_child("NAME");
+        entry.append_attribute("i") = planID;
+        entry.append_attribute("n") = name.c_str();
+    }
+}
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////PRIVATE:
+
+
+
+void Serializer::AddAutoName(int planID)
+{
+    pugi::xml_node xmlPlan = GetNodeByID(planID);
+    if (not xmlPlan )
+    {
+        std::string randomName;
+        for (int i = 0; i <= NAME_MAX_LENGTH; ++i)
+        {
+            randomName.push_back( AUTO_NAME_CHARS.at( rand() % AUTO_NAME_CHARS.length() ) );
+            pugi::xml_node nameCheck = GetNodeByName(randomName);
+            if (not nameCheck) {
+                break;
+            }
+        }
+        AddName(planID, randomName);
+    }
+    //finally, save the xml...
+    doc.save_file(XML_FILE_NAME);
+}
+
+pugi::xml_node Serializer::GetNodeByID(int planID) {
+    return doc.child("NAMES").find_child_by_attribute("NAME", "i", patch::to_string( planID ).c_str() );
+}
+pugi::xml_node Serializer::GetNodeByName(std::string name) {
+    return doc.child("NAMES").find_child_by_attribute("NAME", "n", name.c_str() );
+}
+
+void Serializer::OpenFile(pugi::xml_document & doc, const char * fileName)
+{
+    pugi::xml_parse_result result = doc.load_file(fileName);
 
     if (!result) {
         std::cout << "Failure Loading XML File: " << result.description() << std::endl;
@@ -28,38 +121,22 @@ void Serializer::OpenFile(pugi::xml_document & doc)
     }
 }
 
-void Serializer::SaveFile(std::shared_ptr<ChipPlan> plan)
-{
-    pugi::xml_document doc;
-    OpenFile(doc);
-    if(doc) {
-        SaveNode(doc, plan);
-        doc.save_file(XML_FILE_NAME);
-    }
-}
 
-std::shared_ptr<ChipPlan> Serializer::LoadFile(int planID)
-{
-    pugi::xml_document doc;
-    OpenFile(doc);
-    if(doc) {
-        return LoadNode(doc, planID);
-    }
-}
-
-void Serializer::SaveNode(pugi::xml_node & doc, std::shared_ptr<ChipPlan> plan_p)
+void Serializer::SavePlanParts(std::shared_ptr<ChipPlan> plan_p)
 {
     if (plan_p->IsModified())
     {
+        pugi::xml_node plansNode = doc.child("PLANS");
+
         //check highest used planID in the XML and use next number as new planID
-        pugi::xml_node db = doc.child("PLAN_DB");
+        pugi::xml_node db = plansNode.child("PLAN_DB");
         int newID = db.attribute("HIGHEST_ID").as_int() + 1;
         db.attribute("HIGHEST_ID") = newID;
         //update the plan in memory with the new ID...
         plan_p->planID = newID;
 
         //create the new plan in the xml...
-        pugi::xml_node plan = doc.append_child("PLAN");
+        pugi::xml_node plan = plansNode.append_child("PLAN");
         plan.append_attribute("i") = newID;
 
         for (auto d: plan_p->devices) {
@@ -77,7 +154,7 @@ void Serializer::SaveNode(pugi::xml_node & doc, std::shared_ptr<ChipPlan> plan_p
                 auto h = std::dynamic_pointer_cast<ChipHandle>(d);
                 auto p = h->GetPlan();
                 //holy recursion batman!?!...
-                if (p) SaveNode(doc, p);
+                if (p) SavePlanParts(p);
                 pugi::xml_node dev = plan.append_child("HAND");
                 dev.append_attribute("i").set_value(d->GetSerial() );
                 dev.append_attribute("x").set_value(d->GetSmartPos().x);
@@ -115,17 +192,17 @@ void Serializer::SaveNode(pugi::xml_node & doc, std::shared_ptr<ChipPlan> plan_p
     plan_p->modified = false;
 }
 
-std::shared_ptr<ChipPlan> Serializer::LoadNode(pugi::xml_node & doc, int planID)
+std::shared_ptr<ChipPlan> Serializer::LoadPlanParts(int planID)
 {
     std::shared_ptr<ChipPlan> memPlan = nullptr;
     
+    pugi::xml_node plansNode = doc.child("PLANS");
+    pugi::xml_node db = plansNode.child("PLAN_DB");
     //Find plan with matching planID in the XML...
-    pugi::xml_node db = doc.child("PLAN_DB");
-    pugi::xml_node xmlPlan = doc.find_child_by_attribute("PLAN", "i", patch::to_string( planID ).c_str() );
+    pugi::xml_node xmlPlan = plansNode.find_child_by_attribute("PLAN", "i", patch::to_string( planID ).c_str() );
     
     if (xmlPlan)
     {
-//        memPlan = std::make_shared<ChipPlan> ();
         memPlan = BlobFactory::MakePlan();
         memPlan->planID = planID;
         for (pugi::xml_node device = xmlPlan.child("HAND"); device; device = device.next_sibling("HAND"))
@@ -137,7 +214,7 @@ std::shared_ptr<ChipPlan> Serializer::LoadNode(pugi::xml_node & doc, int planID)
             auto handle = BlobFactory::AddHandle(memPlan, serial, pos);
             //Recursively load subplans and assign them...
             if (link != 0) {
-                auto subPlan = LoadNode(doc, link);
+                auto subPlan = LoadPlanParts(link);
                 handle->SetPlan(subPlan);
                 subPlan->RegisterReferer(handle);
             }
@@ -174,37 +251,3 @@ std::shared_ptr<ChipPlan> Serializer::LoadNode(pugi::xml_node & doc, int planID)
     return memPlan;
 }
 
-
-void PrintNode(pugi::xml_node & doc)
-{
-//    for (pugi::xml_node plan = doc.child("PLAN"); plan; plan = plan.next_sibling("PLAN"))
-//    {
-//        std::cout << "Anchor Tag: " << plan.attribute("anch").value() << std::endl;
-//        std::cout << "Width:      " << plan.attribute("w").as_int() << std::endl;
-//        std::cout << "Height:     " << plan.attribute("h").as_bool() << std::endl;
-//
-//        for (pugi::xml_node device = plan.child("NEUR"); device; device = device.next_sibling("NEUR"))
-//        {
-//            std::cout << "Device Type:" << device.name() << std::endl;
-//            std::cout << "ID:         " << device.attribute("i").as_int() << std::endl;
-//            std::cout << "x pos:      " << device.attribute("x").as_int() << std::endl;
-//            std::cout << "y pos:      " << device.attribute("y").as_int() << std::endl;
-//            std::cout << "threshold:  " << device.attribute("thr").as_int() << std::endl;
-//            if (device.attribute("n")) std::cout << "name:       " << device.attribute("n").value() << std::endl;
-//        }
-//        for (pugi::xml_node device = plan.child("SOCK"); device; device = device.next_sibling("SOCK"))
-//        {
-//            std::cout << "Device Type:" << device.name() << std::endl;
-//            std::cout << "ID:         " << device.attribute("i").as_int() << std::endl;
-//            std::cout << "x pos:      " << device.attribute("x").as_int() << std::endl;
-//            std::cout << "y pos:      " << device.attribute("y").as_int() << std::endl;
-//            if (device.attribute("n")) std::cout << "name:       " << device.attribute("n").value() << std::endl;
-//        }
-//        for (pugi::xml_node device = plan.child("WIRE"); device; device = device.next_sibling("WIRE"))
-//        {
-//            std::cout << "Device Type:" << device.name() << std::endl;
-//            std::cout << "to device:  " << device.attribute("t").as_int() << std::endl;
-//            if (device.attribute("w")) std::cout << "weight:     " << device.attribute("w").as_int() << std::endl;
-//        }
-//    }
-}

@@ -13,7 +13,22 @@
 #include "Serializer.hpp"
 #include "ChipPlan.hpp"
 
-class Model : public RefererInterface
+class BaseReferer : public RefererInterface
+{
+public:
+    BaseReferer();
+    void Logic();
+    void SetPlan(std::shared_ptr<ChipPlan> p);
+    virtual void StepOut(bool charge, int slot) override;
+    virtual void SetModified() override;
+    virtual void SwapIn(std::shared_ptr<ChipPlan>) override;
+
+//private:
+    std::shared_ptr<ChipPlan> basePlan;    
+};
+
+
+class Model
 {
 public:
     Model();
@@ -21,19 +36,21 @@ public:
 
     void Logic();
     
-    virtual void StepOut(bool charge, int slot) override;
-    virtual void SetModified() override;
-    virtual void SwapIn(std::shared_ptr<ChipPlan>) override;
-    
-    void SetBasePlan(std::shared_ptr<ChipPlan> newPlan)         {basePlan = newPlan;}
-    std::shared_ptr<ChipPlan> GetBasePlan()                     {return basePlan;}
+    //void SetBasePlan(std::shared_ptr<ChipPlan> newPlan)         {baseReferer->basePlan = newPlan;}
+    const std::shared_ptr<ChipPlan> GetBasePlan() const                     {return baseReferer->basePlan;}
 
     std::shared_ptr<ChipPlan> WipePlan(std::shared_ptr<ChipPlan> plan, bool forced);
     std::shared_ptr<ChipPlan> LoadPlan(int num, std::shared_ptr<ChipPlan> plan);
     void SavePlan(PlanPos pos);
+    void SavePlanAsNew(PlanPos pos);
+
+
+//    std::string GetName(int id);
+//    void AddName(int id, std::string name);
+//    void AddAutoName(int id)        {serializer.AddAutoName(id);}
 private:
     Serializer serializer;
-    std::shared_ptr<ChipPlan> basePlan;
+    std::shared_ptr<BaseReferer> baseReferer;
 };
 
 

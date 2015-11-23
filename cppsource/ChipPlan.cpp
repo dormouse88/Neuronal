@@ -349,7 +349,7 @@ void ChipPlan::DrawTitle(sf::RenderTarget & rt)
     auto pB = GetWorldPaddedBound();
     sf::Text planNumText;
     planNumText.setFont( ViewResources::GetInstance().font );
-    planNumText.setString( patch::to_string(GetPlanID()).append( IsModified() ? "*" : "") );
+    planNumText.setString( patch::to_string(GetPlanID()).append( IsModified() ? "* " : " ") );
     planNumText.setColor( sf::Color::Cyan );
     planNumText.setPosition(pB.left + pB.width/2.f, pB.top + pB.height - 40.f );
     rt.draw(planNumText);

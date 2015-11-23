@@ -112,7 +112,8 @@ bool Controller::HandleInput()
             }
             if (event.key.code == sf::Keyboard::Q)
             {
-                theModel.SavePlan( pos1 );
+                if (event.key.shift) theModel.SavePlanAsNew( pos1 );
+                else theModel.SavePlan( pos1 );
             }
             if (event.key.code == sf::Keyboard::W)
             {
@@ -150,6 +151,20 @@ bool Controller::HandleInput()
             {
                 theModel.Logic();
             }
+
+            if (event.key.code == sf::Keyboard::R)
+            {
+//                theModel.AddName(pos1.GetPlan()->GetPlanID());
+            }
+            if (event.key.code == sf::Keyboard::T)
+            {
+//                theModel.AddName(pos1.GetPlan()->GetPlanID());
+            }
+            if (event.key.code == sf::Keyboard::Y)
+            {
+//                theModel.RemoveName(pos1.GetPlan()->GetPlanID());
+            }
+            
             if (event.key.code == sf::Keyboard::Num1)
             {
                 theView.SetHighlightingMode(1);

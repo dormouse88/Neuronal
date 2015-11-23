@@ -146,7 +146,13 @@ std::shared_ptr<Wire> BlobFactory::AddWire(std::shared_ptr<ChipPlan> plan, Wirab
 void BlobFactory::RemoveDevice(PlanPos pos)
 {
     std::shared_ptr<Device> d = ChipPlanFunc::GetDevice(pos);
-    if (d) pos.GetPlan()->RemoveDevice(d);
+    if (d) {
+        auto h = std::dynamic_pointer_cast<ChipHandle> (d);
+        if (not h or h->GetPlan()->IsEmpty())
+        {
+            pos.GetPlan()->RemoveDevice(d);
+        }
+    }
 }
 
 void BlobFactory::RemoveWire(PlanPos pos1, PlanPos pos2)

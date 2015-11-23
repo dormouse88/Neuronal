@@ -41,8 +41,6 @@ View::View(Model & model_p)
     planNumText.setCharacterSize(25.f);
     planNumText.setPosition(30.f, 30.f);
     planNumText.setColor( sf::Color::Green );
-    
-    viewBasePlan = model_p.GetBasePlan();
 }
 
 

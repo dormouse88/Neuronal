@@ -31,8 +31,8 @@ public:
     void Clamp();
     void SetHighlightingMode(int x)             { highlightingMode = x; }
     
-    sf::RenderWindow & GetWindow()                  {return window;}
-    std::shared_ptr<ChipPlan> GetViewBasePlan()     {return viewBasePlan.lock();}
+    sf::RenderWindow & GetWindow()                        {return window;}
+    std::shared_ptr<ChipPlan> GetViewBasePlan()           {return theModel.GetBasePlan(); }//{return viewBasePlan.lock();}
     
 private:
     sf::RenderWindow window;
@@ -44,7 +44,7 @@ private:
     sf::Text planNumText;
 
     const Model & theModel;
-    std::weak_ptr<ChipPlan> viewBasePlan;
+    //std::weak_ptr<ChipPlan> viewBasePlan;
 
     int highlightingMode;
 public:

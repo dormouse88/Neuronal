@@ -21,12 +21,26 @@ class Serializer
 public:
     Serializer();
     ~Serializer() {}
-    void SaveFile(std::shared_ptr<ChipPlan> plan);
-    std::shared_ptr<ChipPlan> LoadFile(int planID);
+
+    std::shared_ptr<ChipPlan> LoadPlan(int planID);
+    void SavePlan(std::shared_ptr<ChipPlan> plan);
+    void SavePlanAsNew(std::shared_ptr<ChipPlan> plan);
+
+    std::string GetName(int planID);
+    void RemoveName(int planID);
+    void AddName(int planID, std::string name);
+    
 private:
-    void OpenFile(pugi::xml_document & doc);
-    void SaveNode(pugi::xml_node & doc, std::shared_ptr<ChipPlan> plan_p);
-    std::shared_ptr<ChipPlan> LoadNode(pugi::xml_node & doc, int planID);
+    void AddAutoName(int planID);
+    pugi::xml_node GetNodeByID(int planID);
+    pugi::xml_node GetNodeByName(std::string name);
+    
+    void OpenFile(pugi::xml_document & doc, const char * fileName);
+    
+    void SavePlanParts(std::shared_ptr<ChipPlan> plan_p);
+    std::shared_ptr<ChipPlan> LoadPlanParts(int planID);
+
+    pugi::xml_document doc;
 };
 
 #endif	/* SERIALIZER_HPP */
