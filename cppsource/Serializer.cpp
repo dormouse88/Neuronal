@@ -12,6 +12,7 @@
 #include <sstream>
 #include <string>
 #include <SFML/System.hpp>// (/Vector2.hpp)
+#include <cassert>
 
 const char XML_FILE_NAME [] = "tree.xml";
 
@@ -23,6 +24,14 @@ Serializer::Serializer()
 {
     srand(time(nullptr));
     OpenFile(doc, XML_FILE_NAME);
+
+    
+    for (pugi::xml_node pNode: doc.child("PLANS").children("PLAN"))
+    {
+        int id = pNode.attribute("i").as_int(0);
+        int anc = pNode.attribute("anc").as_int(0);
+        //AddAncestryEntry(id, anc);
+    }
 }
 
 
@@ -34,14 +43,14 @@ std::shared_ptr<ChipPlan> Serializer::LoadPlan(int planID)
 void Serializer::SavePlan(std::shared_ptr<ChipPlan> plan)
 {
     int oldID = plan->GetPlanID();
-    std::string oldName = GetName( oldID );
+    std::string oldName = GetNameByID( oldID );
     SavePlanParts(plan);
     if (not oldName.empty()) {
         RemoveName(oldID);
         AddName(plan->GetPlanID(), oldName);
     }
     else {
-        AddAutoName(plan->GetPlanID());
+        AddName(plan->GetPlanID(), GetUnusedAutoName());
     }
     doc.save_file(XML_FILE_NAME);
 }
@@ -49,32 +58,39 @@ void Serializer::SavePlan(std::shared_ptr<ChipPlan> plan)
 void Serializer::SavePlanAsNew(std::shared_ptr<ChipPlan> plan)
 {
     SavePlanParts(plan);
-    AddAutoName(plan->GetPlanID());
+    AddName(plan->GetPlanID(), GetUnusedAutoName());
     doc.save_file(XML_FILE_NAME);
 }
 
-std::string Serializer::GetName(int planID)
+int Serializer::GetIDByName(std::string name)
 {
-    pugi::xml_node xmlPlan = GetNodeByID(planID);
-    if (xmlPlan) {
-        return xmlPlan.attribute("n").as_string();
-    }
-    else return "";
+    pugi::xml_node xmlPlan = GetNameNodeByName(name);
+    return xmlPlan.attribute("i").as_int(0);
+}
+std::string Serializer::GetNameByID(int planID)
+{
+    pugi::xml_node xmlPlan = GetNameNodeByID(planID);
+    return xmlPlan.attribute("n").as_string("");
 }
 
 void Serializer::RemoveName(int planID)
 {
-    pugi::xml_node p = GetNodeByID(planID);
-    if (p) doc.child("NAMES").remove_child(p);
+    pugi::xml_node p = GetNameNodeByID(planID);
+    if (p) {
+        doc.child("NAMES").remove_child(p);
+        doc.save_file(XML_FILE_NAME);
+    }
 }
 
 void Serializer::AddName(int planID, std::string name)
 {
-    if (not GetNodeByID(planID) and not GetNodeByName(name)) {
+    if (not GetNameNodeByID(planID) and not GetNameNodeByName(name))
+    {
         pugi::xml_node names = doc.child("NAMES");
         pugi::xml_node entry = names.append_child("NAME");
         entry.append_attribute("i") = planID;
         entry.append_attribute("n") = name.c_str();
+        doc.save_file(XML_FILE_NAME);
     }
 }
 
@@ -84,30 +100,24 @@ void Serializer::AddName(int planID, std::string name)
 
 
 
-void Serializer::AddAutoName(int planID)
+std::string Serializer::GetUnusedAutoName()
 {
-    pugi::xml_node xmlPlan = GetNodeByID(planID);
-    if (not xmlPlan )
+    std::string randomName;
+    for (int i = 0; i <= NAME_MAX_LENGTH; ++i)
     {
-        std::string randomName;
-        for (int i = 0; i <= NAME_MAX_LENGTH; ++i)
-        {
-            randomName.push_back( AUTO_NAME_CHARS.at( rand() % AUTO_NAME_CHARS.length() ) );
-            pugi::xml_node nameCheck = GetNodeByName(randomName);
-            if (not nameCheck) {
-                break;
-            }
+        randomName.push_back( AUTO_NAME_CHARS.at( rand() % AUTO_NAME_CHARS.length() ) );
+        pugi::xml_node nameCheck = GetNameNodeByName(randomName);
+        if (not nameCheck) {
+            return randomName;
         }
-        AddName(planID, randomName);
     }
-    //finally, save the xml...
-    doc.save_file(XML_FILE_NAME);
+    throw "NAME MAX LENGTH Reached! (highly unlikely to reach this)";
 }
 
-pugi::xml_node Serializer::GetNodeByID(int planID) {
+pugi::xml_node Serializer::GetNameNodeByID(int planID) {
     return doc.child("NAMES").find_child_by_attribute("NAME", "i", patch::to_string( planID ).c_str() );
 }
-pugi::xml_node Serializer::GetNodeByName(std::string name) {
+pugi::xml_node Serializer::GetNameNodeByName(std::string name) {
     return doc.child("NAMES").find_child_by_attribute("NAME", "n", name.c_str() );
 }
 
@@ -126,18 +136,24 @@ void Serializer::SavePlanParts(std::shared_ptr<ChipPlan> plan_p)
 {
     if (plan_p->IsModified())
     {
+        int oldID = plan_p->planID;
         pugi::xml_node plansNode = doc.child("PLANS");
-
         //check highest used planID in the XML and use next number as new planID
         pugi::xml_node db = plansNode.child("PLAN_DB");
         int newID = db.attribute("HIGHEST_ID").as_int() + 1;
         db.attribute("HIGHEST_ID") = newID;
         //update the plan in memory with the new ID...
         plan_p->planID = newID;
+        plan_p->nameGetter = std::bind(&Serializer::GetNameByID , this, std::placeholders::_1);
+        plan_p->relativesGetter = std::bind(&Serializer::GetRelatives , this, std::placeholders::_1);
 
         //create the new plan in the xml...
         pugi::xml_node plan = plansNode.append_child("PLAN");
         plan.append_attribute("i") = newID;
+        if (oldID > 0) {
+            plan.append_attribute("anc") = oldID;
+            AddAncestryEntry(newID, oldID);
+        }
 
         for (auto d: plan_p->devices) {
             if (d->SerialName() == "NEUR")
@@ -205,6 +221,10 @@ std::shared_ptr<ChipPlan> Serializer::LoadPlanParts(int planID)
     {
         memPlan = BlobFactory::MakePlan();
         memPlan->planID = planID;
+        memPlan->nameGetter = std::bind(&Serializer::GetNameByID , this, std::placeholders::_1);
+        memPlan->relativesGetter = std::bind(&Serializer::GetRelatives , this, std::placeholders::_1);
+        
+
         for (pugi::xml_node device = xmlPlan.child("HAND"); device; device = device.next_sibling("HAND"))
         {
             sf::Vector2i pos { device.attribute("x").as_int(), device.attribute("y").as_int() };

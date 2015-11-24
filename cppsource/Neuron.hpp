@@ -41,6 +41,7 @@ public:
     virtual void LogicAct();
     virtual void LogicCalculate();
 
+    bool IsThresholdMet() const                   {return receivedCharge >= threshold; }
     bool GetFiring() const                      {return firing;}
     void SetFiring(bool f)                      {firing = f;}
     int GetThreshold() const {return threshold;}

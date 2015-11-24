@@ -11,6 +11,7 @@
 #include <memory>
 #include "BlobFactory.hpp"
 #include "Serializer.hpp"
+#include "UserData.hpp"
 #include "ChipPlan.hpp"
 
 class BaseReferer : public RefererInterface
@@ -45,11 +46,12 @@ public:
     void SavePlanAsNew(PlanPos pos);
 
 
-//    std::string GetName(int id);
-//    void AddName(int id, std::string name);
-//    void AddAutoName(int id)        {serializer.AddAutoName(id);}
+
+    void AddName(int id, std::string name)      {serializer->AddName(id, name);}
+    void RemoveName(int id)                        {serializer->RemoveName(id);}
 private:
-    Serializer serializer;
+    std::shared_ptr<UserData> userData;
+    std::shared_ptr<Serializer> serializer;
     std::shared_ptr<BaseReferer> baseReferer;
 };
 

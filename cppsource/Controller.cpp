@@ -154,15 +154,15 @@ bool Controller::HandleInput()
 
             if (event.key.code == sf::Keyboard::R)
             {
-//                theModel.AddName(pos1.GetPlan()->GetPlanID());
+                theModel.AddName(pos1.GetPlan()->GetPlanID(), "CyboLatch");
             }
             if (event.key.code == sf::Keyboard::T)
             {
-//                theModel.AddName(pos1.GetPlan()->GetPlanID());
+                theModel.AddName(pos1.GetPlan()->GetPlanID(), "SN@RFK!77EN");
             }
             if (event.key.code == sf::Keyboard::Y)
             {
-//                theModel.RemoveName(pos1.GetPlan()->GetPlanID());
+                theModel.RemoveName(pos1.GetPlan()->GetPlanID());
             }
             
             if (event.key.code == sf::Keyboard::Num1)

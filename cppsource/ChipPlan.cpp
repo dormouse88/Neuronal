@@ -8,6 +8,7 @@
 #include "ChipPlan.hpp"
 #include "ChipHandle.hpp"
 #include <cassert>
+#include "Serializer.hpp" //Just to use class Relatives
 
 ChipPlan::ChipPlan(std::shared_ptr<PlanGrid> g)
     :Wirable(), planID(0), modified(false), padding(2), planGrid(g)
@@ -349,7 +350,17 @@ void ChipPlan::DrawTitle(sf::RenderTarget & rt)
     auto pB = GetWorldPaddedBound();
     sf::Text planNumText;
     planNumText.setFont( ViewResources::GetInstance().font );
-    planNumText.setString( patch::to_string(GetPlanID()).append( IsModified() ? "* " : " ") );
+    std::string textString { patch::to_string(GetPlanID()) };
+    if (nameGetter) textString.append(" -- " + nameGetter(GetPlanID()));
+    if (relativesGetter) {
+        auto rels = relativesGetter(GetPlanID());
+        textString.append(" // " + patch::to_string(rels.parent) + " ");
+    }
+    if (IsModified()) {
+        textString.append("**");
+        textString.insert(0, "**");
+    }
+    planNumText.setString( textString );
     planNumText.setColor( sf::Color::Cyan );
     planNumText.setPosition(pB.left + pB.width/2.f, pB.top + pB.height - 40.f );
     rt.draw(planNumText);

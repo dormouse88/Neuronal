@@ -45,7 +45,9 @@ void BaseReferer::SwapIn(std::shared_ptr<ChipPlan> p)
 
 
 Model::Model()
-    :baseReferer(std::make_shared<BaseReferer>())
+    :userData(std::make_shared<UserData>())
+    ,serializer(std::make_shared<Serializer>())
+    ,baseReferer(std::make_shared<BaseReferer>())
 {
     auto basePlan = BlobFactory::MakePlan();
     basePlan->RegisterReferer(baseReferer);
@@ -72,7 +74,7 @@ std::shared_ptr<ChipPlan> Model::LoadPlan(int num, std::shared_ptr<ChipPlan> pla
 {
     if (not plan->IsModified())
     {
-        auto loadedPlan = serializer.LoadPlan(num);
+        auto loadedPlan = serializer->LoadPlan(num);
         if (loadedPlan)
         {
             auto ref = plan->GetReferer();
@@ -85,9 +87,9 @@ std::shared_ptr<ChipPlan> Model::LoadPlan(int num, std::shared_ptr<ChipPlan> pla
 
 void Model::SavePlan(PlanPos pos)
 {
-    if (not pos.IsLocated()) serializer.SavePlan(pos.GetPlan());
+    if (not pos.IsLocated()) serializer->SavePlan(pos.GetPlan());
 }
 void Model::SavePlanAsNew(PlanPos pos)
 {
-    if (not pos.IsLocated()) serializer.SavePlanAsNew(pos.GetPlan());
+    if (not pos.IsLocated()) serializer->SavePlanAsNew(pos.GetPlan());
 }

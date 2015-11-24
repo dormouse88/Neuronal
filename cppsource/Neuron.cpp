@@ -44,6 +44,7 @@ void NeuronView::Draw(sf::RenderTarget & rt, const Neuron & n)
     rt.draw(thresholdText);
     receivedText.setString( patch::to_string( n.GetReceivedCharge() ) );
     receivedText.setPosition( perceivedPos + RECEIVED_OFFSET );
+    receivedText.setColor( n.IsThresholdMet() ? sf::Color::Red : sf::Color::Black );
     rt.draw(receivedText);
 }
 
@@ -74,8 +75,7 @@ void Neuron::LogicAct()
 
 void Neuron::LogicCalculate()
 {
-    if (receivedCharge >= threshold) SetFiring(true);
-    else SetFiring(false);
+    SetFiring(IsThresholdMet());
     receivedCharge = 0;
 }
 

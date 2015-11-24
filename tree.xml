@@ -1,12 +1,15 @@
 <?xml version="1.0"?>
 <NAMES>
-	<NAME i="12" n="V" />
 	<NAME i="15" n="C" />
 	<NAME i="18" n="S" />
 	<NAME i="19" n="H" />
+	<NAME i="21" n="G" />
+	<NAME i="27" n="GU" />
+	<NAME i="12" n="CyboLatch" />
+	<NAME i="29" n="SN@RFK!77EN" />
 </NAMES>
 <PLANS>
-	<PLAN_DB HIGHEST_ID="19" />
+	<PLAN_DB HIGHEST_ID="29" />
 	<PLAN i="1">
 		<NEUR i="1" x="-2" y="0" thr="1" />
 		<NEUR i="2" x="-2" y="-1" thr="1" />
@@ -206,5 +209,96 @@
 		<JUMP i="9" x="1" y="3" />
 		<NEUR i="12" x="-2" y="1" thr="2" />
 		<NEUR i="13" x="2" y="1" thr="2" />
+	</PLAN>
+	<PLAN i="20">
+		<NEUR i="1" x="-1" y="0" thr="1" />
+		<NEUR i="2" x="1" y="0" thr="1" />
+		<NEUR i="3" x="-2" y="0" thr="1" />
+	</PLAN>
+	<PLAN i="21">
+		<NEUR i="1" x="-1" y="0" thr="2" />
+		<NEUR i="2" x="1" y="0" thr="4" />
+		<NEUR i="3" x="-2" y="0" thr="2" />
+	</PLAN>
+	<PLAN i="22">
+		<NEUR i="1" x="-1" y="0" thr="6" />
+		<NEUR i="2" x="1" y="0" thr="4" />
+		<NEUR i="3" x="-2" y="0" thr="5" />
+		<WIRE f="1" t="2" w="1" fs="0" ts="0" />
+		<WIRE f="2" t="0" w="1" fs="0" ts="1" />
+		<WIRE f="3" t="1" w="1" fs="0" ts="0" />
+		<WIRE f="0" t="3" w="1" fs="1" ts="0" />
+	</PLAN>
+	<PLAN i="23">
+		<HAND i="1" x="-1" y="0" link="22" />
+		<HAND i="2" x="0" y="-1" link="18" />
+		<HAND i="3" x="1" y="0" link="16" />
+		<HAND i="4" x="0" y="1" link="22" />
+	</PLAN>
+	<PLAN i="24">
+		<HAND i="1" x="-1" y="0" link="22" />
+		<HAND i="2" x="0" y="-1" link="18" />
+		<HAND i="3" x="1" y="0" link="16" />
+		<HAND i="4" x="0" y="1" link="22" />
+		<JUMP i="5" x="-1" y="-1" />
+		<JUMP i="6" x="-1" y="1" />
+		<JUMP i="7" x="1" y="1" />
+		<JUMP i="8" x="1" y="-1" />
+	</PLAN>
+	<PLAN i="25">
+		<HAND i="1" x="-1" y="0" link="22" />
+		<HAND i="2" x="0" y="-1" link="18" />
+		<HAND i="3" x="1" y="0" link="16" />
+		<HAND i="4" x="0" y="1" link="22" />
+		<JUMP i="5" x="-1" y="-1" />
+		<JUMP i="6" x="-1" y="1" />
+		<JUMP i="7" x="1" y="1" />
+		<JUMP i="8" x="1" y="-1" />
+		<JUMP i="9" x="-2" y="1" />
+		<JUMP i="10" x="-1" y="2" />
+		<JUMP i="11" x="1" y="2" />
+		<JUMP i="12" x="2" y="1" />
+		<NEUR i="13" x="0" y="-2" thr="1" />
+	</PLAN>
+	<PLAN i="26">
+		<NEUR i="1" x="-1" y="0" thr="-1" />
+		<NEUR i="2" x="1" y="0" thr="4" />
+		<NEUR i="3" x="-2" y="0" thr="0" />
+		<WIRE f="1" t="2" w="1" fs="0" ts="0" />
+		<WIRE f="2" t="0" w="1" fs="0" ts="1" />
+		<WIRE f="3" t="1" w="1" fs="0" ts="0" />
+		<WIRE f="0" t="3" w="1" fs="1" ts="0" />
+	</PLAN>
+	<PLAN i="27" anc="24">
+		<HAND i="1" x="-1" y="0" link="22" />
+		<HAND i="2" x="0" y="-1" link="18" />
+		<HAND i="3" x="1" y="0" link="16" />
+		<HAND i="4" x="0" y="1" link="22" />
+		<JUMP i="5" x="-1" y="-1" />
+		<JUMP i="6" x="-1" y="1" />
+		<JUMP i="7" x="1" y="1" />
+		<JUMP i="8" x="1" y="-1" />
+		<NEUR i="9" x="0" y="0" thr="1" />
+	</PLAN>
+	<PLAN i="28" anc="24">
+		<HAND i="1" x="-1" y="0" link="22" />
+		<HAND i="2" x="0" y="-1" link="18" />
+		<HAND i="3" x="1" y="0" link="16" />
+		<HAND i="4" x="0" y="1" link="22" />
+		<JUMP i="5" x="-2" y="-2" />
+		<JUMP i="6" x="-2" y="2" />
+		<JUMP i="7" x="2" y="2" />
+		<JUMP i="8" x="2" y="-2" />
+	</PLAN>
+	<PLAN i="29" anc="28">
+		<HAND i="1" x="-2" y="0" link="22" />
+		<HAND i="2" x="0" y="-2" link="18" />
+		<HAND i="3" x="2" y="0" link="16" />
+		<HAND i="4" x="0" y="2" link="22" />
+		<JUMP i="5" x="-2" y="-2" />
+		<JUMP i="6" x="-2" y="2" />
+		<JUMP i="7" x="2" y="2" />
+		<JUMP i="8" x="2" y="-2" />
+		<HAND i="9" x="0" y="0" link="1" />
 	</PLAN>
 </PLANS>
