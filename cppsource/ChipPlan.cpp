@@ -8,7 +8,7 @@
 #include "ChipPlan.hpp"
 #include "ChipHandle.hpp"
 #include <cassert>
-#include "Serializer.hpp" //Just to use class Relatives
+#include "UserData.hpp" //fwd dec
 
 ChipPlan::ChipPlan(std::shared_ptr<PlanGrid> g)
     :Wirable(), planID(0), modified(false), padding(2), planGrid(g)
@@ -351,10 +351,10 @@ void ChipPlan::DrawTitle(sf::RenderTarget & rt)
     sf::Text planNumText;
     planNumText.setFont( ViewResources::GetInstance().font );
     std::string textString { patch::to_string(GetPlanID()) };
-    if (nameGetter) textString.append(" -- " + nameGetter(GetPlanID()));
-    if (relativesGetter) {
-        auto rels = relativesGetter(GetPlanID());
-        textString.append(" // " + patch::to_string(rels.parent) + " ");
+    if (userData) {
+        textString.append(" -- " + userData->GetNameByID(GetPlanID()));
+        auto rels = userData->GetRelatives(GetPlanID());
+        if (rels and rels->parent) textString.append(" // " + patch::to_string(rels->parent) + " ");
     }
     if (IsModified()) {
         textString.append("**");

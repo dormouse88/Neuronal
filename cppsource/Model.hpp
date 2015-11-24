@@ -45,13 +45,11 @@ public:
     void SavePlan(PlanPos pos);
     void SavePlanAsNew(PlanPos pos);
 
-
-
-    void AddName(int id, std::string name)      {serializer->AddName(id, name);}
-    void RemoveName(int id)                        {serializer->RemoveName(id);}
+    void AddName(int id, std::string name)                  {userData->AddName(id, name); }
+    void RemoveName(int id)                                 {userData->RemoveName(id);    }
 private:
-    std::shared_ptr<UserData> userData;
     std::shared_ptr<Serializer> serializer;
+    std::shared_ptr<UserData> userData;
     std::shared_ptr<BaseReferer> baseReferer;
 };
 

@@ -17,9 +17,8 @@
 #include "PlanGrid.hpp"
 #include "PlanPos.hpp"
 #include "RefererInterface.hpp"
+class UserData;  //fwd dec
 class ChipHandle;
-
-class Relatives; //kill with fire
 
 const sf::Vector2f GRABBER_SIZE { GRID_SIZE * 0.5f };
 
@@ -87,8 +86,9 @@ public:
 
 private:
     int planID;
-    std::function<std::string(int)> nameGetter;
-    std::function<const Relatives&(int)> relativesGetter;
+//    std::function<std::string(int)> nameGetter;
+//    std::function<const Relatives&(int)> relativesGetter;
+    std::shared_ptr<UserData> userData;
     std::shared_ptr<PlanGrid> planGrid;
     std::weak_ptr<RefererInterface> referer;
     std::vector<std::shared_ptr<Device> > devices;

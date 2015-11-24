@@ -45,10 +45,12 @@ void BaseReferer::SwapIn(std::shared_ptr<ChipPlan> p)
 
 
 Model::Model()
-    :userData(std::make_shared<UserData>())
-    ,serializer(std::make_shared<Serializer>())
+    :serializer(std::make_shared<Serializer>())
+    ,userData(std::make_shared<UserData>(serializer))
     ,baseReferer(std::make_shared<BaseReferer>())
 {
+    serializer->LoadUserData(userData);
+    
     auto basePlan = BlobFactory::MakePlan();
     basePlan->RegisterReferer(baseReferer);
     baseReferer->SetPlan(basePlan);
@@ -74,7 +76,7 @@ std::shared_ptr<ChipPlan> Model::LoadPlan(int num, std::shared_ptr<ChipPlan> pla
 {
     if (not plan->IsModified())
     {
-        auto loadedPlan = serializer->LoadPlan(num);
+        auto loadedPlan = serializer->LoadPlan(num, userData);
         if (loadedPlan)
         {
             auto ref = plan->GetReferer();
@@ -87,9 +89,30 @@ std::shared_ptr<ChipPlan> Model::LoadPlan(int num, std::shared_ptr<ChipPlan> pla
 
 void Model::SavePlan(PlanPos pos)
 {
-    if (not pos.IsLocated()) serializer->SavePlan(pos.GetPlan());
+    if (not pos.IsLocated()) 
+    {
+        auto plan = pos.GetPlan();
+        int oldID = plan->GetPlanID();
+        std::string oldName = userData->GetNameByID( oldID );
+        serializer->SavePlan(plan, userData);
+        userData->AddAncestryEntry(plan->GetPlanID(), oldID);
+        if (not oldName.empty()) {
+            userData->RemoveName(oldID);
+            userData->AddName(plan->GetPlanID(), oldName);
+        }
+        else {
+            userData->AddAutoName(plan->GetPlanID());
+        }
+    }
 }
 void Model::SavePlanAsNew(PlanPos pos)
 {
-    if (not pos.IsLocated()) serializer->SavePlanAsNew(pos.GetPlan());
+    if (not pos.IsLocated()) 
+    {
+        auto plan = pos.GetPlan();
+        int oldID = plan->GetPlanID();
+        serializer->SavePlan(plan, userData);
+        userData->AddAncestryEntry(plan->GetPlanID(), oldID);
+        userData->AddAutoName(plan->GetPlanID());
+    }
 }

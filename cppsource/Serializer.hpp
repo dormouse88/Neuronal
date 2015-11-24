@@ -16,35 +16,31 @@
 #include "Device.hpp"
 #include "Wire.hpp"
 #include "ChipPlan.hpp"
-#include "UserData.hpp"
+class UserData; //fwd dec
 
 class Serializer
 {
 public:
     Serializer();
+    
+    //Model interface...
+    void SavePlan(std::shared_ptr<ChipPlan> plan_p, std::shared_ptr<UserData>);
+    std::shared_ptr<ChipPlan> LoadPlan(int planID, std::shared_ptr<UserData>);
 
-    std::shared_ptr<ChipPlan> LoadPlan(int planID);
-    void SavePlan(std::shared_ptr<ChipPlan> plan);
-    void SavePlanAsNew(std::shared_ptr<ChipPlan> plan);
-
-    int GetIDByName(std::string name);
-    std::string GetNameByID(int planID);
-    void RemoveName(int planID);
-    void AddName(int planID, std::string name);
+    //UserData interface...
+    void LoadUserData(std::shared_ptr<UserData>);
+    void SaveAddAncestryEntry(int id, int anc);
+    void SaveRemoveName(int planID);
+    void SaveAddName(int planID, std::string name);
 
 private:
-    std::string GetUnusedAutoName();
+    void OpenFile(pugi::xml_document & doc, const char * fileName);
     pugi::xml_node GetNameNodeByID(int planID);
     pugi::xml_node GetNameNodeByName(std::string name);
     
-    void OpenFile(pugi::xml_document & doc, const char * fileName);
-
-    void SavePlanParts(std::shared_ptr<ChipPlan> plan_p);
-    std::shared_ptr<ChipPlan> LoadPlanParts(int planID);
-
     pugi::xml_document doc;
-    std::shared_ptr<UserData> userData;
 };
 
 #endif	/* SERIALIZER_HPP */
+
 
