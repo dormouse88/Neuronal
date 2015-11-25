@@ -17,6 +17,90 @@ UserData::UserData(std::shared_ptr<Serializer> s)
     :serializer(s)
 {}
 
+
+int UserData::GetID(int planID, PlanNav nav)
+{
+    int target = planID;
+
+    if (nav == PlanNav::PREV_NAME or nav == PlanNav::NEXT_NAME)  //access the name maps
+    {
+        auto nid_it = namesByID.find(planID);
+        if (namesByID.empty()) //names is empty
+        {
+            target = 0;
+        }
+        else if (nid_it == namesByID.end()) //planID has no name
+        {
+            target = namesByName.begin()->second;
+        }
+        else
+        {
+            auto nn_it = namesByName.find( nid_it->second );
+            assert(nn_it != namesByName.end());
+            if (nav == PlanNav::PREV_NAME and nn_it != namesByName.begin()) --nn_it;
+            if (nav == PlanNav::NEXT_NAME and nn_it != std::prev(namesByName.begin())) ++nn_it;
+            target = nn_it->second;
+        }
+    }
+    else  //access the ancestry maps
+    {
+        auto begin = ancestry.begin();
+        auto end = ancestry.end();
+        auto it = ancestry.find(planID);
+
+        if (begin == end) //ancestry is empty
+        {
+            target = 0;
+        }
+        else if (it == end) //planID was not found in ancestry
+        {
+            //switch on nav
+            if (nav == PlanNav::PREV_ID) target = begin->first;
+            else if (nav == PlanNav::NEXT_ID) target = (--end)->first;
+            else target = begin->first;
+        }
+        else if (nav == PlanNav::PREV_ID)
+        {
+            if (it != begin) --it;
+            target = it->first;
+        }
+        else if (nav == PlanNav::NEXT_ID)
+        {
+            if (it != std::prev(end)) ++it;
+            target = it->first;
+        }
+        else if (nav == PlanNav::PARENT)
+        {
+            if (it->second->parent > 0) target = it->second->parent;
+            else target = it->first;
+        }
+        else if (nav == PlanNav::FIRST_CHILD)
+        {
+            if (not it->second->kids.empty()) target = *( it->second->kids.begin() );
+            else target = it->first;
+        }
+        else if (nav == PlanNav::PREV_SIBLING or nav == PlanNav::NEXT_SIBLING)
+        {
+            auto par_it = ancestry.find(it->second->parent);
+            if (par_it != end)
+            {
+                auto sib_it = par_it->second->kids.find(planID);
+                assert(sib_it != par_it->second->kids.end());
+
+                if (nav == PlanNav::PREV_SIBLING and sib_it != par_it->second->kids.begin()) --sib_it;
+                if (nav == PlanNav::NEXT_SIBLING and sib_it != std::prev(par_it->second->kids.end())) ++sib_it;
+                target = *sib_it ;
+            }
+            else {
+                target = it->first;
+            }
+        }
+        else assert(false);
+    }
+    return target;
+}
+
+
 //Ancestry //Getters
 std::shared_ptr<const Relatives> UserData::GetRelatives(int id) const
 {

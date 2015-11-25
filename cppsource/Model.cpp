@@ -61,27 +61,36 @@ void Model::Logic()
     baseReferer->Logic();
 }
 
-std::shared_ptr<ChipPlan> Model::WipePlan(std::shared_ptr<ChipPlan> plan, bool forced)
+std::shared_ptr<ChipPlan> Model::WipePlan(PlanPos pos, bool forced)
 {
-    if (forced or not plan->IsModified())
+    if (not pos.IsLocated())
     {
-        auto emptyPlan = BlobFactory::MakePlan();
-        auto ref = plan->GetReferer();
-        if (ref) ref->SwapIn(emptyPlan);
-        return emptyPlan;
+        std::shared_ptr<ChipPlan> plan = pos.GetPlan();
+        if (forced or not plan->IsModified())
+        {
+            auto emptyPlan = BlobFactory::MakePlan();
+            auto ref = plan->GetReferer();
+            if (ref) ref->SwapIn(emptyPlan);
+            return emptyPlan;
+        }
     }
     return nullptr;
 }
-std::shared_ptr<ChipPlan> Model::LoadPlan(int num, std::shared_ptr<ChipPlan> plan)
+std::shared_ptr<ChipPlan> Model::LoadPlan(PlanPos pos, PlanNav nav)
 {
-    if (not plan->IsModified())
+    if (not pos.IsLocated())
     {
-        auto loadedPlan = serializer->LoadPlan(num, userData);
-        if (loadedPlan)
+        std::shared_ptr<ChipPlan> plan = pos.GetPlan();
+        if (not plan->IsModified())
         {
-            auto ref = plan->GetReferer();
-            if (ref) ref->SwapIn(loadedPlan);
-            return loadedPlan;
+            int num = userData->GetID(plan->GetPlanID(), nav);
+            auto loadedPlan = serializer->LoadPlan(num, userData);
+            if (loadedPlan)
+            {
+                auto ref = plan->GetReferer();
+                if (ref) ref->SwapIn(loadedPlan);
+                return loadedPlan;
+            }
         }
     }
     return nullptr;

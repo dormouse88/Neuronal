@@ -40,8 +40,8 @@ public:
     //void SetBasePlan(std::shared_ptr<ChipPlan> newPlan)         {baseReferer->basePlan = newPlan;}
     const std::shared_ptr<ChipPlan> GetBasePlan() const                     {return baseReferer->basePlan;}
 
-    std::shared_ptr<ChipPlan> WipePlan(std::shared_ptr<ChipPlan> plan, bool forced);
-    std::shared_ptr<ChipPlan> LoadPlan(int num, std::shared_ptr<ChipPlan> plan);
+    std::shared_ptr<ChipPlan> WipePlan(PlanPos, bool forced);
+    std::shared_ptr<ChipPlan> LoadPlan(PlanPos, PlanNav nav);
     void SavePlan(PlanPos pos);
     void SavePlanAsNew(PlanPos pos);
 

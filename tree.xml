@@ -3,8 +3,10 @@
 	<NAME i="2" n="E" />
 	<NAME i="3" n="Q" />
 	<NAME i="4" n="A" />
-	<NAME i="5" n="SN@RFK!77EN" />
 	<NAME i="6" n="CyboLatch" />
+	<NAME i="10" n="SN@RFK!77EN" />
+	<NAME i="11" n="R" />
+	<NAME i="12" n="O" />
 </NAMES>
 <RELATIVES>
 	<REL i="1" anc="0" />
@@ -13,9 +15,15 @@
 	<REL i="4" anc="1" />
 	<REL i="5" anc="0" />
 	<REL i="6" anc="5" />
+	<REL i="7" anc="5" />
+	<REL i="8" anc="7" />
+	<REL i="9" anc="4" />
+	<REL i="10" anc="8" />
+	<REL i="11" anc="9" />
+	<REL i="12" anc="10" />
 </RELATIVES>
 <PLANS>
-	<PLAN_DB HIGHEST_ID="6" />
+	<PLAN_DB HIGHEST_ID="12" />
 	<PLAN i="1">
 		<NEUR i="1" x="0" y="-1" thr="1" />
 		<NEUR i="2" x="0" y="0" thr="1" />
@@ -118,5 +126,172 @@
 		<NEUR i="4" x="2" y="4" thr="1" />
 		<NEUR i="5" x="3" y="3" thr="1" />
 		<NEUR i="1" x="1" y="3" thr="1" />
+	</PLAN>
+	<PLAN i="7">
+		<NEUR i="1" x="-1" y="0" thr="1" />
+		<NEUR i="2" x="-1" y="1" thr="1" />
+		<NEUR i="3" x="-1" y="2" thr="1" />
+		<NEUR i="4" x="-1" y="3" thr="1" />
+		<NEUR i="5" x="-1" y="4" thr="1" />
+		<NEUR i="6" x="0" y="0" thr="1" />
+		<NEUR i="7" x="1" y="0" thr="1" />
+		<NEUR i="8" x="2" y="0" thr="1" />
+		<NEUR i="9" x="3" y="0" thr="1" />
+		<NEUR i="10" x="4" y="0" thr="1" />
+		<NEUR i="11" x="0" y="3" thr="1" />
+		<NEUR i="12" x="1" y="2" thr="1" />
+		<NEUR i="13" x="3" y="2" thr="1" />
+		<NEUR i="14" x="4" y="3" thr="1" />
+		<NEUR i="15" x="5" y="0" thr="1" />
+		<NEUR i="16" x="5" y="1" thr="1" />
+		<NEUR i="17" x="5" y="2" thr="1" />
+		<NEUR i="18" x="5" y="3" thr="1" />
+		<NEUR i="19" x="5" y="4" thr="1" />
+		<NEUR i="20" x="5" y="5" thr="1" />
+		<NEUR i="21" x="5" y="7" thr="1" />
+		<NEUR i="22" x="5" y="6" thr="1" />
+		<NEUR i="23" x="-1" y="5" thr="1" />
+		<NEUR i="24" x="-1" y="6" thr="1" />
+		<NEUR i="25" x="-1" y="7" thr="1" />
+		<NEUR i="26" x="0" y="7" thr="1" />
+		<NEUR i="27" x="1" y="7" thr="1" />
+		<NEUR i="28" x="2" y="7" thr="1" />
+		<NEUR i="29" x="3" y="7" thr="1" />
+		<NEUR i="30" x="4" y="7" thr="1" />
+		<JUMP i="31" x="2" y="4" />
+		<JUMP i="32" x="1" y="4" />
+		<JUMP i="33" x="3" y="4" />
+		<JUMP i="34" x="2" y="5" />
+		<JUMP i="35" x="2" y="3" />
+	</PLAN>
+	<PLAN i="8">
+		<NEUR i="1" x="-1" y="0" thr="1" />
+		<NEUR i="2" x="-1" y="1" thr="1" />
+		<NEUR i="3" x="-1" y="2" thr="1" />
+		<NEUR i="4" x="-1" y="3" thr="1" />
+		<NEUR i="5" x="-1" y="4" thr="1" />
+		<NEUR i="6" x="0" y="0" thr="1" />
+		<NEUR i="7" x="1" y="0" thr="1" />
+		<NEUR i="8" x="2" y="0" thr="1" />
+		<NEUR i="9" x="3" y="0" thr="1" />
+		<NEUR i="10" x="4" y="0" thr="1" />
+		<NEUR i="11" x="0" y="3" thr="1" />
+		<NEUR i="12" x="1" y="2" thr="1" />
+		<NEUR i="13" x="3" y="2" thr="1" />
+		<NEUR i="14" x="4" y="3" thr="1" />
+		<NEUR i="15" x="5" y="0" thr="1" />
+		<NEUR i="16" x="5" y="1" thr="1" />
+		<NEUR i="17" x="5" y="2" thr="1" />
+		<NEUR i="18" x="5" y="3" thr="1" />
+		<NEUR i="19" x="5" y="4" thr="1" />
+		<NEUR i="20" x="5" y="5" thr="1" />
+		<NEUR i="21" x="5" y="7" thr="1" />
+		<NEUR i="22" x="5" y="6" thr="1" />
+		<NEUR i="23" x="-1" y="5" thr="1" />
+		<NEUR i="24" x="-1" y="6" thr="1" />
+		<NEUR i="25" x="-1" y="7" thr="1" />
+		<NEUR i="26" x="0" y="7" thr="1" />
+		<NEUR i="27" x="1" y="7" thr="1" />
+		<NEUR i="28" x="2" y="7" thr="1" />
+		<NEUR i="29" x="3" y="7" thr="1" />
+		<NEUR i="30" x="4" y="7" thr="1" />
+		<JUMP i="31" x="2" y="4" />
+		<JUMP i="32" x="1" y="4" />
+		<JUMP i="33" x="3" y="4" />
+		<JUMP i="34" x="2" y="5" />
+		<JUMP i="35" x="2" y="3" />
+		<HAND i="36" x="3" y="5" link="4" />
+	</PLAN>
+	<PLAN i="9">
+		<NEUR i="1" x="-2" y="0" thr="1" />
+		<NEUR i="2" x="0" y="0" thr="1" />
+		<NEUR i="3" x="1" y="0" thr="1" />
+		<NEUR i="4" x="2" y="0" thr="1" />
+		<NEUR i="6" x="-1" y="0" thr="1" />
+		<HAND i="5" x="-2" y="-1" link="6" />
+	</PLAN>
+	<PLAN i="10">
+		<HAND i="36" x="3" y="5" link="9" />
+		<NEUR i="1" x="-1" y="0" thr="1" />
+		<NEUR i="2" x="-1" y="1" thr="1" />
+		<NEUR i="3" x="-1" y="2" thr="1" />
+		<NEUR i="4" x="-1" y="3" thr="1" />
+		<NEUR i="5" x="-1" y="4" thr="1" />
+		<NEUR i="6" x="0" y="0" thr="1" />
+		<NEUR i="7" x="1" y="0" thr="1" />
+		<NEUR i="8" x="2" y="0" thr="1" />
+		<NEUR i="9" x="3" y="0" thr="1" />
+		<NEUR i="10" x="4" y="0" thr="1" />
+		<NEUR i="11" x="0" y="3" thr="1" />
+		<NEUR i="12" x="1" y="2" thr="1" />
+		<NEUR i="13" x="3" y="2" thr="1" />
+		<NEUR i="14" x="4" y="3" thr="1" />
+		<NEUR i="15" x="5" y="0" thr="1" />
+		<NEUR i="16" x="5" y="1" thr="1" />
+		<NEUR i="17" x="5" y="2" thr="1" />
+		<NEUR i="18" x="5" y="3" thr="1" />
+		<NEUR i="19" x="5" y="4" thr="1" />
+		<NEUR i="20" x="5" y="5" thr="1" />
+		<NEUR i="21" x="5" y="7" thr="1" />
+		<NEUR i="22" x="5" y="6" thr="1" />
+		<NEUR i="23" x="-1" y="5" thr="1" />
+		<NEUR i="24" x="-1" y="6" thr="1" />
+		<NEUR i="25" x="-1" y="7" thr="1" />
+		<NEUR i="26" x="0" y="7" thr="1" />
+		<NEUR i="27" x="1" y="7" thr="1" />
+		<NEUR i="28" x="2" y="7" thr="1" />
+		<NEUR i="29" x="3" y="7" thr="1" />
+		<NEUR i="30" x="4" y="7" thr="1" />
+		<JUMP i="31" x="2" y="4" />
+		<JUMP i="32" x="1" y="4" />
+		<JUMP i="33" x="3" y="4" />
+		<JUMP i="34" x="2" y="5" />
+		<JUMP i="35" x="2" y="3" />
+	</PLAN>
+	<PLAN i="11">
+		<HAND i="5" x="-2" y="-1" link="5" />
+		<NEUR i="1" x="-2" y="0" thr="1" />
+		<NEUR i="2" x="0" y="0" thr="1" />
+		<NEUR i="3" x="1" y="0" thr="1" />
+		<NEUR i="4" x="2" y="0" thr="1" />
+		<NEUR i="6" x="-1" y="0" thr="1" />
+	</PLAN>
+	<PLAN i="12">
+		<HAND i="36" x="3" y="5" link="11" />
+		<NEUR i="1" x="-1" y="0" thr="1" />
+		<NEUR i="2" x="-1" y="1" thr="1" />
+		<NEUR i="3" x="-1" y="2" thr="1" />
+		<NEUR i="4" x="-1" y="3" thr="1" />
+		<NEUR i="5" x="-1" y="4" thr="1" />
+		<NEUR i="6" x="0" y="0" thr="1" />
+		<NEUR i="7" x="1" y="0" thr="1" />
+		<NEUR i="8" x="2" y="0" thr="1" />
+		<NEUR i="9" x="3" y="0" thr="1" />
+		<NEUR i="10" x="4" y="0" thr="1" />
+		<NEUR i="11" x="0" y="3" thr="1" />
+		<NEUR i="12" x="1" y="2" thr="1" />
+		<NEUR i="13" x="3" y="2" thr="1" />
+		<NEUR i="14" x="4" y="3" thr="1" />
+		<NEUR i="15" x="5" y="0" thr="1" />
+		<NEUR i="16" x="5" y="1" thr="1" />
+		<NEUR i="17" x="5" y="2" thr="1" />
+		<NEUR i="18" x="5" y="3" thr="1" />
+		<NEUR i="19" x="5" y="4" thr="1" />
+		<NEUR i="20" x="5" y="5" thr="1" />
+		<NEUR i="21" x="5" y="7" thr="1" />
+		<NEUR i="22" x="5" y="6" thr="1" />
+		<NEUR i="23" x="-1" y="5" thr="1" />
+		<NEUR i="24" x="-1" y="6" thr="1" />
+		<NEUR i="25" x="-1" y="7" thr="1" />
+		<NEUR i="26" x="0" y="7" thr="1" />
+		<NEUR i="27" x="1" y="7" thr="1" />
+		<NEUR i="28" x="2" y="7" thr="1" />
+		<NEUR i="29" x="3" y="7" thr="1" />
+		<NEUR i="30" x="4" y="7" thr="1" />
+		<JUMP i="31" x="2" y="4" />
+		<JUMP i="32" x="1" y="4" />
+		<JUMP i="33" x="3" y="4" />
+		<JUMP i="34" x="2" y="5" />
+		<JUMP i="35" x="2" y="3" />
 	</PLAN>
 </PLANS>

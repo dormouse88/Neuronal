@@ -21,6 +21,8 @@ public:
     bool HandleInput();
 
 private:
+    void CursorsGoHere(std::shared_ptr<ChipPlan>);
+
     Model & theModel;
     View & theView;
 

@@ -13,6 +13,10 @@
 #include <memory>
 #include "Serializer.hpp"
 
+enum class PlanNav { PARENT, FIRST_CHILD, PREV_SIBLING, NEXT_SIBLING, PREV_ID, NEXT_ID, PREV_NAME, NEXT_NAME };
+//enum class IDNav { PREV_ID, NEXT_ID };
+//enum class NameNav { PREV_NAME, NEXT_NAME };
+
 struct Relatives
 {
     Relatives() :parent(0) {}
@@ -25,6 +29,8 @@ class UserData
 public:
     UserData(std::shared_ptr<Serializer>);
 
+    int GetID(int planID, PlanNav nav);
+    
 //ancestry
     std::shared_ptr<const Relatives> GetRelatives(int id) const;
     //setters

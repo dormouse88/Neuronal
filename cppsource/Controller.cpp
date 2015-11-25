@@ -11,6 +11,13 @@ Controller::Controller(Model & model_p, View & view_p)
     :theModel(model_p), theView(view_p), mouseCursorSet(false)
 {}
 
+void Controller::CursorsGoHere(std::shared_ptr<ChipPlan> p)
+{
+    if (p) {
+        theView.cursorOne.SetGridOnly( p->GetGrid() );
+        theView.cursorTwo.SetGridOnly( p->GetGrid() );
+    }
+}
 
 bool Controller::HandleInput()
 {
@@ -117,28 +124,50 @@ bool Controller::HandleInput()
             }
             if (event.key.code == sf::Keyboard::W)
             {
-                auto wp = theModel.WipePlan(pos1.GetPlan(), event.key.shift and event.key.control);
-                if (wp) {
-                    theView.cursorOne.SetGridOnly( wp->GetGrid() );
-                    theView.cursorTwo.SetGridOnly( wp->GetGrid() );
-                }
+                auto p = theModel.WipePlan(pos1, event.key.shift and event.key.control);
+                CursorsGoHere(p);
             }
-            if (event.key.code == sf::Keyboard::Dash)
+            if (event.key.code == sf::Keyboard::Numpad1)
             {
-                auto lp = theModel.LoadPlan(pos1.GetPlan()->GetPlanID() - 1, pos1.GetPlan());
-                if (lp) {
-                    theView.cursorOne.SetGridOnly( lp->GetGrid() );
-                    theView.cursorTwo.SetGridOnly( lp->GetGrid() );
-                }
+                auto p = theModel.LoadPlan(pos1, PlanNav::PREV_ID);
+                CursorsGoHere(p);
             }
-            if (event.key.code == sf::Keyboard::Equal)
+            if (event.key.code == sf::Keyboard::Numpad3)
             {
-                auto lp = theModel.LoadPlan(pos1.GetPlan()->GetPlanID() + 1, pos1.GetPlan());
-                if (lp) {
-                    theView.cursorOne.SetGridOnly( lp->GetGrid() );
-                    theView.cursorTwo.SetGridOnly( lp->GetGrid() );
-                }
+                auto p = theModel.LoadPlan(pos1, PlanNav::NEXT_ID);
+                CursorsGoHere(p);
             }
+            if (event.key.code == sf::Keyboard::Numpad7)
+            {
+                auto p = theModel.LoadPlan(pos1, PlanNav::PREV_NAME);
+                CursorsGoHere(p);
+            }
+            if (event.key.code == sf::Keyboard::Numpad9)
+            {
+                auto p = theModel.LoadPlan(pos1, PlanNav::NEXT_NAME);
+                CursorsGoHere(p);
+            }
+            if (event.key.code == sf::Keyboard::Numpad8)
+            {
+                auto p = theModel.LoadPlan(pos1, PlanNav::PARENT);
+                CursorsGoHere(p);
+            }
+            if (event.key.code == sf::Keyboard::Numpad2)
+            {
+                auto p = theModel.LoadPlan(pos1, PlanNav::FIRST_CHILD);
+                CursorsGoHere(p);
+            }
+            if (event.key.code == sf::Keyboard::Numpad4)
+            {
+                auto p = theModel.LoadPlan(pos1, PlanNav::PREV_SIBLING);
+                CursorsGoHere(p);
+            }
+            if (event.key.code == sf::Keyboard::Numpad6)
+            {
+                auto p = theModel.LoadPlan(pos1, PlanNav::NEXT_SIBLING);
+                CursorsGoHere(p);
+            }
+            
             if (event.key.code == sf::Keyboard::LBracket)
             {
                 theView.cursorOne.Dislocate();
@@ -151,7 +180,7 @@ bool Controller::HandleInput()
             {
                 theModel.Logic();
             }
-
+            
             if (event.key.code == sf::Keyboard::R)
             {
                 theModel.AddName(pos1.GetPlan()->GetPlanID(), "CyboLatch");
