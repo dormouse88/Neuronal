@@ -434,13 +434,19 @@ std::shared_ptr<Wirable> ChipPlanFunc::GetWirable(PlanPos pos)
 }
 std::shared_ptr<Wire> ChipPlanFunc::GetWire(PlanPos pos1, PlanPos pos2)
 {
-    if (pos1.GetGrid() == pos2.GetGrid())
+    if (MatchOnPlan(pos1, pos2))  //(pos1.GetGrid() == pos2.GetGrid())
     {
         auto w1 = GetWirable(pos1);
         auto w2 = GetWirable(pos2);
         if (w1 and w2) return pos1.GetPlan()->GetWire(*w1, *w2);
     }
     return nullptr;
+}
+std::vector<std::shared_ptr<Wire> > ChipPlanFunc::GetWires(PlanPos pos, bool from, bool to)
+{
+    auto w1 = GetWirable(pos);
+    if (w1) return pos.GetPlan()->GetWires(w1, from, to);
+    return std::vector<std::shared_ptr<Wire> >();
 }
 
 bool ChipPlanFunc::IsPositionFree(PlanPos pos)
@@ -474,7 +480,7 @@ void ChipPlanFunc::DeviceHandle(PlanPos pos, int code)
 }
 void ChipPlanFunc::WireHandle(PlanPos pos1, PlanPos pos2, int code)
 {
-    if (MatchOnPlan(pos1, pos2))
+    if (true)//(MatchOnPlan(pos1, pos2))
     {
         auto w = GetWire(pos1, pos2);
         if (w) w->Handle(code);

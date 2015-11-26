@@ -10,7 +10,6 @@
 
 #include "Model.hpp"
 #include "View.hpp"
-//#include "BlobFactory.hpp"
 
 class Controller
 {
@@ -28,6 +27,10 @@ private:
 
     sf::Vector2f mouseCursorWorldPos;
     bool mouseCursorSet;
+    bool enteringName;
+    bool enteringFilter;
+    std::string enteringText;
+    sf::Clock textEntryCooldown;
 };
 
 #endif	/* CONTROLLER_HPP */

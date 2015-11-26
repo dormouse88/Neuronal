@@ -63,7 +63,7 @@ public:
     std::shared_ptr<Device> GetDevice(VectorSmart pos);
     std::shared_ptr<Device> GetDevice(int serial);
     std::shared_ptr<Wire> GetWire(const Wirable& from, const Wirable& to);
-    std::vector<std::shared_ptr<Wire> > GetWires(std::shared_ptr<Wirable> device, bool from, bool to); 
+    std::vector<std::shared_ptr<Wire> > GetWires(std::shared_ptr<Wirable>, bool from, bool to); 
 
     virtual VectorWorld GetWireAttachPos(WireAttachSide was) const override;
     
@@ -86,9 +86,7 @@ public:
 
 private:
     int planID;
-//    std::function<std::string(int)> nameGetter;
-//    std::function<const Relatives&(int)> relativesGetter;
-    std::shared_ptr<UserData> userData;
+    std::shared_ptr<const UserData> userData;
     std::shared_ptr<PlanGrid> planGrid;
     std::weak_ptr<RefererInterface> referer;
     std::vector<std::shared_ptr<Device> > devices;
@@ -105,6 +103,7 @@ namespace ChipPlanFunc
     std::shared_ptr<Device> GetDevice(PlanPos pos);
     std::shared_ptr<Wirable> GetWirable(PlanPos pos);
     std::shared_ptr<Wire> GetWire(PlanPos pos1, PlanPos pos2);
+    std::vector<std::shared_ptr<Wire> > GetWires(PlanPos pos, bool from, bool to);
     bool IsPositionFree(PlanPos pos);
     void SetPosition(PlanPos dPos, PlanPos toPos);
 

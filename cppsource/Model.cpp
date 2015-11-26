@@ -98,30 +98,34 @@ std::shared_ptr<ChipPlan> Model::LoadPlan(PlanPos pos, PlanNav nav)
 
 void Model::SavePlan(PlanPos pos)
 {
-    if (not pos.IsLocated()) 
+    auto plan = pos.GetPlan();
+    if (not pos.IsLocated() and plan->IsModified())
     {
-        auto plan = pos.GetPlan();
         int oldID = plan->GetPlanID();
         std::string oldName = userData->GetNameByID( oldID );
-        serializer->SavePlan(plan, userData);
-        userData->AddAncestryEntry(plan->GetPlanID(), oldID);
-        if (not oldName.empty()) {
-            userData->RemoveName(oldID);
-            userData->AddName(plan->GetPlanID(), oldName);
-        }
-        else {
-            userData->AddAutoName(plan->GetPlanID());
+        if ( serializer->SavePlan(plan, userData) )
+        {
+            userData->AddAncestryEntry(plan->GetPlanID(), oldID);
+            if (not oldName.empty()) {
+                userData->RemoveName(oldID);
+                userData->AddName(plan->GetPlanID(), oldName);
+            }
+            else {
+                userData->AddAutoName(plan->GetPlanID());
+            }
         }
     }
 }
 void Model::SavePlanAsNew(PlanPos pos)
 {
-    if (not pos.IsLocated()) 
+    auto plan = pos.GetPlan();
+    if (not pos.IsLocated() and plan->IsModified())
     {
-        auto plan = pos.GetPlan();
         int oldID = plan->GetPlanID();
-        serializer->SavePlan(plan, userData);
-        userData->AddAncestryEntry(plan->GetPlanID(), oldID);
-        userData->AddAutoName(plan->GetPlanID());
+        if ( serializer->SavePlan(plan, userData) )
+        {
+            userData->AddAncestryEntry(plan->GetPlanID(), oldID);
+            userData->AddAutoName(plan->GetPlanID());
+        }
     }
 }

@@ -18,17 +18,3 @@ const ViewResources & ViewResources::GetInstance()
     static ViewResources * instance = new ViewResources();
     return *instance;
 }
-
-
-
-//Helper Functions
-//RED
-//sf::Vector2i mapCoordsToGrid(const sf::Vector2f & point)
-//{
-//    return sf::Vector2i{ static_cast<int>(floorf(point.x / GRID_SIZE.x)), static_cast<int>(floorf(point.y / GRID_SIZE.y)) };
-//}
-//
-//sf::Vector2f mapGridToCoords(const sf::Vector2i & point)
-//{
-//    return sf::Vector2f{point.x * GRID_SIZE.x, point.y * GRID_SIZE.y};
-//}

@@ -6,9 +6,10 @@
  */
 
 #include "Controller.hpp"
+#include <cassert>
 
 Controller::Controller(Model & model_p, View & view_p)
-    :theModel(model_p), theView(view_p), mouseCursorSet(false)
+    :theModel(model_p), theView(view_p), mouseCursorSet(false), enteringName(false), enteringFilter(false)
 {}
 
 void Controller::CursorsGoHere(std::shared_ptr<ChipPlan> p)
@@ -16,6 +17,10 @@ void Controller::CursorsGoHere(std::shared_ptr<ChipPlan> p)
     if (p) {
         theView.cursorOne.SetGridOnly( p->GetGrid() );
         theView.cursorTwo.SetGridOnly( p->GetGrid() );
+        
+        auto b = p->GetWorldPaddedBound();
+        theView.CentreOn( {b.left + b.width*0.5f, b.top + b.height} );
+        theView.Clamp();
     }
 }
 
@@ -65,148 +70,209 @@ bool Controller::HandleInput()
             }
             theView.Zoom( 1.f + (-0.4f * event.mouseWheel.delta) );
         }
-        
-        //Keyboard Events
-        if (event.type == sf::Event::KeyPressed)
+
+        if (enteringName or enteringFilter)
         {
-            if (event.key.code == sf::Keyboard::N)
+            if (event.type == sf::Event::KeyPressed)
             {
-                if (event.key.shift == false) {
-                    BlobFactory::AddNeuron(pos1);
+                if (event.key.code == sf::Keyboard::BackSpace)
+                {
+                    if (enteringText.length() > 0) enteringText.erase(enteringText.length()-1);
                 }
-                else {
-                    BlobFactory::RemoveDevice(pos1);
-                }
-            }
-            if (event.key.code == sf::Keyboard::J)
-            {
-                BlobFactory::AddJumper(pos1);
-            }
-            if (event.key.code == sf::Keyboard::H)
-            {
-                BlobFactory::AddHandle(pos1);
-            }
-            if (event.key.code == sf::Keyboard::B)
-            {
-                if (event.key.shift == false) {
-                    BlobFactory::AddWire(pos1, pos2);
-                }
-                else {
-                    BlobFactory::RemoveWire(pos1, pos2);
+                if (event.key.code == sf::Keyboard::Return or event.key.code == sf::Keyboard::Escape)
+                {
+                    if (event.key.code == sf::Keyboard::Return)
+                    {
+                        if (enteringName) {
+                            theModel.AddName(pos1.GetPlan()->GetPlanID(), enteringText);
+                        }
+                        if (enteringFilter) {
+                            auto p = theModel.SetNameFilter(pos1, enteringText);
+                            CursorsGoHere(p);
+                        }
+                    }
+                    enteringName = false;
+                    enteringFilter = false;
+                    enteringText.clear();
                 }
             }
-            if (event.key.code == sf::Keyboard::A) {
-                ChipPlanFunc::DeviceHandle(pos1, 1);
-            }
-            if (event.key.code == sf::Keyboard::Z) {
-                ChipPlanFunc::DeviceHandle(pos1, 2);
-            }
-            if (event.key.code == sf::Keyboard::D) {
-                ChipPlanFunc::WireHandle(pos1, pos2, 1);
-            }
-            if (event.key.code == sf::Keyboard::C) {
-                ChipPlanFunc::WireHandle(pos1, pos2, 2);
-            }
-            if (event.key.code == sf::Keyboard::F) {
-                ChipPlanFunc::WireHandle(pos1, pos2, 3);
-            }
-            if (event.key.code == sf::Keyboard::V) {
-                ChipPlanFunc::WireHandle(pos1, pos2, 4);
-            }
-            if (event.key.code == sf::Keyboard::M)
+            if (event.type == sf::Event::TextEntered and textEntryCooldown.getElapsedTime() > sf::milliseconds(200) )
             {
-                ChipPlanFunc::SetPosition(pos1, pos2);
-            }
-            if (event.key.code == sf::Keyboard::Q)
-            {
-                if (event.key.shift) theModel.SavePlanAsNew( pos1 );
-                else theModel.SavePlan( pos1 );
-            }
-            if (event.key.code == sf::Keyboard::W)
-            {
-                auto p = theModel.WipePlan(pos1, event.key.shift and event.key.control);
-                CursorsGoHere(p);
-            }
-            if (event.key.code == sf::Keyboard::Numpad1)
-            {
-                auto p = theModel.LoadPlan(pos1, PlanNav::PREV_ID);
-                CursorsGoHere(p);
-            }
-            if (event.key.code == sf::Keyboard::Numpad3)
-            {
-                auto p = theModel.LoadPlan(pos1, PlanNav::NEXT_ID);
-                CursorsGoHere(p);
-            }
-            if (event.key.code == sf::Keyboard::Numpad7)
-            {
-                auto p = theModel.LoadPlan(pos1, PlanNav::PREV_NAME);
-                CursorsGoHere(p);
-            }
-            if (event.key.code == sf::Keyboard::Numpad9)
-            {
-                auto p = theModel.LoadPlan(pos1, PlanNav::NEXT_NAME);
-                CursorsGoHere(p);
-            }
-            if (event.key.code == sf::Keyboard::Numpad8)
-            {
-                auto p = theModel.LoadPlan(pos1, PlanNav::PARENT);
-                CursorsGoHere(p);
-            }
-            if (event.key.code == sf::Keyboard::Numpad2)
-            {
-                auto p = theModel.LoadPlan(pos1, PlanNav::FIRST_CHILD);
-                CursorsGoHere(p);
-            }
-            if (event.key.code == sf::Keyboard::Numpad4)
-            {
-                auto p = theModel.LoadPlan(pos1, PlanNav::PREV_SIBLING);
-                CursorsGoHere(p);
-            }
-            if (event.key.code == sf::Keyboard::Numpad6)
-            {
-                auto p = theModel.LoadPlan(pos1, PlanNav::NEXT_SIBLING);
-                CursorsGoHere(p);
-            }
-            
-            if (event.key.code == sf::Keyboard::LBracket)
-            {
-                theView.cursorOne.Dislocate();
-            }
-            if (event.key.code == sf::Keyboard::RBracket)
-            {
-                theView.cursorTwo.Dislocate();
-            }
-            if (event.key.code == sf::Keyboard::Space)
-            {
-                theModel.Logic();
-            }
-            
-            if (event.key.code == sf::Keyboard::R)
-            {
-                theModel.AddName(pos1.GetPlan()->GetPlanID(), "CyboLatch");
-            }
-            if (event.key.code == sf::Keyboard::T)
-            {
-                theModel.AddName(pos1.GetPlan()->GetPlanID(), "SN@RFK!77EN");
-            }
-            if (event.key.code == sf::Keyboard::Y)
-            {
-                theModel.RemoveName(pos1.GetPlan()->GetPlanID());
-            }
-            
-            if (event.key.code == sf::Keyboard::Num1)
-            {
-                theView.SetHighlightingMode(1);
-            }
-            if (event.key.code == sf::Keyboard::Num2)
-            {
-                theView.SetHighlightingMode(2);
-            }
-            if (event.key.code == sf::Keyboard::Num3)
-            {
-                theView.SetHighlightingMode(3);
+                sf::Uint32 ch = event.text.unicode;
+                if (ch >= 0x61 and ch <= 0x7A) {  //convert lowercase to capitals
+                    ch -= 0x20;
+                }
+                if (    (ch >= 0x30 and ch <= 0x39) or  //numbers
+                        (ch >= 0x41 and ch <= 0x5A) or  //capitals
+                        (ch == 0x23)    )  //#
+                {
+                    enteringText.append( sf::String{ch} );
+                }
             }
         }
+        else  //free keyboard response...
+        {
+            //Keyboard Events
+            if (event.type == sf::Event::KeyPressed)
+            {
+                if (event.key.code == sf::Keyboard::N)
+                {
+                    if (event.key.shift == false) {
+                        BlobFactory::AddNeuron(pos1);
+                    }
+                    else {
+                        BlobFactory::RemoveDevice(pos1);
+                    }
+                }
+                if (event.key.code == sf::Keyboard::J)
+                {
+                    BlobFactory::AddJumper(pos1);
+                }
+                if (event.key.code == sf::Keyboard::H)
+                {
+                    BlobFactory::AddHandle(pos1);
+                }
+                if (event.key.code == sf::Keyboard::B)
+                {
+                    if (event.key.shift == false) {
+                        BlobFactory::AddWire(pos1, pos2);
+                    }
+                    else {
+                        BlobFactory::RemoveWire(pos1, pos2);
+                    }
+                }
+                if (event.key.code == sf::Keyboard::A) {
+                    ChipPlanFunc::DeviceHandle(pos1, 1);
+                }
+                if (event.key.code == sf::Keyboard::Z) {
+                    ChipPlanFunc::DeviceHandle(pos1, 2);
+                }
+                if (event.key.code == sf::Keyboard::D) {
+                    ChipPlanFunc::WireHandle(pos1, pos2, 1);
+                }
+                if (event.key.code == sf::Keyboard::C) {
+                    ChipPlanFunc::WireHandle(pos1, pos2, 2);
+                }
+                if (event.key.code == sf::Keyboard::F) {
+                    ChipPlanFunc::WireHandle(pos1, pos2, 3);
+                }
+                if (event.key.code == sf::Keyboard::V) {
+                    ChipPlanFunc::WireHandle(pos1, pos2, 4);
+                }
+                if (event.key.code == sf::Keyboard::M)
+                {
+                    ChipPlanFunc::SetPosition(pos1, pos2);
+                }
+                if (event.key.code == sf::Keyboard::Q)
+                {
+                    if (event.key.shift) theModel.SavePlanAsNew( pos1 );
+                    else theModel.SavePlan( pos1 );
+                }
+                if (event.key.code == sf::Keyboard::W)
+                {
+                    auto p = theModel.WipePlan(pos1, event.key.shift and event.key.control);
+                    CursorsGoHere(p);
+                }
+                
+                if (event.key.code == sf::Keyboard::Numpad1)
+                {
+                    auto p = theModel.LoadPlan(pos1, PlanNav::PREV_ID);
+                    CursorsGoHere(p);
+                }
+                if (event.key.code == sf::Keyboard::Numpad3)
+                {
+                    auto p = theModel.LoadPlan(pos1, PlanNav::NEXT_ID);
+                    CursorsGoHere(p);
+                }
+                if (event.key.code == sf::Keyboard::Numpad7)
+                {
+                    auto p = theModel.LoadPlan(pos1, PlanNav::PREV_NAME);
+                    CursorsGoHere(p);
+                }
+                if (event.key.code == sf::Keyboard::Numpad9)
+                {
+                    auto p = theModel.LoadPlan(pos1, PlanNav::NEXT_NAME);
+                    CursorsGoHere(p);
+                }
+                if (event.key.code == sf::Keyboard::Numpad8)
+                {
+                    auto p = theModel.LoadPlan(pos1, PlanNav::PARENT);
+                    CursorsGoHere(p);
+                }
+                if (event.key.code == sf::Keyboard::Numpad2)
+                {
+                    auto p = theModel.LoadPlan(pos1, PlanNav::FIRST_CHILD);
+                    CursorsGoHere(p);
+                }
+                if (event.key.code == sf::Keyboard::Numpad4)
+                {
+                    auto p = theModel.LoadPlan(pos1, PlanNav::PREV_SIBLING);
+                    CursorsGoHere(p);
+                }
+                if (event.key.code == sf::Keyboard::Numpad6)
+                {
+                    auto p = theModel.LoadPlan(pos1, PlanNav::NEXT_SIBLING);
+                    CursorsGoHere(p);
+                }
+                if (event.key.code == sf::Keyboard::Subtract)
+                {
+//                    theModel.ToggleNameFiltering(true);
+                }
+                if (event.key.code == sf::Keyboard::Add)
+                {
+                    assert(not enteringName);
+                    assert(not enteringFilter);
+                    enteringFilter = true;
+                    textEntryCooldown.restart();
+                }
+
+                if (event.key.code == sf::Keyboard::LBracket)
+                {
+                    theView.cursorOne.Dislocate();
+                }
+                if (event.key.code == sf::Keyboard::RBracket)
+                {
+                    theView.cursorTwo.Dislocate();
+                }
+                if (event.key.code == sf::Keyboard::Space)
+                {
+                    theModel.Logic();
+                }
+
+                if (event.key.code == sf::Keyboard::R)
+                {
+                    theModel.AddName(pos1.GetPlan()->GetPlanID(), "CyboLatch");
+                }
+                if (event.key.code == sf::Keyboard::T)
+                {
+                    theModel.AddName(pos1.GetPlan()->GetPlanID(), "SN@RFK!77EN");
+                }
+                if (event.key.code == sf::Keyboard::Y)
+                {
+                    theModel.RemoveName(pos1.GetPlan()->GetPlanID());
+                }
+                if (event.key.code == sf::Keyboard::U)
+                {
+                    assert(not enteringName);
+                    assert(not enteringFilter);
+                    enteringName = true;
+                    textEntryCooldown.restart();
+                }
+
+                if (event.key.code == sf::Keyboard::Num1)
+                {
+                    theView.SetHighlightingMode(1);
+                }
+                if (event.key.code == sf::Keyboard::Num2)
+                {
+                    theView.SetHighlightingMode(2);
+                }
+                if (event.key.code == sf::Keyboard::Num3)
+                {
+                    theView.SetHighlightingMode(3);
+                }
+            } //(if event.type is keyPressed)
+        }//else (not entering text)
     } //(while events)
     
     if ( sf::Mouse::isButtonPressed(sf::Mouse::Middle) )

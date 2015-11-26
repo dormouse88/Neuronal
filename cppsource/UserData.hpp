@@ -13,7 +13,7 @@
 #include <memory>
 #include "Serializer.hpp"
 
-enum class PlanNav { PARENT, FIRST_CHILD, PREV_SIBLING, NEXT_SIBLING, PREV_ID, NEXT_ID, PREV_NAME, NEXT_NAME };
+enum class PlanNav { PARENT, FIRST_CHILD, PREV_SIBLING, NEXT_SIBLING, PREV_ID, NEXT_ID, PREV_NAME, NEXT_NAME, FILTER_NAME };
 //enum class IDNav { PREV_ID, NEXT_ID };
 //enum class NameNav { PREV_NAME, NEXT_NAME };
 
@@ -30,6 +30,8 @@ public:
     UserData(std::shared_ptr<Serializer>);
 
     int GetID(int planID, PlanNav nav);
+    void SetNameFilter(std::string s)               {nameFilter = s;}
+    std::string GetNameFilter() const               {return nameFilter;}
     
 //ancestry
     std::shared_ptr<const Relatives> GetRelatives(int id) const;
@@ -51,6 +53,9 @@ private:
     std::map<int, std::shared_ptr<Relatives> > ancestry;
     std::map<int, std::string> namesByID;
     std::map<std::string, int> namesByName;
+
+    bool nameFiltering;
+    std::string nameFilter;
     
     std::shared_ptr<Serializer> serializer;
     

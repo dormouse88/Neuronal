@@ -26,6 +26,17 @@ Serializer::Serializer()
     OpenFile(doc, XML_FILE_NAME);
 }
 
+bool Serializer::SavePlan(std::shared_ptr<ChipPlan> plan_p, std::shared_ptr<UserData> userData)
+{
+    bool saved = SavePlanRecursively(plan_p, userData);
+    doc.save_file(XML_FILE_NAME);
+    return saved;
+}
+std::shared_ptr<ChipPlan> Serializer::LoadPlan(int planID, std::shared_ptr<UserData> userData)
+{
+    return LoadPlanRecursively(planID, userData);
+}
+
 
 void Serializer::LoadUserData(std::shared_ptr<UserData> ud)
 {
@@ -58,22 +69,19 @@ void Serializer::SaveAddAncestryEntry(int id, int anc)
 void Serializer::SaveRemoveName(int planID)
 {
     pugi::xml_node p = GetNameNodeByID(planID);
-    if (p) {
-        doc.child("NAMES").remove_child(p);
-        doc.save_file(XML_FILE_NAME);
-    }
+    assert(p);
+    doc.child("NAMES").remove_child(p);
+    doc.save_file(XML_FILE_NAME);
 }
 
 void Serializer::SaveAddName(int planID, std::string name)
 {
-    if (not GetNameNodeByID(planID) and not GetNameNodeByName(name))
-    {
-        pugi::xml_node names = doc.child("NAMES");
-        pugi::xml_node entry = names.append_child("NAME");
-        entry.append_attribute("i") = planID;
-        entry.append_attribute("n") = name.c_str();
-        doc.save_file(XML_FILE_NAME);
-    }
+    assert(not GetNameNodeByID(planID) and not GetNameNodeByName(name));
+    pugi::xml_node names = doc.child("NAMES");
+    pugi::xml_node entry = names.append_child("NAME");
+    entry.append_attribute("i") = planID;
+    entry.append_attribute("n") = name.c_str();
+    doc.save_file(XML_FILE_NAME);
 }
 
 
@@ -100,7 +108,7 @@ pugi::xml_node Serializer::GetNameNodeByName(std::string name) {
 }
 
 
-void Serializer::SavePlan(std::shared_ptr<ChipPlan> plan_p, std::shared_ptr<UserData> userData)
+bool Serializer::SavePlanRecursively(std::shared_ptr<ChipPlan> plan_p, std::shared_ptr<UserData> userData)
 {
     if (plan_p->IsModified())
     {
@@ -167,12 +175,13 @@ void Serializer::SavePlan(std::shared_ptr<ChipPlan> plan_p, std::shared_ptr<User
             wire.append_attribute("fs").set_value(w->GetFromSlot());
             wire.append_attribute("ts").set_value(w->GetToSlot());
         }
+        plan_p->modified = false;
+        return true;
     }
-    plan_p->modified = false;
-    doc.save_file(XML_FILE_NAME);
+    return false;
 }
 
-std::shared_ptr<ChipPlan> Serializer::LoadPlan(int planID, std::shared_ptr<UserData> userData)
+std::shared_ptr<ChipPlan> Serializer::LoadPlanRecursively(int planID, std::shared_ptr<UserData> userData)
 {
     std::shared_ptr<ChipPlan> memPlan = nullptr;
     

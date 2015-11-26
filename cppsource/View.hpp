@@ -23,6 +23,10 @@ public:
     ~View() {}
     
     void Draw();
+private:
+    void DrawMain();
+    void DrawBar();
+public:    
 
     void Zoom(float zoomFactor);
     void Pan(sf::Vector2f moveBy);
@@ -41,7 +45,8 @@ private:
     sf::View barOverlay;
 
     sf::RectangleShape mainOverlayBox;
-    sf::Text planNumText;
+    sf::Text barText1;
+    sf::Text barText2;
 
     const Model & theModel;
     //std::weak_ptr<ChipPlan> viewBasePlan;
@@ -50,10 +55,10 @@ private:
 public:
     Cursor cursorOne;
     Cursor cursorTwo;
-    std::weak_ptr<Device> device1;
-    std::weak_ptr<Device> device2;
-    std::weak_ptr<Wire> wire1;
-    int xmlPlan;
+//    std::weak_ptr<Device> device1;
+//    std::weak_ptr<Device> device2;
+//    std::weak_ptr<Wire> wire1;
+//    int xmlPlan;
 };
 
 #endif	/* VIEW_HPP */

@@ -24,7 +24,7 @@ public:
     Serializer();
     
     //Model interface...
-    void SavePlan(std::shared_ptr<ChipPlan> plan_p, std::shared_ptr<UserData>);
+    bool SavePlan(std::shared_ptr<ChipPlan> plan_p, std::shared_ptr<UserData>);
     std::shared_ptr<ChipPlan> LoadPlan(int planID, std::shared_ptr<UserData>);
 
     //UserData interface...
@@ -37,6 +37,9 @@ private:
     void OpenFile(pugi::xml_document & doc, const char * fileName);
     pugi::xml_node GetNameNodeByID(int planID);
     pugi::xml_node GetNameNodeByName(std::string name);
+
+    bool SavePlanRecursively(std::shared_ptr<ChipPlan> plan_p, std::shared_ptr<UserData>);
+    std::shared_ptr<ChipPlan> LoadPlanRecursively(int planID, std::shared_ptr<UserData>);
     
     pugi::xml_document doc;
 };

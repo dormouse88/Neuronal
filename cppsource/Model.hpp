@@ -45,6 +45,10 @@ public:
     void SavePlan(PlanPos pos);
     void SavePlanAsNew(PlanPos pos);
 
+    std::shared_ptr<ChipPlan> SetNameFilter(PlanPos pos, std::string filter)        { userData->SetNameFilter(filter); return LoadPlan(pos, PlanNav::FILTER_NAME); }
+    std::string GetNameFilter() const                                               { return userData->GetNameFilter(); }
+
+    
     void AddName(int id, std::string name)                  {userData->AddName(id, name); }
     void RemoveName(int id)                                 {userData->RemoveName(id);    }
 private:
