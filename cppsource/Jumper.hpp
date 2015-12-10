@@ -34,13 +34,16 @@ public:
     Jumper(int serial, sf::Vector2i pos_p, std::shared_ptr<ChipPlan> cont);
     virtual ~Jumper() {;}
 
-    virtual std::string SerialName() const { return "JUMP";}
-    virtual void ReceiveCharge(bool charge, int weight, int slot);
-    virtual bool CanRegisterIn(int slot) const;
-    
-    virtual sf::Vector2f GetWireAttachPos(WireAttachSide) const;
+    //Misc...
+    virtual std::string SerialName() const override             { return "JUMP";}
     virtual void Draw(sf::RenderTarget & rt) override;
     virtual void Handle(int code) override;
+
+    //Wirable...
+    virtual void ReceiveCharge(bool charge, int weight, int slot);
+    virtual sf::Vector2f GetWireAttachPos(WireAttachSide) const;
+    virtual bool CanRegisterIn(int slot) const;
+    
 private:
     JumperView v;
 };

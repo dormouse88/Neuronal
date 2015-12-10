@@ -15,7 +15,8 @@ class RefererInterface
 public:
     virtual void StepOut(bool charge, int slot) = 0;
     virtual void SetModified() = 0;
-    virtual void SwapIn(std::shared_ptr<ChipPlan>) = 0;
+    virtual void SetSubPlan(std::shared_ptr<ChipPlan>, std::shared_ptr<RefererInterface>) = 0;
+    virtual std::shared_ptr<ChipPlan> GetSubPlan() = 0;
 };
 
 #endif	/* REFERERINTERFACE_HPP */

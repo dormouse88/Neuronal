@@ -35,22 +35,26 @@ public:
     Neuron(int serial_p, sf::Vector2i pos_p, int threshold_p, std::shared_ptr<ChipPlan> cont);
     virtual ~Neuron() {;}
 
-    virtual std::string SerialName() const { return "NEUR";}
-    virtual void ReceiveCharge(bool charge, int weight, int slot);
-    virtual bool IsWeightedIn() const override              {return true;}
-    virtual void LogicAct();
-    virtual void LogicCalculate();
-
-    bool IsThresholdMet() const                   {return receivedCharge >= threshold; }
-    bool GetFiring() const                      {return firing;}
-    void SetFiring(bool f)                      {firing = f;}
-    int GetThreshold() const {return threshold;}
-    int GetReceivedCharge() const {return receivedCharge;}
-    void ModifyThreshold(int v) {threshold += v;}
-
-    virtual sf::Vector2f GetWireAttachPos(WireAttachSide was) const override;
+    //Misc...
+    virtual std::string SerialName() const override         { return "NEUR";}
     virtual void Draw(sf::RenderTarget & rt) override;
     virtual void Handle(int code) override;
+
+    //Wirable...
+    virtual void ReceiveCharge(bool charge, int weight, int slot) override;
+    virtual VectorWorld GetWireAttachPos(WireAttachSide was) const override;
+    virtual bool IsWeightedIn() const override              {return true;}
+    
+    //Device...
+    virtual void LogicAct() override;
+    virtual void LogicCalculate() override;
+
+    bool IsThresholdMet() const                 {return receivedCharge >= threshold; }
+    bool GetFiring() const                      {return firing;}
+    void SetFiring(bool f)                      {firing = f;}
+    int GetThreshold() const                    {return threshold;}
+    int GetReceivedCharge() const               {return receivedCharge;}
+    void ModifyThreshold(int v)                 {threshold += v;}
     
 private:
     bool firing;

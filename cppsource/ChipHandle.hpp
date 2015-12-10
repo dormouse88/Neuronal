@@ -18,28 +18,29 @@ class ChipHandle : public Device, public DeviceView, public RefererInterface
 public:
     ChipHandle(int serial_p, sf::Vector2i pos_p, std::shared_ptr<ChipPlan> cont);
     virtual ~ChipHandle() {}
+    //Misc...
     virtual std::string SerialName() const override { return "HAND";}
+    virtual void Draw(sf::RenderTarget & rt) override;
+    virtual void Handle(int code) override;
     
+    //Wirable...
     virtual void ReceiveCharge(bool charge, int weight, int slot) override;
-
+    virtual VectorWorld GetWireAttachPos(WireAttachSide was) const override;
     virtual bool IsSlotted(SlottedSide) const override;
     virtual bool CanRegisterIn(int slot) const override;
     virtual bool CanRegisterOut(int slot) const override;
+    
+    //Device...
     virtual void LogicAct() override;
     virtual void LogicCalculate() override;
+    virtual VectorDumb GetPlodedSize() override;
 
+    //RefererInterface...
     virtual void StepOut(bool charge, int slot) override;
     virtual void SetModified() override;
-    virtual void SwapIn(std::shared_ptr<ChipPlan>) override;
-    
-    void SetPlan(std::shared_ptr<ChipPlan> newPlan)     {plan = newPlan; SetModified();}
-    std::shared_ptr<ChipPlan> GetPlan()                 {return plan;}
+    virtual void SetSubPlan(std::shared_ptr<ChipPlan>, std::shared_ptr<RefererInterface>) override;
+    virtual std::shared_ptr<ChipPlan> GetSubPlan() override;
 
-    virtual sf::Vector2f GetWireAttachPos(WireAttachSide was) const override;
-    virtual void Draw(sf::RenderTarget & rt) override;
-    virtual void Handle(int code) override;
-
-    virtual VectorDumb GetPlodedSize();
     bool IsExploded();
     void SetExploded(bool yes);
 private:

@@ -63,24 +63,28 @@ void ChipHandle::LogicCalculate()
     if (plan) plan->PassOnCalculate();
 }
 
+//RefererInterface...
 void ChipHandle::StepOut(bool charge, int slot)
 {
     PushCharge(charge, slot);
 }
-
 void ChipHandle::SetModified()
 {
     auto cont = GetContainer();
     if (cont) cont->SetModified();
 }
-
-void ChipHandle::SwapIn(std::shared_ptr<ChipPlan> p)
+void ChipHandle::SetSubPlan(std::shared_ptr<ChipPlan> p, std::shared_ptr<RefererInterface> myself)
 {
-    auto smart_this = plan->GetReferer();
-    SetPlan(p);
-    p->RegisterReferer( smart_this );
+    plan = p;
+    p->RegisterReferer( myself );
+    SetModified();
     p->PlodeRefresh();
 }
+std::shared_ptr<ChipPlan> ChipHandle::GetSubPlan()
+{
+    return plan;
+}
+
 
 
 sf::Vector2f ChipHandle::GetWireAttachPos(WireAttachSide was) const

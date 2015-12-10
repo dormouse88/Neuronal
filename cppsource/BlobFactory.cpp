@@ -55,8 +55,8 @@ std::shared_ptr<ChipHandle> BlobFactory::AddHandle(std::shared_ptr<ChipPlan> pla
     {
         auto handle = std::make_shared<ChipHandle> (serial, pos, plan);
         auto subPlan = MakePlan();
-        subPlan->RegisterReferer(handle);
-        handle->SetPlan( subPlan );
+        //DEL//subPlan->RegisterReferer(handle);
+        handle->SetSubPlan( subPlan, handle );
         
         plan->ImportDevice(handle);
         ret = handle;
@@ -148,7 +148,7 @@ void BlobFactory::RemoveDevice(PlanPos pos)
     std::shared_ptr<Device> d = ChipPlanFunc::GetDevice(pos);
     if (d) {
         auto h = std::dynamic_pointer_cast<ChipHandle> (d);
-        if (not h or h->GetPlan()->IsEmpty())
+        if (not h or h->GetSubPlan()->IsEmpty())
         {
             pos.GetPlan()->RemoveDevice(d);
         }

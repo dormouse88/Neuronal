@@ -18,11 +18,7 @@ void BaseReferer::Logic()
     basePlan->PassOnAct();
 }
 
-void BaseReferer::SetPlan(std::shared_ptr<ChipPlan> p)
-{
-    basePlan = p;
-}
-
+//RefererInterface...
 void BaseReferer::StepOut(bool charge, int slot)
 {
     ;
@@ -31,13 +27,15 @@ void BaseReferer::SetModified()
 {
     ;
 }
-void BaseReferer::SwapIn(std::shared_ptr<ChipPlan> p)
+void BaseReferer::SetSubPlan(std::shared_ptr<ChipPlan> p, std::shared_ptr<RefererInterface> myself)
 {
-    auto smart_this = basePlan->GetReferer();
     basePlan = p;
-    p->RegisterReferer( smart_this );
+    p->RegisterReferer( myself );
 }
-
+std::shared_ptr<ChipPlan> BaseReferer::GetSubPlan()
+{
+    return basePlan;
+}
 
 
 
@@ -52,8 +50,7 @@ Model::Model()
     serializer->LoadUserData(userData);
     
     auto basePlan = BlobFactory::MakePlan();
-    basePlan->RegisterReferer(baseReferer);
-    baseReferer->SetPlan(basePlan);
+    baseReferer->SetSubPlan(basePlan, baseReferer);
 }
 
 void Model::Logic()
@@ -70,7 +67,7 @@ std::shared_ptr<ChipPlan> Model::WipePlan(PlanPos pos, bool forced)
         {
             auto emptyPlan = BlobFactory::MakePlan();
             auto ref = plan->GetReferer();
-            if (ref) ref->SwapIn(emptyPlan);
+            if (ref) ref->SetSubPlan(emptyPlan, ref);
             return emptyPlan;
         }
     }
@@ -88,7 +85,7 @@ std::shared_ptr<ChipPlan> Model::LoadPlan(PlanPos pos, PlanNav nav)
             if (loadedPlan)
             {
                 auto ref = plan->GetReferer();
-                if (ref) ref->SwapIn(loadedPlan);
+                if (ref) ref->SetSubPlan(loadedPlan, ref);
                 return loadedPlan;
             }
         }

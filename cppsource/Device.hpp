@@ -41,10 +41,11 @@ public:
     Device(int serial_p, VectorSmart pos_p, std::shared_ptr<ChipPlan> cont);
     virtual ~Device() {}
 
+    //virtuals...
     virtual void LogicAct() {}
     virtual void LogicCalculate() {}
-
-    virtual sf::Vector2i GetPlodedSize() { return sf::Vector2i {1, 1}; }
+    virtual VectorDumb GetPlodedSize()          { return VectorDumb {1, 1}; }
+    
     VectorWorld CalculateOffset(VectorWorld objectSize) const;
 
     VectorWorld GetWorldPos() const             {return ppos.GetWorldPos();}
@@ -52,7 +53,7 @@ public:
     VectorSmart GetSmartPos() const             {return ppos.GetSmartPos();}
     void SetPosSmart(VectorSmart p)             {ppos.SetPosSmart(p);}
 
-    int GetSerial() const                   {return serial;}
+    int GetSerial() const                       {return serial;}
 private:
     PlanPos ppos;
     int serial;

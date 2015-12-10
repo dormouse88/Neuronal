@@ -19,12 +19,14 @@ class BaseReferer : public RefererInterface
 public:
     BaseReferer();
     void Logic();
-    void SetPlan(std::shared_ptr<ChipPlan> p);
+    
+    //RefererInterface...
     virtual void StepOut(bool charge, int slot) override;
     virtual void SetModified() override;
-    virtual void SwapIn(std::shared_ptr<ChipPlan>) override;
-
-//private:
+    virtual void SetSubPlan(std::shared_ptr<ChipPlan>, std::shared_ptr<RefererInterface>) override;
+    virtual std::shared_ptr<ChipPlan> GetSubPlan() override;
+    
+private:
     std::shared_ptr<ChipPlan> basePlan;    
 };
 
@@ -38,7 +40,7 @@ public:
     void Logic();
     
     //void SetBasePlan(std::shared_ptr<ChipPlan> newPlan)         {baseReferer->basePlan = newPlan;}
-    const std::shared_ptr<ChipPlan> GetBasePlan() const                     {return baseReferer->basePlan;}
+    const std::shared_ptr<ChipPlan> GetBasePlan() const                     {return baseReferer->GetSubPlan();}
 
     std::shared_ptr<ChipPlan> WipePlan(PlanPos, bool forced);
     std::shared_ptr<ChipPlan> LoadPlan(PlanPos, PlanNav nav);

@@ -66,7 +66,7 @@ void Cursor::SetPosWorld(VectorWorld point)
         {
             if (h->IsExploded())
             {
-                ppos.SetGrid(h->GetPlan()->GetGrid());
+                ppos.SetGrid(h->GetSubPlan()->GetGrid());
             }
             else done = true;
         }
@@ -142,7 +142,7 @@ void Cursor::Revalidate()
         auto d = ChipPlanFunc::GetDevice(ppos);
         auto h = std::dynamic_pointer_cast<ChipHandle>(d);
         if (h) {
-            if (h->IsExploded()) ppos.SetGrid( h->GetPlan()->GetGrid() );
+            if (h->IsExploded()) ppos.SetGrid( h->GetSubPlan()->GetGrid() );
         }
     }
     //Then work back up (the other way) to the base

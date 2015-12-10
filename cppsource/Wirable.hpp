@@ -10,7 +10,7 @@
 
 #include <memory>
 #include <vector>
-#include <SFML/System.hpp>  //for sf::Vector
+#include "PlanGrid.hpp"     //for VectorWorld (for now)
 class Wire;
 
 enum class WireAttachSide { IN, OUT };
@@ -22,17 +22,18 @@ public:
     Wirable() {}
     virtual ~Wirable() {}
 
+    //Virtuals...
     virtual void ReceiveCharge(bool charge, int weight, int slot) = 0;
+    virtual VectorWorld GetWireAttachPos(WireAttachSide) const = 0;
+    virtual bool IsWeightedIn() const                   {return false;}
+    virtual bool IsSlotted(SlottedSide) const           {return false;}
+    virtual bool CanRegisterIn(int slot) const          {return true;}  //Client needs to call this before calling RegisterIn(). RegisterIn() should throw an exception on failure perhaps.
+    virtual bool CanRegisterOut(int slot) const         {return true;}
 
-    virtual bool IsWeightedIn() const           {return false;}
-    virtual bool IsSlotted(SlottedSide) const   {return false;}
-    virtual bool CanRegisterIn(int slot) const  {return true;}  //Client needs to call this before calling RegisterIn(). RegisterIn() should throw an exception on failure perhaps.
-    virtual bool CanRegisterOut(int slot) const {return true;}
     void RegisterIn(std::shared_ptr<Wire> w)    { inWires.push_back(w);}
     void RegisterOut(std::shared_ptr<Wire> w)   { outWires.push_back(w);}
     bool HasWireTo(int fromSlot, Wirable & to, int toSlot) const;
 
-    virtual sf::Vector2f GetWireAttachPos(WireAttachSide) const = 0;
 protected:
     void PushCharge(bool charge, int slot = 0);
     void CleanWireVectors() const;

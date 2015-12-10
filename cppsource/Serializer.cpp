@@ -139,7 +139,7 @@ bool Serializer::SavePlanRecursively(std::shared_ptr<ChipPlan> plan_p, std::shar
             else if (d->SerialName() == "HAND")
             {
                 auto h = std::dynamic_pointer_cast<ChipHandle>(d);
-                auto p = h->GetPlan();
+                auto p = h->GetSubPlan();
                 //holy recursion batman!?!...
                 if (p) SavePlan(p, userData);
                 pugi::xml_node dev = plan.append_child("HAND");
@@ -206,8 +206,7 @@ std::shared_ptr<ChipPlan> Serializer::LoadPlanRecursively(int planID, std::share
             //Recursively load subplans and assign them...
             if (link != 0) {
                 auto subPlan = LoadPlan(link, userData);
-                handle->SetPlan(subPlan);
-                subPlan->RegisterReferer(handle);
+                handle->SetSubPlan(subPlan, handle);
             }
         }
         for (pugi::xml_node device = xmlPlan.child("NEUR"); device; device = device.next_sibling("NEUR"))
