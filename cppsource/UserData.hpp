@@ -29,7 +29,7 @@ class UserData
 public:
     UserData(std::shared_ptr<Serializer>);
 
-    int GetID(int planID, PlanNav nav);
+    int GetID(int planID, PlanNav nav) const;
     void SetNameFilter(std::string s)               {nameFilter = s;}
     std::string GetNameFilter() const               {return nameFilter;}
     
@@ -41,6 +41,8 @@ public:
 //names    
     int GetIDByName(std::string name) const;
     std::string GetNameByID(int planID) const;
+    bool CanAddName(int planID) const;
+    bool CanAddName(int planID, std::string) const;
     //setters
     void RemoveName(int planID);
     void AddName(int planID, std::string name);

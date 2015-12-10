@@ -1,0 +1,82 @@
+PROPOSAL: NAMES AND AUTO-NAMES
+	Auto-names can be generated automatically. They have equal status to real names (perhaps preceded by an unenterable symbol).
+	There are two save buttons:
+		'SAVE' will transfer the name (auto or real) from the ancestor plan onto the directly saved plan. If the ancestor had no name, an auto-name is confered onto the new plan. In any case, the old plan will have no name.
+		'SAVE AS NEW' will confer an auto-name onto the new plan. The old plan will not be affected.
+	And two name buttons:
+		'NAME': if plan has a name it will be modified. Else it will add a new name.
+		'UNNAME': if plan has a name it will be deleted.
+	All plans can be named and un-named (which is in effect adding and removing from the library).
+	Stuff to add later: Ancestry traversal, db trimming, note attachments and read-only loading.
+
+	BUTTONS REQUIRED:
+		Loading:
+			Name and ID:
+				4/5 buttons:
+					next (ID)
+					prev (ID)
+					search/filter_name
+					next_name + prev_name -OR- name_lock
+			Ancestry Traversal:
+				4 buttons) parent, first_child, next_sibling, prev_sibling
+				3 buttons) parent, first_child, sibling_lock
+			PROP:
+				8 - Parent - Selects parent or does nothing if no parent
+				2 - FirstChild - Selects first child or does nothing if no children
+				4 - Prev Sibling - Selects prev ID sibling or does nothing
+				6 - Next Sibling - Selects next ID sibling or does nothing
+				1 - Prev ID - Selects prev ID or does nothing if lowest plan
+				3 - Next ID - Selects next ID or does nothing if highest plan
+				7 - Prev Name - Selects prev alphabetical name or does nothing if AAA. Selects first name if current has no name.
+				9 - Next Name - Selects next alphabetical name or does nothing if ZZZ. Selects last name if current has no name.
+				0 - Name entry - Changes filter text.
+				
+				ISSUE:
+					Numeric and Alphabetic ordering: Pugi's "find" may become too slow (linear time). Is a bimap cache needed for performance? Or use two maps in parallel?
+
+		Saving:
+			Saving and naming:
+				4 buttons:
+					save 		- Save and... if (old has name) {Transfer old name to new} 	else {Confer auto name on new}
+					save_as_new - Save and... Confer auto name on new
+					name 		- if (plan has name) { modify name } 			else { add new name (check it is unique) }
+					unname 		- delete name (if exists)
+				Also:
+					Get Name by planID to draw on plan.
+
+
+	IMPLEMENTATION:
+		ISSUE: Container of names:
+			OBS: Use cases: <Get name from planID, Get planID from name, Add name/planID pair, (Get NameID for notes?)>
+			OBS: Data to be stored is: <string, planID, (NameID)>
+			POSS: Use existing main db or new container.
+				OBS: Using main db to store names would violate the immutable idea of it.
+			OBS: Attaching notes to names is tricky. If plans can be un-named, what happens to the name and the note that references it? Perhaps can't un-name before deleting/reassigning note.
+			CONC: Use a new container holding just <string, planID> for now.
+			
+		ISSUE: Auto-name generation:
+			OBS: I guess it shouldn't be a letter presentation of planID (AB, AC, etc) otherwise transferring name to descendants is problematic.
+			PROP: Random 1 char name, then if that fails try a random 2 char name. A maximum char limit maybe isn't needed (or same as real-name limit).
+			CONC: Go with that prop.
+
+	ISSUE: How can ChipPlans access the metadata in Serializer?
+		OBS: There's potentially ancestry and the name cache
+		Cache must be closely tied to serializer to update it.
+		Cache must also have a reference passed to chipPlans.
+
+	ISSUE: Save changes to Serializer(xml) or UserData(mem cache)?
+		1) Modify UserData directly and modify Serializer from it
+			Ancestry: data is immutable so... UserData::AddEntry just passes on to serializer.
+			Names: bimap overwrites the xml_node NAMES with freshly built xml (saves when?/how often? every plan save or app quit?)
+		2) Modify Serializer directly and modify UserData from it
+			Ancestry: Serializer::AddEntry just passes on to UserData::AddEntry
+			Names: Serializer modifies its xml then calls UserData::ReBuild() to overwrite UserData with updated info. (must refresh every time there's a change)
+		OBS: Either way, less mirroring of functions across both classes can be avoided by rebuilding the indirect from the direct.
+			Choice is which class to get the modification functions and which to get the ReBuild function (Serializer or UserData).
+		OBS: 2 smells and is perverted. 2 is a cache.
+		OBS: UserData is a class that Plans can hold pointers to to access the data. Could just be a wrapper really?
+		CONC: Do UserData as a proxy/wrapper. This is kinda option 1 
+
+
+		
+			

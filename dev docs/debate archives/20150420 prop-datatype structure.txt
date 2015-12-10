@@ -1,0 +1,139 @@
+Types:
+======
+COMPONENT named, joins wires,       delays, specific-multi-input, specific-output,
+NEURON    named, joins wires,       delays, weighted-multi-input, outputs-to-many,
+SOCKET    named, joins wires+'puts, quick,  unweighted-one-input, outputs-to-many, scale-boundary,
+WIRE      anon,  joins chips,
+
+
+TEXT-ONLY DESCRIPTION:
+======================
+COMP identifier:type
+NEUR identifier:threshold
+SOCK identifier
+WIRE from[:socket]-to[:weight/socket]
+
+
+COMP<i-id,n-name,sha-sha,tag-tag>
+NEUR<i-id,n-name,thr-threshold>
+SOCK<i-id,n-name>
+WIRE<f-fromobj,fs-fromsock,t-toobj,ts-tosock,w-weight>
+
+XML example:
+------------
+
+<TAGS>
+	<TAG name="one bit memory" sha="73cbab378" />
+	<TAG name="obgm" sha="3b862dae1" />
+</TAGS>
+<COMMITS>
+	<COMMIT sha="3c44a901d3" original_name="one bit memory">
+		<PARTS>
+			<NEUR i="1" thr="1" x="1" y="1"/>
+		</PARTS>
+		<WIRES>
+			<WIRE f="1" t="1" w="1"/>
+		</WIRES>
+	</COMMIT>
+	<COMMIT sha="73cbab378" old_sha="3c44a901d3" original_name="one bit memory">
+		<PARTS>
+			<SOCK i="3" n="set" x="1" y="1"/>
+			<SOCK i="4" n="reset" x="1" y="1"/>
+			<NEUR i="1" thr="1" x="1" y="1"/>
+			<SOCK i="7" n="out" x="1" y="1"/>
+		</PARTS>
+		<WIRES>
+			<WIRE f="3" t="1" w="1"/>
+			<WIRE f="4" t="1" w="-1"/>
+			<WIRE f="1" t="1" w="1"/>
+			<WIRE f="1" t="7"/>
+		</WIRES>
+	</COMMIT>
+	<COMMIT sha="3b862dae1" original_name="obgm">
+		<PARTS>
+			<SOCK i="2" n="setreset" x="1" y="1"/>
+			<SOCK i="3" n="gate" x="1" y="1"/>
+			<COMP i="4" n="latch" x="1" y="1" sha="73cbab378" tag="one bit memory"/>
+			<NEUR i="8" thr="2" n="setter" x="1" y="1"/>
+			<NEUR i="9" thr="1" n="resetter" x="1" y="1"/>
+			<SOCK i="11" n="out" x="1" y="1"/>
+		</PARTS>
+		<WIRES>
+			<WIRE f="2" t="8" w="1"/>
+			<WIRE f="2" t="9" w="-1"/>
+			<WIRE f="3" t="8" w="1"/>
+			<WIRE f="3" t="9" w="-1"/>
+			<WIRE f="8" t="4" ts="set"/>
+			<WIRE f="9" t="4" ts="reset"/>
+			<WIRE f="4" t="11" fs="out"/>
+		</WIRES>
+	</COMMIT>
+</COMMITS>
+
+Examples:
+---------
+
+COMPONENT- one bit memory:
+	Sock S
+	Sock R
+	Neur f:1
+	Sock O
+	Wire S-f: 1
+	Wire R-f:-1
+	Wire f-f: 1
+	Wire f-O
+
+COMPONENT- one bit gated memory:
+	Sock SR
+	Sock G
+	Comp f:obm
+	Neur a:2
+	Neur b:1
+	Sock O
+	Wire SR-a:1
+	Wire SR-b:-1
+	Wire G-a:1
+	Wire G-b:1
+	Wire a-f:S
+	Wire b-f:R
+	Wire f:O-O
+
+COMPONENT- half adder:
+	NEUR x:1
+	NEUR y:2
+	SOCK in1
+	SOCK in2
+	SOCK out
+	SOCK c
+	WIRE in1-x:1
+	WIRE in1-y:1
+	WIRE in2-x:1
+	WIRE in2-y:1
+	WIRE y-x:-2
+	WIRE x-out
+	WIRE y-c
+
+COMPONENT- 2 bit counter:
+	COMP h1:halfadder
+	COMP h2:halfadder
+	COMP m1:obgm
+	COMP m2:obgm
+	NEUR x:0
+	SOCK input
+	SOCK out1
+	SOCK out2
+	SOCK outc
+	WIRE h1:out-m1:SR
+	WIRE h2:out-m2:SR
+	WIRE input-m1:G
+	WIRE input-m2:G
+	WIRE m1:O-h1:in2
+	WIRE m2:O-h2:in2
+	WIRE m1:O-out1
+	WIRE m2:O-out2
+	WIRE x-h1:in1
+	WIRE h1:c-h2:in1
+	WIRE h2:c-outc
+
+
+

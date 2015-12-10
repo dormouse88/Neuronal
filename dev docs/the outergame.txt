@@ -1,0 +1,61 @@
+The innersim will be presented inside an outergame context.
+This outergame will provide the levels/objectives equivalent to the levels of manufactoria.
+
+TIME:
+	The innersim and the outergame each have their own units of time. The innersim time is finer grained.
+	While it would be possible to fix a constant ratio between the two (eg. 60 innerticks make an outertick), I think it will be better if outergame time is advanced through an output of innersim, for 2 reasons:
+		1) It will be much harder for the user if they have to design constructs within the innersim to be precisely timed.
+		2) It will not place an unnecessary complexity constraint on what the innersim can achieve in one outer 'tick'.
+		A "send" or "step" output on the base ChipPlan seems a little contrived but its the best idea i have so far.
+			Or a "wait" output? Then outergame time passes whenever any output is sent, including wait.
+	Some time ago, I was considering having outergame actions cost different amounts of time to perform. An interesting idea, though probably also too difficult and finnicky for the player.
+
+STRINGS:
+	Manufactoria and LogicBox both concern themselves mainly with processing strings.
+	String processing would be possible in my game although the idea of an infinite tape of memory isn't built in. The string could be stored in the outergame, and fed in to the innersim, one symbol per outer tick. The innersim outputs could write to the back of the queue. This behaviour could contrivedly be presented in the game world somehow (leaving scents, etc?).
+	The requirement to modify the string in a certain way could be to manipulate the cats thru scent trails???
+
+IMPRECISE OBJECTIVES
+	The innersim does not suit such a string-oriented context like that of manufactoria/logicbox. Hopefully the innersim will work well with less precise objectives than manufactoria and the outergame can offer more than one exact way to win. The outergame must be transparent and understood to make the innersim challenges fair.
+	The requirement to heed inputs is dependent on the inputs being different in each test.
+	Showing players the outergame arena is problematic since there is no one correct configuration to show them.
+		1) The player must base their solution solely on the description of what is required. (can't see arena)
+		2) Show one randomly selected arena configuration and have a re-roll button to emphasize the variance.
+		3) Most of the arena can be fixed, and the location of spawn points are also fixed. The randomness of inputs comes in which spawn points are actually spawned from.
+				Need timed spawns that spawn on turn x?
+				Need logic/dependency between spawnpoints (spawnX triggers if spawnY triggers)?
+		4) Have a certain number of test cases in each test suite. Each test is not generated from some logic or rng but is designed by the level designer. 
+		(3+4 also try to answer the question of defining the test-cases)
+	Early levels can have only 1 configuration/spawn-point/test-case to smooth the learning curve and gradually introduce the idea of having to pass all tests.
+
+
+PROP:
+	Outergame is the control of a Mouse avatar. Probably from a top down view in a visible grid (chuchu rocket).
+	Or possibly an insect/bug/ant.
+	A square-tiled grid is quite difficult to navigate. This has pros and cons. (Hex grid?)
+
+	MECHANICS:
+		Rules:
+			All things can be detectable and undetectable or partially detectable
+			Some kind of physics?: Include things that can be pushed?
+				What happens when a moving thing hits another moving thing (eg. two cats)?
+					They could bounce off each other. (I could animate the movement between the two quantized states)
+						Even spaces: R--L to -rl- to L--R
+						Odd Spaces: R---L to -R-L- to -L-R- to L---R
+					Or They could pass thru each other like chuchu rocket.
+		Elements:
+			Death Tiles: (The strictness of death tiles helps to make solution requirements more rigid).
+			Death Cats: Moving hazards are pretty critical. Cats detectable by different senses could be interesting (tactile cats, smelly cats, noisy cats, etc). What are the rules for movement?
+		
+			Wall Tiles: When would you ever need wall tiles over detectable death tiles?? To make the innersim solution easier perhaps?
+		
+	INS AND OUTS:
+		INs - sight (LOS), sound (directional), smell (non-directional), newsquare (scents), canmove,
+		OUTs - move, active sense(sight/sound/smell),
+		Senses can be active or passive (always on vs. have to sniff for example)
+
+		INs - LFR whiskers, nosebump, LR ears, smell scents,
+		OUTs - LR feet, squeak, mark scents,
+
+	
+	

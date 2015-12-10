@@ -1,0 +1,117 @@
+No SHA:
+-------
+Just use tags as names to save plans. No SHA is used.
+Each plan saves a local copy of the components it uses inside itself.
+The local copy is updated with the tag version upon opening unless it doesn't fit.
+Editing a subcomponent that has no tag is to edit the local copy.
+Adding a tag is "saving in the library".
+
+Misc:
+-----
+Must disallow cyclic references of components (would maybe be prevented by physical size constraints).
+Insertion and deletion of rows and columns would be useful for size management.
+
+Connecting memory objects to serialised objects:
+------------------------------------------------
+* It's probably the case that charge will have to be reset when any edit is made.
+* Wires specify the ID they connect to and from. Therefore either:
+  1) Components and Devices must not clash ids, or
+  2) Wires must specify which type of id they are referring to.
+* sockets on component inputs or outputs will be in number order.
+  XML wires will specify the socket number they connect to.
+* Serialising will be done recursively through the component tree starting from the root.
+  The local copy is ALWAYS updated and the link copy is updated too where there is one.
+
+Switching between editing components and their subcomponents:
+-------------------------------------------------------------
+* User is actually only ever editing one component (sub-components are visible but immutable).
+  Each change of edit context does a full commit and then full reload into the new context.
+
+* The anchor/link reference system:
+  A component can fail to "fit" because the size is too big or its ports are too few.
+  If a link is present, that version will be attempted first. If it wont fit, falls back to the local version.
+  local copy is updated to match whenever a linked component is successfully loaded.
+
+
+Component object in memory consists of two parts, link and anchor:
+------------------------------------------------------------------
+(Model links to the root anchor directly.)
+anchor (type):
+	?anch_name,
+	vector<links>, vector<devices>, vector<wires>,
+	w,h
+link (token):
+	pointer_to_anchor
+	?link,
+	outer_id,
+	x,y,
+
+Sub-component compatibility:
+----------------------------
+Maybe it's possible to guarantee sub-components will always work. (excepting cyclic refs). This would eliminate the need for local versions.
+The two causes for "not fitting" (and the solutions) are:
+1) Socket undercount: Add more ghost sockets as necessary. (Sockets needn't exist!?!).
+2) Physically oversized: Simulate functionality anyway but hide visibility of component until space is made.
+
+
+XML Schema:
+------------
+(i=id, thr=threshold, w=weight, n=name, ps=pinside, pn=pinnumber, f=from, t=to, fs=fromsocket, ts=tosocket)
+(anch=anchor, link=link)
+(? preceding attribute denotes optional)
+<PLAN anch(str) w(int) h(int)>
+	<COMP i(id) link(str) x(int) y(int)>
+		<PLAN>
+		</PLAN>
+	</COMP>
+	<NEUR i(id) x(int) y(int) thr(int) ?n(str) />
+	<SOCK i(id) x(int) y(int) ps(tribool) ?pn(int) ?n(str) />
+	<WIRE f(id) t(id) ?fs(int) ?ts(int) ?w(int) />
+</PLAN>
+
+XML Example:
+------------
+(All devices would have unique positional data)
+<COMMITS>
+//(This commit gets Deleted/overwritten)
+//	<PLAN anch="one bit memory" w="3" h="1">
+//		<NEUR i="1" thr="1" x="1" y="1"/>
+//		<WIRE f="1" t="1" w="1"/>
+//	</PLAN>
+	<PLAN anch="one bit memory" w="3" h="2">
+		<SOCK i="3" n="set" x="1" y="1"/>
+		<SOCK i="4" n="reset" x="1" y="1"/>
+		<NEUR i="1" thr="1" x="1" y="1"/>
+		<SOCK i="7" n="out" x="1" y="1"/>
+		<WIRE f="3" t="1" w="1"/>
+		<WIRE f="4" t="1" w="-1"/>
+		<WIRE f="1" t="1" w="1"/>
+		<WIRE f="1" t="7"/>
+	</PLAN>
+	<PLAN anch="obgm" w="6" h="2">
+		<SOCK i="2" n="setreset" x="1" y="1"/>
+		<SOCK i="3" n="gate" x="1" y="1"/>
+		<COMP i="4" n="latch" x="1" y="1" link="one bit memory">
+			<PLAN w="3" h="2">
+				<SOCK i="3" n="set" x="1" y="1"/>
+				<SOCK i="4" n="reset" x="1" y="1"/>
+				<NEUR i="1" thr="1" x="1" y="1"/>
+				<SOCK i="7" n="out" x="1" y="1"/>
+				<WIRE f="3" t="1" w="1"/>
+				<WIRE f="4" t="1" w="-1"/>
+				<WIRE f="1" t="1" w="1"/>
+				<WIRE f="1" t="7"/>
+			</PLAN>
+		</COMP>
+		<NEUR i="8" thr="2" n="setter" x="1" y="1"/>
+		<NEUR i="9" thr="1" n="resetter" x="1" y="1"/>
+		<SOCK i="11" n="out" x="1" y="1"/>
+		<WIRE f="2" t="8" w="1"/>
+		<WIRE f="2" t="9" w="-1"/>
+		<WIRE f="3" t="8" w="1"/>
+		<WIRE f="3" t="9" w="-1"/>
+		<WIRE f="8" t="4" ts="set"/>
+		<WIRE f="9" t="4" ts="reset"/>
+		<WIRE f="4" t="11" fs="out"/>
+	</PLAN>
+</COMMITS>

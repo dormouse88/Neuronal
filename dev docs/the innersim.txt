@@ -1,0 +1,38 @@
+
+CONSIDER: Neurons subsuming jumper functionality.
+	Am I really happy with the distinction between neurons and jumpers? Have 'instant' neurons or 'OR input' jumpers?
+	
+	PROP: neurons can have 'delay' and 'numbers' as optional modules. Or properties that invisibly default to off.
+		'Numbers' allows wire input weights and the threshold to be set (otherwise they all invisibly default to 1). Cosmetic difference only?
+		'Delay' could either be a separate device with only that role, OR a neuron augmentation OR just a property of all neurons that defaults to off. Again Cosmetic difference only?
+
+		PROP:
+			Neurons that have all weights and thresholds as 1 are displayed with a more simple graphic.
+			Neurons that have delay set to ON are drawn with a large bulb on the end.
+		
+		OBS: The two-segment neuron idea would fit into this nicely: The neuron itself can be coloured according to the calculated firing state while the delay bulb can be coloured according to the stored firing state.
+		OBS: Old XML can be automatically converted to new (though there'll be loads more delay bulbs than necessary).
+		
+		CONSIDERATION: Implementing the charge propagation.
+			Make a list of all inputless outputers (outergame inputs, (zero)neurons with no inputs, neurons with delay bulbs)
+			Call PushCharge() on all these.
+			Neuron::ReceiveCharge() will store the accumulated total charge (as it does now) but also store the accumulated number of charges it has received.
+				Each call, it checks if it has received from all its input wires and if so, it calculates its firing state by comparing the total received against the threshold and then propagates that firing state.
+			Cyclic dependencies of fast neurons will cause affected neurons to never fire. Maybe check for this and highlight it to the user. Simple to check, just iterate thru every device at the end of a tick and they should all have fired.
+			
+		CONSIDERATION: Will feedback to the player about how the system is operating be better under the new or old way? The new way since it is a superset of the options available in the old way.
+		
+		
+		
+CONSIDER: Multichannel wires.
+	To link multiple outputs of one plan to multiple inputs of another, user has to add multiple jumpers. That's not great. Also can't connect a neuron to multiple inputs or outputs without intermediary neurons.
+
+	PROP:
+		Wires are normal (single). wire selection is normal (single).
+		Wiring plans can only happen when they are exploded, through selection of 'sockets' along the side. These are pseudo devices that are provided so there is always one spare.
+		That solves everything!
+		
+		DETAILS:
+			Sockets are not neurons, do not look like neurons and cannot carry delay bulbs.
+			Linking a output socket to multiple seems safe, but what about an input socket? Auto 'OR' behaviour or disallow? How would OR behaviour interfere with charge propagation?
+			Although wiring and dewiring cannot occur when a plan is desploded, wires should maybe be drawn differently and multiple wires should be indicated.

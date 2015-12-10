@@ -1,0 +1,33 @@
+No local Versions:
+	Plans don't save cached versions of their subplans. Links only.
+No Auto-updating:
+	Once a plan is saved, it won't and can't be changed directly or indirectly through a subplan change.
+	If the user was to "update" a subplan B within plan A, that would be to link A's handle to a different serial (presumably a version-child of B), and "A" would be saved as a new serial. The original A would be unaffected.
+All Plans saved forever:
+	Saving saves ALL open plans independently in the master db. Plans can never be deleted.
+Plans have serial numbers:
+	Each plan is assigned the first unused serial number upon save.
+	Each plan also stores its version-parent plan number (except originals). This allows for a user-traversible tree of plans.
+	User can move left (up to the single parent), up or down (amongst the many siblings) or right (to the (first of) many children)
+
+Names are superficial and can come later. Use paper for now.
+
+
+
+
+
+
+
+XML Schema:
+------------
+(i=id, thr=threshold, w=weight, f=from, t=to, fs=fromsocket, ts=tosocket)
+(anc=ancestor(version-parent), link=planID to link to)
+(? preceding attribute denotes optional or optionally utilised)
+
+<PLAN i(id) anc(id)>
+	<HAND i(id) x(int) y(int) link(id) />
+	<NEUR i(id) x(int) y(int) thr(int) />
+	<SOCK i(id) x(int) y(int) />
+	<WIRE f(id) t(id) ?fs(int) ?ts(int) ?w(int) />
+</PLAN>
+

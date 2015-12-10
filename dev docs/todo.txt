@@ -1,0 +1,46 @@
+Not Commited
+============
+Added a textual feedback bar.
+
+
+General
+=======
+	Finalize some good names for terms
+	Why CPU load + Framerate loss when exploded?
+Visual / Interface
+==================
+	Draw neurons as two halves with independent firing states. Change the neuron shape?
+	Draw slot matching + valency (to show how many slots are ignored in both directions) between handles and chips.
+	Set discrete zoom levels?
+	Solve: No space to see wires between exploded chips when adjacent. Disallow adjacency? Draw plan boundary half a cell inwards? (changing GRID_SIZE doesn't help exploded chips)
+	Place circular wire labels intelligently (on wire but close to device).
+	Allow chip cycling while unexploded and draw name on the handle.
+	Choose highest number plan to load into an empty plan, not lowest.
+	Change explode key from AZ to something else. AZ is a modifying key.
+	Fix that device movement 'animation feature' so it doesn't trigger on plan loads.
+	View centers in wrong place in both: 1 Plan collapse and 2 Plan Load/Wipe
+	Add a reset all charge button.
+	Add a collapse all/expand! all button.
+	Add a device copy button?
+	Add an encapsulate button. This will put all devices (and their wires) within a rectangular area bounded by the cursors into a newly created sub-plan. Fucking groovy. May require multiwires.
+	Make sure autoname symbol (@) doesn't get sorted between numbers and letters.
+	Allow spaces or underscores in names.
+	Add flashing insert cursor when entering text.
+
+InnerSim
+========
+	Add in Plan Loading:
+		db trimming,
+		note attachments,
+		read-only loading,
+		containment tree traversal.
+	CONSIDER: Neurons subsuming jumper functionality.
+	CONSIDER: Multichannel wires?
+	CONSIDER: Named slots?
+		handle-to-plan slot matching could work with names just the same as it does with numbers (though refactoring would then be tricky). An auto-name system like when saving plans could be used.
+
+OuterGame
+=========
+	CONSIDER: How to define a test suite? (Simple vs uncheapability payoffs)
+	CONSIDER: Use a 'Wait' output or 'Send' output?
+	CONSIDER: Repeating inputs or once only? Repeating!!!

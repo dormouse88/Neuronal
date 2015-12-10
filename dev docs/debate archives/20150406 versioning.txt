@@ -1,0 +1,106 @@
+==================================
+COMPONENT COMPOSITION DIFFICULTIES
+==================================
+
+The Problem:
+------------
+A is current sandbox. B to E are saved components.
+A >B >C >D >E
+A contains B which contains C, etc.
+Changing C will cause/require A and B to also change:
+a*>b*>c*>D >E
+A and B might be used elsewhere and this will break those things.
+
+Solutions:
+----------
+1) Must Branch C into C2 before editing is allowed. This automatically branches B into B2
+2) Can edit C. At Close, asks if you want to save, save as, or lose changes. Does this for anything changed directly (C and A). Anything only changed indirectly (B) is not saved but might be different by virtue of constituents being different. (would be different if saved over C but not if saved as C2). A Downside is that this still allows older solutions to be unrecoverably destroyed by updating components.
+3) Each component saves its constituents inside itself. So then it'll need its own name or else may clash? Possible but will lead to a squillion versions.
+4) Branching C removes its name and the name of all using it (B). These are prompted for saving at close.
+5) Use git style system where the app understands by identity (eg SHA-1) and names are just tags pointing to those identities. 
+
+NOTE: Can Components be changed or saved over? This is what 1 is trying to do.
+NOTE: Human-readable NAMES should be distinguished from IDENTITY. NAMES are for easy access in the component library. IDENTITY is for permanence?, etc. NAMING NEEDN'T FOLLOW VERSIONING.
+NOTE: Changing the type of an existing component might invalidate wires that point to named inputs as sockets may be different.
+
+1 is the best. 5 is better.
+
+
+Branch Timeline:
+----------------
+Save e
+Save d
+Save c
+Save x (X>C)
+Save b
+(so b1>c1>d1>e1 and x1>c1>d1>e1)
+begin a
+Branch C1->C2
+	Branches B1->B2
+(now also b2>c2)
+Branch D1->D2 (doesn't need more branching while b2+c2 aren't saved)
+Save a
+(now a1>b2>c2>d2>e1)
+
+
+git
+=========================================================================================
+
+
+Git Timeline:
+-------------
+create *
+commit 1_e1
+	tag E
+create * (insert E)
+commit 2_d1
+	tag D
+create * (insert D)
+commit 3_c1
+create * (insert 3)
+commit 4_x1
+	tag X
+commit 5_b1 tag B
+(so b1>c1>d1>e1 and x1>c1>d1>e1)
+begin a
+change C
+	change B
+change D
+	change C
+	change B
+save:
+	commit 6(b2
+	commit 7(c2
+	commit 8(d2
+	commit 9(a1
+
+
+Git data:
+---------
+Commits:
+	SHA-1 ID number
+	previous ID number if it has one
+	A parts description including references to commit numbers of any constituent components
+Tags:
+	A name
+	The number of the commit that they point to
+
+
+Git System Interface:
+---------------------
+Saving:
+	Each component is saved as a separate entity using its SHA-1.
+	Default save updates tags to point to new versions.
+	Alternate save is to fork a new version (only difference is the tags).
+Tagging:
+	Each Tag points to one commit. There can exist 0 or more tags for each commit.
+	For modifications, tags can move to new version or stay pointing to original.
+	New tags can be applied to either too.
+	(When Components include sub-components, they can specify a tag to attempt to keep updated.
+	Failure to name match the sockets will cause a fallback to the SHA.)
+Library:
+	Two libraries, one of all commits by number, the other of commits with tags.
+
+
+	
+

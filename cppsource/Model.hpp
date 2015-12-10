@@ -47,10 +47,12 @@ public:
 
     std::shared_ptr<ChipPlan> SetNameFilter(PlanPos pos, std::string filter)        { userData->SetNameFilter(filter); return LoadPlan(pos, PlanNav::FILTER_NAME); }
     std::string GetNameFilter() const                                               { return userData->GetNameFilter(); }
-
     
+    bool CanAddName(int planID) const                       {userData->CanAddName(planID);}
     void AddName(int id, std::string name)                  {userData->AddName(id, name); }
     void RemoveName(int id)                                 {userData->RemoveName(id);    }
+
+    std::shared_ptr<const UserData> GetUserData() const     {return userData;}
 private:
     std::shared_ptr<Serializer> serializer;
     std::shared_ptr<UserData> userData;

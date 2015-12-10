@@ -1,0 +1,20 @@
+Ultimately, think about if any proposed system is better than conventional saving.
+
+? Allow user to "delete" plans, except they are only 'safely deleted', as in removed from the load selection options (library).
+? Rather than the usual language of 'saving and deleting', think in terms of 'promoting and relegating' from/to the library.
+? Use Starred Plans / Star rankings
+? When cycling through plans, have a control to toggle between all-plans or starred-only or named-only.
+
+Saving by name:
+	? Names are stored in their own container of which they are a primaryish key OR as an optional detail in container of planIDs.
+	? Textual input for saving and searching
+	
+Either:
+	Allow storage of notes attached to plans.
+	History navigation controls to allow selecting ancestor, descendents and siblings.
+	Database trimming may be necessary for space and declutter reasons.
+	Allow plans to be loaded in read-only mode
+	
+Could use letters AB, AC, etc as a different way of presenting numbers.
+		
+		

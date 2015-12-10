@@ -1,0 +1,128 @@
+Component object in memory consists of: vector<components>, vector<devices>, vector<wires>, SHA, tag, outer_id,
+
+Misc:
+-----
+Must disallow cyclic references of components
+Insertion and deletion of rows and columns would be useful for size management.
+Should I allow multiple tags to point to one SHA? Or have a SHA list with optional tag attached?
+
+
+Connecting memory objects to serialised objects:
+------------------------------------------------
+* It's probably the case that charge will have to be reset when any edit is made.
+* Wires specify the ID they connect to and from. Therefore either:
+  1) Components and Devices must not clash ids, or
+  2) Wires must specify which type of id they are referring to.
+* sockets on component inputs or outputs will be in number order.
+  XML wires will specify the socket number they connect to.
+* Serialising will be done one component at a time.
+  The order the tree is traversed shouldn't matter since they are loosely coupled.
+
+
+Switching between editing components and their subcomponents:
+-------------------------------------------------------------
+* User is actually only ever editing one component (sub-components are visible but immutable).
+  Each change of edit context does a full commit and then full reload into the new context.
+  Will probably require garbage collection of any commits that are neither used nor tagged.
+
+* The Tag/Sha reference system:
+  A component can fail to "fit" because the size is too big or its ports are too few.
+  If a tag is present, that version will be attempted first. If it wont fit, falls back to the SHA version.
+  Hard SHA is updated to match whenever a tagged component is successfully loaded.
+
+NOT COMMITTING HAS DIFFICULTIES:
+* Must Pan out to widest component level before save-quit.
+* Narrowing in to edit an inner component or Widening out to edit an outer component:
+  Would probably require Serialisation and on widening, calculation of inner SHA.
+
+* Difficulties with zooming into subcomponent that is referred to by SHA only (locked).
+  On Zoom out: Where no tag is used AND the new inner component fits, (offer to) update the SHA ref to the new version.
+  OR
+  Refuse (or advise against) editing of untagged subcomponents.
+  OR
+  All components must be on tag-follow mode to edit. Attempting to edit prompts for new tag if one doesn't exist.
+
+
+
+
+
+
+
+Git data:
+---------
+Commits:
+	SHA-1 ID number
+	previous ID number if it has one
+	A parts description including references to commit numbers of any constituent components
+Tags:
+	A name
+	The number of the commit that they point to
+
+
+Git System Interface:
+---------------------
+Saving:
+	Each component is saved as a separate entity using its SHA-1.
+	Default save updates tags to point to new versions.
+	Alternate save can fork a new version (only difference is the tags).
+Tagging:
+	Each Tag points to one commit. There can exist 0 or more tags for each commit.
+	For modifications, tags can move to new version or stay pointing to original.
+	New tags can be applied to either too.
+	(When Components include sub-components, they can specify a tag to attempt to keep updated.
+	Failure to match the sockets will cause a fallback to the SHA.)
+Library:
+	Two libraries, one of all commits by number, the other of commits with tags.
+
+
+
+XML Schema:
+------------
+(i=id, thr=threshold, w=weight, n=name, ps=pinside, pn=pinnumber, f=from, t=to, fs=fromsocket, ts=tosocket)
+(? preceding attribute denotes optional)
+<PLAN sha(sha) ?old_sha(sha) w(int) h(int) ?n(str)>
+	<COMP i(id) x(int) y(int) sha(sha) ?tag(str) ?n(str) />
+	<NEUR i(id) x(int) y(int) thr(int) ?n(str) />
+	<SOCK i(id) x(int) y(int) ps(tribool) pn(int) ?n(str) />
+	<WIRE f(id) t(id) ?fs(int) ?ts(int) ?w(int) />
+</PLAN>
+
+XML Example:
+------------
+(All devices would have unique positional data)
+<TAGS>
+	<TAG name="one bit memory" sha="73cbab378" />
+	<TAG name="obgm" sha="3b862dae1" />
+</TAGS>
+<COMMITS>
+	<PLAN sha="3c44a901d3" original_name="one bit memory" w="3" h="1">
+		<NEUR i="1" thr="1" x="1" y="1"/>
+		<WIRE f="1" t="1" w="1"/>
+	</PLAN>
+	<PLAN sha="73cbab378" old_sha="3c44a901d3" original_name="one bit memory" w="3" h="2">
+		<SOCK i="3" n="set" x="1" y="1"/>
+		<SOCK i="4" n="reset" x="1" y="1"/>
+		<NEUR i="1" thr="1" x="1" y="1"/>
+		<SOCK i="7" n="out" x="1" y="1"/>
+		<WIRE f="3" t="1" w="1"/>
+		<WIRE f="4" t="1" w="-1"/>
+		<WIRE f="1" t="1" w="1"/>
+		<WIRE f="1" t="7"/>
+	</PLAN>
+	<PLAN sha="3b862dae1" original_name="obgm" w="6" h="2">
+		<SOCK i="2" n="setreset" x="1" y="1"/>
+		<SOCK i="3" n="gate" x="1" y="1"/>
+		<COMP i="4" n="latch" x="1" y="1" sha="73cbab378" tag="one bit memory"/>
+		<NEUR i="8" thr="2" n="setter" x="1" y="1"/>
+		<NEUR i="9" thr="1" n="resetter" x="1" y="1"/>
+		<SOCK i="11" n="out" x="1" y="1"/>
+		<WIRE f="2" t="8" w="1"/>
+		<WIRE f="2" t="9" w="-1"/>
+		<WIRE f="3" t="8" w="1"/>
+		<WIRE f="3" t="9" w="-1"/>
+		<WIRE f="8" t="4" ts="set"/>
+		<WIRE f="9" t="4" ts="reset"/>
+		<WIRE f="4" t="11" fs="out"/>
+	</PLAN>
+</COMMITS>
+

@@ -142,6 +142,7 @@ bool Controller::HandleInput()
                     }
                 }
                 if (event.key.code == sf::Keyboard::A) {
+                    theView.PostMessage("Tried to modify a device upwards");
                     ChipPlanFunc::DeviceHandle(pos1, 1);
                 }
                 if (event.key.code == sf::Keyboard::Z) {
@@ -161,6 +162,7 @@ bool Controller::HandleInput()
                 }
                 if (event.key.code == sf::Keyboard::M)
                 {
+                    theView.PostMessage("Tried to move something");
                     ChipPlanFunc::SetPosition(pos1, pos2);
                 }
                 if (event.key.code == sf::Keyboard::Q)
@@ -216,13 +218,17 @@ bool Controller::HandleInput()
                 }
                 if (event.key.code == sf::Keyboard::Subtract)
                 {
-//                    theModel.ToggleNameFiltering(true);
+                    assert(not enteringName);
+                    assert(not enteringFilter);
+                    auto p = theModel.SetNameFilter(pos1, "");
+                    CursorsGoHere(p);
                 }
                 if (event.key.code == sf::Keyboard::Add)
                 {
                     assert(not enteringName);
                     assert(not enteringFilter);
                     enteringFilter = true;
+                    enteringText = theModel.GetNameFilter();
                     textEntryCooldown.restart();
                 }
 
@@ -239,19 +245,11 @@ bool Controller::HandleInput()
                     theModel.Logic();
                 }
 
-                if (event.key.code == sf::Keyboard::R)
-                {
-                    theModel.AddName(pos1.GetPlan()->GetPlanID(), "CyboLatch");
-                }
-                if (event.key.code == sf::Keyboard::T)
-                {
-                    theModel.AddName(pos1.GetPlan()->GetPlanID(), "SN@RFK!77EN");
-                }
                 if (event.key.code == sf::Keyboard::Y)
                 {
                     theModel.RemoveName(pos1.GetPlan()->GetPlanID());
                 }
-                if (event.key.code == sf::Keyboard::U)
+                if (event.key.code == sf::Keyboard::U and theModel.CanAddName(pos1.GetPlan()->GetPlanID()))
                 {
                     assert(not enteringName);
                     assert(not enteringFilter);
@@ -302,6 +300,8 @@ bool Controller::HandleInput()
 //        theView.cursorTwo.SetGridOnly(theView.cursorOne.GetPlanPos().GetGrid());
 //    }
 
+    theView.SetTextEntering(enteringName or enteringFilter, enteringText);
+    
     return quitYet;
 }
 

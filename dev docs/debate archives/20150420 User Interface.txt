@@ -1,0 +1,22 @@
+ADD
+neur, sock, comp, wire, io
+DELETE
+neur, sock, comp, wire, io
+EDIT
+neur, sock,       wire,
+
+EXPAND
+selected, all
+COLLAPSE
+selected, all
+
+SAVE
+collapsed component?, toggle mutable?
+
+RUN
+step, speeds, restart
+
+ZOOM/PAN, etc
+
+VISIBILITY TOGGLE
+selected, all

@@ -1,0 +1,84 @@
+	
+NO_INPUT LEVELS:
+	GO: Go Forward:
+		Ins (none) Outs (LR feet).
+		MAP: Empty arena with fixed start location directly beneath fixed goal.
+		SOL: Connect a zero neuron to both feet.
+	WAIT: After 5 ticks, go forward.
+		Ins (none) Outs (LR feet).
+		MAP: Same as "Go Forward", but with a hazard that disappears/moves away.
+		SOL: Use a zero neuron that connects through a chain of neurons to delay the signal (and possibly trigger the "send" output).
+	STRAIGHTEN: Turn right once, then go forward.
+		Ins (none) Outs (LR feet).
+		MAP: Same as "Go Forward", but start facing to the left.
+		SOL: Use a zero neuron to turn but inhibit that zn with another zn that also causes the movement.
+
+	FLIPFLOP: Alternately go forward and turn right.
+		Ins (none) Outs (LR feet).
+		MAP: 
+		SOL: Use a Zero neuron with a -1 weighted feedback loop to create an alternating fire. Connect two output prep neurons to it.
+
+EARLY LEVELS:
+	IFPOS: If possible, go forward. Otherwise turn right.
+		Ins (nosebump) Outs (LR feet).
+		MAP: A set arena with blocks which provides a natural circuit upon which all possible start points and goals are situated.
+		SOL: Done. Connect a zero-neuron-initiated loop to both feet. Inhibit left foot with the input signal.
+	CORRIDEATH: Move forward when safe. (this would be a much easier puzzle without the timeout requirement)
+		Ins (nosebump) Outs (LR feet).
+		MAP: A narrowish corridor with a fixed goal at the far end. Random cats move back and forth across the central path.
+		SOL: Done (seq version). Move forward when detect a cat in front, or at timeout (after sending x number of 'wait' outputs).
+	WIDEBLOCK: Get to the far end, moving round any obstacles.
+		Ins (nosebump) Outs (LR feet)
+		MAP: A squareish arena with a fixed goal at the far end. Has randomly (max 1 per row) located static blocks (possibly deadly).
+		SOL: Done. If (nosebump) {turn right, forward, turn left, forward} else {forward}.
+	CORRIBLOCK: Get to the far end, moving round any obstacles.
+		Ins (nosebump, LRwhiskers) Outs (LR feet)
+		MAP: A narrowish corridor with a fixed goal at the far end. Has randomly (max 1 per row) located static blocks (possibly deadly).
+		SOL: Done. If (nosebump) { if (Rwhisker) {turn left, forward, turn right, forward} else {turn right, forward, turn left, forward} } else {forward}.
+
+MIDDLE LEVELS:
+	SPIRAL: Move onto every tile in a spiral motion (no inputs)
+		Ins (none) Outs (LR feet)
+		MAP: The start is fixed in the centre of a square area surrounded by (undetectable) chasm on all four sides. Must reach the randomly located goal.
+		SOL: Done (multiple variants). Also on paper. Uses two int memories connected to an incrementer and a decrementer and checks for zero.
+	BREADCRUMB: Follow the scent trail
+		Ins (smell scents) Outs (LR feet)
+		MAP: The player must follow a scent trail and move in the correct directions to the goal.
+		SOL: Done. (solution is part of the breadcrumb algo)
+			Must keep track of orientation (unless scentSmell is perspective-dependent like arrows on the ground).
+			//up 0, right 1, down 2, left 3
+			//orient and sbuffer are 2bit memories.
+			while (orient != 0) { turn left, dec orient }
+			while (sbuffer != 0) { turn right, inc orient, dec sbuffer }
+			forward, read scent to buffer
+LATER LEVELS:
+	SEARCH: Search everywhere for the goal.
+		Ins (LFR Whiskers, smell scents) Outs (LR feet, mark scents)
+		MAP: Large, entirely random arena. Contains scattered detectable blocks to create a (solvable) maze.
+		SOL: Breadcrumb algo.
+			If (notL or notF or notR whisker) { move onto LFR. Mark scent of dir } else { move direction of smellScent }
+
+
+	
+		
+Stale cell increment algo: Requires being able to mark each cell with an (unlimited) integer. Will eventually reach each square.
+	Definition: Mark value of current cell as lowest neighbor + 1. Then move onto lowest neighbor (randomly choose between ties).
+	4445-221110000
+	33-----1211x00
+	22--1111110000
+	2222111000----
+	2212211100----
+	2222-1111--000
+	2222--11100000
+	
+The breadcrumb trail algo: Requires being able to mark each cell with a direction (so 5 scents including null). Will eventually reach each square.
+	Definition: If an adjacent virgin cell exists, move onto it and mark it with the direction just moved. Else, retrace steps until virgin cell exists.
+	0000000000000urr00
+	000urrrrrrrrrrud00
+	brrllu00lllurrrd00
+	00d00u00d00uurddrr
+	0ldurr00d00ulldrrd
+	0drr0000d00lllllld
+	00000000d00000cllu
+	00000000drrrrrrrrr
+

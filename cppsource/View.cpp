@@ -12,6 +12,91 @@
 #include "ChipHandle.hpp"
 #include "ChipPlan.hpp"
 
+
+ViewPanel::ViewPanel()
+{
+    mainOutlineBox.setSize(sf::Vector2f{300.f, 140.f} );
+    mainOutlineBox.setPosition(300.f, 20.f );
+    mainOutlineBox.setFillColor(sf::Color::Transparent);
+    mainOutlineBox.setOutlineThickness(2.f);
+    mainOutlineBox.setOutlineColor(sf::Color::Yellow);
+
+    parentPlanText.setFont(ViewResources::GetInstance().font);
+    parentPlanText.setCharacterSize(25.f);
+    parentPlanText.setPosition(320.f, 30.f);
+    parentPlanText.setColor( sf::Color::Green );
+
+    mainPlanText.setFont(ViewResources::GetInstance().font);
+    mainPlanText.setCharacterSize(29.f);
+    mainPlanText.setPosition(320.f, 70.f);
+    mainPlanText.setColor( sf::Color::Green );
+
+    kidsPlanText.setFont(ViewResources::GetInstance().font);
+    kidsPlanText.setCharacterSize(25.f);
+    kidsPlanText.setPosition(320.f, 110.f);
+    kidsPlanText.setColor( sf::Color::Green );
+}
+
+void ViewPanel::SetPlanID(int plan, std::shared_ptr<const UserData> uData)
+{
+    planID = plan;
+    auto userData = uData;
+    
+    int parent = 0;
+    int numKids = 0;
+    auto relatives = userData->GetRelatives(planID);
+    if (relatives) {
+        parent = relatives->parent;
+        numKids = relatives->kids.size();
+    }
+    mainPlanText.setString( patch::to_string(planID) + ": " + userData->GetNameByID(planID) );
+    parentPlanText.setString( patch::to_string(parent) + ": " + userData->GetNameByID(parent) );
+    kidsPlanText.setString( "< kids: " + patch::to_string(numKids) + "   >" );
+}
+
+void ViewPanel::Draw(sf::RenderTarget &rt)
+{
+    rt.draw( mainOutlineBox );
+    rt.draw( parentPlanText );
+    rt.draw( mainPlanText );
+    rt.draw( kidsPlanText );
+}
+
+
+
+
+
+const int MESSAGES_TO_DISPLAY = 4;
+Marquee::Marquee()
+{
+    for (int i = 0; i< MESSAGES_TO_DISPLAY; i++)
+    {
+        sf::Text barText;
+        barText.setFont(ViewResources::GetInstance().font);
+        barText.setCharacterSize(25.f);
+        barText.setPosition(670.f, 30.f + (i*25.f) );
+        barText.setColor( sf::Color::Magenta );
+        texts.emplace_back(barText);
+    }
+}
+
+void Marquee::PostMessage(std::string message)
+{
+    messageDeque.push_front(message);
+    if (messageDeque.size() > MESSAGES_TO_DISPLAY) messageDeque.pop_back();
+}
+
+void Marquee::Draw(sf::RenderTarget &rt)
+{
+    for (int i = 0; i<texts.size(); i++)
+    {
+        //auto & x = texts.at(i);
+        if (i<messageDeque.size()) texts.at(i).setString( messageDeque.at(i) );
+        rt.draw( texts.at(i) );
+    }
+}
+
+
 const sf::FloatRect MAIN_VIEWPORT {0.f, 0.f, 1.f, 0.8f};
 const sf::FloatRect BAR_VIEWPORT {0.f, 0.8f, 1.f, 0.2f};
 const int BAR_HEIGHT = 180.f;
@@ -25,7 +110,6 @@ View::View(Model & model_p)
     ,mainView(sf::Vector2f{0.f, 0.f}, INITIAL_MAINVIEW_SIZE )
     ,mainOverlay(sf::FloatRect{0.f,0.f, INITIAL_MAINVIEW_SIZE.x, INITIAL_MAINVIEW_SIZE.y})
     ,barOverlay(sf::FloatRect{0.f,0.f, INITIAL_MAINVIEW_SIZE.x, BAR_HEIGHT})
-    ,mainOverlayBox(sf::Vector2f{1400.f, 720.f} )
     ,cursorOne(model_p.GetBasePlan()->GetGrid())
     ,cursorTwo(model_p.GetBasePlan()->GetGrid(), sf::Color::Cyan)
     ,highlightingMode(1)
@@ -36,17 +120,14 @@ View::View(Model & model_p)
     mainOverlay.setViewport(MAIN_VIEWPORT);
     barOverlay.setViewport(BAR_VIEWPORT);
     window.setView(mainView);
+
+    mainOverlayBox.setSize(sf::Vector2f{1400.f, 720.f} );
     
     barText1.setFont(ViewResources::GetInstance().font);
     barText1.setCharacterSize(25.f);
     barText1.setPosition(30.f, 30.f);
     barText1.setColor( sf::Color::Green );
-
-    barText2.setFont(ViewResources::GetInstance().font);
-    barText2.setCharacterSize(25.f);
-    barText2.setPosition(30.f, 90.f);
-    barText2.setColor( sf::Color::Magenta );
-}
+    }
 
 
 void View::Draw()
@@ -92,7 +173,7 @@ void View::DrawMain() //Main Port...
         if (w1) w1->Draw(window);
     }
     if (highlightingMode == 3)
-    {
+    { //this whole GetWires() business is shonky...
         auto d1 = ChipPlanFunc::GetDevice(cursorOne.GetPlanPos());
         if (d1) {
             d1->Draw(window);
@@ -123,12 +204,17 @@ void View::DrawBar() //Bar Port...
 //    window.draw(lines);
 
     
-    auto ap = GetViewBasePlan();
+    auto ap = cursorOne.GetPlanPos().GetPlan();
+    if (not ap) ap = GetViewBasePlan();
     assert(ap);
-    barText1.setString( "text1: " + patch::to_string(ap->GetPlanID()) );
-    barText2.setString( "text2: " + patch::to_string(ap->SerialName()) );
-    window.draw(barText1);
-    window.draw(barText2);
+    
+    //barText1.setString( "text1: " + patch::to_string(ap->GetPlanID()) );
+    if (drawTextEntering) window.draw(barText1);
+
+    marquee.Draw(window);
+    
+    viewPanel.SetPlanID( ap->GetPlanID(), theModel.GetUserData() );
+    viewPanel.Draw(window);
 }
 
 void View::Zoom(float zoomFactor)

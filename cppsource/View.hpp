@@ -15,6 +15,37 @@
 #include "Cursor.hpp"
 
 
+class ViewPanel
+{
+public:
+    ViewPanel();
+    void SetPlanID(int, std::shared_ptr<const UserData>);
+    void Draw(sf::RenderTarget &rt);
+
+private:
+    std::shared_ptr<UserData> userData;
+    int planID;
+    
+    sf::RectangleShape mainOutlineBox;
+    sf::Text parentPlanText;
+    sf::Text mainPlanText;
+    sf::Text kidsPlanText;
+};
+
+
+#include <string>
+#include <deque>
+class Marquee
+{
+public:
+    Marquee();
+    void PostMessage(std::string s);
+    void Draw(sf::RenderTarget &rt);
+private:
+    std::deque<std::string> messageDeque;
+    std::vector<sf::Text> texts;
+};
+
 class View
 {
 public:
@@ -35,8 +66,16 @@ public:
     void Clamp();
     void SetHighlightingMode(int x)             { highlightingMode = x; }
     
+    ViewPanel viewPanel;
+
+    void PostMessage(std::string message)       { marquee.PostMessage(message);}
+    Marquee marquee;
+    
+    void SetTextEntering(bool on, std::string text = "")     { barText1.setString(text); drawTextEntering = on; }
+    bool drawTextEntering;
+
     sf::RenderWindow & GetWindow()                        {return window;}
-    std::shared_ptr<ChipPlan> GetViewBasePlan()           {return theModel.GetBasePlan(); }//{return viewBasePlan.lock();}
+    std::shared_ptr<ChipPlan> GetViewBasePlan()           {return theModel.GetBasePlan(); }
     
 private:
     sf::RenderWindow window;
@@ -46,19 +85,13 @@ private:
 
     sf::RectangleShape mainOverlayBox;
     sf::Text barText1;
-    sf::Text barText2;
 
     const Model & theModel;
-    //std::weak_ptr<ChipPlan> viewBasePlan;
 
     int highlightingMode;
 public:
     Cursor cursorOne;
     Cursor cursorTwo;
-//    std::weak_ptr<Device> device1;
-//    std::weak_ptr<Device> device2;
-//    std::weak_ptr<Wire> wire1;
-//    int xmlPlan;
 };
 
 #endif	/* VIEW_HPP */

@@ -9,7 +9,9 @@
 #include <cassert>
 #include <map>
 
+const std::string AUTO_NAME_PREFIX = "@";
 const int NAME_MAX_LENGTH = 30;
+const int AUTO_NAME_MAX_LENGTH = NAME_MAX_LENGTH - 1; //to account for the @ identifier
 const std::string AUTO_NAME_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
 
@@ -17,8 +19,7 @@ UserData::UserData(std::shared_ptr<Serializer> s)
     :serializer(s)
 {}
 
-#include <iostream>
-int UserData::GetID(int planID, PlanNav nav)
+int UserData::GetID(int planID, PlanNav nav) const
 {
     int target = planID;
 
@@ -35,10 +36,6 @@ int UserData::GetID(int planID, PlanNav nav)
             char lastLetterPlusOne = static_cast<char>(nameFilter.back() + 1);
             std::string nameFilterPlusOne = nameFilter.substr(0, nameFilter.size()-1) + lastLetterPlusOne;
             upper = namesByName.lower_bound(nameFilterPlusOne);
-
-            std::cout << "lower + upper: " << (lower == upper ? "SAME!" : "DFRNT") << std::endl;
-            if (lower != nn_end) std::cout << "lower: " << lower->first << " and " << lower->second << std::endl;
-            if (upper != nn_end) std::cout << "upper: " << upper->first << " and " << upper->second << std::endl;
         }
 
         if (lower == upper) //(filtered)range is empty
@@ -105,6 +102,7 @@ int UserData::GetID(int planID, PlanNav nav)
             {
                 auto & sibs = ancestry.at(parentID)->kids;
                 auto sib_it = sibs.find(planID);
+                if (sib_it == sibs.end()) sib_it = sibs.begin();
                 assert(sib_it != sibs.end());
                 
                 if (nav == PlanNav::PREV_SIBLING and sib_it != sibs.begin()) --sib_it;
@@ -162,11 +160,18 @@ int UserData::GetIDByName(std::string name) const
     if (namesByName.count(name) > 0) return namesByName.at(name);
     else return 0;
 }
-
 std::string UserData::GetNameByID(int planID) const
 {
     if (namesByID.count(planID) > 0) return namesByID.at(planID);
     else return "";
+}
+bool UserData::CanAddName(int planID) const
+{
+    return planID != 0 and (GetNameByID(planID) == "" or GetNameByID(planID).substr(0,1) == AUTO_NAME_PREFIX);
+}
+bool UserData::CanAddName(int planID, std::string name) const
+{
+    return CanAddName(planID) and name != "" and GetIDByName(name) == 0;
 }
 
 //Names //Setters
@@ -181,8 +186,9 @@ void UserData::RemoveName(int planID)
 }
 void UserData::AddName(int planID, std::string name)
 {
-    if ( name != "" and GetNameByID(planID) == "" and GetIDByName(name) == 0 )
+    if (CanAddName(planID, name))
     {
+        RemoveName(planID);
         namesByID.insert( std::make_pair(planID, name) );
         namesByName.insert( std::make_pair(name, planID) );
         serializer->SaveAddName(planID, name);
@@ -202,15 +208,15 @@ void UserData::AddAutoName(int planID)
 std::string UserData::GetUnusedAutoName()
 {
     std::string randomName;
-    for (int i = 0; i <= NAME_MAX_LENGTH; ++i)
+    for (int i = 0; i <= AUTO_NAME_MAX_LENGTH; ++i)
     {
         randomName.push_back( AUTO_NAME_CHARS.at( rand() % AUTO_NAME_CHARS.length() ) );
         if (namesByName.count(randomName) == 0)
         {
-            return "~" + randomName;
+            return AUTO_NAME_PREFIX + randomName;
         }
     }
-    throw "NAME MAX LENGTH Reached! (highly unlikely to reach this)";
+    throw "NAME MAX LENGTH Reached!"; // Highly unlikely to reach this point with Max of 30, but still bad form.;
 }
 
 
