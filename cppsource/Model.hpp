@@ -13,22 +13,7 @@
 #include "Serializer.hpp"
 #include "UserData.hpp"
 #include "ChipPlan.hpp"
-
-class BaseReferer : public RefererInterface
-{
-public:
-    BaseReferer();
-    void Logic();
-    
-    //RefererInterface...
-    virtual void StepOut(bool charge, int slot) override;
-    virtual void SetModified() override;
-    virtual void SetSubPlan(std::shared_ptr<ChipPlan>, std::shared_ptr<RefererInterface>) override;
-    virtual std::shared_ptr<ChipPlan> GetSubPlan() override;
-    
-private:
-    std::shared_ptr<ChipPlan> basePlan;    
-};
+#include "Puppet.hpp"
 
 
 class Model
@@ -39,8 +24,7 @@ public:
 
     void Logic();
     
-    //void SetBasePlan(std::shared_ptr<ChipPlan> newPlan)         {baseReferer->basePlan = newPlan;}
-    const std::shared_ptr<ChipPlan> GetBasePlan() const                     {return baseReferer->GetSubPlan();}
+    const std::shared_ptr<Puppet> GetPuppet() const                         {return puppet;} //TOTALLY WRONG USE OF CONST!!! SORT THIS OUT!
 
     std::shared_ptr<ChipPlan> WipePlan(PlanPos, bool forced);
     std::shared_ptr<ChipPlan> LoadPlan(PlanPos, PlanNav nav);
@@ -58,7 +42,8 @@ public:
 private:
     std::shared_ptr<Serializer> serializer;
     std::shared_ptr<UserData> userData;
-    std::shared_ptr<BaseReferer> baseReferer;
+
+    std::shared_ptr<Puppet> puppet;
 };
 
 

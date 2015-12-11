@@ -141,7 +141,7 @@ bool Serializer::SavePlanRecursively(std::shared_ptr<ChipPlan> plan_p, std::shar
                 auto h = std::dynamic_pointer_cast<ChipHandle>(d);
                 auto p = h->GetSubPlan();
                 //holy recursion batman!?!...
-                if (p) SavePlan(p, userData);
+                if (p) SavePlanRecursively(p, userData);
                 pugi::xml_node dev = plan.append_child("HAND");
                 dev.append_attribute("i").set_value(d->GetSerial() );
                 dev.append_attribute("x").set_value(d->GetSmartPos().x);
@@ -205,7 +205,7 @@ std::shared_ptr<ChipPlan> Serializer::LoadPlanRecursively(int planID, std::share
             auto handle = BlobFactory::AddHandle(memPlan, serial, pos);
             //Recursively load subplans and assign them...
             if (link != 0) {
-                auto subPlan = LoadPlan(link, userData);
+                auto subPlan = LoadPlanRecursively(link, userData);
                 handle->SetSubPlan(subPlan, handle);
             }
         }

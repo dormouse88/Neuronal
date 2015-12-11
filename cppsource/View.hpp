@@ -46,6 +46,9 @@ private:
     std::vector<sf::Text> texts;
 };
 
+
+
+
 class View
 {
 public:
@@ -74,8 +77,9 @@ public:
     void SetTextEntering(bool on, std::string text = "")     { barText1.setString(text); drawTextEntering = on; }
     bool drawTextEntering;
 
-    sf::RenderWindow & GetWindow()                        {return window;}
-    std::shared_ptr<ChipPlan> GetViewBasePlan()           {return theModel.GetBasePlan(); }
+    sf::RenderWindow & GetWindow()                          {return window;}
+    std::shared_ptr<Puppet> GetPuppet()                     {return theModel.GetPuppet(); }
+    std::shared_ptr<ChipPlan> GetViewBasePlan()             {return GetPuppet()->GetBR()->GetSubPlan(); }
     
 private:
     sf::RenderWindow window;

@@ -1,0 +1,30 @@
+
+Where to address the exchange between the ints of plan sockets and the names of Puppet's inputs and outputs?
+	In the BaseReferer. Puppet passes in the names of the xputs to the BaseReferer, which assigns them slots sequentially (perhaps they can be user settable later).
+
+The BaseReferer has to have its maps initialized once per level to determine which inputs and outputs are present. This provides their names and ints for the slots.
+The inputs map values are set every outergame tick, the outputs map values are set by the innergame via StepOut()
+
+Should the actions and senses be enums or strings or a set of objects of a class or what??? Who cares. Strings for now.
+	enum class Inputs { LWHISK, FWHISK, RWHISK };
+	enum class Outputs { LFOOT, RFOOT };
+	struct Actions {
+		int id;
+		string description;
+	}
+
+Time:
+	The inner and outer time relationships are well understood within the player puppet. But how does the outer tick of the player puppet relate to the general time of the outer world?
+	
+	Model::OuterTick()
+		This is called to universally advance the world time. It calls all its puppets' Act() functions. 
+	
+	Puppet::Act()
+		It calls BR::RetrieveOutputs()
+		Then it determines and performs the action specified by the outputs.
+		Then it calls BR::SetInputState() with the new situation.
+		
+	BR::RetrieveOutputs()
+		This is a get and a clear in one.
+		It returns a map of output names along with their charge state, then it wipes its own outputs and sets its ready flag to Not ready.
+	

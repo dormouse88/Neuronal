@@ -6,7 +6,6 @@
 	<NAME i="8" n="4SEQSPIRAL" />
 	<NAME i="9" n="LATCH" />
 	<NAME i="13" n="DECREMENTER" />
-	<NAME i="14" n="4BDEC" />
 	<NAME i="17" n="GATEDLATCH" />
 	<NAME i="18" n="4BGM" />
 	<NAME i="24" n="INCREMENTER" />
@@ -34,6 +33,7 @@
 	<NAME i="56" n="@Q" />
 	<NAME i="57" n="@F" />
 	<NAME i="61" n="BREADCRUMB" />
+	<NAME i="14" n="4BITDEC" />
 </NAMES>
 <RELATIVES>
 	<REL i="1" anc="0" />
@@ -97,9 +97,10 @@
 	<REL i="59" anc="58" />
 	<REL i="60" anc="59" />
 	<REL i="61" anc="60" />
+	<REL i="62" anc="14" />
 </RELATIVES>
 <PLANS>
-	<PLAN_DB HIGHEST_ID="61" />
+	<PLAN_DB HIGHEST_ID="62" />
 	<PLAN i="1">
 		<NEUR i="1" x="-1" y="-1" thr="1" />
 		<NEUR i="2" x="0" y="-1" thr="1" />
@@ -2506,5 +2507,26 @@
 		<WIRE f="39" t="28" w="1" fs="0" ts="1" />
 		<WIRE f="28" t="25" w="1" fs="1" ts="0" />
 		<WIRE f="31" t="39" w="1" fs="0" ts="0" />
+	</PLAN>
+	<PLAN i="62">
+		<HAND i="1" x="0" y="-1" link="13" />
+		<HAND i="2" x="0" y="1" link="13" />
+		<HAND i="3" x="0" y="3" link="18" />
+		<HAND i="4" x="0" y="5" link="13" />
+		<NEUR i="5" x="0" y="6" thr="1" />
+		<NEUR i="6" x="0" y="-2" thr="0" />
+		<WIRE f="1" t="0" w="1" fs="1" ts="1" />
+		<WIRE f="2" t="0" w="1" fs="1" ts="2" />
+		<WIRE f="3" t="0" w="1" fs="1" ts="3" />
+		<WIRE f="4" t="0" w="1" fs="1" ts="4" />
+		<WIRE f="1" t="2" w="1" fs="2" ts="1" />
+		<WIRE f="2" t="3" w="1" fs="2" ts="1" />
+		<WIRE f="3" t="4" w="1" fs="2" ts="1" />
+		<WIRE f="6" t="1" w="1" fs="0" ts="1" />
+		<WIRE f="4" t="5" w="1" fs="2" ts="0" />
+		<WIRE f="0" t="1" w="1" fs="1" ts="2" />
+		<WIRE f="0" t="2" w="1" fs="2" ts="2" />
+		<WIRE f="0" t="3" w="1" fs="3" ts="2" />
+		<WIRE f="0" t="4" w="1" fs="4" ts="2" />
 	</PLAN>
 </PLANS>

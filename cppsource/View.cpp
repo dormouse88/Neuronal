@@ -110,8 +110,10 @@ View::View(Model & model_p)
     ,mainView(sf::Vector2f{0.f, 0.f}, INITIAL_MAINVIEW_SIZE )
     ,mainOverlay(sf::FloatRect{0.f,0.f, INITIAL_MAINVIEW_SIZE.x, INITIAL_MAINVIEW_SIZE.y})
     ,barOverlay(sf::FloatRect{0.f,0.f, INITIAL_MAINVIEW_SIZE.x, BAR_HEIGHT})
-    ,cursorOne(model_p.GetBasePlan()->GetGrid())
-    ,cursorTwo(model_p.GetBasePlan()->GetGrid(), sf::Color::Cyan)
+//    ,cursorOne(model_p.GetBasePlan()->GetGrid())
+//    ,cursorTwo(model_p.GetBasePlan()->GetGrid(), sf::Color::Cyan)
+    ,cursorOne( model_p.GetPuppet()->GetBR()->GetSubPlan()->GetGrid() )
+    ,cursorTwo( model_p.GetPuppet()->GetBR()->GetSubPlan()->GetGrid(), sf::Color::Cyan )
     ,highlightingMode(1)
 {
     window.setVerticalSyncEnabled(true);

@@ -32,8 +32,11 @@ public:
     std::shared_ptr<RefererInterface> GetReferer();
     std::shared_ptr<ChipHandle> GetHandle();
 
-    virtual std::string SerialName() const { return "PLAN";}
+    //RED//virtual std::string SerialName() const { return "PLAN";}
+    
+    //Wirable...
     virtual void ReceiveCharge(bool charge, int weight, int slot) override;
+    virtual VectorWorld GetWireAttachPos(WireAttachSide was) const override;
     virtual bool IsSlotted(SlottedSide) const override                                                  {return true;}
     virtual bool CanRegisterIn(int slot) const override;
     virtual bool CanRegisterOut(int slot) const override;
@@ -47,7 +50,7 @@ public:
     int GetFreeSerial() const;
     bool IsSerialFree(int serial) const;
     bool IsPositionFree(VectorSmart pos) const;
-    int GetPlanID()                                                                                     {return planID;}
+    int GetPlanID() const                                                                               {return planID;}
 
     void ImportDevice(std::shared_ptr<Device> device);
     void ImportWire(std::shared_ptr<Wire> wire);
@@ -65,8 +68,6 @@ public:
     std::shared_ptr<Wire> GetWire(const Wirable& from, const Wirable& to);
     std::vector<std::shared_ptr<Wire> > GetWires(std::shared_ptr<Wirable>, bool from, bool to); 
 
-    virtual VectorWorld GetWireAttachPos(WireAttachSide was) const override;
-    
     void RecalculateSmartInnerBound();
     PlanRect GetSmartInnerBound() const;
     PlanRect GetSmartPaddedBound() const;

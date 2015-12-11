@@ -49,11 +49,12 @@ public:
     virtual void LogicAct() override;
     virtual void LogicCalculate() override;
 
-    bool IsThresholdMet() const                 {return receivedCharge >= threshold; }
-    bool GetFiring() const                      {return firing;}
-    void SetFiring(bool f)                      {firing = f;}
-    int GetThreshold() const                    {return threshold;}
-    int GetReceivedCharge() const               {return receivedCharge;}
+    bool IsThresholdMet() const                 {return receivedCharge >= threshold; }    //for drawing + private use only
+    bool GetFiring() const                      {return firing;}  //for drawing only
+    //RED//void SetFiring(bool f)                      {firing = f;}
+    int GetThreshold() const                    {return threshold;}  //for drawing only
+    int GetReceivedCharge() const               {return receivedCharge;}  //for drawing only
+    
     void ModifyThreshold(int v)                 {threshold += v;}
     
 private:

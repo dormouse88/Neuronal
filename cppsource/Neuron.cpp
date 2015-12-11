@@ -70,12 +70,12 @@ void Neuron::ReceiveCharge(bool charge, int weight, int slot)
 
 void Neuron::LogicAct()
 {
-    PushCharge(GetFiring(), 0);
+    PushCharge(firing, 0);
 }
 
 void Neuron::LogicCalculate()
 {
-    SetFiring(IsThresholdMet());
+    firing = IsThresholdMet();
     receivedCharge = 0;
 }
 

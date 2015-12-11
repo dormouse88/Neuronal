@@ -1,6 +1,5 @@
 Not Commited
 ============
-Added a textual feedback bar.
 
 
 General

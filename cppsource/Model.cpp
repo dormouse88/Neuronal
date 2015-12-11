@@ -8,54 +8,18 @@
 #include "Model.hpp"
 #include <iostream>
 
-BaseReferer::BaseReferer()
-{
-}
-
-void BaseReferer::Logic()
-{
-    basePlan->PassOnCalculate();
-    basePlan->PassOnAct();
-}
-
-//RefererInterface...
-void BaseReferer::StepOut(bool charge, int slot)
-{
-    ;
-}
-void BaseReferer::SetModified()
-{
-    ;
-}
-void BaseReferer::SetSubPlan(std::shared_ptr<ChipPlan> p, std::shared_ptr<RefererInterface> myself)
-{
-    basePlan = p;
-    p->RegisterReferer( myself );
-}
-std::shared_ptr<ChipPlan> BaseReferer::GetSubPlan()
-{
-    return basePlan;
-}
-
-
-
-
-
 
 Model::Model()
     :serializer(std::make_shared<Serializer>())
     ,userData(std::make_shared<UserData>(serializer))
-    ,baseReferer(std::make_shared<BaseReferer>())
+    ,puppet(std::make_shared<Puppet>())
 {
     serializer->LoadUserData(userData);
-    
-    auto basePlan = BlobFactory::MakePlan();
-    baseReferer->SetSubPlan(basePlan, baseReferer);
 }
 
 void Model::Logic()
 {
-    baseReferer->Logic();
+    puppet->Act();
 }
 
 std::shared_ptr<ChipPlan> Model::WipePlan(PlanPos pos, bool forced)

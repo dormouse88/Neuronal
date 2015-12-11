@@ -8,7 +8,7 @@
 #ifndef REFERERINTERFACE_HPP
 #define	REFERERINTERFACE_HPP
 
-#include "ChipPlan.hpp"
+class ChipPlan;
 
 class RefererInterface
 {
