@@ -24,7 +24,7 @@ public:
 
     void Logic();
     
-    const std::shared_ptr<Puppet> GetPuppet() const                         {return puppet;} //TOTALLY WRONG USE OF CONST!!! SORT THIS OUT!
+    std::shared_ptr<Puppet> GetPuppet()                                      {return puppet;}
 
     std::shared_ptr<ChipPlan> WipePlan(PlanPos, bool forced);
     std::shared_ptr<ChipPlan> LoadPlan(PlanPos, PlanNav nav);

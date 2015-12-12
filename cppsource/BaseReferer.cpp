@@ -7,16 +7,24 @@
 
 #include "BaseReferer.hpp"
 
+#include <iostream>
+
+const int TIME_OUT_TICKS = 2000;
+
 BaseReferer::BaseReferer()
     :outputsReady(false)
-{}
+{
+}
 
 
 //RefererInterface...
 void BaseReferer::StepOut(bool charge, int slot)
 {
-    outputs.at(slot).charge = charge;
-    if (charge) outputsReady = true;
+    if (outputs.count(slot) > 0)
+    {
+        outputs.at(slot).charge = charge;
+        if (charge) outputsReady = true;
+    }
 }
 void BaseReferer::SetModified()
 {
@@ -37,30 +45,33 @@ std::shared_ptr<ChipPlan> BaseReferer::GetSubPlan()
 void BaseReferer::DefineXputs(std::vector<std::string> ins, std::vector<std::string> outs)
 {
     //this is the only thing that actually inserts into the maps
-    for (auto &x: ins)
+    int in_i = 1;
+    for (auto x: ins)
     {
-        int i = 0;          //need to provide actual slot numbers!!!!!
-        SlotData temp { i, x, false };
+        SlotData temp { in_i, x, false };
         inputs.insert( {x, temp } );
+        in_i++;
     }
-    for (auto &x: outs)
+    int out_i = 1;
+    for (auto x: outs)
     {
-        int i = 0;          //need to provide actual slot numbers!!!!!
-        SlotData temp { i, x, false };
-        outputs.insert( { i, temp} );
+        SlotData temp { out_i, x, false };
+        outputs.insert( { out_i, temp} );
+        out_i++;
     }
 }
 void BaseReferer::SetInputState(std::string name, bool charge)
 {
-    inputs.find(name)->second.charge = charge;
+    auto it = inputs.find(name);
+    if (it != inputs.end()) it->second.charge = charge;
 }
 void BaseReferer::TickOnce()
 {
     if (not outputsReady)
     {
-        for (auto &x: outputs)
+        for (auto &x: inputs)
         {
-            basePlan->ReceiveCharge(x.second.charge, 1, x.second.slot);
+            basePlan->StepIn(x.second.charge, x.second.slot);
         }
         basePlan->PassOnCalculate();
         basePlan->PassOnAct();
@@ -68,13 +79,22 @@ void BaseReferer::TickOnce()
 }
 std::map<std::string, bool> BaseReferer::RetrieveOutputs()
 {
-    while (not outputsReady)
+//    std::cout << "inputs length: " << (inputs.size()) << std::endl;
+//    std::cout << "outputs length: " << (outputs.size()) << std::endl;
+//    std::cout << "output counts of one: " << (outputs.count(1)) << std::endl;
+
+    for (int i = 0; i<TIME_OUT_TICKS and not outputsReady; i++)
     {
         TickOnce();
     }
     std::map<std::string, bool> retMap;
+
     //fill retMap with data...
-    for (auto &x: outputs) {
+    for (auto &x: outputs)
+    {
+//        std::cout << "name: " << x.second.name << std::endl;
+//        std::cout << "slot: " << x.second.slot << std::endl;
+//        std::cout << " charge: " << x.second.charge << std::endl;
         retMap.insert( {x.second.name, x.second.charge} );
         //It is necessary to clear the outputs. (Outside of the basePlan, 'true' and 'false' charges do not have parity and false is a non-response).
         x.second.charge = false;

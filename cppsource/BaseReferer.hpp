@@ -17,7 +17,8 @@
 
 struct SlotData
 {
-    SlotData(int s, std::string n, bool c) :slot(s), name(n), charge(c) {}
+    SlotData()                                  :slot(7), name(), charge(false) {}
+    SlotData(int s, std::string n, bool c)      :slot(s), name(n), charge(c) {}
     int slot;
     std::string name;
     bool charge;

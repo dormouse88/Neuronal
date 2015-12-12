@@ -90,7 +90,7 @@ private:
     sf::RectangleShape mainOverlayBox;
     sf::Text barText1;
 
-    const Model & theModel;
+    Model & theModel;
 
     int highlightingMode;
 public:

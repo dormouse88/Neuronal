@@ -232,6 +232,18 @@ bool Controller::HandleInput()
                     textEntryCooldown.restart();
                 }
 
+                if (event.key.code == sf::Keyboard::Y)
+                {
+                    theModel.RemoveName(pos1.GetPlan()->GetPlanID());
+                }
+                if (event.key.code == sf::Keyboard::U and theModel.CanAddName(pos1.GetPlan()->GetPlanID()))
+                {
+                    assert(not enteringName);
+                    assert(not enteringFilter);
+                    enteringName = true;
+                    textEntryCooldown.restart();
+                }
+
                 if (event.key.code == sf::Keyboard::LBracket)
                 {
                     theView.cursorOne.Dislocate();
@@ -243,18 +255,6 @@ bool Controller::HandleInput()
                 if (event.key.code == sf::Keyboard::Space)
                 {
                     theModel.Logic();
-                }
-
-                if (event.key.code == sf::Keyboard::Y)
-                {
-                    theModel.RemoveName(pos1.GetPlan()->GetPlanID());
-                }
-                if (event.key.code == sf::Keyboard::U and theModel.CanAddName(pos1.GetPlan()->GetPlanID()))
-                {
-                    assert(not enteringName);
-                    assert(not enteringFilter);
-                    enteringName = true;
-                    textEntryCooldown.restart();
                 }
 
                 if (event.key.code == sf::Keyboard::Num1)

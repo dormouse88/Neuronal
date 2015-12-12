@@ -17,16 +17,25 @@ const std::string R_FOOT = "R_FOOT";
 
 Puppet::Puppet()
     :inner(std::make_shared<BaseReferer>())
+    ,xPos(0)
+    ,yPos(0)
+    ,orientation(0)
 {
     std::shared_ptr<ChipPlan> basePlan = BlobFactory::MakePlan();
     inner->SetSubPlan(basePlan, inner);
+
+    InitBrain();
 }
 
 void Puppet::InitBrain()
 {
     std::vector<std::string> ins;
+    ins.push_back(L_WHISK);
+    ins.push_back(F_WHISK);
     std::vector<std::string> outs;
-    inner->DefineXputs( ins, outs );
+    outs.push_back(L_FOOT);
+    outs.push_back(R_FOOT);
+    inner->DefineXputs(ins, outs);
 }
 
 void Puppet::Act()
@@ -34,27 +43,29 @@ void Puppet::Act()
     auto outs = inner->RetrieveOutputs();
 
     //Perform an action based on the output information...
-    if (outs.at(L_FOOT) == true and outs.at(R_FOOT) == true) {
+    auto lamb = [&outs] (std::string n) { return outs.count(n) > 0 and outs.at(n) == true; };
+    if (lamb(L_FOOT) and lamb(R_FOOT)) {
         Forward();
     }
-    else if (outs.at(L_FOOT) == true) {
+    else if (lamb(L_FOOT)) {
         Left();
     }
-    else if (outs.at(R_FOOT) == true) {
+    else if (lamb(R_FOOT)) {
         Right();
     }
 
     //set the new sense data from the arena...
-    inner->SetInputState( L_WHISK, true );  //need to use real bool values!!!!
-    inner->SetInputState( F_WHISK, true );  //need to use real bool values!!!!
+    inner->SetInputState( L_WHISK, xPos%3==0 );
+    inner->SetInputState( F_WHISK, yPos > 3 );
 }
 
 void Puppet::Draw(sf::RenderTarget & rt)
 {
     sf::RectangleShape box;
     box.setFillColor( sf::Color {255,160,160} );
-    box.setSize( sf::Vector2f{ 140.f, 140.f } );
-    box.setPosition( sf::Vector2f{ 140.f, 140.f } );
+    if (orientation == 0 or orientation == 2) box.setSize( sf::Vector2f{ 60.f, 140.f } );
+    else box.setSize( sf::Vector2f{ 140.f, 60.f } );
+    box.setPosition( sf::Vector2f{ -1600.f + xPos * 14.f, yPos * 14.f } );
     
     rt.draw(box);
 }

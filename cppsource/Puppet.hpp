@@ -24,11 +24,26 @@ public:
     std::shared_ptr<BaseReferer> GetBR()            {return inner;}
     
 private:
-    void Left() {}
-    void Right() {}
-    void Forward() {}
+    void Left() {
+        orientation--;
+        if (orientation < 0) orientation = 3;
+    }
+    void Right() {
+        orientation++;
+        if (orientation > 3) orientation = 0;
+    }
+    void Forward() {
+        if (orientation == 0) yPos--;
+        else if (orientation == 1) xPos++;
+        else if (orientation == 2) yPos++;
+        else if (orientation == 3) xPos--;
+    }
 private:
     std::shared_ptr<BaseReferer> inner;
+    
+    int xPos;
+    int yPos;
+    int orientation;
 };
 
 
