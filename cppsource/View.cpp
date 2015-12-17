@@ -97,6 +97,17 @@ void Marquee::Draw(sf::RenderTarget &rt)
 }
 
 
+
+
+
+
+
+
+
+
+///////////////////     class View      ////////////////////////////////////////////////
+
+
 const sf::FloatRect MAIN_VIEWPORT {0.f, 0.f, 1.f, 0.8f};
 const sf::FloatRect BAR_VIEWPORT {0.f, 0.8f, 1.f, 0.2f};
 const int BAR_HEIGHT = 180.f;
@@ -110,8 +121,8 @@ View::View(Model & model_p)
     ,mainView(sf::Vector2f{0.f, 0.f}, INITIAL_MAINVIEW_SIZE )
     ,mainOverlay(sf::FloatRect{0.f,0.f, INITIAL_MAINVIEW_SIZE.x, INITIAL_MAINVIEW_SIZE.y})
     ,barOverlay(sf::FloatRect{0.f,0.f, INITIAL_MAINVIEW_SIZE.x, BAR_HEIGHT})
-    ,cursorOne( model_p.GetPuppet()->GetBR()->GetSubPlan()->GetGrid() )
-    ,cursorTwo( model_p.GetPuppet()->GetBR()->GetSubPlan()->GetGrid(), sf::Color::Cyan )
+    ,cursorOne( model_p.GetHero()->GetBR()->GetSubPlan()->GetGrid() )
+    ,cursorTwo( model_p.GetHero()->GetBR()->GetSubPlan()->GetGrid(), sf::Color::Cyan )
     ,highlightingMode(1)
 {
     window.setVerticalSyncEnabled(true);
@@ -147,7 +158,9 @@ void View::DrawMain() //Main Port...
 {
     window.setView(mainView);
     
-    GetPuppet()->Draw(window);
+    GetArena()->Draw(window);
+    GetHero()->Draw(window);
+    GetCat1()->Draw(window);
     
     auto ap = GetViewBasePlan();
     assert(ap);

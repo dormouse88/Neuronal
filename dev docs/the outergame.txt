@@ -26,6 +26,7 @@ IMPRECISE OBJECTIVES
 				Need logic/dependency between spawnpoints (spawnX triggers if spawnY triggers)?
 		4) Have a certain number of test cases in each test suite. Each test is not generated from some logic or rng but is designed by the level designer. 
 		(3+4 also try to answer the question of defining the test-cases)
+		5) Cats have a random headstart out of a set range of turns. This is a cleaner way to randomly place cats in a loop. For static objects, they could have move logic to use for their headstart but then freeze when the real sim starts?
 	Early levels can have only 1 configuration/spawn-point/test-case to smooth the learning curve and gradually introduce the idea of having to pass all tests.
 
 
@@ -49,13 +50,141 @@ PROP:
 		
 			Wall Tiles: When would you ever need wall tiles over detectable death tiles?? To make the innersim solution easier perhaps?
 		
-	INS AND OUTS:
+	INPUTS AND OUTPUTS:
 		INs - sight (LOS), sound (directional), smell (non-directional), newsquare (scents), canmove,
 		OUTs - move, active sense(sight/sound/smell),
 		Senses can be active or passive (always on vs. have to sniff for example)
 
-		INs - LFR whiskers, nosebump, LR ears, smell scents,
-		OUTs - LR feet, squeak, mark scents,
+		INs - 	LFR whiskers, 	detects presence of cats (+ blocks?) in adjacent tiles
+				ears, 			detects presence of cats (moving only?) in a certain radius
+				smell scents, 	reads a binary number from the current tile
+		OUTs - 	LR feet, 		turns left or right. Both simultaneously to go forward.
+				mark scents,	writes a binary number to the current tile
 
+		
+	IMPLEMENTATION:
+		Classes:
+			ArenaPoint									//an x and y struct
+			Orientation									//an enum or typedef
+			Arena
+			Puppet										//That which has a brain
+			ArenaStatic									//That which has a location
+				Spikes : ArenaStatic
+				ArenaMotile : ArenaStatic				//That which can act
+					Puppet : ArenaMotile				//That which acts with a brain
+						Cat : Puppet
+						Mouse : Puppet
+
+		Main Methods:
+			ArenaStatic 		- WhiskerDetectable(), GodLevel(), pos, ori,
+			ArenaMotile			- GetTile(tile), Forward, Left, Right, Die, BoundsCheck
+			Puppet 				- Act, brain,
+			Spikes 				- overrides[[ WhiskerDetectable(), GodLevel(), pos, (ori) ]]
+			Cat					- Sniff()
+
+		typedef int Orientation;
+		enum class AdjacentTile { FRONT, RIGHT, BACK, LEFT };
+		struct ArenaPoint
+		{
+			int x;
+			int y;
+		};
+		
+		class Arena
+		{
+		public:
+			bool IsInBounds(ArenaPoint xy)				{ return topLeft > xy > bottomRight; }
+			bool WhiskerDetect(ArenaPoint xy) 			{ return IsInBounds(xy) and ads.at(xy); }
+		private:
+			//potential optimization //std::multimap< ArenaPoint, std::shared_ptr<ArenaStatic> > ads;
+			std::set< std::shared_ptr<ArenaStatic> > ads;
+			ArenaPoint topLeft;
+			ArenaPoint bottomRight;
+		};
+
+		
+		class ArenaStatic
+		{
+		public:
+			ArenaPoint GetPos(); //necessary?
+			virtual bool WhiskerDetectable() = 0;
+		private:
+			ArenaPoint pos;
+			Orientation ori;
+			std::weak_ptr<Arena> ag; //(could be in ArenaMotile?)
+		};
+
+		
+		class ArenaMotile : public ArenaStatic
+		{
+		public:?:
+			void SetPos(ArenaPoint);
+			void SetOri(Orientation);
+		protected:
+			void Forward()
+			{
+				//set pos according to ori...
+				SetPos( GetPos(AdjacentTile::FRONT) );
+				//do bounds checking...
+				BoundsCheck();
+			}
+			void Left();
+			void Right();
+			void Die();
+		private:
+			ArenaPoint GetPos(AdjacentTile tile)
+			{
+				if 		( (orientation + tile) % 4 == 0) return ArenaPoint { pos.x, pos.y - 1 };
+				else if ( (orientation + tile) % 4 == 1) return ArenaPoint { pos.x + 1, pos.y };
+				else if ( (orientation + tile) % 4 == 2) return ArenaPoint { pos.x, pos.y + 1 };
+				else if ( (orientation + tile) % 4 == 3) return ArenaPoint { pos.x - 1, pos.y };
+			}
+
+			void BoundsCheck()						{ if (not ag->IsInBounds( pos )) Die(); }
+		};
+
+		
+		
+		class Puppet : public ArenaMotile
+		
+		class Cat : public Puppet
+		{
+		public:
+			bool WhiskerDetectable() override 		{ return true; }
+			bool WhiskerDetect()					{ ag->WhiskerDetect( GetTile(AdjacentTile::FRONT) ); }
+			bool Sniff()							{ ag->NoseDetect( GetTile(AdjacentTile::FRONT) ); }
+		};
 	
-	
+		
+		
+		LOOP:
+			act (move, turn, etc)
+			interact (collision checking, death, victory, etc)
+			sense (refresh sense data)
+			
+		COLLISION RULES:
+			There are 3 categories of entity: (STATIC, KILLER, VICTIM)
+			1) if (entity out of Arena bounds) calls entity.Die()
+			2) if (STATIC has any KILLERs or VICTIMs on the same tile) calls KV.Die() 
+			3) if (KILLER has any VICTIM on the same tile) calls VICTIM.Die()
+			4) if (GOAL has any VICTIM on the same tile) calls Win()
+			Otherwise there is no physics to speak of and multiple entities can occupy the same tile.
+			Few ordering/priority questions exist so far (just GOAL+VICTIM vs KILLER+VICTIM).
+			
+			
+			
+DEL	
+	ArenaPoint TileFront()
+	{ 
+		if (orientation == 0) return ArenaPoint { pos.x, pos.y - 1 };
+		else if (orientation == 1) return ArenaPoint { pos.x + 1, pos.y };
+		else if (orientation == 2) return ArenaPoint { pos.x, pos.y + 1 };
+		else if (orientation == 3) return ArenaPoint { pos.x - 1, pos.y };
+	}
+	//set pos according to ori...
+	if (orientation == 0) yPos--;
+	else if (orientation == 1) xPos++;
+	else if (orientation == 2) yPos++;
+	else if (orientation == 3) xPos--;
+
+			

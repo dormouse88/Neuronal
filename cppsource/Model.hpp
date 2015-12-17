@@ -24,7 +24,9 @@ public:
 
     void Logic();
     
-    std::shared_ptr<Puppet> GetPuppet()                                      {return puppet;}
+    std::shared_ptr<Arena> GetArena()                                       {return arena;} //for View
+    std::shared_ptr<Hero> GetHero()                                         {return hero;} //for View
+    std::shared_ptr<Cat> GetCat1()                                         {return cat1;} //for View
 
     std::shared_ptr<ChipPlan> WipePlan(PlanPos, bool forced);
     std::shared_ptr<ChipPlan> LoadPlan(PlanPos, PlanNav nav);
@@ -43,7 +45,9 @@ private:
     std::shared_ptr<Serializer> serializer;
     std::shared_ptr<UserData> userData;
 
-    std::shared_ptr<Puppet> puppet;
+    std::shared_ptr<Arena> arena;
+    std::shared_ptr<Hero> hero;
+    std::shared_ptr<Cat> cat1;
 };
 
 
