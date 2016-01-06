@@ -19,14 +19,21 @@ class ArenaStatic
 {
 public:
     ArenaStatic(ArenaPoint s_pos, Orientation s_ori, std::shared_ptr<Arena> ar);
-    ArenaPoint GetPos()                     { return pos; }
+    //pure virtuals...
     virtual bool WhiskerDetectable() = 0;
     virtual void Draw(sf::RenderTarget & rt) = 0;
+
+    ArenaPoint GetInitialPos()                                                  { return initial_pos; }
+    Orientation GetInitialOri()                                                  { return initial_ori; }
+    virtual ArenaPoint GetActualPos()                                           { return initial_pos; }
+    virtual Orientation GetActualOri()                                           { return initial_ori; }
 protected:
-    ArenaPoint pos;
-    Orientation ori;
     std::weak_ptr<Arena> arena;
+private:
+    const ArenaPoint initial_pos;
+    const Orientation initial_ori;
 };
+
 
 
 class ArenaMotile : public ArenaStatic
@@ -35,16 +42,23 @@ public:
     ArenaMotile(ArenaPoint s_pos, Orientation s_ori, std::shared_ptr<Arena> ar);
     virtual void Act() = 0;
     virtual void Sense() = 0;
-protected:
-    void Forward();
-    void Left();
-    void Right();
+    virtual PredationStatus GetPredationStatus() = 0;
+
+    ArenaPoint GetActualPos() final                                             { return actual_pos; }
+    Orientation GetActualOri() final                                             { return actual_ori; }
     void Die();
 
-    ArenaPoint GetPos(Orientation);
+protected:
+    void WalkForward();
+    void TurnLeft();
+    void TurnRight();
+
+    ArenaPoint GetAdjacentPos(Orientation);
 private:
-    void BoundsCheck();
+    ArenaPoint actual_pos;
+    Orientation actual_ori;
 };
+
 
 
 class Puppet : public ArenaMotile
@@ -55,7 +69,6 @@ public:
     virtual void Sense() override;
     
     std::shared_ptr<BaseReferer> GetBR()            {return inner;}
-    
 private:
     void InitBrain();
     std::shared_ptr<BaseReferer> inner;
@@ -67,19 +80,21 @@ class Cat : public Puppet
 {
 public:
     Cat(ArenaPoint s_pos, Orientation s_ori, std::shared_ptr<Arena> ar) :Puppet(s_pos, s_ori, ar) {}
-    void Draw(sf::RenderTarget & rt) override;
-    bool WhiskerDetectable() override 		{ return true; }
-//    bool WhiskerDetect()                        { ag->WhiskerDetect( GetTile(AdjacentTile::FRONT) ); }
-//    bool Sniff()                                { ag->NoseDetect( GetTile(AdjacentTile::FRONT) ); }
+    bool WhiskerDetectable()                override    { return true; }
+    void Draw(sf::RenderTarget & rt)        override;
+    PredationStatus GetPredationStatus()    override    { return PredationStatus::CAT; }
 };
 
 class Hero : public Puppet
 {
 public:
     Hero(ArenaPoint s_pos, Orientation s_ori, std::shared_ptr<Arena> ar) :Puppet(s_pos, s_ori, ar) {}
-    void Draw(sf::RenderTarget & rt) override;
-    bool WhiskerDetectable() override 		{ return true; }
+    bool WhiskerDetectable()                override 	{ return true; }
+    void Draw(sf::RenderTarget & rt)        override;
+    PredationStatus GetPredationStatus()    override    { return PredationStatus::MOUSE; }
 };
+
+
 
 
 //Non-member Spawn Functions...

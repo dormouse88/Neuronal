@@ -159,8 +159,8 @@ void View::DrawMain() //Main Port...
     window.setView(mainView);
     
     GetArena()->Draw(window);
-    GetHero()->Draw(window);
-    GetCat1()->Draw(window);
+    //GetHero()->Draw(window);
+    //GetCat1()->Draw(window);
     
     auto ap = GetViewBasePlan();
     assert(ap);

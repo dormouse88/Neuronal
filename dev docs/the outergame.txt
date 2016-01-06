@@ -1,190 +1,109 @@
-The innersim will be presented inside an outergame context.
-This outergame will provide the levels/objectives equivalent to the levels of manufactoria.
 
-TIME:
-	The innersim and the outergame each have their own units of time. The innersim time is finer grained.
-	While it would be possible to fix a constant ratio between the two (eg. 60 innerticks make an outertick), I think it will be better if outergame time is advanced through an output of innersim, for 2 reasons:
-		1) It will be much harder for the user if they have to design constructs within the innersim to be precisely timed.
-		2) It will not place an unnecessary complexity constraint on what the innersim can achieve in one outer 'tick'.
-		A "send" or "step" output on the base ChipPlan seems a little contrived but its the best idea i have so far.
-			Or a "wait" output? Then outergame time passes whenever any output is sent, including wait.
-	Some time ago, I was considering having outergame actions cost different amounts of time to perform. An interesting idea, though probably also too difficult and finnicky for the player.
-
-STRINGS:
-	Manufactoria and LogicBox both concern themselves mainly with processing strings.
-	String processing would be possible in my game although the idea of an infinite tape of memory isn't built in. The string could be stored in the outergame, and fed in to the innersim, one symbol per outer tick. The innersim outputs could write to the back of the queue. This behaviour could contrivedly be presented in the game world somehow (leaving scents, etc?).
-	The requirement to modify the string in a certain way could be to manipulate the cats thru scent trails???
-
-IMPRECISE OBJECTIVES
-	The innersim does not suit such a string-oriented context like that of manufactoria/logicbox. Hopefully the innersim will work well with less precise objectives than manufactoria and the outergame can offer more than one exact way to win. The outergame must be transparent and understood to make the innersim challenges fair.
-	The requirement to heed inputs is dependent on the inputs being different in each test.
-	Showing players the outergame arena is problematic since there is no one correct configuration to show them.
-		1) The player must base their solution solely on the description of what is required. (can't see arena)
-		2) Show one randomly selected arena configuration and have a re-roll button to emphasize the variance.
-		3) Most of the arena can be fixed, and the location of spawn points are also fixed. The randomness of inputs comes in which spawn points are actually spawned from.
-				Need timed spawns that spawn on turn x?
-				Need logic/dependency between spawnpoints (spawnX triggers if spawnY triggers)?
-		4) Have a certain number of test cases in each test suite. Each test is not generated from some logic or rng but is designed by the level designer. 
-		(3+4 also try to answer the question of defining the test-cases)
-		5) Cats have a random headstart out of a set range of turns. This is a cleaner way to randomly place cats in a loop. For static objects, they could have move logic to use for their headstart but then freeze when the real sim starts?
-	Early levels can have only 1 configuration/spawn-point/test-case to smooth the learning curve and gradually introduce the idea of having to pass all tests.
+DEFINING TEST SUITES:
+	1) Suites are defined in code (c++?)
+	2) Have a certain number of test cases described in each test suite. Each is hand-designed by the level designer.
+	3) Most of the arena can be fixed, and the location of spawn points are also fixed. The randomness of inputs comes in which spawn points are actually spawned from. Perhaps need timed spawns that spawn on turn x? / Need logic/dependency between spawnpoints (spawnX triggers if spawnY triggers)?
+	4) Cats have a random headstart out of a set range of turns. This is a cleaner way to randomly place cats in a loop. For static objects, they could have move logic to use for their headstart but then freeze when the real sim starts? Static headstarts would have to be processed first, then process cat headstarts using the final locations of those statics when providing sense data for the cats.
+PRESENTING TEST SUITES:
+	a) The player must base their solution solely on the textual description of what is required. (can't see arena at all until testing?)
+	b) Show one randomly selected arena configuration and have a re-roll button to emphasize the variance.
+	c) (REQUIRES 3) Draw all the spawn points.
+	d) (REQUIRES 4) Draw all objects showing the range of headstarts. The only thing that collapses is the headstart number which collapses from a range (eg 0-5), to a number (eg 3).
+	CONC: 4 + d
 
 
-PROP:
-	Outergame is the control of a Mouse avatar. Probably from a top down view in a visible grid (chuchu rocket).
-	Or possibly an insect/bug/ant.
-	A square-tiled grid is quite difficult to navigate. This has pros and cons. (Hex grid?)
+HOW AND WHERE DOES THE COLLAPSE FROM SUITE TO TEST HAPPEN?
+	(Consider the case of using 'STEP' button as 'TEST' is comprehensive anyway)
+	How:
+		Randomly selected test? (random with fixed or fluid seed)
+			With re-roll?
+		in sequence? (could mean actually in order or just random with a fixed seed)
+		user-specified? (useful but may be tricky to 'specify'. Just using an outer chip as a test bed is an option)
+	Where:
+		When the first step is taken?
+		Have a test selection phase that has to be done before any steps can occur?
+			A re-roll button might be useful here even if it is possible to present the suite as a whole.
+	What happens if STEP is pressed when in 'Generalized' mode? Greyed-Out I guess.
+	CONC:
+		A pseudo-random set of possible tests is derived from each suite. This set is fixed and is like a hash of the suite. This set can be the full range of possibilities when that range isn't too big.
+		Collapse occurs to a random member of this fixed set when the "specify" button is pressed.
+		OBS: If the collapse is just from range to numbers, the headstart phase would still need to be played out.
 
-	MECHANICS:
-		Rules:
-			All things can be detectable and undetectable or partially detectable
-			Some kind of physics?: Include things that can be pushed?
-				What happens when a moving thing hits another moving thing (eg. two cats)?
-					They could bounce off each other. (I could animate the movement between the two quantized states)
-						Even spaces: R--L to -rl- to L--R
-						Odd Spaces: R---L to -R-L- to -L-R- to L---R
-					Or They could pass thru each other like chuchu rocket.
-		Elements:
-			Death Tiles: (The strictness of death tiles helps to make solution requirements more rigid).
-			Death Cats: Moving hazards are pretty critical. Cats detectable by different senses could be interesting (tactile cats, smelly cats, noisy cats, etc). What are the rules for movement?
+ENTITIES AND LEVELS:
+	How to make certain level configurations?
+		Randomly placed holes in walls?
+			Wall has a plan that detects once on first tick and moves forward (until OOB) upon detection. A perpendicular moving cat with greater (random) headstart is the detected entity. It also moves OOB.
+		Scents??
+			Perhaps can't be placed directly by level designer? Must be marked by a cat with appropriate plan.
+			
+	Interaction rules:
+		Timing:
+			An oncoming MOUSE and DANGER-ACTIVE would pass thru each other if even number of spaces between them!
+			Change Logic sequence so DANGER and MICE have alternate turns rather than simultaneous? Then test Interactions after either turn.
+		Killing:
+			OOB kills anything.
+			DANGER kills MOUSE.
+		Detection:
+			Whiskers detect all adjacent DANGER blocks.
+			Ears detect movement within certain radius.
 		
-			Wall Tiles: When would you ever need wall tiles over detectable death tiles?? To make the innersim solution easier perhaps?
-		
-	INPUTS AND OUTPUTS:
-		INs - sight (LOS), sound (directional), smell (non-directional), newsquare (scents), canmove,
-		OUTs - move, active sense(sight/sound/smell),
-		Senses can be active or passive (always on vs. have to sniff for example)
-
-		INs - 	LFR whiskers, 	detects presence of cats (+ blocks?) in adjacent tiles
-				ears, 			detects presence of cats (moving only?) in a certain radius
-				smell scents, 	reads a binary number from the current tile
-		OUTs - 	LR feet, 		turns left or right. Both simultaneously to go forward.
-				mark scents,	writes a binary number to the current tile
-
-		
-	IMPLEMENTATION:
-		Classes:
-			ArenaPoint									//an x and y struct
-			Orientation									//an enum or typedef
-			Arena
-			Puppet										//That which has a brain
-			ArenaStatic									//That which has a location
-				Spikes : ArenaStatic
-				ArenaMotile : ArenaStatic				//That which can act
-					Puppet : ArenaMotile				//That which acts with a brain
-						Cat : Puppet
-						Mouse : Puppet
-
-		Main Methods:
-			ArenaStatic 		- WhiskerDetectable(), GodLevel(), pos, ori,
-			ArenaMotile			- GetTile(tile), Forward, Left, Right, Die, BoundsCheck
-			Puppet 				- Act, brain,
-			Spikes 				- overrides[[ WhiskerDetectable(), GodLevel(), pos, (ori) ]]
-			Cat					- Sniff()
-
-		typedef int Orientation;
-		enum class AdjacentTile { FRONT, RIGHT, BACK, LEFT };
-		struct ArenaPoint
-		{
-			int x;
-			int y;
-		};
-		
-		class Arena
-		{
-		public:
-			bool IsInBounds(ArenaPoint xy)				{ return topLeft > xy > bottomRight; }
-			bool WhiskerDetect(ArenaPoint xy) 			{ return IsInBounds(xy) and ads.at(xy); }
-		private:
-			//potential optimization //std::multimap< ArenaPoint, std::shared_ptr<ArenaStatic> > ads;
-			std::set< std::shared_ptr<ArenaStatic> > ads;
-			ArenaPoint topLeft;
-			ArenaPoint bottomRight;
-		};
-
-		
-		class ArenaStatic
-		{
-		public:
-			ArenaPoint GetPos(); //necessary?
-			virtual bool WhiskerDetectable() = 0;
-		private:
-			ArenaPoint pos;
-			Orientation ori;
-			std::weak_ptr<Arena> ag; //(could be in ArenaMotile?)
-		};
-
-		
-		class ArenaMotile : public ArenaStatic
-		{
-		public:?:
-			void SetPos(ArenaPoint);
-			void SetOri(Orientation);
-		protected:
-			void Forward()
-			{
-				//set pos according to ori...
-				SetPos( GetPos(AdjacentTile::FRONT) );
-				//do bounds checking...
-				BoundsCheck();
-			}
-			void Left();
-			void Right();
-			void Die();
-		private:
-			ArenaPoint GetPos(AdjacentTile tile)
-			{
-				if 		( (orientation + tile) % 4 == 0) return ArenaPoint { pos.x, pos.y - 1 };
-				else if ( (orientation + tile) % 4 == 1) return ArenaPoint { pos.x + 1, pos.y };
-				else if ( (orientation + tile) % 4 == 2) return ArenaPoint { pos.x, pos.y + 1 };
-				else if ( (orientation + tile) % 4 == 3) return ArenaPoint { pos.x - 1, pos.y };
-			}
-
-			void BoundsCheck()						{ if (not ag->IsInBounds( pos )) Die(); }
-		};
-
-		
-		
-		class Puppet : public ArenaMotile
-		
-		class Cat : public Puppet
-		{
-		public:
-			bool WhiskerDetectable() override 		{ return true; }
-			bool WhiskerDetect()					{ ag->WhiskerDetect( GetTile(AdjacentTile::FRONT) ); }
-			bool Sniff()							{ ag->NoseDetect( GetTile(AdjacentTile::FRONT) ); }
-		};
+	Priority in headstart phase:
+		Multiple tiers of priority? Maybe tiers structured by PLAN rather than individual entity? Maybe this could just be done using a delay in the plan when the level designer wants to?
+		CONC: All entities take one simultaneous step at a time, just like in real play. Ordering can be controlled by delays within the plans and headstart values.
+			But do different headstarts all start together or all end together? End together I suppose.
+				Entities whose headstarts haven't begun are not even spawned? So don't get detected/killed?
+					CONC: "Headstart" is actually spawn time (as negative). Time starts at t = -<largest headstart> and mouse spawns at t = 0.
+	Maybe a big distinction between different PLANs? Not such a strong distinction between STATICs and CATs?
+		ENTITY	DANGER	DUMB		 		No plan , Spawns at collapsed value. 
+		ENTITY	DANGER	FREEZING 			Has plan, Spawns at collapsed value. Freezes in place at t = 0!
+		ENTITY	DANGER	ACTIVE	 			Has plan, Spawns at collapsed value.
+		ENTITY	MOUSE 						Has plan, Spawns at zero.
+		OBS: DUMB is just a cosmetic type of DANGER when there is no plan assigned.
 	
-		
-		
-		LOOP:
-			act (move, turn, etc)
-			interact (collision checking, death, victory, etc)
-			sense (refresh sense data)
-			
-		COLLISION RULES:
-			There are 3 categories of entity: (STATIC, KILLER, VICTIM)
-			1) if (entity out of Arena bounds) calls entity.Die()
-			2) if (STATIC has any KILLERs or VICTIMs on the same tile) calls KV.Die() 
-			3) if (KILLER has any VICTIM on the same tile) calls VICTIM.Die()
-			4) if (GOAL has any VICTIM on the same tile) calls Win()
-			Otherwise there is no physics to speak of and multiple entities can occupy the same tile.
-			Few ordering/priority questions exist so far (just GOAL+VICTIM vs KILLER+VICTIM).
-			
-			
-			
-DEL	
-	ArenaPoint TileFront()
-	{ 
-		if (orientation == 0) return ArenaPoint { pos.x, pos.y - 1 };
-		else if (orientation == 1) return ArenaPoint { pos.x + 1, pos.y };
-		else if (orientation == 2) return ArenaPoint { pos.x, pos.y + 1 };
-		else if (orientation == 3) return ArenaPoint { pos.x - 1, pos.y };
-	}
-	//set pos according to ori...
-	if (orientation == 0) yPos--;
-	else if (orientation == 1) xPos++;
-	else if (orientation == 2) yPos++;
-	else if (orientation == 3) xPos--;
+MULTIPLE MICE:
+	ALL spawnpoints would spawn a mouse for every test and all mice must survive. (I thought this was pointless once but I can't remember why)
+	Functionally identical to running multiple single-mouse tests so long as mice don't affect anything (undetectable). EXCEPT SCENTS!
+	They would all use the same brain plan (charges could be different).
+	CONC: Don't do it
+MULTIPLE GOALS:
+	Could have multiple goals and require that each mouse must get to all goals?
+	Functionally equivalent to running test multiple times with random goals so long as goals don't affect anything (undetectable).
+	CONC: Don't do it
 
-			
+CATS meet GOAL:
+	Cats could optionally sit on goals (using goal detection or level design tricks) as a mechanism for fucking them up. This makes CAT-GOAL collisions level-determined and don't have to be a fundamental mechanic.
+
+
+STEP BUTTONS:
+	Transitions:
+		DeSpecced:
+			Spec
+			Test / Cancel
+		Specced:
+			DeSpec
+			Reset
+			Step (inner+outer)
+			Play (inner+outer&to-Prep+to-End) / Stop
+	States:
+		DeSpecced		Spec->Sp
+			DeSp		Test->Testing
+			*Testing*	Cancel->Paused		(fail)->Ended		(pass)->Victory
+		Specced			DeSpec->DeSp		Reset->Sp
+			Sp			Step->Paused		Play->Playing
+			Paused		Step->Paused/Ended	Play->Playing
+			*Playing*	Stop->Paused		(end)->Ended
+			Ended
+
+	Test/Cancel Test
+	Reset
+	Step Outer
+	Step Inner
+	Play Outer/Pause
+	Play Inner/Pause
+	Specify Level
+	De-Specify Level
+
+DONT FORGET:
+	ear detection: detects presence of cats (moving only?) in a certain radius
+	
+

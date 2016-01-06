@@ -21,7 +21,8 @@ CONSIDER: Neurons subsuming jumper functionality.
 			Cyclic dependencies of fast neurons will cause affected neurons to never fire. Maybe check for this and highlight it to the user. Simple to check, just iterate thru every device at the end of a tick and they should all have fired.
 			OBS: Sending a 'false' charge is now very different from not sending any charge. Devices rely on counting all charges (including 'false') to know they are ready to calculate their own state.
 		
-		CONSIDERATION: Will feedback to the player about how the system is operating be better under the new or old way? The new way since it is a superset of the options available in the old way.
+		CONSIDERATION: Will feedback to the player about how the system is operating be better under the new or old way?
+			CONC: The new way since it is a superset of the options available in the old way.
 		
 		
 		
@@ -39,10 +40,12 @@ CONSIDER: Multichannel wires.
 				PROP: No!
 			
 			CONSIDERATION: Are sockets neurons? Do they 'OR' inputs or disallow multiple inputs?
-				OPTION 1) Sockets are like jumpers and won't allow more than 1 input. They instantly pass on their charge.
-				OPTION 2) Sockets are like default neurons and cannot have numbers or delay bulbs. This way they have 'OR' behaviour and so allow multi-in and multi-out which makes wiring rules simpler.
+				OPTION 1)
+					Sockets are like jumpers and won't allow more than 1 input. They instantly pass on their charge.
+				OPTION 2)
+					Sockets are like default neurons and cannot have numbers or delay bulbs. This way they have 'OR' behaviour and so allow multi-in and multi-out which makes wiring rules simpler.
 					Under the old charge system, OR behaviour would interfere with charge propagation. It could work under the new mostly-fast neuron system though, ... right?
-						Unfortunately sockets will need state to remember at least if they have fired, if not also their cumulative charge + num of charges.
+					OBS: Unfortunately sockets will need state to remember at least if they have fired, if not also their cumulative charge + num of charges.
 						Perhaps this state could be in ChipHandle/ChipPlan?
 						PROP:
 							Store two map<int, Socket> in ChipHandle, one each for inputs and outputs. Sockets are like unwired default neurons. The only state these have is with regard to charge and don't need serialization.

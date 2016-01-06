@@ -12,6 +12,9 @@
 #include <memory>
 #include <SFML/Graphics.hpp>
 
+const sf::Vector2f ARENA_GRID_SIZE { 200.f , 200.f };
+
+enum class PredationStatus { CAT, MOUSE };
 
 typedef int Orientation;
 //enum class OriEnum { FRONT = 0, RIGHT = 1, BACK = 2, LEFT = 3 };
@@ -41,11 +44,13 @@ public:
         //InitBoard()
     void RegisterStatic(std::shared_ptr<ArenaStatic> guy);
     void RegisterMotile(std::shared_ptr<ArenaMotile> guy);
-    void Draw(sf::RenderTarget &rt) {}
+    void Draw(sf::RenderTarget &rt);
     bool IsInBounds(ArenaPoint);
+    void Interactions();
     bool WhiskerDetect(ArenaPoint);
 private:
-    std::vector< std::shared_ptr<ArenaStatic> > mots;
+    std::vector< std::shared_ptr<ArenaStatic> > statics;
+    std::vector< std::shared_ptr<ArenaMotile> > motiles;
     ArenaPoint minCorner;
     ArenaPoint maxCorner;
 };

@@ -1,5 +1,9 @@
-Not Commited
-============
+Do Next
+=======
+Loading of tests
+Loading of test suites
+Sort question of assigning inputs/outputs to slots
+Multichannel wires + flexible neurons
 
 
 General
@@ -10,7 +14,7 @@ Visual / Interface
 ==================
 	Draw neurons as two halves with independent firing states. Change the neuron shape?
 	Draw slot matching + valency (to show how many slots are ignored in both directions) between handles and chips.
-	Set discrete zoom levels?
+	Set discrete zoom levels + use a smarter better centering algo (like googlemaps).
 	Solve: No space to see wires between exploded chips when adjacent. Disallow adjacency? Draw plan boundary half a cell inwards? (changing GRID_SIZE doesn't help exploded chips)
 	Place circular wire labels intelligently (on wire but close to device).
 	Allow chip cycling while unexploded and draw name on the handle.
@@ -41,5 +45,10 @@ InnerSim
 OuterGame
 =========
 	CONSIDER: How to define a test suite? (Simple vs uncheapability payoffs)
-	CONSIDER: Use a 'Wait' output or 'Send' output?
+	CONSIDER: Use a 'Wait' output or 'Send' output? Wait!!!
 	CONSIDER: Repeating inputs or once only? Repeating!!!
+
+
+
+Not Commited
+============

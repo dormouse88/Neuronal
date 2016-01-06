@@ -8,10 +8,64 @@
 #include "Puppet.hpp"
 #include <cassert>
 
-//senses
-const std::string L_WHISK = "L_WHISK";
-const std::string F_WHISK = "F_WHISK";
 
+//////////////////////////////////////ArenaStatic....
+ArenaStatic::ArenaStatic(ArenaPoint s_pos, Orientation s_ori, std::shared_ptr<Arena> ar)
+    :initial_pos(s_pos)
+    ,initial_ori(s_ori)
+    ,arena(ar)
+{}
+
+
+
+
+
+
+//////////////////////////////////////ArenaMotile....
+ArenaMotile::ArenaMotile(ArenaPoint s_pos, Orientation s_ori, std::shared_ptr<Arena> ar)
+    :ArenaStatic(s_pos, s_ori, ar)
+    ,actual_pos(s_pos)
+    ,actual_ori(s_ori)
+{}
+
+void ArenaMotile::WalkForward()
+{
+    actual_pos =  GetAdjacentPos(OriEnums::FRONT);
+}
+void ArenaMotile::TurnLeft()
+{
+    actual_ori--;
+    if (actual_ori < 0) actual_ori = 3;
+}
+void ArenaMotile::TurnRight()
+{
+    actual_ori++;
+    if (actual_ori > 3) actual_ori = 0;
+}
+void ArenaMotile::Die()
+{
+    actual_pos = GetInitialPos(); //(temporary solution)
+}
+ArenaPoint ArenaMotile::GetAdjacentPos(Orientation tile)
+{
+    if      ( (actual_ori + tile) % 4 == 0) return ArenaPoint { actual_pos.x,       actual_pos.y - 1 };
+    else if ( (actual_ori + tile) % 4 == 1) return ArenaPoint { actual_pos.x + 1,   actual_pos.y };
+    else if ( (actual_ori + tile) % 4 == 2) return ArenaPoint { actual_pos.x,       actual_pos.y + 1 };
+    else if ( (actual_ori + tile) % 4 == 3) return ArenaPoint { actual_pos.x - 1,   actual_pos.y };
+    else assert(false);
+}
+
+
+
+
+
+
+
+//////////////////////////// Puppet
+//senses
+const std::string F_WHISK = "F_WHISK";
+const std::string L_WHISK = "L_WHISK";
+const std::string R_WHISK = "R_WHISK";
 //actions
 const std::string L_FOOT = "L_FOOT";
 const std::string R_FOOT = "R_FOOT";
@@ -44,13 +98,13 @@ void Puppet::Act()
     //Perform an action based on the output information from the brain...
     auto lamb = [&outs] (std::string n) { return outs.count(n) > 0 and outs.at(n) == true; };
     if (lamb(L_FOOT) and lamb(R_FOOT)) {
-        Forward();
+        WalkForward();
     }
     else if (lamb(L_FOOT)) {
-        Left();
+        TurnLeft();
     }
     else if (lamb(R_FOOT)) {
-        Right();
+        TurnRight();
     }
 }
 
@@ -58,65 +112,18 @@ void Puppet::Sense()
 {
     //sends the new sense data to the brain from the arena...
     auto arenaLock = arena.lock();
-    inner->SetInputState( L_WHISK, arenaLock->WhiskerDetect( GetPos(OriEnums::LEFT) ) );
-    inner->SetInputState( F_WHISK, arenaLock->WhiskerDetect( GetPos(OriEnums::FRONT) ) );
+    inner->SetInputState( F_WHISK, arenaLock->WhiskerDetect( GetAdjacentPos(OriEnums::FRONT) ) );
+    inner->SetInputState( L_WHISK, arenaLock->WhiskerDetect( GetAdjacentPos(OriEnums::LEFT) ) );
+    inner->SetInputState( R_WHISK, arenaLock->WhiskerDetect( GetAdjacentPos(OriEnums::RIGHT) ) );
 }
 
 
 
-//////////////////////////////////////ArenaStatic....
-ArenaStatic::ArenaStatic(ArenaPoint s_pos, Orientation s_ori, std::shared_ptr<Arena> ar)
-    :pos(s_pos)
-    ,ori(s_ori)
-    ,arena(ar)
-{}
 
 
 
 
 
-
-//////////////////////////////////////ArenaMotile....
-ArenaMotile::ArenaMotile(ArenaPoint s_pos, Orientation s_ori, std::shared_ptr<Arena> ar)
-    :ArenaStatic(s_pos, s_ori, ar)
-{}
-
-void ArenaMotile::Forward()
-{
-    //set pos according to ori...
-    pos =  GetPos(OriEnums::FRONT);
-    //do bounds checking...
-    BoundsCheck();
-}
-void ArenaMotile::Left()
-{
-    ori--;
-    if (ori < 0) ori = 3;
-}
-void ArenaMotile::Right()
-{
-    ori++;
-    if (ori > 3) ori = 0;
-}
-void ArenaMotile::Die()
-{
-    ;
-}
-ArenaPoint ArenaMotile::GetPos(Orientation tile)
-{
-    if      ( (ori + tile) % 4 == 0) return ArenaPoint { pos.x, pos.y - 1 };
-    else if ( (ori + tile) % 4 == 1) return ArenaPoint { pos.x + 1, pos.y };
-    else if ( (ori + tile) % 4 == 2) return ArenaPoint { pos.x, pos.y + 1 };
-    else if ( (ori + tile) % 4 == 3) return ArenaPoint { pos.x - 1, pos.y };
-    else assert(false);
-}
-void ArenaMotile::BoundsCheck()
-{
-    if (not arena.lock()->IsInBounds( pos ))
-    {
-        Die();
-    }
-}
 
 
 
@@ -127,9 +134,9 @@ void Hero::Draw(sf::RenderTarget & rt)
 {
     sf::RectangleShape box;
     box.setFillColor( sf::Color {210,140,140} );
-    if (ori == 0 or ori == 2) box.setSize( sf::Vector2f{ 70.f, 100.f } );
+    if (GetActualOri() == 0 or GetActualOri() == 2) box.setSize( sf::Vector2f{ 70.f, 100.f } );
     else box.setSize( sf::Vector2f{ 100.f, 70.f } );
-    box.setPosition( sf::Vector2f{ -1600.f + pos.x * 160.f, pos.y * 160.f } );
+    box.setPosition( sf::Vector2f{ -1600.f + GetActualPos().x * ARENA_GRID_SIZE.x, GetActualPos().y * ARENA_GRID_SIZE.y } );
 
     rt.draw(box);
 }
@@ -138,14 +145,18 @@ void Cat::Draw(sf::RenderTarget & rt)
 {
     sf::RectangleShape box;
     box.setFillColor( sf::Color {255,0,0} );
-    if (ori == 0 or ori == 2) box.setSize( sf::Vector2f{ 70.f, 100.f } );
+    if (GetActualOri() == 0 or GetActualOri() == 2) box.setSize( sf::Vector2f{ 70.f, 100.f } );
     else box.setSize( sf::Vector2f{ 100.f, 70.f } );
-    box.setPosition( sf::Vector2f{ -1600.f + pos.x * 160.f, pos.y * 160.f } );
+    box.setPosition( sf::Vector2f{ -1600.f + GetActualPos().x * ARENA_GRID_SIZE.x, GetActualPos().y * ARENA_GRID_SIZE.y } );
 
     rt.draw(box);
 }
 
 
+
+
+
+//non-member Spawn Functions...
 std::shared_ptr<Cat> SpawnCat(ArenaPoint p, Orientation o, std::shared_ptr<Arena> arena)
 {
     auto guy = std::make_shared<Cat>(p,o,arena);

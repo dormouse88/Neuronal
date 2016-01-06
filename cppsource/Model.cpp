@@ -13,8 +13,8 @@ Model::Model()
     :serializer(std::make_shared<Serializer>())
     ,userData(std::make_shared<UserData>(serializer))
     ,arena(std::make_shared<Arena>())
-    ,hero( SpawnHero(ArenaPoint{0,0}, 0, arena) )
-    ,cat1( SpawnCat(ArenaPoint{0,3}, 0, arena) )
+    ,hero( SpawnHero(ArenaPoint{2,0}, 0, arena) )
+    ,cat1( SpawnCat(ArenaPoint{2,3}, 0, arena) )
 {
     serializer->LoadUserData(userData);
 }
@@ -26,6 +26,7 @@ void Model::Logic()
     //sense
     hero->Act();
     cat1->Act();
+    arena->Interactions();
     hero->Sense();
     cat1->Sense();
 }
