@@ -24,6 +24,12 @@ struct SlotData
     bool charge;
 };
 
+struct XPuts
+{
+    std::vector<SlotData> ins;
+    std::vector<SlotData> outs;
+};
+
 class BaseReferer : public RefererInterface
 {
 public:
@@ -35,7 +41,7 @@ public:
     virtual void SetSubPlan(std::shared_ptr<ChipPlan>, std::shared_ptr<RefererInterface>) override;
     virtual std::shared_ptr<ChipPlan> GetSubPlan() override;
 
-    void DefineXputs(std::vector<std::string> ins, std::vector<std::string> outs);
+    void DefineXputs(XPuts);
     void SetInputState(std::string, bool);
     void TickOnce();
     std::map<std::string, bool> RetrieveOutputs();

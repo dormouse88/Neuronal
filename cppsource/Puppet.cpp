@@ -7,51 +7,41 @@
 
 #include "Puppet.hpp"
 #include <cassert>
+#include "Arena.hpp"
 
-
-//////////////////////////////////////ArenaStatic....
-ArenaStatic::ArenaStatic(ArenaPoint s_pos, Orientation s_ori, std::shared_ptr<Arena> ar)
-    :initial_pos(s_pos)
-    ,initial_ori(s_ori)
-    ,arena(ar)
+//////////////////////////////////////Entity....
+ArenaEntity::ArenaEntity(ArenaPoint s_pos, Orientation s_ori, std::shared_ptr<Arena> ar)
+    :pos_(s_pos)
+    ,ori_(s_ori)
+    ,arena_(ar)
+    ,alive_(true)
 {}
 
-
-
-
-
-
-//////////////////////////////////////ArenaMotile....
-ArenaMotile::ArenaMotile(ArenaPoint s_pos, Orientation s_ori, std::shared_ptr<Arena> ar)
-    :ArenaStatic(s_pos, s_ori, ar)
-    ,actual_pos(s_pos)
-    ,actual_ori(s_ori)
-{}
-
-void ArenaMotile::WalkForward()
+void ArenaEntity::WalkForward()
 {
-    actual_pos =  GetAdjacentPos(OriEnums::FRONT);
+    pos_ =  GetAdjacentPos(OriEnums::FRONT);
 }
-void ArenaMotile::TurnLeft()
+void ArenaEntity::TurnLeft()
 {
-    actual_ori--;
-    if (actual_ori < 0) actual_ori = 3;
+    ori_--;
+    if (ori_ < 0) ori_ = 3;
 }
-void ArenaMotile::TurnRight()
+void ArenaEntity::TurnRight()
 {
-    actual_ori++;
-    if (actual_ori > 3) actual_ori = 0;
+    ori_++;
+    if (ori_ > 3) ori_ = 0;
 }
-void ArenaMotile::Die()
+void ArenaEntity::Die()
 {
-    actual_pos = GetInitialPos(); //(temporary solution)
+    alive_ = false;
+    pos_ = {0,0}; //GetInitialPos(); //(temporary solution)
 }
-ArenaPoint ArenaMotile::GetAdjacentPos(Orientation tile)
+ArenaPoint ArenaEntity::GetAdjacentPos(Orientation tile)
 {
-    if      ( (actual_ori + tile) % 4 == 0) return ArenaPoint { actual_pos.x,       actual_pos.y - 1 };
-    else if ( (actual_ori + tile) % 4 == 1) return ArenaPoint { actual_pos.x + 1,   actual_pos.y };
-    else if ( (actual_ori + tile) % 4 == 2) return ArenaPoint { actual_pos.x,       actual_pos.y + 1 };
-    else if ( (actual_ori + tile) % 4 == 3) return ArenaPoint { actual_pos.x - 1,   actual_pos.y };
+    if      ( (ori_ + tile) % 4 == 0) return ArenaPoint { pos_.x,       pos_.y - 1 };
+    else if ( (ori_ + tile) % 4 == 1) return ArenaPoint { pos_.x + 1,   pos_.y };
+    else if ( (ori_ + tile) % 4 == 2) return ArenaPoint { pos_.x,       pos_.y + 1 };
+    else if ( (ori_ + tile) % 4 == 3) return ArenaPoint { pos_.x - 1,   pos_.y };
     else assert(false);
 }
 
@@ -62,48 +52,24 @@ ArenaPoint ArenaMotile::GetAdjacentPos(Orientation tile)
 
 
 //////////////////////////// Puppet
-//senses
-const std::string F_WHISK = "F_WHISK";
-const std::string L_WHISK = "L_WHISK";
-const std::string R_WHISK = "R_WHISK";
-//actions
-const std::string L_FOOT = "L_FOOT";
-const std::string R_FOOT = "R_FOOT";
-
-Puppet::Puppet(ArenaPoint s_pos, Orientation s_ori, std::shared_ptr<Arena> ar)
-    :ArenaMotile(s_pos, s_ori, ar)
-    ,inner(std::make_shared<BaseReferer>())
-{
-    std::shared_ptr<ChipPlan> basePlan = BlobFactory::MakePlan();
-    inner->SetSubPlan(basePlan, inner);
-
-    InitBrain();
-}
-
-void Puppet::InitBrain()
-{
-    std::vector<std::string> ins;
-    ins.push_back(L_WHISK);
-    ins.push_back(F_WHISK);
-    std::vector<std::string> outs;
-    outs.push_back(L_FOOT);
-    outs.push_back(R_FOOT);
-    inner->DefineXputs(ins, outs);
-}
+Puppet::Puppet(ArenaPoint s_pos, Orientation s_ori, std::shared_ptr<Arena> ar, std::shared_ptr<BaseReferer> brain)
+    :ArenaEntity(s_pos, s_ori, ar)
+    ,brain_(brain)
+{}
 
 void Puppet::Act()
 {
-    auto outs = inner->RetrieveOutputs();
+    auto outs = brain_->RetrieveOutputs();
 
     //Perform an action based on the output information from the brain...
     auto lamb = [&outs] (std::string n) { return outs.count(n) > 0 and outs.at(n) == true; };
-    if (lamb(L_FOOT) and lamb(R_FOOT)) {
+    if (lamb(L_FOOT.name) and lamb(R_FOOT.name)) {
         WalkForward();
     }
-    else if (lamb(L_FOOT)) {
+    else if (lamb(L_FOOT.name)) {
         TurnLeft();
     }
-    else if (lamb(R_FOOT)) {
+    else if (lamb(R_FOOT.name)) {
         TurnRight();
     }
 }
@@ -111,10 +77,10 @@ void Puppet::Act()
 void Puppet::Sense()
 {
     //sends the new sense data to the brain from the arena...
-    auto arenaLock = arena.lock();
-    inner->SetInputState( F_WHISK, arenaLock->WhiskerDetect( GetAdjacentPos(OriEnums::FRONT) ) );
-    inner->SetInputState( L_WHISK, arenaLock->WhiskerDetect( GetAdjacentPos(OriEnums::LEFT) ) );
-    inner->SetInputState( R_WHISK, arenaLock->WhiskerDetect( GetAdjacentPos(OriEnums::RIGHT) ) );
+    auto arenaLock = arena_.lock();
+    brain_->SetInputState( F_WHISK.name, arenaLock->WhiskerDetect( GetAdjacentPos(OriEnums::FRONT) ) );
+    brain_->SetInputState( L_WHISK.name, arenaLock->WhiskerDetect( GetAdjacentPos(OriEnums::LEFT) ) );
+    brain_->SetInputState( R_WHISK.name, arenaLock->WhiskerDetect( GetAdjacentPos(OriEnums::RIGHT) ) );
 }
 
 
@@ -129,8 +95,9 @@ void Puppet::Sense()
 
 
 ////////////////////////////////////////
-//Hero
-void Hero::Draw(sf::RenderTarget & rt)
+
+//Mouse
+void Mouse::Draw(sf::RenderTarget & rt)
 {
     sf::RectangleShape box;
     box.setFillColor( sf::Color {210,140,140} );
@@ -156,16 +123,74 @@ void Cat::Draw(sf::RenderTarget & rt)
 
 
 
-//non-member Spawn Functions...
-std::shared_ptr<Cat> SpawnCat(ArenaPoint p, Orientation o, std::shared_ptr<Arena> arena)
+
+//////////////////////////////////////Spawn....
+
+//MouseSpawnGroup
+MouseSpawnGroup::MouseSpawnGroup()
+    :brain_(BlobFactory::MakeBrain())
+    ,whoWillSpawn_(-1)
 {
-    auto guy = std::make_shared<Cat>(p,o,arena);
-    arena->RegisterMotile(guy);
-    return guy;
+    brain_->DefineXputs(GetMouseXPuts());
 }
-std::shared_ptr<Hero> SpawnHero(ArenaPoint p, Orientation o, std::shared_ptr<Arena> arena)
+
+void MouseSpawnGroup::AddSpawner(ArenaPoint p, Orientation o)
 {
-    auto guy = std::make_shared<Hero>(p,o,arena);
-    arena->RegisterMotile(guy);
-    return guy;
+    auto sp = std::make_shared<MouseSpawner>(p,o);
+    spawns_.emplace_back(sp);
 }
+
+void MouseSpawnGroup::Specify()
+{
+    if (spawns_.size() > 0)
+    {
+        whoWillSpawn_ = std::rand() % spawns_.size();
+    }
+    else
+    {
+        whoWillSpawn_ = -1;
+    }
+}
+
+void MouseSpawnGroup::TimeIsNow(int t, std::shared_ptr<Arena> arena)
+{
+    if (t == 0 and whoWillSpawn_ != -1)
+    {
+        auto chosenOne = spawns_.at(whoWillSpawn_);
+        auto guy = std::make_shared<Mouse>(chosenOne->pos_, chosenOne->ori_, arena, brain_);
+        arena->RegisterMouse(guy);
+    }
+}
+
+//CatSpawnGroup
+CatSpawnGroup::CatSpawnGroup()
+{}
+
+void CatSpawnGroup::AddSpawner(ArenaPoint p, Orientation o, TimeRange timeRange, int planNum)
+{
+    auto sp = std::make_shared<CatSpawner>(p, o, timeRange, planNum);
+    spawns_.emplace_back(sp);
+}
+
+void CatSpawnGroup::Specify()
+{
+    for (auto &cat: spawns_)
+    {
+        int rangeSize = cat->timeRange_.end +1 - cat->timeRange_.start;
+        cat->timeExact_ = cat->timeRange_.start + ( std::rand() % rangeSize );
+    }
+}
+
+void CatSpawnGroup::TimeIsNow(int t, std::shared_ptr<Arena> arena)
+{
+    for (auto &x: spawns_)
+    {
+        if (t == x->timeExact_)
+        {
+            auto guy = std::make_shared<Cat>(x->pos_, x->ori_, arena, x->brain_);
+            arena->RegisterCat(guy);
+        }
+    }
+}
+
+

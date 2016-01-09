@@ -11,48 +11,37 @@
 #include <vector>
 #include <memory>
 #include <SFML/Graphics.hpp>
+#include "ArenaBasics.hpp"
+#include "Puppet.hpp"
 
 const sf::Vector2f ARENA_GRID_SIZE { 200.f , 200.f };
 
-enum class PredationStatus { CAT, MOUSE };
-
-typedef int Orientation;
-//enum class OriEnum { FRONT = 0, RIGHT = 1, BACK = 2, LEFT = 3 };
-namespace OriEnums {
-    const int FRONT = 0;
-    const int RIGHT = 1;
-    const int BACK = 2;
-    const int LEFT = 3;
-};
-
-struct ArenaPoint
-{
-    ArenaPoint() :x(0), y(0) {}
-    ArenaPoint(int p_x, int p_y) :x(p_x), y(p_y) {}
-    int x;
-    int y;
-};
-bool operator==(const ArenaPoint & lhs, const ArenaPoint & rhs);
-
-class ArenaStatic;
-class ArenaMotile;
-
-class Arena
+class Arena : public std::enable_shared_from_this<Arena>
 {
 public:
     Arena();
-        //InitBoard()
-    void RegisterStatic(std::shared_ptr<ArenaStatic> guy);
-    void RegisterMotile(std::shared_ptr<ArenaMotile> guy);
+    void InitBoard();
+    void TimeAdvance();
+    std::shared_ptr<BaseReferer> GetMouseBrain()    { return mouseSpawnGroup.GetMouseBrain(); }
+
+    void RegisterMouse(std::shared_ptr<Mouse> mouse);
+    void RegisterCat(std::shared_ptr<Cat> cat);
+    void MakeMouseSpawner(ArenaPoint p, Orientation o);
+    void MakeCatSpawner(ArenaPoint p, Orientation o, TimeRange timeRange, int planNum);
+
     void Draw(sf::RenderTarget &rt);
     bool IsInBounds(ArenaPoint);
-    void Interactions();
     bool WhiskerDetect(ArenaPoint);
 private:
-    std::vector< std::shared_ptr<ArenaStatic> > statics;
-    std::vector< std::shared_ptr<ArenaMotile> > motiles;
+    void Interactions();
+    CatSpawnGroup catSpawnGroup;
+    MouseSpawnGroup mouseSpawnGroup;
+    std::vector< std::shared_ptr<Cat> > cats;
+    std::vector< std::shared_ptr<Mouse> > mice;
     ArenaPoint minCorner;
     ArenaPoint maxCorner;
+    bool isTimeOn_;
+    TimeExact t_;
 };
 
 //potential optimization:

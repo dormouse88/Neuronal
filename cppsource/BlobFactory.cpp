@@ -64,6 +64,7 @@ std::shared_ptr<ChipHandle> BlobFactory::AddHandle(std::shared_ptr<ChipPlan> pla
     return ret;
 }
 
+
 std::shared_ptr<ChipPlan> BlobFactory::MakePlan()
 {
     auto g = std::make_shared<PlanGrid>();
@@ -71,6 +72,18 @@ std::shared_ptr<ChipPlan> BlobFactory::MakePlan()
     g->RegisterPlan(p);
     return p;
 }
+
+std::shared_ptr<BaseReferer> BlobFactory::MakeBrain()
+{
+    auto brain = std::make_shared<BaseReferer>();
+    std::shared_ptr<ChipPlan> basePlan = BlobFactory::MakePlan();
+    brain->SetSubPlan(basePlan, brain);
+
+    //InitBrain();
+
+    return brain;
+}
+
 
 
 std::shared_ptr<Wire> BlobFactory::AddWire(PlanPos pos1, PlanPos pos2)

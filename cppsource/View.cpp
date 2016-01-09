@@ -121,8 +121,8 @@ View::View(Model & model_p)
     ,mainView(sf::Vector2f{0.f, 0.f}, INITIAL_MAINVIEW_SIZE )
     ,mainOverlay(sf::FloatRect{0.f,0.f, INITIAL_MAINVIEW_SIZE.x, INITIAL_MAINVIEW_SIZE.y})
     ,barOverlay(sf::FloatRect{0.f,0.f, INITIAL_MAINVIEW_SIZE.x, BAR_HEIGHT})
-    ,cursorOne( model_p.GetHero()->GetBR()->GetSubPlan()->GetGrid() )
-    ,cursorTwo( model_p.GetHero()->GetBR()->GetSubPlan()->GetGrid(), sf::Color::Cyan )
+    ,cursorOne( model_p.GetMouseBrain()->GetSubPlan()->GetGrid() )
+    ,cursorTwo( model_p.GetMouseBrain()->GetSubPlan()->GetGrid(), sf::Color::Cyan )
     ,highlightingMode(1)
 {
     window.setVerticalSyncEnabled(true);
@@ -138,7 +138,7 @@ View::View(Model & model_p)
     barText1.setCharacterSize(25.f);
     barText1.setPosition(30.f, 30.f);
     barText1.setColor( sf::Color::Green );
-    }
+}
 
 
 void View::Draw()
@@ -159,8 +159,6 @@ void View::DrawMain() //Main Port...
     window.setView(mainView);
     
     GetArena()->Draw(window);
-    //GetHero()->Draw(window);
-    //GetCat1()->Draw(window);
     
     auto ap = GetViewBasePlan();
     assert(ap);

@@ -13,6 +13,7 @@
 #include "Jumper.hpp"
 #include "ChipHandle.hpp"
 #include "ChipPlan.hpp"
+#include "BaseReferer.hpp"
 
 namespace BlobFactory
 {
@@ -24,6 +25,7 @@ namespace BlobFactory
     std::shared_ptr<ChipHandle> AddHandle(std::shared_ptr<ChipPlan> plan, int serial, VectorSmart pos);
     
     std::shared_ptr<ChipPlan>   MakePlan();
+    std::shared_ptr<BaseReferer> MakeBrain();
     
     std::shared_ptr<Wire>       AddWire(PlanPos pos1, PlanPos pos2);
     std::shared_ptr<Wire>       AddWire(std::shared_ptr<ChipPlan> plan, Wirable & from, Wirable & to, signed weight);

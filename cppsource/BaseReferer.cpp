@@ -42,22 +42,24 @@ std::shared_ptr<ChipPlan> BaseReferer::GetSubPlan()
 
 
 
-void BaseReferer::DefineXputs(std::vector<std::string> ins, std::vector<std::string> outs)
+void BaseReferer::DefineXputs(XPuts xputs)
 {
     //this is the only thing that actually inserts into the maps
-    int in_i = 1;
-    for (auto x: ins)
+    inputs.clear();
+    //int in_i = 1;
+    for (auto sd: xputs.ins)
     {
-        SlotData temp { in_i, x, false };
-        inputs.insert( {x, temp } );
-        in_i++;
+        //SlotData temp { in_i, str, false };
+        inputs.insert( {sd.name, sd} );
+        //in_i++;
     }
-    int out_i = 1;
-    for (auto x: outs)
+    outputs.clear();
+    //int out_i = 1;
+    for (auto sd: xputs.outs)
     {
-        SlotData temp { out_i, x, false };
-        outputs.insert( { out_i, temp} );
-        out_i++;
+        //SlotData temp { out_i, sd, false };
+        outputs.insert( { sd.slot, sd} );
+        //out_i++;
     }
 }
 void BaseReferer::SetInputState(std::string name, bool charge)
@@ -79,22 +81,14 @@ void BaseReferer::TickOnce()
 }
 std::map<std::string, bool> BaseReferer::RetrieveOutputs()
 {
-//    std::cout << "inputs length: " << (inputs.size()) << std::endl;
-//    std::cout << "outputs length: " << (outputs.size()) << std::endl;
-//    std::cout << "output counts of one: " << (outputs.count(1)) << std::endl;
-
     for (int i = 0; i<TIME_OUT_TICKS and not outputsReady; i++)
     {
         TickOnce();
     }
     std::map<std::string, bool> retMap;
-
     //fill retMap with data...
     for (auto &x: outputs)
     {
-//        std::cout << "name: " << x.second.name << std::endl;
-//        std::cout << "slot: " << x.second.slot << std::endl;
-//        std::cout << " charge: " << x.second.charge << std::endl;
         retMap.insert( {x.second.name, x.second.charge} );
         //It is necessary to clear the outputs. (Outside of the basePlan, 'true' and 'false' charges do not have parity and false is a non-response).
         x.second.charge = false;
