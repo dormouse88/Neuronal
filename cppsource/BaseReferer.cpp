@@ -8,6 +8,7 @@
 #include "BaseReferer.hpp"
 
 #include <iostream>
+#include <set>
 
 const int TIME_OUT_TICKS = 2000;
 
@@ -42,24 +43,20 @@ std::shared_ptr<ChipPlan> BaseReferer::GetSubPlan()
 
 
 
-void BaseReferer::DefineXputs(XPuts xputs)
+void BaseReferer::DefineXputs(XPuts all, XPutFilter filter)
 {
     //this is the only thing that actually inserts into the maps
     inputs.clear();
-    //int in_i = 1;
-    for (auto sd: xputs.ins)
+    for (auto sd: all.ins)
     {
-        //SlotData temp { in_i, str, false };
-        inputs.insert( {sd.name, sd} );
-        //in_i++;
+        if (filter == nullptr or filter->count( sd.name ) > 0)
+            inputs.insert( {sd.name, sd} );
     }
     outputs.clear();
-    //int out_i = 1;
-    for (auto sd: xputs.outs)
+    for (auto sd: all.outs)
     {
-        //SlotData temp { out_i, sd, false };
-        outputs.insert( { sd.slot, sd} );
-        //out_i++;
+        if (filter == nullptr or filter->count( sd.name ) > 0)
+            outputs.insert( { sd.slot, sd} );
     }
 }
 void BaseReferer::SetInputState(std::string name, bool charge)

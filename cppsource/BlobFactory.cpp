@@ -55,7 +55,6 @@ std::shared_ptr<ChipHandle> BlobFactory::AddHandle(std::shared_ptr<ChipPlan> pla
     {
         auto handle = std::make_shared<ChipHandle> (serial, pos, plan);
         auto subPlan = MakePlan();
-        //DEL//subPlan->RegisterReferer(handle);
         handle->SetSubPlan( subPlan, handle );
         
         plan->ImportDevice(handle);
@@ -68,7 +67,7 @@ std::shared_ptr<ChipHandle> BlobFactory::AddHandle(std::shared_ptr<ChipPlan> pla
 std::shared_ptr<ChipPlan> BlobFactory::MakePlan()
 {
     auto g = std::make_shared<PlanGrid>();
-    auto p = std::make_shared<ChipPlan>(g);
+    auto p = std::make_shared<ChipPlan>(g, userData_);
     g->RegisterPlan(p);
     return p;
 }
@@ -78,9 +77,6 @@ std::shared_ptr<BaseReferer> BlobFactory::MakeBrain()
     auto brain = std::make_shared<BaseReferer>();
     std::shared_ptr<ChipPlan> basePlan = BlobFactory::MakePlan();
     brain->SetSubPlan(basePlan, brain);
-
-    //InitBrain();
-
     return brain;
 }
 

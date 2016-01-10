@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<LEVEL num="1" minx="-7" miny="-7" maxx="5" maxy="6">
+	<INPUT name="F_WHISK" />
+	<OUTPUT name="L_FOOT" />
+	<MSPAWN posx="2" posy="3" ori="2" />
+	<CSPAWN posx="3" posy="4" ori="1" mint="-5" maxt="-3" catplan="1" />
+	<PLAN i="1">
+		<NEUR i="1" x="-1" y="-1" thr="1" />
+		<NEUR i="2" x="0" y="-1" thr="-1" />
+		<NEUR i="3" x="1" y="-1" thr="-1" />
+		<WIRE f="0" t="1" w="1" fs="1" ts="0" />
+		<WIRE f="1" t="2" w="1" fs="0" ts="0" />
+		<WIRE f="2" t="0" w="1" fs="0" ts="2" />
+		<WIRE f="3" t="0" w="1" fs="0" ts="1" />
+	</PLAN>
+</LEVEL>

@@ -8,32 +8,17 @@
 #include "Arena.hpp"
 #include "Puppet.hpp"
 
-Arena::Arena()
-    :minCorner(-7, -7)
-    ,maxCorner(7, 7)
-    ,isTimeOn_(true)
-    ,t_(-6)
+Arena::Arena(std::shared_ptr<BlobFactory> factory)
+    :levelNum(0)
+    ,mouseSpawnGroup(factory)
+    ,catSpawnGroup(factory)
+{}
+
+void Arena::Specify()
 {
-    InitBoard();
     mouseSpawnGroup.Specify();
     catSpawnGroup.Specify();
-}
-
-//Have an Arena Serializer that has access to Arena and calls all the necessary methods to create all these things.
-//Decide an XML schema for defining levels.
-//
-//A "level" Specifies:
-//Arena Dimensions
-//MouseXPuts
-//MouseSpawners
-//CatPlans -- how about this?
-//CatSpawners
-//GoalSpawners
-
-void Arena::InitBoard()
-{
-    MakeMouseSpawner(ArenaPoint{2,0}, 0);
-    MakeCatSpawner(ArenaPoint{2,3}, 0, TimeRange{-5,-3}, 9);
+    t_ = -6;//catSpawnGroup.CalculateEarliestTime();
 }
 
 void Arena::TimeAdvance()
@@ -65,13 +50,13 @@ void Arena::RegisterCat(std::shared_ptr<Cat> guy)
 {
     cats.emplace_back(guy);
 }
-void Arena::MakeMouseSpawner(ArenaPoint p, Orientation o)
+std::shared_ptr<MouseSpawner> Arena::MakeMouseSpawner(ArenaPoint p, Orientation o)
 {
-    mouseSpawnGroup.AddSpawner(p, o);
+    return mouseSpawnGroup.AddSpawner(p, o);
 }
-void Arena::MakeCatSpawner(ArenaPoint p, Orientation o, TimeRange timeRange, int planNum)
+std::shared_ptr<CatSpawner> Arena::MakeCatSpawner(ArenaPoint p, Orientation o, TimeRange timeRange, int planNum)
 {
-    catSpawnGroup.AddSpawner(p, o, timeRange, planNum);
+    return catSpawnGroup.AddSpawner(p, o, timeRange, planNum);
 }
 
 

@@ -17,21 +17,13 @@
 class Arena;  //fwd dec
 
 //senses
-//const std::string F_WHISK = "F_WHISK";
-//const std::string L_WHISK = "L_WHISK";
-//const std::string R_WHISK = "R_WHISK";
 const SlotData F_WHISK {1,"F_WHISK",false};
 const SlotData L_WHISK {2,"L_WHISK",false};
 const SlotData R_WHISK {3,"R_WHISK",false};
-
 //actions
-//const std::string L_FOOT = "L_FOOT";
-//const std::string R_FOOT = "R_FOOT";
 const SlotData L_FOOT {1,"L_FOOT",false};
 const SlotData R_FOOT {2,"R_FOOT",false};
-
-
-inline XPuts GetMouseXPuts()
+inline XPuts GetAllXPuts()
 {
     XPuts ret;
     ret.ins.emplace_back(R_WHISK);
@@ -40,7 +32,6 @@ inline XPuts GetMouseXPuts()
     ret.outs.emplace_back(R_FOOT);
     return ret;
 }
-
 
 
 
@@ -80,7 +71,7 @@ public:
     virtual void Sense() override;
 
     //void SetBrain(std::shared_ptr<BaseReferer> b)       {brain_ = b;}
-    std::shared_ptr<BaseReferer> GetBrain()             {return brain_;}
+    //std::shared_ptr<BaseReferer> GetBrain()             {return brain_;}
 private:
     std::shared_ptr<BaseReferer> brain_;
 };
@@ -117,20 +108,19 @@ struct MouseSpawner
     Orientation ori_;
 };
 
-struct CatSpawner
+class CatSpawner
 {
-    CatSpawner(ArenaPoint s_pos, Orientation s_ori, TimeRange timeRange, int planNum)
+public:
+    CatSpawner(ArenaPoint s_pos, Orientation s_ori, TimeRange timeRange, int planNum, std::shared_ptr<BlobFactory> factory)
         :pos_(s_pos)
         ,ori_(s_ori)
         ,timeRange_(timeRange)
         ,timeExact_(timeRange.start)
         ,planNum_(planNum)
-        ,brain_(BlobFactory::MakeBrain())
-    {
-        brain_->DefineXputs(GetMouseXPuts());
-        //cat needs to have the planNum plan loaded into it here!!
-        //planNum_...
-    }
+        ,brain_(factory->MakeBrain())
+    {}
+    void DefineCatXPuts()                           { brain_->DefineXputs(GetAllXPuts(), nullptr); }
+    std::shared_ptr<BaseReferer> GetCatBrain()      { return brain_; }
     ArenaPoint pos_;
     Orientation ori_;
     TimeRange timeRange_;
@@ -153,15 +143,16 @@ public:
 class MouseSpawnGroup : public SpawnGroup
 {
 public:
-    MouseSpawnGroup();
-    void AddSpawner(ArenaPoint, Orientation);
+    MouseSpawnGroup(std::shared_ptr<BlobFactory>);
+    std::shared_ptr<MouseSpawner> AddSpawner(ArenaPoint, Orientation);
+    void DefineMouseXPuts(XPutFilter f)                     {brain_->DefineXputs(GetAllXPuts(), f);}
     std::shared_ptr<BaseReferer> GetMouseBrain()            {return brain_;}
     
     void Specify()                                          override;
     void DeSpecify()                                        override {} //?set whoWillSpawn to zero?
     void TimeIsNow(int t, std::shared_ptr<Arena> arena)     override;
 
-//    std::weak_ptr<Arena> arena_;
+private:
     std::vector<std::shared_ptr<MouseSpawner> > spawns_;
     std::shared_ptr<BaseReferer> brain_;
     int whoWillSpawn_;
@@ -170,15 +161,16 @@ public:
 class CatSpawnGroup : public SpawnGroup
 {
 public:
-    CatSpawnGroup();
-    void AddSpawner(ArenaPoint, Orientation, TimeRange timeRange, int planNum);
+    CatSpawnGroup(std::shared_ptr<BlobFactory>);
+    std::shared_ptr<CatSpawner> AddSpawner(ArenaPoint, Orientation, TimeRange timeRange, int planNum);
 
     void Specify()                                          override;
     void DeSpecify()                                        override {} //?disable all timeExacts?
     void TimeIsNow(int t, std::shared_ptr<Arena> arena)     override;
-    
-//    std::weak_ptr<Arena> arena_;
+
+private:
     std::vector<std::shared_ptr<CatSpawner> > spawns_;
+    std::shared_ptr<BlobFactory> factory_;
 };
 
 

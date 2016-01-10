@@ -17,15 +17,19 @@
 #include "Wire.hpp"
 #include "ChipPlan.hpp"
 class UserData; //fwd dec
+class Arena; //fwd dec
 
 class Serializer
 {
 public:
     Serializer();
+
+    void LoadLevel(std::shared_ptr<Arena> a, std::shared_ptr<BlobFactory> f);
     
     //Model interface...
-    bool SavePlan(std::shared_ptr<ChipPlan> plan_p, std::shared_ptr<UserData>);
-    std::shared_ptr<ChipPlan> LoadPlan(int planID, std::shared_ptr<UserData>);
+    bool                        SaveUserPlan(std::shared_ptr<ChipPlan> plan_p);
+    std::shared_ptr<ChipPlan>   LoadUserPlan(int planID, std::shared_ptr<BlobFactory>);
+    std::shared_ptr<ChipPlan>   LoadLevelPlan(int levelNum, int planID, std::shared_ptr<BlobFactory>);
 
     //UserData interface...
     void LoadUserData(std::shared_ptr<UserData>);
@@ -38,10 +42,11 @@ private:
     pugi::xml_node GetNameNodeByID(int planID);
     pugi::xml_node GetNameNodeByName(std::string name);
 
-    bool SavePlanRecursively(std::shared_ptr<ChipPlan> plan_p, std::shared_ptr<UserData>);
-    std::shared_ptr<ChipPlan> LoadPlanRecursively(int planID, std::shared_ptr<UserData>);
+    bool SavePlanRecursively(pugi::xml_node container, std::shared_ptr<ChipPlan> plan_p);
+    std::shared_ptr<ChipPlan> LoadPlanRecursively(pugi::xml_node container, int planID, std::shared_ptr<BlobFactory> factory);
     
-    pugi::xml_document doc;
+    pugi::xml_document userDoc_;
+    pugi::xml_document levelsDoc_;
 };
 
 #endif	/* SERIALIZER_HPP */

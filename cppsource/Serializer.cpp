@@ -14,41 +14,99 @@
 #include <SFML/System.hpp>// (/Vector2.hpp)
 #include <cassert>
 #include "UserData.hpp"  //fwd dec
+#include "Arena.hpp" //fwd dec
 
 
-const char XML_FILE_NAME [] = "tree.xml";
+
+const char XML_USER_FILENAME [] = "tree.xml";
+const char XML_LEVELS_FILENAME [] = "levels1.xml";
 
 
 Serializer::Serializer()
-    :doc()
+    :userDoc_()
+    ,levelsDoc_()
 {
     srand(time(nullptr));
-    OpenFile(doc, XML_FILE_NAME);
+    OpenFile(userDoc_, XML_USER_FILENAME);
+    OpenFile(levelsDoc_, XML_LEVELS_FILENAME);
 }
 
-bool Serializer::SavePlan(std::shared_ptr<ChipPlan> plan_p, std::shared_ptr<UserData> userData)
+void Serializer::LoadLevel(std::shared_ptr<Arena> a, std::shared_ptr<BlobFactory> f)
 {
-    bool saved = SavePlanRecursively(plan_p, userData);
-    doc.save_file(XML_FILE_NAME);
+    //auto a = this;
+    {
+        //level number
+        a->levelNum = 1;
+    }
+    {
+        //arena dimensions
+        a->minCorner = ArenaPoint{-7,-7};
+        a->maxCorner = ArenaPoint{7,7};
+    }
+    {
+        //mouse xputs
+        auto filter = std::make_shared<std::set<std::string> >();//(lev derived)
+        filter->insert(R_WHISK.name);
+        filter->insert(F_WHISK.name);
+        filter->insert(L_FOOT.name);
+        filter->insert(R_FOOT.name);
+        a->mouseSpawnGroup.DefineMouseXPuts( filter );
+    }
+    {
+        //mouse spawners
+        int x = 2;
+        int y = 0;
+        int ori = 0;
+        a->MakeMouseSpawner(ArenaPoint{x,y}, ori);
+    }
+    {
+        //cat spawners (with brains)
+        int x = 2;
+        int y = 3;
+        int ori = 0;
+        int mint = -5;
+        int maxt = -3;
+        int planNum = 1;
+        auto s = a->MakeCatSpawner(ArenaPoint{x,y}, ori, TimeRange{mint,maxt}, planNum);
+        s->DefineCatXPuts( );
+        auto br = s->GetCatBrain();
+        auto catPlan = LoadLevelPlan( a->levelNum, planNum, f );
+        assert(catPlan);
+        br->SetSubPlan(catPlan, br);
+    }
+}
+
+
+
+
+bool Serializer::SaveUserPlan(std::shared_ptr<ChipPlan> plan_p)
+{
+    bool saved = SavePlanRecursively(userDoc_.child("PLANS"), plan_p);
+    userDoc_.save_file(XML_USER_FILENAME);
     return saved;
 }
-std::shared_ptr<ChipPlan> Serializer::LoadPlan(int planID, std::shared_ptr<UserData> userData)
+std::shared_ptr<ChipPlan> Serializer::LoadUserPlan(int planID, std::shared_ptr<BlobFactory> factory)
 {
-    return LoadPlanRecursively(planID, userData);
+    return LoadPlanRecursively(userDoc_.child("PLANS"), planID, factory);
 }
 
+std::shared_ptr<ChipPlan> Serializer::LoadLevelPlan(int levelNum, int planID, std::shared_ptr<BlobFactory> factory)
+{
+    pugi::xml_node con = levelsDoc_.find_child_by_attribute("LEVEL", "num", patch::to_string( levelNum ).c_str() );
+    return LoadPlanRecursively(con, planID, factory);
+}
 
 void Serializer::LoadUserData(std::shared_ptr<UserData> ud)
 {
     //Ancestry...
-    for (pugi::xml_node node: doc.child("RELATIVES").children("REL"))
+    for (pugi::xml_node node: userDoc_.child("RELATIVES").children("REL"))
     {
         int id = node.attribute("i").as_int(0);
         int anc = node.attribute("anc").as_int(0);
         ud->MakeAncestryEntry(id, anc);
     }
     //And names...
-    for (pugi::xml_node node: doc.child("NAMES").children("NAME"))
+    for (pugi::xml_node node: userDoc_.child("NAMES").children("NAME"))
     {
         int i = node.attribute("i").as_int(0);
         std::string name = node.attribute("n").as_string(0);
@@ -60,28 +118,28 @@ void Serializer::LoadUserData(std::shared_ptr<UserData> ud)
 void Serializer::SaveAddAncestryEntry(int id, int anc)
 {
     assert(id > 0);
-    pugi::xml_node entry = doc.child("RELATIVES").append_child("REL");
+    pugi::xml_node entry = userDoc_.child("RELATIVES").append_child("REL");
     entry.append_attribute("i") = id;
     entry.append_attribute("anc") = anc;
-    doc.save_file(XML_FILE_NAME);
+    userDoc_.save_file(XML_USER_FILENAME);
 }
 
 void Serializer::SaveRemoveName(int planID)
 {
     pugi::xml_node p = GetNameNodeByID(planID);
     assert(p);
-    doc.child("NAMES").remove_child(p);
-    doc.save_file(XML_FILE_NAME);
+    userDoc_.child("NAMES").remove_child(p);
+    userDoc_.save_file(XML_USER_FILENAME);
 }
 
 void Serializer::SaveAddName(int planID, std::string name)
 {
     assert(not GetNameNodeByID(planID) and not GetNameNodeByName(name));
-    pugi::xml_node names = doc.child("NAMES");
+    pugi::xml_node names = userDoc_.child("NAMES");
     pugi::xml_node entry = names.append_child("NAME");
     entry.append_attribute("i") = planID;
     entry.append_attribute("n") = name.c_str();
-    doc.save_file(XML_FILE_NAME);
+    userDoc_.save_file(XML_USER_FILENAME);
 }
 
 
@@ -101,29 +159,37 @@ void Serializer::OpenFile(pugi::xml_document & doc, const char * fileName)
 }
 
 pugi::xml_node Serializer::GetNameNodeByID(int planID) {
-    return doc.child("NAMES").find_child_by_attribute("NAME", "i", patch::to_string( planID ).c_str() );
+    return userDoc_.child("NAMES").find_child_by_attribute("NAME", "i", patch::to_string( planID ).c_str() );
 }
 pugi::xml_node Serializer::GetNameNodeByName(std::string name) {
-    return doc.child("NAMES").find_child_by_attribute("NAME", "n", name.c_str() );
+    return userDoc_.child("NAMES").find_child_by_attribute("NAME", "n", name.c_str() );
 }
 
 
-bool Serializer::SavePlanRecursively(std::shared_ptr<ChipPlan> plan_p, std::shared_ptr<UserData> userData)
+bool Serializer::SavePlanRecursively(pugi::xml_node container, std::shared_ptr<ChipPlan> plan_p)
 {
     if (plan_p->IsModified())
     {
         int oldID = plan_p->planID;
-        pugi::xml_node plansNode = doc.child("PLANS");
-        //check highest used planID in the XML and use next number as new planID
-        pugi::xml_node db = plansNode.child("PLAN_DB");
-        int newID = db.attribute("HIGHEST_ID").as_int() + 1;
-        db.attribute("HIGHEST_ID") = newID;
+        //check highest used planID in the XML and use next number as new planID...
+        int newID = 0;
+        for (int i = 1; i<100000; i++) {
+            if ( not container.find_child_by_attribute("PLAN", "i", patch::to_string( i ).c_str() ) ) {
+                newID = i;
+                break;
+            }
+        }
+        assert(newID > 0);
+//        Old method of saving highest int used...
+//        pugi::xml_node db = plansNode.child("PLAN_DB");
+//        int newID = db.attribute("HIGHEST_ID").as_int() + 1;
+//        db.attribute("HIGHEST_ID") = newID;
+        
         //update the plan in memory with the new ID...
         plan_p->planID = newID;
-        plan_p->userData = userData;
 
         //create the new plan in the xml...
-        pugi::xml_node plan = plansNode.append_child("PLAN");
+        pugi::xml_node plan = container.append_child("PLAN");
         plan.append_attribute("i") = newID;
 
         for (auto d: plan_p->devices) {
@@ -141,7 +207,7 @@ bool Serializer::SavePlanRecursively(std::shared_ptr<ChipPlan> plan_p, std::shar
                 auto h = std::dynamic_pointer_cast<ChipHandle>(d);
                 auto p = h->GetSubPlan();
                 //holy recursion batman!?!...
-                if (p) SavePlanRecursively(p, userData);
+                if (p) SavePlanRecursively(container, p);
                 pugi::xml_node dev = plan.append_child("HAND");
                 dev.append_attribute("i").set_value(d->GetSerial() );
                 dev.append_attribute("x").set_value(d->GetSmartPos().x);
@@ -181,20 +247,17 @@ bool Serializer::SavePlanRecursively(std::shared_ptr<ChipPlan> plan_p, std::shar
     return false;
 }
 
-std::shared_ptr<ChipPlan> Serializer::LoadPlanRecursively(int planID, std::shared_ptr<UserData> userData)
+std::shared_ptr<ChipPlan> Serializer::LoadPlanRecursively(pugi::xml_node container, int planID, std::shared_ptr<BlobFactory> factory)
 {
     std::shared_ptr<ChipPlan> memPlan = nullptr;
     
-    pugi::xml_node plansNode = doc.child("PLANS");
-    pugi::xml_node db = plansNode.child("PLAN_DB");
     //Find plan with matching planID in the XML...
-    pugi::xml_node xmlPlan = plansNode.find_child_by_attribute("PLAN", "i", patch::to_string( planID ).c_str() );
+    pugi::xml_node xmlPlan = container.find_child_by_attribute("PLAN", "i", patch::to_string( planID ).c_str() );
     
     if (xmlPlan)
     {
-        memPlan = BlobFactory::MakePlan();
+        memPlan = factory->MakePlan();
         memPlan->planID = planID;
-        memPlan->userData = userData;
 
         for (pugi::xml_node device = xmlPlan.child("HAND"); device; device = device.next_sibling("HAND"))
         {
@@ -202,10 +265,10 @@ std::shared_ptr<ChipPlan> Serializer::LoadPlanRecursively(int planID, std::share
             int link { device.attribute("link").as_int() };
             int serial { device.attribute("i").as_int() };
             //creates handle with default empty plan...
-            auto handle = BlobFactory::AddHandle(memPlan, serial, pos);
+            auto handle = factory->AddHandle(memPlan, serial, pos);
             //Recursively load subplans and assign them...
             if (link != 0) {
-                auto subPlan = LoadPlanRecursively(link, userData);
+                auto subPlan = LoadPlanRecursively(container, link, factory);
                 handle->SetSubPlan(subPlan, handle);
             }
         }
@@ -214,13 +277,13 @@ std::shared_ptr<ChipPlan> Serializer::LoadPlanRecursively(int planID, std::share
             sf::Vector2i pos { device.attribute("x").as_int(), device.attribute("y").as_int() };
             int threshold { device.attribute("thr").as_int() };
             int serial { device.attribute("i").as_int() };
-            BlobFactory::AddNeuron(memPlan, serial, pos, threshold);
+            factory->AddNeuron(memPlan, serial, pos, threshold);
         }
         for (pugi::xml_node device = xmlPlan.child("JUMP"); device; device = device.next_sibling("JUMP"))
         {
             sf::Vector2i pos { device.attribute("x").as_int(), device.attribute("y").as_int() };
             int serial { device.attribute("i").as_int() };
-            BlobFactory::AddJumper(memPlan, serial, pos);
+            factory->AddJumper(memPlan, serial, pos);
         }
         for (pugi::xml_node wire = xmlPlan.child("WIRE"); wire; wire = wire.next_sibling("WIRE"))
         {
@@ -234,7 +297,7 @@ std::shared_ptr<ChipPlan> Serializer::LoadPlanRecursively(int planID, std::share
             if (from != 0) fromDev = memPlan->GetDevice(from);
             std::shared_ptr<Wirable> toDev = memPlan;
             if (to != 0) toDev = memPlan->GetDevice(to);
-            BlobFactory::AddWire(memPlan, *fromDev, fromSlot, *toDev, toSlot, weight);
+            factory->AddWire(memPlan, *fromDev, fromSlot, *toDev, toSlot, weight);
         }
         memPlan->modified = false;
     }//if (xmlPlan)

@@ -118,27 +118,27 @@ bool Controller::HandleInput()
                 if (event.key.code == sf::Keyboard::N)
                 {
                     if (event.key.shift == false) {
-                        BlobFactory::AddNeuron(pos1);
+                        theModel.GetFactory()->AddNeuron(pos1);
                     }
                     else {
-                        BlobFactory::RemoveDevice(pos1);
+                        theModel.GetFactory()->RemoveDevice(pos1);
                     }
                 }
                 if (event.key.code == sf::Keyboard::J)
                 {
-                    BlobFactory::AddJumper(pos1);
+                    theModel.GetFactory()->AddJumper(pos1);
                 }
                 if (event.key.code == sf::Keyboard::H)
                 {
-                    BlobFactory::AddHandle(pos1);
+                    theModel.GetFactory()->AddHandle(pos1);
                 }
                 if (event.key.code == sf::Keyboard::B)
                 {
                     if (event.key.shift == false) {
-                        BlobFactory::AddWire(pos1, pos2);
+                        theModel.GetFactory()->AddWire(pos1, pos2);
                     }
                     else {
-                        BlobFactory::RemoveWire(pos1, pos2);
+                        theModel.GetFactory()->RemoveWire(pos1, pos2);
                     }
                 }
                 if (event.key.code == sf::Keyboard::A) {

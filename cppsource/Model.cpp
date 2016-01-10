@@ -12,9 +12,12 @@
 Model::Model()
     :serializer(std::make_shared<Serializer>())
     ,userData(std::make_shared<UserData>(serializer))
-    ,arena(std::make_shared<Arena>())
+    ,factory_(std::make_shared<BlobFactory>(userData))
+    ,arena(std::make_shared<Arena>(factory_))
 {
     serializer->LoadUserData(userData);
+    serializer->LoadLevel(arena, factory_);
+    arena->Specify();
 }
 
 void Model::Logic()
@@ -29,7 +32,7 @@ std::shared_ptr<ChipPlan> Model::WipePlan(PlanPos pos, bool forced)
         std::shared_ptr<ChipPlan> plan = pos.GetPlan();
         if (forced or not plan->IsModified())
         {
-            auto emptyPlan = BlobFactory::MakePlan();
+            auto emptyPlan = factory_->MakePlan();
             auto ref = plan->GetReferer();
             if (ref) ref->SetSubPlan(emptyPlan, ref);
             return emptyPlan;
@@ -45,7 +48,7 @@ std::shared_ptr<ChipPlan> Model::LoadPlan(PlanPos pos, PlanNav nav)
         if (not plan->IsModified())
         {
             int num = userData->GetID(plan->GetPlanID(), nav);
-            auto loadedPlan = serializer->LoadPlan(num, userData);
+            auto loadedPlan = serializer->LoadUserPlan(num, factory_);
             if (loadedPlan)
             {
                 auto ref = plan->GetReferer();
@@ -64,7 +67,7 @@ void Model::SavePlan(PlanPos pos)
     {
         int oldID = plan->GetPlanID();
         std::string oldName = userData->GetNameByID( oldID );
-        if ( serializer->SavePlan(plan, userData) )
+        if ( serializer->SaveUserPlan(plan) )
         {
             userData->AddAncestryEntry(plan->GetPlanID(), oldID);
             if (not oldName.empty()) {
@@ -83,7 +86,7 @@ void Model::SavePlanAsNew(PlanPos pos)
     if (not pos.IsLocated() and plan->IsModified())
     {
         int oldID = plan->GetPlanID();
-        if ( serializer->SavePlan(plan, userData) )
+        if ( serializer->SaveUserPlan(plan) )
         {
             userData->AddAncestryEntry(plan->GetPlanID(), oldID);
             userData->AddAutoName(plan->GetPlanID());

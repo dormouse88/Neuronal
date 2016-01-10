@@ -15,8 +15,10 @@
 #include "ChipPlan.hpp"
 #include "BaseReferer.hpp"
 
-namespace BlobFactory
+class BlobFactory
 {
+public:
+    BlobFactory(std::shared_ptr<UserData> ud) :userData_(ud) {}
     std::shared_ptr<Neuron>     AddNeuron(PlanPos pos);
     std::shared_ptr<Neuron>     AddNeuron(std::shared_ptr<ChipPlan> plan, int serial, VectorSmart pos, int threshold);
     std::shared_ptr<Jumper>     AddJumper(PlanPos pos);
@@ -33,7 +35,8 @@ namespace BlobFactory
 
     void RemoveDevice(PlanPos pos);
     void RemoveWire(PlanPos pos1, PlanPos pos2);
-
+protected:
+    std::shared_ptr<UserData> userData_;
 };
 
 #endif	/* BLOBFACTORY_HPP */

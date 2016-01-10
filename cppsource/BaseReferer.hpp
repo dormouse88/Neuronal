@@ -11,6 +11,7 @@
 #include <memory>
 #include <map>
 #include <vector>
+#include <set>
 #include <string>
 #include "RefererInterface.hpp"
 #include "ChipPlan.hpp"
@@ -29,6 +30,7 @@ struct XPuts
     std::vector<SlotData> ins;
     std::vector<SlotData> outs;
 };
+typedef std::shared_ptr<std::set<std::string> > XPutFilter;
 
 class BaseReferer : public RefererInterface
 {
@@ -41,7 +43,7 @@ public:
     virtual void SetSubPlan(std::shared_ptr<ChipPlan>, std::shared_ptr<RefererInterface>) override;
     virtual std::shared_ptr<ChipPlan> GetSubPlan() override;
 
-    void DefineXputs(XPuts);
+    void DefineXputs(XPuts all, XPutFilter filter);
     void SetInputState(std::string, bool);
     void TickOnce();
     std::map<std::string, bool> RetrieveOutputs();

@@ -127,17 +127,16 @@ void Cat::Draw(sf::RenderTarget & rt)
 //////////////////////////////////////Spawn....
 
 //MouseSpawnGroup
-MouseSpawnGroup::MouseSpawnGroup()
-    :brain_(BlobFactory::MakeBrain())
+MouseSpawnGroup::MouseSpawnGroup(std::shared_ptr<BlobFactory> factory)
+    :brain_(factory->MakeBrain())
     ,whoWillSpawn_(-1)
-{
-    brain_->DefineXputs(GetMouseXPuts());
-}
+{}
 
-void MouseSpawnGroup::AddSpawner(ArenaPoint p, Orientation o)
+std::shared_ptr<MouseSpawner> MouseSpawnGroup::AddSpawner(ArenaPoint p, Orientation o)
 {
     auto sp = std::make_shared<MouseSpawner>(p,o);
     spawns_.emplace_back(sp);
+    return sp;
 }
 
 void MouseSpawnGroup::Specify()
@@ -163,13 +162,15 @@ void MouseSpawnGroup::TimeIsNow(int t, std::shared_ptr<Arena> arena)
 }
 
 //CatSpawnGroup
-CatSpawnGroup::CatSpawnGroup()
+CatSpawnGroup::CatSpawnGroup(std::shared_ptr<BlobFactory> factory)
+    :factory_(factory)
 {}
 
-void CatSpawnGroup::AddSpawner(ArenaPoint p, Orientation o, TimeRange timeRange, int planNum)
+std::shared_ptr<CatSpawner> CatSpawnGroup::AddSpawner(ArenaPoint p, Orientation o, TimeRange timeRange, int planNum)
 {
-    auto sp = std::make_shared<CatSpawner>(p, o, timeRange, planNum);
+    auto sp = std::make_shared<CatSpawner>(p, o, timeRange, planNum, factory_);
     spawns_.emplace_back(sp);
+    return sp;
 }
 
 void CatSpawnGroup::Specify()

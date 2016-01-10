@@ -41,9 +41,11 @@ public:
     void RemoveName(int id)                                 {userData->RemoveName(id);    }
 
     std::shared_ptr<const UserData> GetUserData() const     {return userData;}
+    std::shared_ptr<BlobFactory> GetFactory()               {return factory_;}
 private:
     std::shared_ptr<Serializer> serializer;
     std::shared_ptr<UserData> userData;
+    std::shared_ptr<BlobFactory> factory_;
 
     std::shared_ptr<Arena> arena;
 };

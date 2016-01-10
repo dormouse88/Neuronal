@@ -11,6 +11,7 @@
 #include <vector>
 #include <memory>
 #include <SFML/Graphics.hpp>
+#include "BlobFactory.hpp"
 #include "ArenaBasics.hpp"
 #include "Puppet.hpp"
 
@@ -19,21 +20,22 @@ const sf::Vector2f ARENA_GRID_SIZE { 200.f , 200.f };
 class Arena : public std::enable_shared_from_this<Arena>
 {
 public:
-    Arena();
-    void InitBoard();
+    Arena(std::shared_ptr<BlobFactory>);
+    void Specify();
     void TimeAdvance();
     std::shared_ptr<BaseReferer> GetMouseBrain()    { return mouseSpawnGroup.GetMouseBrain(); }
 
     void RegisterMouse(std::shared_ptr<Mouse> mouse);
     void RegisterCat(std::shared_ptr<Cat> cat);
-    void MakeMouseSpawner(ArenaPoint p, Orientation o);
-    void MakeCatSpawner(ArenaPoint p, Orientation o, TimeRange timeRange, int planNum);
+    std::shared_ptr<MouseSpawner> MakeMouseSpawner(ArenaPoint p, Orientation o);
+    std::shared_ptr<CatSpawner> MakeCatSpawner(ArenaPoint p, Orientation o, TimeRange timeRange, int planNum);
 
     void Draw(sf::RenderTarget &rt);
     bool IsInBounds(ArenaPoint);
     bool WhiskerDetect(ArenaPoint);
 private:
     void Interactions();
+    int levelNum;
     CatSpawnGroup catSpawnGroup;
     MouseSpawnGroup mouseSpawnGroup;
     std::vector< std::shared_ptr<Cat> > cats;
@@ -42,6 +44,8 @@ private:
     ArenaPoint maxCorner;
     bool isTimeOn_;
     TimeExact t_;
+
+    friend class Serializer;
 };
 
 //potential optimization:

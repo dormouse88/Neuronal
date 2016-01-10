@@ -25,7 +25,7 @@ const sf::Vector2f GRABBER_SIZE { GRID_SIZE * 0.5f };
 class ChipPlan : public Wirable
 {
 public:
-    ChipPlan(std::shared_ptr<PlanGrid> g);
+    ChipPlan(std::shared_ptr<PlanGrid> g, std::shared_ptr<UserData> u);
     virtual ~ChipPlan() {}
 
     void RegisterReferer(std::shared_ptr<RefererInterface> ref);
@@ -87,7 +87,7 @@ public:
 
 private:
     int planID;
-    std::shared_ptr<const UserData> userData;
+    std::shared_ptr<const UserData> userData_;
     std::shared_ptr<PlanGrid> planGrid;
     std::weak_ptr<RefererInterface> referer;
     std::vector<std::shared_ptr<Device> > devices;

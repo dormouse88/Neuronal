@@ -107,3 +107,39 @@ DONT FORGET:
 	ear detection: detects presence of cats (moving only?) in a certain radius
 	
 
+
+Have an Arena Serializer that has access to Arena and calls all the necessary methods to create all these things.
+	LoadLevel(int number, std::shared_ptr<Arena> a)
+	{
+		load "levels.xml" and find "number" node. Call it lev.
+		a->minCorner = lev.min
+		a->maxCorner = lev.max
+		a->mouseSpawnGroup.brain_->DefineXPuts( lev.mouseXPuts )
+		for each mspawn in lev:
+			a->mouseSpawnGroup.MakeSpawner( mspawn.pos, mspawn.ori )
+		for each cspawn in lev:
+			temp = brain
+			serializer.loadPlan( temp, cspawn.planNum )
+			a->catSpawnGroup.MakeSpawner( cspawn.pos, cspawn.ori, cspawn.timeRange, cspawn.temp )
+		Goals...
+	}
+
+Decide an XML schema for defining levels.
+<LEVEL num="1" minx="-7" miny="-7" maxx="5" maxy="6">
+	<INPUT name="F_WHISK" />
+	<OUTPUT name="L_FOOT" />
+	<MSPAWN posx="2" posy="3" ori="2" />
+	<CSPAWN posx="3" posy="4" ori="1" mint="-5" maxt="-3" catplan="1" />
+	<CPLAN i="1">
+		(content as with user plans)
+	</CPLAN>
+</LEVEL>
+
+A "level" Specifies:
+	Arena Dimensions
+	MouseXPuts
+	MouseSpawners
+	CatPlans -- how about this?
+	CatSpawners
+	GoalSpawners
+

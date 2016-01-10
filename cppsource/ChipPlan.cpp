@@ -10,8 +10,8 @@
 #include <cassert>
 #include "UserData.hpp" //fwd dec
 
-ChipPlan::ChipPlan(std::shared_ptr<PlanGrid> g)
-    :Wirable(), planID(0), modified(false), padding(2), planGrid(g)
+ChipPlan::ChipPlan(std::shared_ptr<PlanGrid> g, std::shared_ptr<UserData> u)
+    :Wirable(), planID(0), modified(false), padding(2), planGrid(g), userData_(u)
 {
     RecalculateSmartInnerBound();
 }
@@ -351,9 +351,9 @@ void ChipPlan::DrawTitle(sf::RenderTarget & rt)
     sf::Text planNumText;
     planNumText.setFont( ViewResources::GetInstance().font );
     std::string textString { patch::to_string(GetPlanID()) };
-    if (userData) {
-        textString.append(" -- " + userData->GetNameByID(GetPlanID()));
-        auto rels = userData->GetRelatives(GetPlanID());
+    if (userData_) {
+        textString.append(" -- " + userData_->GetNameByID(GetPlanID()));
+        auto rels = userData_->GetRelatives(GetPlanID());
         if (rels and rels->parent) textString.append(" // " + patch::to_string(rels->parent) + " ");
     }
     if (IsModified()) {
