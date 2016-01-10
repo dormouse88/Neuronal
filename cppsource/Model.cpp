@@ -16,13 +16,17 @@ Model::Model()
     ,arena(std::make_shared<Arena>(factory_))
 {
     serializer->LoadUserData(userData);
-    serializer->LoadLevel(arena, factory_);
+    serializer->LoadLevel(1, arena, factory_);
     arena->Specify();
 }
 
-void Model::Logic()
+void Model::OuterTick()
 {
     arena->TimeAdvance();
+}
+void Model::InnerTick()
+{
+    arena->GetMouseBrain()->TickOnce();
 }
 
 std::shared_ptr<ChipPlan> Model::WipePlan(PlanPos pos, bool forced)

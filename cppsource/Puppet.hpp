@@ -163,6 +163,7 @@ class CatSpawnGroup : public SpawnGroup
 public:
     CatSpawnGroup(std::shared_ptr<BlobFactory>);
     std::shared_ptr<CatSpawner> AddSpawner(ArenaPoint, Orientation, TimeRange timeRange, int planNum);
+    int CalculateEarliestTime() const;
 
     void Specify()                                          override;
     void DeSpecify()                                        override {} //?disable all timeExacts?

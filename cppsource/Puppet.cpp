@@ -173,6 +173,15 @@ std::shared_ptr<CatSpawner> CatSpawnGroup::AddSpawner(ArenaPoint p, Orientation 
     return sp;
 }
 
+int CatSpawnGroup::CalculateEarliestTime() const
+{
+    int et = 0;
+    for (auto &c: spawns_) {
+        if (c->timeRange_.start < et) et = c->timeRange_.start;
+    }
+    return et;
+}
+
 void CatSpawnGroup::Specify()
 {
     for (auto &cat: spawns_)

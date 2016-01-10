@@ -144,11 +144,11 @@ void ChipHandle::Draw(sf::RenderTarget & rt)
 
 void ChipHandle::Handle(int code)
 {
-    if (code == 1) {
+    if (code == 3) {
         if (IsExploded()) SetExploded(false);
         else SetExploded(true);
     }
-    if (code == 2) {
+    if (code == 4) {
         SetExploded(false);
     }
 }

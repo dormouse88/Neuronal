@@ -148,6 +148,12 @@ bool Controller::HandleInput()
                 if (event.key.code == sf::Keyboard::Z) {
                     ChipPlanFunc::DeviceHandle(pos1, 2);
                 }
+                if (event.key.code == sf::Keyboard::S) {
+                    ChipPlanFunc::DeviceHandle(pos1, 3);
+                }
+                if (event.key.code == sf::Keyboard::X) {
+                    ChipPlanFunc::DeviceHandle(pos1, 4);
+                }
                 if (event.key.code == sf::Keyboard::D) {
                     ChipPlanFunc::WireHandle(pos1, pos2, 1);
                 }
@@ -232,11 +238,11 @@ bool Controller::HandleInput()
                     textEntryCooldown.restart();
                 }
 
-                if (event.key.code == sf::Keyboard::Y)
+                if (event.key.code == sf::Keyboard::R)
                 {
                     theModel.RemoveName(pos1.GetPlan()->GetPlanID());
                 }
-                if (event.key.code == sf::Keyboard::U and theModel.CanAddName(pos1.GetPlan()->GetPlanID()))
+                if (event.key.code == sf::Keyboard::E and theModel.CanAddName(pos1.GetPlan()->GetPlanID()))
                 {
                     assert(not enteringName);
                     assert(not enteringFilter);
@@ -252,9 +258,13 @@ bool Controller::HandleInput()
                 {
                     theView.cursorTwo.Dislocate();
                 }
-                if (event.key.code == sf::Keyboard::Space)
+                if (event.key.code == sf::Keyboard::Comma)
                 {
-                    theModel.Logic();
+                    theModel.InnerTick();
+                }
+                if (event.key.code == sf::Keyboard::Period)
+                {
+                    theModel.OuterTick();
                 }
 
                 if (event.key.code == sf::Keyboard::Num1)

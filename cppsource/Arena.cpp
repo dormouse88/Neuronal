@@ -18,7 +18,7 @@ void Arena::Specify()
 {
     mouseSpawnGroup.Specify();
     catSpawnGroup.Specify();
-    t_ = -6;//catSpawnGroup.CalculateEarliestTime();
+    t_ = catSpawnGroup.CalculateEarliestTime();
 }
 
 void Arena::TimeAdvance()
@@ -66,7 +66,7 @@ void Arena::Draw(sf::RenderTarget &rt)
     box.setFillColor( sf::Color {35,35,75} );
     box.setOutlineColor( sf::Color {155,155,255} );
     box.setOutlineThickness(3.f);
-    box.setSize( sf::Vector2f{ ARENA_GRID_SIZE.x * (maxCorner.x - minCorner.x), ARENA_GRID_SIZE.y * (maxCorner.y - minCorner.y) } );
+    box.setSize( sf::Vector2f{ ARENA_GRID_SIZE.x * (maxCorner.x - minCorner.x + 1), ARENA_GRID_SIZE.y * (maxCorner.y - minCorner.y + 1) } );
     box.setPosition( sf::Vector2f{ -1600.f + (minCorner.x * ARENA_GRID_SIZE.x), (minCorner.y * ARENA_GRID_SIZE.y) } );
 
     rt.draw(box);

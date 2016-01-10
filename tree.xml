@@ -34,7 +34,7 @@
 	<NAME i="57" n="@F" />
 	<NAME i="61" n="BREADCRUMB" />
 	<NAME i="14" n="4BITDEC" />
-	<NAME i="63" n="NEWADD" />
+	<NAME i="64" n="NEWADD" />
 </NAMES>
 <RELATIVES>
 	<REL i="1" anc="0" />
@@ -100,6 +100,7 @@
 	<REL i="61" anc="60" />
 	<REL i="62" anc="14" />
 	<REL i="63" anc="0" />
+	<REL i="64" anc="63" />
 </RELATIVES>
 <PLANS>
 	<PLAN_DB HIGHEST_ID="62" />
@@ -2542,5 +2543,35 @@
 		<WIRE f="3" t="2" w="1" fs="0" ts="0" />
 		<WIRE f="1" t="0" w="1" fs="0" ts="1" />
 		<WIRE f="2" t="0" w="1" fs="0" ts="2" />
+	</PLAN>
+	<PLAN i="64">
+		<NEUR i="1" x="0" y="0" thr="1" />
+		<NEUR i="2" x="0" y="1" thr="1" />
+		<NEUR i="3" x="-1" y="2" thr="1" />
+		<NEUR i="4" x="-1" y="-1" thr="0" />
+		<NEUR i="5" x="0" y="2" thr="1" />
+		<NEUR i="6" x="0" y="3" thr="1" />
+		<NEUR i="7" x="0" y="4" thr="1" />
+		<NEUR i="8" x="0" y="5" thr="1" />
+		<NEUR i="9" x="0" y="6" thr="1" />
+		<WIRE f="0" t="1" w="1" fs="1" ts="0" />
+		<WIRE f="0" t="2" w="1" fs="2" ts="0" />
+		<WIRE f="0" t="3" w="1" fs="3" ts="0" />
+		<WIRE f="3" t="1" w="1" fs="0" ts="0" />
+		<WIRE f="3" t="2" w="1" fs="0" ts="0" />
+		<WIRE f="1" t="0" w="1" fs="0" ts="1" />
+		<WIRE f="2" t="0" w="1" fs="0" ts="2" />
+		<WIRE f="4" t="1" w="1" fs="0" ts="0" />
+		<WIRE f="4" t="2" w="1" fs="0" ts="0" />
+		<WIRE f="4" t="5" w="1" fs="0" ts="0" />
+		<WIRE f="4" t="6" w="1" fs="0" ts="0" />
+		<WIRE f="4" t="7" w="1" fs="0" ts="0" />
+		<WIRE f="5" t="0" w="1" fs="0" ts="3" />
+		<WIRE f="6" t="0" w="1" fs="0" ts="4" />
+		<WIRE f="7" t="0" w="1" fs="0" ts="5" />
+		<WIRE f="8" t="0" w="1" fs="0" ts="6" />
+		<WIRE f="9" t="0" w="1" fs="0" ts="7" />
+		<WIRE f="4" t="8" w="1" fs="0" ts="0" />
+		<WIRE f="4" t="9" w="1" fs="0" ts="0" />
 	</PLAN>
 </PLANS>

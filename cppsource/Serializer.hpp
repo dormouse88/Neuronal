@@ -24,7 +24,7 @@ class Serializer
 public:
     Serializer();
 
-    void LoadLevel(std::shared_ptr<Arena> a, std::shared_ptr<BlobFactory> f);
+    void LoadLevel(int num, std::shared_ptr<Arena> a, std::shared_ptr<BlobFactory> f);
     
     //Model interface...
     bool                        SaveUserPlan(std::shared_ptr<ChipPlan> plan_p);

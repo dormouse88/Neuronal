@@ -1,7 +1,9 @@
 Do Next
 =======
-Loading of tests
-Loading of test suites
+Draw Xputs
+Draw Arena Entities better
+Decide definite slot order for xputs
+Decide definite physics system (turn order, etc)
 Sort question of assigning inputs/outputs to slots
 Multichannel wires + flexible neurons
 

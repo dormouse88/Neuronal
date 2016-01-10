@@ -23,7 +23,8 @@ public:
     Model();
     Model(const Model&) = delete;
 
-    void Logic();
+    void OuterTick();
+    void InnerTick();
     
     std::shared_ptr<Arena> GetArena()                                       {return arena;} //for View
     std::shared_ptr<BaseReferer> GetMouseBrain()                            {return arena->GetMouseBrain(); }

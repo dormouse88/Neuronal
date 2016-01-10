@@ -31,51 +31,63 @@ Serializer::Serializer()
     OpenFile(levelsDoc_, XML_LEVELS_FILENAME);
 }
 
-void Serializer::LoadLevel(std::shared_ptr<Arena> a, std::shared_ptr<BlobFactory> f)
+void Serializer::LoadLevel(int num, std::shared_ptr<Arena> a, std::shared_ptr<BlobFactory> f)
 {
-    //auto a = this;
+    //Find level in the XML...
+    pugi::xml_node xmlLevel = levelsDoc_.find_child_by_attribute("LEVEL", "num", patch::to_string( num ).c_str() );
+    
+    if (xmlLevel)
     {
         //level number
-        a->levelNum = 1;
+        a->levelNum = num;
     }
     {
         //arena dimensions
-        a->minCorner = ArenaPoint{-7,-7};
-        a->maxCorner = ArenaPoint{7,7};
+        a->minCorner = ArenaPoint{ xmlLevel.attribute("min_x").as_int(), xmlLevel.attribute("min_y").as_int() };
+        a->maxCorner = ArenaPoint{ xmlLevel.attribute("max_x").as_int(), xmlLevel.attribute("max_y").as_int() };
     }
     {
         //mouse xputs
-        auto filter = std::make_shared<std::set<std::string> >();//(lev derived)
-        filter->insert(R_WHISK.name);
-        filter->insert(F_WHISK.name);
-        filter->insert(L_FOOT.name);
-        filter->insert(R_FOOT.name);
+        XPutFilter filter = std::make_shared<std::set<std::string> >();
+        for ( pugi::xml_node n: xmlLevel.children("INPUT") ) {
+            filter->insert( n.attribute("name").as_string() );
+        }
+        for ( pugi::xml_node n: xmlLevel.children("OUTPUT") ) {
+            filter->insert( n.attribute("name").as_string() );
+        }
         a->mouseSpawnGroup.DefineMouseXPuts( filter );
     }
     {
         //mouse spawners
-        int x = 2;
-        int y = 0;
-        int ori = 0;
-        a->MakeMouseSpawner(ArenaPoint{x,y}, ori);
+        for ( pugi::xml_node n: xmlLevel.children("MSPAWN") ) {
+            int x = n.attribute("pos_x").as_int();
+            int y = n.attribute("pos_y").as_int();
+            int ori = n.attribute("ori").as_int();
+            a->MakeMouseSpawner(ArenaPoint{x,y}, ori);
+        }
     }
     {
         //cat spawners (with brains)
-        int x = 2;
-        int y = 3;
-        int ori = 0;
-        int mint = -5;
-        int maxt = -3;
-        int planNum = 1;
-        auto s = a->MakeCatSpawner(ArenaPoint{x,y}, ori, TimeRange{mint,maxt}, planNum);
-        s->DefineCatXPuts( );
-        auto br = s->GetCatBrain();
-        auto catPlan = LoadLevelPlan( a->levelNum, planNum, f );
-        assert(catPlan);
-        br->SetSubPlan(catPlan, br);
+        for ( pugi::xml_node n: xmlLevel.children("CSPAWN") ) {
+            int x = n.attribute("pos_x").as_int();
+            int y = n.attribute("pos_y").as_int();
+            int ori = n.attribute("ori").as_int();
+            int min_t = n.attribute("min_t").as_int();
+            int max_t = n.attribute("max_t").as_int();
+            int planNum = n.attribute("cat_plan").as_int();
+            auto spawner = a->MakeCatSpawner(ArenaPoint{x,y}, ori, TimeRange{min_t,max_t}, planNum);
+            spawner->DefineCatXPuts();
+            auto brain = spawner->GetCatBrain();
+            auto catPlan = LoadLevelPlan( num, planNum, f );
+            assert(catPlan);
+            brain->SetSubPlan(catPlan, brain);
+        }
+    }
+    {
+        //goal spawners
+        
     }
 }
-
 
 
 
