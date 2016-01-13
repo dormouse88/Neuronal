@@ -6,9 +6,9 @@
 	<OUTPUT name="L_FOOT" />
 	<OUTPUT name="R_FOOT" />
 	<MSPAWN pos_x="-1" pos_y="-1" ori="2" />
-	<CSPAWN pos_x="2" pos_y="4" ori="1" min_t="-5" max_t="-3" cat_plan="1" />
-	<CSPAWN pos_x="3" pos_y="4" ori="1" min_t="-3" max_t="-1" cat_plan="1" />
-	<CSPAWN pos_x="4" pos_y="4" ori="1" min_t="-1" max_t="-1" cat_plan="2" />
+	<CSPAWN pos_x="1" pos_y="-4" ori="1" min_t="-5" max_t="-3" cat_plan="1" />
+	<CSPAWN pos_x="2" pos_y="4" ori="2" min_t="-3" max_t="-1" cat_plan="2" />
+	<CSPAWN pos_x="4" pos_y="4" ori="3" min_t="-1" max_t="-1" cat_plan="2" />
 	<GSPAWN pos_x="-3" pos_y="-3" />
 	<PLAN i="1">
 		<NEUR i="1" x="-1" y="-1" thr="1" />
@@ -17,11 +17,11 @@
 		<WIRE f="0" t="1" w="1" fs="1" ts="0" />
 		<WIRE f="1" t="2" w="1" fs="0" ts="0" />
 		<WIRE f="2" t="0" w="1" fs="0" ts="2" />
-		<WIRE f="3" t="0" w="1" fs="0" ts="1" />
+		<WIRE f="3" t="0" w="1" fs="0" ts="3" />
 	</PLAN>
 	<PLAN i="2">
 		<NEUR i="1" x="1" y="0" thr="-1" />
 		<NEUR i="2" x="2" y="0" thr="1" />
-		<WIRE f="1" t="0" w="1" fs="0" ts="1" />
+		<WIRE f="1" t="0" w="1" fs="0" ts="2" />
 	</PLAN>
 </LEVEL>

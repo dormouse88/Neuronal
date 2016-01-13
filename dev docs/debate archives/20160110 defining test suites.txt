@@ -1,0 +1,60 @@
+
+DECIDE AN XML SCHEMA FOR DEFINING LEVELS:
+	<LEVEL num="1" min_x="-7" min_y="-7" max_x="5" max_y="6">
+		<INPUT name="F_WHISK" />
+		<OUTPUT name="L_FOOT" />
+		<MSPAWN pos_x="-1" pos_y="-1" ori="2" />
+		<CSPAWN pos_x="2" pos_y="4" ori="1" min_t="-5" max_t="-3" cat_plan="1" />
+		<GSPAWN pos_x="-3" pos_y="-3" />
+		<PLAN i="1">
+			(content here is the same as with user plans)
+		</PLAN>
+	</LEVEL>
+
+DEFINING TEST SUITES:
+	1) Suites are defined in code (c++?)
+	2) Have a certain number of test cases described in each test suite. Each is hand-designed by the level designer.
+	3) Most of the arena can be fixed, and the location of spawn points are also fixed. The randomness of inputs comes in which spawn points are actually spawned from. Perhaps need timed spawns that spawn on turn x? / Need logic/dependency between spawnpoints (spawnX triggers if spawnY triggers)?
+	4) Cats have a random headstart out of a set range of turns. This is a cleaner way to randomly place cats in a loop. For static objects, they could have move logic to use for their headstart but then freeze when the real sim starts? Static headstarts would have to be processed first, then process cat headstarts using the final locations of those statics when providing sense data for the cats.
+PRESENTING TEST SUITES:
+	a) The player must base their solution solely on the textual description of what is required. (can't see arena at all until testing?)
+	b) Show one randomly selected arena configuration and have a re-roll button to emphasize the variance.
+	c) (REQUIRES 3) Draw all the spawn points.
+	d) (REQUIRES 4) Draw all objects showing the range of headstarts. The only thing that collapses is the headstart number which collapses from a range (eg 0-5), to a number (eg 3).
+	CONC: 4 + d
+
+
+HOW AND WHERE DOES THE COLLAPSE FROM SUITE TO TEST HAPPEN?
+	(Consider the case of using 'STEP' button as 'TEST' is comprehensive anyway)
+	How:
+		Randomly selected test? (random with fixed or fluid seed)
+			With re-roll?
+		in sequence? (could mean actually in order or just random with a fixed seed)
+		user-specified? (useful but may be tricky to 'specify'. Just using an outer chip as a test bed is an option)
+	Where:
+		When the first step is taken?
+		Have a test selection phase that has to be done before any steps can occur?
+			A re-roll button might be useful here even if it is possible to present the suite as a whole.
+	What happens if STEP is pressed when in 'Generalized' mode? Greyed-Out I guess.
+	CONC:
+		A pseudo-random set of possible tests is derived from each suite. This set is fixed and is like a hash of the suite. This set can be the full range of possibilities when that range isn't too big.
+		Collapse occurs to a random member of this fixed set when the "specify" button is pressed.
+		OBS: If the collapse is just from range to numbers, the headstart phase would still need to be played out.
+
+PRIORITY IN HEADSTART PHASE:
+	Multiple tiers of priority? Maybe tiers structured by PLAN rather than individual entity? Maybe this could just be done using a delay in the plan when the level designer wants to?
+	CONC: All entities take one simultaneous step at a time, just like in real play. Ordering can be controlled by delays within the plans and headstart values.
+		But do different headstarts all start together or all end together? End together I suppose.
+			Entities whose headstarts haven't begun are not even spawned? So don't get detected/killed?
+				CONC: "Headstart" is actually spawn time (as negative). Time starts at t = -<largest headstart> and mouse spawns at t = 0.
+
+MULTIPLE MICE:
+	ALL spawnpoints would spawn a mouse for every test and all mice must survive. (I thought this was pointless once but I can't remember why)
+	Functionally identical to running multiple single-mouse tests so long as mice don't affect anything (undetectable). EXCEPT SCENTS!
+	They would all use the same brain plan (charges could be different).
+	CONC: Don't do it
+MULTIPLE GOALS:
+	Could have multiple goals and require that each mouse must get to all goals?
+	Functionally equivalent to running test multiple times with random goals so long as goals don't affect anything (undetectable).
+	CONC: Don't do it
+

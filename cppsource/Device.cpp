@@ -9,7 +9,7 @@
 #include "ChipPlan.hpp"
 
 Device::Device(int serial_p, VectorSmart pos_p, std::shared_ptr<ChipPlan> cont)
-    :Gobject(cont)
+    :PlanOwned(cont)
     , serial(serial_p)
     , ppos(pos_p, cont->GetGrid())
 {}

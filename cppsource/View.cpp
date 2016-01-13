@@ -160,10 +160,12 @@ void View::DrawMain() //Main Port...
     
     GetArena()->Draw(window);
     
+    auto br = theModel.GetMouseBrain();
     auto ap = GetViewBasePlan();
+    assert(br);
     assert(ap);
     //Draw all plans/devices/wires...
-    ap->Draw(window);
+    br->DrawBrain(window);
 
     //Highlighting modes...
     if (highlightingMode != 1)  //dim everything that's been drawn so far...
@@ -257,7 +259,7 @@ void View::CentreOn(VectorWorld point)
 void View::Clamp()
 {
     auto clampPlan = GetViewBasePlan(); //cursorOne.GetPlanPos().GetPlan();
-    if (clampPlan)
+    if (clampPlan and false) //CLAMP IS TEMPORARILY DISABLED!!  Because the arena and brain are drawn together at the moment.
     {
         RectWorld b = clampPlan->GetWorldPaddedBound();
         auto center = mainView.getCenter();

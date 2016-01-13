@@ -29,14 +29,14 @@ public:
 
 #include <string>
 
-class Gobject: public Drawable, public Responsive
+class PlanOwned: public Drawable, public Responsive
 {
 public:
-    Gobject(std::shared_ptr<ChipPlan> cont)
+    PlanOwned(std::shared_ptr<ChipPlan> cont)
         :container(cont), dead(false)
         
     {}
-    virtual ~Gobject() = 0;
+    virtual ~PlanOwned() = 0;
     virtual std::string SerialName() const = 0;
     void Zingaya() {dead = true;}
     bool IsDead() const {return dead;}
@@ -47,7 +47,7 @@ private:
     std::weak_ptr<ChipPlan> container;
 };
 
-inline Gobject::~Gobject() {}
+inline PlanOwned::~PlanOwned() {}
 
 
 #endif	/* GOBJECT_HPP */

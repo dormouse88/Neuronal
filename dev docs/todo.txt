@@ -1,9 +1,10 @@
 Do Next
 =======
 Draw Xputs
-Draw Arena Entities better
-Decide definite slot order for xputs
+Draw Arena Spawners + Entities better
 Decide definite physics system (turn order, etc)
+---v---
+
 Sort question of assigning inputs/outputs to slots
 Multichannel wires + flexible neurons
 
@@ -18,15 +19,15 @@ Visual / Interface
 	Draw slot matching + valency (to show how many slots are ignored in both directions) between handles and chips.
 	Set discrete zoom levels + use a smarter better centering algo (like googlemaps).
 	Solve: No space to see wires between exploded chips when adjacent. Disallow adjacency? Draw plan boundary half a cell inwards? (changing GRID_SIZE doesn't help exploded chips)
-	Place circular wire labels intelligently (on wire but close to device).
+	Make wire text labels circle-shaped and place them intelligently (on wire but close to device).
 	Allow chip cycling while unexploded and draw name on the handle.
 	Choose highest number plan to load into an empty plan, not lowest.
-	Change explode key from AZ to something else. AZ is a modifying key.
 	Fix that device movement 'animation feature' so it doesn't trigger on plan loads.
+	Plan Grabbers are unnecessary if using dedicated keys for collapse and expand. (doh)
 	View centers in wrong place in both: 1 Plan collapse and 2 Plan Load/Wipe
 	Add a reset all charge button.
 	Add a collapse all/expand! all button.
-	Add a device copy button?
+	Add a device copy button? (useful for non-empty handles)
 	Add an encapsulate button. This will put all devices (and their wires) within a rectangular area bounded by the cursors into a newly created sub-plan. Fucking groovy. May require multiwires.
 	Make sure autoname symbol (@) doesn't get sorted between numbers and letters.
 	Allow spaces or underscores in names.
@@ -46,9 +47,6 @@ InnerSim
 
 OuterGame
 =========
-	CONSIDER: How to define a test suite? (Simple vs uncheapability payoffs)
-	CONSIDER: Use a 'Wait' output or 'Send' output? Wait!!!
-	CONSIDER: Repeating inputs or once only? Repeating!!!
 
 
 

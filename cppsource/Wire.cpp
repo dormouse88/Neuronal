@@ -133,7 +133,7 @@ void WireView::Draw(sf::RenderTarget & rt, const Wire & w)
  * @param weight_p
  */
 Wire::Wire(Wirable & from_p, int fromSlot_p, Wirable & to_p, int toSlot_p, signed weight_p, std::shared_ptr<ChipPlan> cont)
-    :Gobject(cont), v(*this), from(from_p), fromSlot(fromSlot_p), to(to_p), toSlot(toSlot_p), weight(weight_p), firing(false)
+    :PlanOwned(cont), v(*this), from(from_p), fromSlot(fromSlot_p), to(to_p), toSlot(toSlot_p), weight(weight_p), firing(false)
 {}
 
 void Wire::ReceiveCharge(bool f)

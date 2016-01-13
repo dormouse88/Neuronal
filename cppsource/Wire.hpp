@@ -37,7 +37,7 @@ private:
 #include "Gobject.hpp"
 class Wirable;
 
-class Wire : public Gobject
+class Wire : public PlanOwned
 {
 public:
     Wire(Wirable & from_p, int fromSlot_p, Wirable & to_p, int toSlot_p, signed weight_p, std::shared_ptr<ChipPlan> cont);

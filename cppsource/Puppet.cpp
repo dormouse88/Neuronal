@@ -7,7 +7,8 @@
 
 #include "Puppet.hpp"
 #include <cassert>
-#include "Arena.hpp"
+#include "Arena.hpp"  //fwd dec
+#include "AllXPuts.hpp"
 
 //////////////////////////////////////Entity....
 ArenaEntity::ArenaEntity(ArenaPoint s_pos, Orientation s_ori, std::shared_ptr<Arena> ar)
@@ -62,6 +63,8 @@ void Puppet::Act()
     auto outs = brain_->RetrieveOutputs();
 
     //Perform an action based on the output information from the brain...
+    //Since it is possible to receive requests for multiple commands at once, an order of priority will have to be established and made explicit.
+    //As an example, a preliminary order might be: (Moving or Turning) > Marking Scents > Reading Scents > Waiting
     auto lamb = [&outs] (std::string n) { return outs.count(n) > 0 and outs.at(n) == true; };
     if (lamb(L_FOOT.name) and lamb(R_FOOT.name)) {
         WalkForward();
@@ -89,118 +92,63 @@ void Puppet::Sense()
 
 
 
-
-
-
-
-
 ////////////////////////////////////////
 
 //Mouse
 void Mouse::Draw(sf::RenderTarget & rt)
 {
-    sf::RectangleShape box;
-    box.setFillColor( sf::Color {210,140,140} );
-    if (GetActualOri() == 0 or GetActualOri() == 2) box.setSize( sf::Vector2f{ 70.f, 100.f } );
-    else box.setSize( sf::Vector2f{ 100.f, 70.f } );
-    box.setPosition( sf::Vector2f{ -1600.f + GetActualPos().x * ARENA_GRID_SIZE.x, GetActualPos().y * ARENA_GRID_SIZE.y } );
+    sf::ConvexShape shape;
+    {
+        // resize it to 5 points
+        shape.setPointCount(5);
+        // define the points
+        const int LONG = 75;
+        const int SHORT = 55;
+        shape.setPoint(0, sf::Vector2f(0, -LONG));
+        shape.setPoint(1, sf::Vector2f(SHORT, -SHORT));
+        shape.setPoint(2, sf::Vector2f(SHORT, SHORT));
+        shape.setPoint(3, sf::Vector2f(-SHORT, SHORT));
+        shape.setPoint(4, sf::Vector2f(-SHORT, -SHORT));
+    }
+    shape.setRotation( 90.f * GetActualOri() );
 
-    rt.draw(box);
+    auto fr = arena_.lock()->GetCellBounds(GetActualPos().x, GetActualPos().y);
+    shape.setPosition( fr.left + (fr.width/2.f), fr.top + (fr.height/2.f) );
+
+    shape.setFillColor( MOUSE_COLOR_1 );
+    rt.draw(shape);
 }
 //Cat
 void Cat::Draw(sf::RenderTarget & rt)
 {
-    sf::RectangleShape box;
-    box.setFillColor( sf::Color {255,0,0} );
-    if (GetActualOri() == 0 or GetActualOri() == 2) box.setSize( sf::Vector2f{ 70.f, 100.f } );
-    else box.setSize( sf::Vector2f{ 100.f, 70.f } );
-    box.setPosition( sf::Vector2f{ -1600.f + GetActualPos().x * ARENA_GRID_SIZE.x, GetActualPos().y * ARENA_GRID_SIZE.y } );
-
-    rt.draw(box);
-}
-
-
-
-
-
-
-//////////////////////////////////////Spawn....
-
-//MouseSpawnGroup
-MouseSpawnGroup::MouseSpawnGroup(std::shared_ptr<BlobFactory> factory)
-    :brain_(factory->MakeBrain())
-    ,whoWillSpawn_(-1)
-{}
-
-std::shared_ptr<MouseSpawner> MouseSpawnGroup::AddSpawner(ArenaPoint p, Orientation o)
-{
-    auto sp = std::make_shared<MouseSpawner>(p,o);
-    spawns_.emplace_back(sp);
-    return sp;
-}
-
-void MouseSpawnGroup::Specify()
-{
-    if (spawns_.size() > 0)
+    sf::ConvexShape shape;
     {
-        whoWillSpawn_ = std::rand() % spawns_.size();
+        // resize it to 5 points
+        shape.setPointCount(5);
+        // define the points
+        const int MULT = 14;
+        const int USUAL = MULT * 3;
+        const int EXTRA = MULT * 1;
+        shape.setPoint(0, sf::Vector2f(0, -USUAL -EXTRA));
+        shape.setPoint(1, sf::Vector2f(USUAL, -USUAL));
+        shape.setPoint(2, sf::Vector2f(USUAL, USUAL));
+        shape.setPoint(3, sf::Vector2f(-USUAL, USUAL));
+        shape.setPoint(4, sf::Vector2f(-USUAL, -USUAL));
     }
-    else
-    {
-        whoWillSpawn_ = -1;
-    }
+    shape.setRotation( 90.f * GetActualOri() );
+
+    auto fr = arena_.lock()->GetCellBounds(GetActualPos().x, GetActualPos().y);
+    shape.setPosition( fr.left + (fr.width/2.f), fr.top + (fr.height/2.f) );
+
+    shape.setFillColor( CAT_COLOR_1 );
+    rt.draw(shape);
+    
+    sf::Text planText;
+    planText.setFont(ViewResources::GetInstance().font);
+    planText.setColor(sf::Color::White);
+    planText.setCharacterSize(34);
+    planText.setString( patch::to_string( GetBrain()->GetSubPlan()->GetPlanID() ) );
+    planText.setPosition( fr.left + (fr.width/2.f) -(planText.getGlobalBounds().width/2.f), fr.top + (fr.height/2.f) -(planText.getGlobalBounds().height/2.f) );
+    rt.draw(planText);
 }
-
-void MouseSpawnGroup::TimeIsNow(int t, std::shared_ptr<Arena> arena)
-{
-    if (t == 0 and whoWillSpawn_ != -1)
-    {
-        auto chosenOne = spawns_.at(whoWillSpawn_);
-        auto guy = std::make_shared<Mouse>(chosenOne->pos_, chosenOne->ori_, arena, brain_);
-        arena->RegisterMouse(guy);
-    }
-}
-
-//CatSpawnGroup
-CatSpawnGroup::CatSpawnGroup(std::shared_ptr<BlobFactory> factory)
-    :factory_(factory)
-{}
-
-std::shared_ptr<CatSpawner> CatSpawnGroup::AddSpawner(ArenaPoint p, Orientation o, TimeRange timeRange, int planNum)
-{
-    auto sp = std::make_shared<CatSpawner>(p, o, timeRange, planNum, factory_);
-    spawns_.emplace_back(sp);
-    return sp;
-}
-
-int CatSpawnGroup::CalculateEarliestTime() const
-{
-    int et = 0;
-    for (auto &c: spawns_) {
-        if (c->timeRange_.start < et) et = c->timeRange_.start;
-    }
-    return et;
-}
-
-void CatSpawnGroup::Specify()
-{
-    for (auto &cat: spawns_)
-    {
-        int rangeSize = cat->timeRange_.end +1 - cat->timeRange_.start;
-        cat->timeExact_ = cat->timeRange_.start + ( std::rand() % rangeSize );
-    }
-}
-
-void CatSpawnGroup::TimeIsNow(int t, std::shared_ptr<Arena> arena)
-{
-    for (auto &x: spawns_)
-    {
-        if (t == x->timeExact_)
-        {
-            auto guy = std::make_shared<Cat>(x->pos_, x->ori_, arena, x->brain_);
-            arena->RegisterCat(guy);
-        }
-    }
-}
-
 

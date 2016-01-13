@@ -14,8 +14,7 @@
 #include "BlobFactory.hpp"
 #include "ArenaBasics.hpp"
 #include "Puppet.hpp"
-
-const sf::Vector2f ARENA_GRID_SIZE { 200.f , 200.f };
+#include "SpawnGroups.hpp"
 
 class Arena : public std::enable_shared_from_this<Arena>
 {
@@ -33,8 +32,10 @@ public:
     void Draw(sf::RenderTarget &rt);
     bool IsInBounds(ArenaPoint);
     bool WhiskerDetect(ArenaPoint);
+    sf::FloatRect GetCellBounds(int x, int y);
 private:
     void Interactions();
+    void CrossoverCheck();
     int levelNum;
     CatSpawnGroup catSpawnGroup;
     MouseSpawnGroup mouseSpawnGroup;

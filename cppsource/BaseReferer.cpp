@@ -95,3 +95,30 @@ std::map<std::string, bool> BaseReferer::RetrieveOutputs()
     return retMap;
 }
 
+void BaseReferer::DrawBrain(sf::RenderTarget & rt)
+{
+    RectWorld bound = basePlan->GetWorldPaddedBound();
+    float xi = bound.left - 20.f;
+    float yi = bound.top + 20.f; 
+    float xo = bound.left + bound.width + 20.f;
+    float yo = bound.top + 20.f; 
+
+    sf::Text t;
+    t.setFont(ViewResources::GetInstance().font);
+    t.setCharacterSize(22.f);
+    t.setColor( sf::Color::Green );
+    for (auto p: inputs) {
+        t.setString( patch::to_string(p.second.slot) + ": " + p.second.name );
+        t.setPosition(xi - t.getGlobalBounds().width, yi);
+        rt.draw(t);
+        yi += 70.f;
+    }
+    for (auto p: outputs) {
+        t.setString( patch::to_string(p.second.slot) + ": " + p.second.name );
+        t.setPosition(xo, yo);
+        rt.draw(t);
+        yo += 70.f;
+    }
+    
+    basePlan->Draw(rt);
+}

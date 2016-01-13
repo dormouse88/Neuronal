@@ -35,7 +35,7 @@ protected:
 
 
 
-class Device : public Wirable, public Gobject
+class Device : public Wirable, public PlanOwned
 {
 public:
     Device(int serial_p, VectorSmart pos_p, std::shared_ptr<ChipPlan> cont);

@@ -47,6 +47,8 @@ public:
     void SetInputState(std::string, bool);
     void TickOnce();
     std::map<std::string, bool> RetrieveOutputs();
+
+    void DrawBrain(sf::RenderTarget & rt);
     
 private:
     std::map<std::string, SlotData > inputs;

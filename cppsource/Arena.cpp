@@ -8,6 +8,9 @@
 #include "Arena.hpp"
 #include "Puppet.hpp"
 
+const sf::Vector2f ARENA_GRID_SIZE  { 200.f , 200.f };
+const sf::Vector2f ARENA_POS        { 1800.f, 0.f };
+
 Arena::Arena(std::shared_ptr<BlobFactory> factory)
     :levelNum(0)
     ,mouseSpawnGroup(factory)
@@ -18,28 +21,25 @@ void Arena::Specify()
 {
     mouseSpawnGroup.Specify();
     catSpawnGroup.Specify();
-    t_ = catSpawnGroup.CalculateEarliestTime();
+    t_ = catSpawnGroup.CalculateEarliestTime() - 1;
 }
 
 void Arena::TimeAdvance()
 {
-    mouseSpawnGroup.TimeIsNow(t_, shared_from_this() );
-    catSpawnGroup.TimeIsNow(t_, shared_from_this() );
-    //act
-    //interact
-    //sense
+    t_++;
+    //act > spawn > interact > sense
     for (auto &cat: cats)
         cat->Act();
+    CrossoverCheck();
+    for (auto &mouse: mice)
+        mouse->Act();
+    mouseSpawnGroup.TimeIsNow(t_, shared_from_this() );
+    catSpawnGroup.TimeIsNow(t_, shared_from_this() );
     Interactions();
     for (auto &cat: cats)
         cat->Sense();
-
-    for (auto &mouse: mice)
-        mouse->Act();
-    Interactions();
     for (auto &mouse: mice)
         mouse->Sense();
-    t_++;
 }
 
 void Arena::RegisterMouse(std::shared_ptr<Mouse> guy)
@@ -66,11 +66,35 @@ void Arena::Draw(sf::RenderTarget &rt)
     box.setFillColor( sf::Color {35,35,75} );
     box.setOutlineColor( sf::Color {155,155,255} );
     box.setOutlineThickness(3.f);
-    box.setSize( sf::Vector2f{ ARENA_GRID_SIZE.x * (maxCorner.x - minCorner.x + 1), ARENA_GRID_SIZE.y * (maxCorner.y - minCorner.y + 1) } );
-    box.setPosition( sf::Vector2f{ -1600.f + (minCorner.x * ARENA_GRID_SIZE.x), (minCorner.y * ARENA_GRID_SIZE.y) } );
-
+    auto min_c = GetCellBounds(minCorner.x, minCorner.y);
+    auto max_c = GetCellBounds(maxCorner.x, maxCorner.y);
+    box.setSize( sf::Vector2f { max_c.left - min_c.left + max_c.width, max_c.top - min_c.top + max_c.height } );
+    box.setPosition( min_c.left, min_c.top );
     rt.draw(box);
+
+    sf::RectangleShape dot;
+    dot.setSize( {200.f, 200.f } );
+    dot.setFillColor( sf::Color::Transparent );
+    dot.setOutlineThickness(-2.f);
+    dot.setOutlineColor( sf::Color {145, 145, 95} );
+    for (int i = minCorner.x; i<=maxCorner.x; i++) {
+        for (int j = minCorner.y; j<=maxCorner.y; j++) {
+            auto b = GetCellBounds(i,j);
+            dot.setPosition( b.left + (b.width*0.f), b.top + (b.height*0.f));
+            rt.draw(dot);
+        }
+    }
     
+    sf::Text timeText;
+    timeText.setFont(ViewResources::GetInstance().font);
+    timeText.setString( "t  =  " + patch::to_string( t_ ) );
+    timeText.setColor(sf::Color::White);
+    timeText.setCharacterSize(50.f);
+    timeText.setPosition(ARENA_POS.x, ARENA_POS.y - 90.f);
+    rt.draw(timeText);
+    
+    catSpawnGroup.Draw(rt, shared_from_this());
+    mouseSpawnGroup.Draw(rt, shared_from_this());
     for (auto &x: cats) x->Draw(rt);
     for (auto &x: mice) x->Draw(rt);
 }
@@ -80,6 +104,30 @@ void Arena::Draw(sf::RenderTarget &rt)
 bool Arena::IsInBounds(ArenaPoint xy)
 {
     return ( xy.x >= minCorner.x and xy.y >= minCorner.y and xy.x <= maxCorner.x and xy.y <= maxCorner.y );
+}
+
+bool Arena::WhiskerDetect(ArenaPoint xy)
+{
+    //Should whiskers detect out-of-bounds???
+    if (not IsInBounds(xy)) return true;
+    for (auto &x : cats)
+    {
+        if ( x->GetActualPos() == xy and x->WhiskerDetectable() )
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+sf::FloatRect Arena::GetCellBounds(int x, int y)
+{
+    sf::FloatRect fr;
+    fr.left = ARENA_POS.x + (ARENA_GRID_SIZE.x * (x - minCorner.x));
+    fr.top = ARENA_POS.y + (ARENA_GRID_SIZE.y * (y - minCorner.y));
+    fr.width = ARENA_GRID_SIZE.x;
+    fr.height = ARENA_GRID_SIZE.y;
+    return fr;
 }
 
 void Arena::Interactions()
@@ -100,18 +148,17 @@ void Arena::Interactions()
     //need to check for goal collisions too.
 }
 
-bool Arena::WhiskerDetect(ArenaPoint xy)
+void Arena::CrossoverCheck()
 {
-    //Should whiskers detect out-of-bounds???
-    if (not IsInBounds(xy)) return true;
-    for (auto &x : cats)
+    //Check against the special case of cat and mouse passing thru each other...
+    for (auto &x: mice)
     {
-        if ( x->GetActualPos() == xy and x->WhiskerDetectable() )
+        for (auto &y: cats)
         {
-            return true;
+            if (x->GetActualPos() == y->GetActualPos() and
+                x->GetActualOri() == (y->GetActualOri() + 2) % 4 )
+                    x->Die();
         }
     }
-    return false;
 }
-
 

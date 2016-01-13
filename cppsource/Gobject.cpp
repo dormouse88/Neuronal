@@ -15,7 +15,7 @@
 //    if (c) c->SetModified();
 //}
 
-std::shared_ptr<ChipPlan> Gobject::GetContainer()
+std::shared_ptr<ChipPlan> PlanOwned::GetContainer()
 {
     return container.lock();
 }
