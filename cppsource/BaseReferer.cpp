@@ -56,7 +56,7 @@ void BaseReferer::DefineXputs(XPuts all, XPutFilter filter)
     outputs.clear();
     for (auto sd: all.outs)
     {
-        if (filter == nullptr or filter->count( sd.name ) > 0)
+        if (filter == nullptr or filter->count( sd.name ) > 0 or sd.name == "WAIT") //bit naughty but who cares
             outputs.insert( { sd.slot, sd} );
     }
 }
@@ -88,8 +88,9 @@ std::map<std::string, bool> BaseReferer::RetrieveOutputs()
     for (auto &x: outputs)
     {
         retMap.insert( {x.second.name, x.second.charge} );
-        //It is necessary to clear the outputs. (Outside of the basePlan, 'true' and 'false' charges do not have parity and false is a non-response).
-        x.second.charge = false;
+        //It is seemingly not necessary to clear the outputs. (Outside of the basePlan, 'true' and 'false' charges do not have parity and false is a non-response).
+        //Not clearing them allows Draw() to highlight outputs activated.
+        //x.second.charge = false;
     }
     outputsReady = false;
     return retMap;
@@ -103,17 +104,22 @@ void BaseReferer::DrawBrain(sf::RenderTarget & rt)
     float xo = bound.left + bound.width + 20.f;
     float yo = bound.top + 20.f; 
 
+    const sf::Color BRIGHT { 0, 255, 0 };
+    const sf::Color DULL   { 0, 125, 0 };
     sf::Text t;
     t.setFont(ViewResources::GetInstance().font);
     t.setCharacterSize(22.f);
-    t.setColor( sf::Color::Green );
     for (auto p: inputs) {
+        if (p.second.charge) t.setColor( BRIGHT );
+        else t.setColor( DULL );
         t.setString( patch::to_string(p.second.slot) + ": " + p.second.name );
         t.setPosition(xi - t.getGlobalBounds().width, yi);
         rt.draw(t);
         yi += 70.f;
     }
     for (auto p: outputs) {
+        if (p.second.charge) t.setColor( BRIGHT );
+        else t.setColor( DULL );
         t.setString( patch::to_string(p.second.slot) + ": " + p.second.name );
         t.setPosition(xo, yo);
         rt.draw(t);

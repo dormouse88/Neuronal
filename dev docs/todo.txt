@@ -1,12 +1,10 @@
 Do Next
 =======
-Draw Xputs
-Draw Arena Spawners + Entities better
-Decide definite physics system (turn order, etc)
+Finalize some good names for terms
 ---v---
-
-Sort question of assigning inputs/outputs to slots
-Multichannel wires + flexible neurons
+flexible neurons
+Multichannel wires
+named slots
 
 
 General
@@ -43,12 +41,19 @@ InnerSim
 	CONSIDER: Neurons subsuming jumper functionality.
 	CONSIDER: Multichannel wires?
 	CONSIDER: Named slots?
-		handle-to-plan slot matching could work with names just the same as it does with numbers (though refactoring would then be tricky). An auto-name system like when saving plans could be used.
+
+Inbetween
+=========
+	Split view for arena/brain
+	Tools to make cat plans (plan exporting) (related to db trimming)
+	Allow viewing of cat brains. (if only for debugging and level design)
+	More robust XML loading (with feedback on failures) + omit default values when saving.
+
 
 OuterGame
 =========
+	Add goals
+	Freezing cats
 
 
 
-Not Commited
-============

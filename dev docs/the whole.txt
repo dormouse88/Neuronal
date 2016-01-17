@@ -1,0 +1,38 @@
+TERMINOLOGY:
+	INNERSIM		- The contents of a BRAIN
+	PLAN			- A board of DEVICEs and WIREs that essentially forms a visual function. (May hold other PLANs within itself via HANDLEs).
+	PLANOWNED		- DEVICEs and WIREs collectively.
+	DEVICE			- A component of a PLAN that has a location.
+	WIRE			- A CHARGE-carrying connection between two DEVICEs, or between a DEVICE and its parent PLAN.
+	HANDLE			- A DEVICE that has a space to hold a PLAN
+	NEURON			- A DEVICE that acts as the sole logic primitive.
+	BULB			- An optional feature of a NEURON that delays the output.
+	SLOT			- The property that determines CHARGE transmission between a HANDLE and its contained PLAN.
+	?PORT?			- Pseudo-elements of a HANDLE that correlate to SLOTs and can be wired similarly to default NEURONs.
+	CHARGE			- The two-state "data" that DEVICEs and WIREs carry.
+	(CHIP			- (no longer used)(redundant term)
+	(JUMPER			- (no longer used)(to-be-redundant component)
+	(SOCKET			- (no longer used)(confused and now-superceded term)
+	
+	RELATIVES		-
+	VERSIONPARENT	-
+	VERSIONCHILD	-
+	CONTAINPARENT	-
+	CONTAINCHILD	-
+	
+	OUTERGAME		- An ARENA and its contents
+	ARENA			- The playing field for ENTITYs
+	SPAWNER			- A cursor located on the ARENA that can create an ENTITY
+	ENTITY			- An actor on the ARENA (inc GOALs?)
+	CAT				- An ENTITY that kills MOUSEs
+	MOUSE			- An ENTITY that the player controls the BRAIN of
+	GOAL			- The target which the MOUSE has to reach to win.
+	PUPPET			- An ENTITY controlled by a BRAIN
+	BRAIN			- An interface between a PLAN and a PUPPET
+	XPUTS			- Elements of a BRAIN that represent abilities of a PUPPET.
+	SPECIFIED		- In a state of having the set of possible configurations collapsed down to a single configuration
+	DESPECIFIED		- In a state of having only the set of possible configurations.
+	TIMERANGE		- Time DESPECIFIED
+	TIMEEXACT		- Time SPECIFIED
+	
+	LEVEL			- A defined configuration of an ARENA and its contents.

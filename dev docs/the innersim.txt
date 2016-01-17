@@ -14,18 +14,35 @@ CONSIDER: Neurons subsuming jumper functionality.
 		OBS: Old XML can be automatically converted to new (though there'll be loads more delay bulbs than necessary).
 		
 		CONSIDERATION: Implementing the charge propagation.
-			Make a list of all inputless outputers (outergame inputs, (zero)neurons with no inputs, neurons with delay bulbs)
-			Call PushCharge() on all these.
+		Current Imp:
+			PHASE ACT:
+				(Push Inputs)
+				Neuron - PushCharge
+			PHASE CALC:
+				Neuron - Sum charges to calculate firing bool
+			ReceiveCharge:
+				Neuron - add charge to receivedTotal
+				Jumper - immediately calls PushCharge
+		
+		New Imp:
+			PHASE ACT:
+				Neuron - if (have bulb) PushCharge(bulbCharge); FireIfReady();
+					<All inputless outputers (outergame inputs, neurons with no inputs, neurons delay bulbs) will respond with a PushCharge>
+			PHASE CALC:
+				Neuron - if (have bulb) bulb.adopt(); receivedChargeNum = 0; receivedChargeTotal = 0;
+					<The charge of Neuron bulbs must not be changed during the main phase. Instead the next value of the bulb should be silently passed in. This value is then adopted in a separate phase>
+			Neuron::FireIfReady() if (received all) { if (hasbulb) nextBulbCharge = charge, else pushCharge() };
 			Neuron::ReceiveCharge() will store the accumulated total charge (as it does now) but also store the accumulated number of charges it has received.
 				Each call, it checks if it has received from all its input wires and if so, it calculates its firing state by comparing the total received against the threshold and then propagates that firing state.
-			Cyclic dependencies of fast neurons will cause affected neurons to never fire. Maybe check for this and highlight it to the user. Simple to check, just iterate thru every device at the end of a tick and they should all have fired.
+
+			OBS: Cyclic dependencies of fast neurons will cause affected neurons to never fire. Maybe check for this and highlight it to the user. Simple to check, just iterate thru every device at the end of a tick and they should all have fired.
 			OBS: Sending a 'false' charge is now very different from not sending any charge. Devices rely on counting all charges (including 'false') to know they are ready to calculate their own state.
 		
-		CONSIDERATION: Will feedback to the player about how the system is operating be better under the new or old way?
-			CONC: The new way since it is a superset of the options available in the old way.
-		
-		
-		
+	CONSIDERATION: Will feedback to the player about how the system is operating be better under the new or old way?
+		CONC: The new way since it is a superset of the options available in the old way.
+
+
+
 CONSIDER: Multichannel wires.
 	To link multiple outputs of one plan to multiple inputs of another, user has to add multiple jumpers. That's not great. Also can't connect a neuron to multiple inputs or outputs without intermediary neurons.
 
@@ -53,4 +70,16 @@ CONSIDER: Multichannel wires.
 							On each ChipPlan::ReceiveCharge(), the plan passes the charge to ChipHandle using StepOut() as usual. ChipHandle then calls (informs+queries) the appropriate output Socket.
 							That way ChipHandle can contain and manage the input and output sockets. ChipPlan stays oblivious to the change.
 						
+
+CONSIDER: Named Slots.
+	OBS: Handle-to-plan slot matching could work with names just the same as it does with numbers.
+		When a charge is passed across plan/handle divide, the system currently looks for an exact match (slot 5 sends a signal to slot 5) on an int variable. This could just as easily be a string instead.
+	OBS: An auto-name system like when saving plans could be used.
+		When a new slot is created (by adding a wire) it is currently assigned the first available int. This could be made to be the first available capital letter instead (A,B,C,AB,AC,etc). This would provide an easy default value and also allow for a single, simple mechanic (just matching on exact string equality). Note that unlike with plan naming, "auto names" should not be denoted by a special symbol and are effectively not differentiated from real names.
+	OBS: A plan/handle complex will draw a single interface "array" of slots. The slots in this array will be the union of the slots on the handle and the plan (sorted alphabetically).
+	OBS: Interface: There must be a novel string input control. Controls to cycle up/down the slots are optional (if provided, the "end" could be the first available capital letter).
+	OBS: Drawing: I guess having a fairly low maximum character limit is necessary to not take up too much space. Unless I use tooltips or something (nah).
+
+
+
 

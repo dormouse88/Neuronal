@@ -8,26 +8,28 @@ ENTITIES AND LEVELS:
 			
 	Interaction rules:
 		Timing:
-			An oncoming MOUSE and DANGER-ACTIVE would pass thru each other if even number of spaces between them!
-			Change Logic sequence so DANGER and MICE have alternate turns rather than simultaneous? Then test Interactions after either turn.
+			An oncoming MOUSE and CAT-ACTIVE would pass thru each other if even number of spaces between them!
+				One option would be to: Change Logic sequence so CAT and MOUSE have alternate turns rather than simultaneous? Then test Interactions after either turn.
+				However, it seems to be that this case is a specific problem and that generally, simultaneous actions are correct. I've implemented a check for this specific situation instead.
 		Killing:
 			OOB kills anything.
-			DANGER kills MOUSE.
+			CAT kills MOUSE.
 		Detection:
-			Whiskers detect all adjacent DANGER blocks.
+			Whiskers detect all adjacent CAT blocks.
 			Ears detect movement within certain radius.
 		Termination:
-			Mouse Dies (Lose)
-			Mouse Touches Goal (Win)
+			MOUSE Dies (Lose)
+			MOUSE Touches GOAL (Win)
 		CATS meet GOAL:
 			Cats could optionally sit on goals (using goal detection or level design tricks) as a mechanism for fucking them up. This makes CAT-GOAL collisions level-determined and don't have to be a fundamental mechanic.
 		
 	Maybe a big distinction between different PLANs? Not such a strong distinction between STATICs and CATs?
-		ENTITY	DANGER	DUMB		 		No plan , Spawns at collapsed value. 
-		ENTITY	DANGER	FREEZING 			Has plan, Spawns at collapsed value. Freezes in place at t = 0!
-		ENTITY	DANGER	ACTIVE	 			Has plan, Spawns at collapsed value.
+		ENTITY	CAT		DUMB		 		No plan , Spawns at collapsed value. 
+		ENTITY	CAT		FREEZING 			Has plan, Spawns at collapsed value. Freezes in place at t = 0!
+		ENTITY	CAT		ACTIVE	 			Has plan, Spawns at collapsed value.
 		ENTITY	MOUSE 						Has plan, Spawns at zero.
-		OBS: DUMB is just a cosmetic type of DANGER when there is no plan assigned.
+		OBS: DUMB is just a cosmetic type of CAT when there is no plan assigned.
+		OBS: FREEZING is best as a boolean property of CAT
 	
 
 
