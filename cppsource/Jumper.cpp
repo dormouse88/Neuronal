@@ -45,8 +45,7 @@ void Jumper::ReceiveCharge(bool charge, int weight, int slot)
 
 bool Jumper::CanRegisterIn(int slot) const
 {
-    CleanWireVectors();
-    return inWires.size() == 0 ? true : false;
+    return GetInWiresNum() == 0 ? true : false;
 }
 
 sf::Vector2f Jumper::GetWireAttachPos(WireAttachSide was) const

@@ -148,6 +148,9 @@ bool Controller::HandleInput()
                 if (event.key.code == sf::Keyboard::Z) {
                     ChipPlanFunc::DeviceHandle(pos1, 2);
                 }
+                if (event.key.code == sf::Keyboard::BackSlash) {
+                    ChipPlanFunc::DeviceHandle(pos1, 3);
+                }
                 if (event.key.code == sf::Keyboard::S) {
                     ChipPlanFunc::DeviceHandle(pos1, 3);
                 }

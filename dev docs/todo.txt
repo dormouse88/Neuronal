@@ -1,8 +1,12 @@
 Do Next
 =======
-Finalize some good names for terms
+Draw neurons as two halves with independent firing states. Change the neuron shape?
+Fix that device movement 'animation feature' so it doesn't trigger on plan loads.
+draw simple neurons more simply
 ---v---
 flexible neurons
+	Deal with fast-only loops
+	Replace jumpers in serialization, etc
 Multichannel wires
 named slots
 
@@ -13,14 +17,12 @@ General
 	Why CPU load + Framerate loss when exploded?
 Visual / Interface
 ==================
-	Draw neurons as two halves with independent firing states. Change the neuron shape?
 	Draw slot matching + valency (to show how many slots are ignored in both directions) between handles and chips.
 	Set discrete zoom levels + use a smarter better centering algo (like googlemaps).
 	Solve: No space to see wires between exploded chips when adjacent. Disallow adjacency? Draw plan boundary half a cell inwards? (changing GRID_SIZE doesn't help exploded chips)
 	Make wire text labels circle-shaped and place them intelligently (on wire but close to device).
 	Allow chip cycling while unexploded and draw name on the handle.
 	Choose highest number plan to load into an empty plan, not lowest.
-	Fix that device movement 'animation feature' so it doesn't trigger on plan loads.
 	Plan Grabbers are unnecessary if using dedicated keys for collapse and expand. (doh)
 	View centers in wrong place in both: 1 Plan collapse and 2 Plan Load/Wipe
 	Add a reset all charge button.

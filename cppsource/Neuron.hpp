@@ -14,20 +14,23 @@
 #include "Device.hpp"
 class Neuron;
 
-class NeuronView : public DeviceView
+class NeuronView
 {
 public:
     NeuronView(const Neuron & n);
-    virtual ~NeuronView() {}
 
     void Draw(sf::RenderTarget & rt, const Neuron & n);
 private:
-    sf::RectangleShape shape;
+    VectorWorld perceivedPos_;
+    sf::ConvexShape simpleShape;
+    sf::ConvexShape fullShape;
+    sf::ConvexShape bulbShape;
     sf::Text thresholdText;
     sf::Text receivedText;
 };
 
-
+//enum class Charge { ON, OFF };
+typedef bool Charge;
 
 class Neuron : public Device
 {
@@ -49,18 +52,27 @@ public:
     virtual void LogicAct() override;
     virtual void LogicCalculate() override;
 
-    bool IsThresholdMet() const                 {return receivedCharge >= threshold; }    //for drawing + private use only
-    bool GetFiring() const                      {return firing;}  //for drawing only
-    //RED//void SetFiring(bool f)                      {firing = f;}
-    int GetThreshold() const                    {return threshold;}  //for drawing only
-    int GetReceivedCharge() const               {return receivedCharge;}  //for drawing only
+    bool IsThresholdMet() const                 {return receivedSum_ >= threshold_; }  //for drawing only
+    bool GetFiring() const                      {return charge_;}                      //for drawing only
+    int GetThreshold() const                    {return threshold_;}                   //for drawing only
+    int GetReceivedCharge() const               {return receivedSum_;}                 //for drawing only
+    bool HasBulb() const                        {return hasBulb_;}                     //for drawing only
+    bool IsSimple() const                       {return threshold_ == 1;}               //for drawing only
+    bool GetBulbCharge() const                  {return bulbCharge_;}                   //for drawing only
     
-    void ModifyThreshold(int v)                 {threshold += v;}
+    void ModifyThreshold(int v)                 {threshold_ += v;}
     
 private:
-    bool firing;
-    int threshold;
-    int receivedCharge;
+    void FireIfReady();
+    bool ReceivedAll() const                    { return receivedNum_ == GetInWiresNum(); }
+
+    bool hasBulb_;
+    Charge bulbCharge_;
+    Charge charge_;
+    int threshold_;
+    int receivedSum_;
+    int receivedNum_;
+
     NeuronView v;
 };
 

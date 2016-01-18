@@ -45,3 +45,21 @@ void Wirable::PushCharge(bool firing, int slot)
     }
 }
 
+
+bool Wirable::IsInSlotFree(int slot) const
+{
+    CleanWireVectors();
+    for (auto w: inWires) {
+        if (w.lock()->GetToSlot() == slot) return false;
+    }
+    return true;
+}
+bool Wirable::IsOutSlotFree(int slot) const
+{
+    CleanWireVectors();
+    for (auto w: outWires) {
+        if (w.lock()->GetToSlot() == slot) return false;
+    }
+    return true;
+}
+

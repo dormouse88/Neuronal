@@ -39,19 +39,11 @@ void ChipPlan::ReceiveCharge(bool charge, int weight, int slot)
 
 bool ChipPlan::CanRegisterIn(int slot) const
 {
-    CleanWireVectors();
-    for (auto w: inWires) {
-        if (w.lock()->GetToSlot() == slot) return false;
-    }
-    return true;
+    return IsInSlotFree(slot);
 }
 bool ChipPlan::CanRegisterOut(int slot) const
 {
-    CleanWireVectors();
-    for (auto w: outWires) {
-        if (w.lock()->GetFromSlot() == slot) return false;
-    }
-    return true;
+    return IsOutSlotFree(slot);
 }
 
 

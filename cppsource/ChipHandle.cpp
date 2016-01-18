@@ -39,19 +39,11 @@ bool ChipHandle::IsSlotted(SlottedSide) const
 
 bool ChipHandle::CanRegisterIn(int slot) const
 {
-    CleanWireVectors();
-    for (auto w: inWires) {
-        if (w.lock()->GetToSlot() == slot) return false;
-    }
-    return true;
+    return IsInSlotFree(slot);
 }
 bool ChipHandle::CanRegisterOut(int slot) const
 {
-    CleanWireVectors();
-    for (auto w: outWires) {
-        if (w.lock()->GetFromSlot() == slot) return false;
-    }
-    return true;
+    return IsOutSlotFree(slot);
 }
 
 void ChipHandle::LogicAct()
