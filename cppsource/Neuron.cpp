@@ -15,7 +15,9 @@ const sf::Vector2f THRESHOLD_OFFSET { -7.f, -19.f };
 const sf::Vector2f WIRE_IN_OFFSET  { -33.f, 0.f };
 const sf::Vector2f WIRE_OUT_OFFSET { +43.f, 0.f }; //RECTANGLE };
 
-NeuronView::NeuronView(const Neuron & n)
+//NeuronView::NeuronView(const Neuron & n)
+//{}
+void Neuron::InitVisuals()
 {
     // W width, H height, L length, P protrusion
     const int MAIN_WB = 30; //width back
@@ -84,9 +86,11 @@ NeuronView::NeuronView(const Neuron & n)
     receivedText.setColor(sf::Color{100,100,100} );
 }
 
-void NeuronView::Draw(sf::RenderTarget & rt, const Neuron & n)
+void Neuron::Draw(sf::RenderTarget & rt) //, const Neuron & n)
 {
+    const Neuron & n = *this;
     sf::ConvexShape & shape = n.IsSimple() ? simpleShape : fullShape;
+    VectorWorld perceivedPos_;
     perceivedPos_ = n.CalculateOffset(RECTANGLE);
     shape.setPosition( perceivedPos_ );
     if (n.GetFiring())
@@ -133,8 +137,10 @@ Neuron::Neuron(int serial_p, sf::Vector2i pos_p, int threshold_p, std::shared_pt
     ,threshold_(threshold_p)
     ,receivedNum_(0)
     ,receivedSum_(0)
-    ,v(*this)
-{}
+    //,v(*this)
+{
+    InitVisuals();
+}
 
 void Neuron::ReceiveCharge(bool charge, int weight, int slot)
 {
@@ -183,11 +189,11 @@ sf::Vector2f Neuron::GetWireAttachPos(WireAttachSide was) const
     return wirePos;
 }
 
-void Neuron::Draw(sf::RenderTarget & rt) { v.Draw(rt, *this); }
+//void Neuron::Draw(sf::RenderTarget & rt) { v.Draw(rt, *this); }
 void Neuron::Handle(int code)
 {
-    if (code == 1) { ModifyThreshold(1); }
-    if (code == 2) { ModifyThreshold(-1); }
+    if (code == 1) { threshold_ += 1; }
+    if (code == 2) { threshold_ -= 1;; }
     if (code == 3) { hasBulb_ = not hasBulb_; bulbCharge_ = false; }
     GetContainer()->SetModified();
 }

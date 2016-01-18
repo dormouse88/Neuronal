@@ -12,22 +12,14 @@
 #include "miscUtil.hpp"
 #include "ViewResources.hpp"
 #include "Device.hpp"
-class Neuron;
 
-class NeuronView
-{
-public:
-    NeuronView(const Neuron & n);
-
-    void Draw(sf::RenderTarget & rt, const Neuron & n);
-private:
-    VectorWorld perceivedPos_;
-    sf::ConvexShape simpleShape;
-    sf::ConvexShape fullShape;
-    sf::ConvexShape bulbShape;
-    sf::Text thresholdText;
-    sf::Text receivedText;
-};
+//class Neuron;
+//class NeuronView
+//{
+//public:
+//    NeuronView(const Neuron & n);
+//private:
+//};
 
 //enum class Charge { ON, OFF };
 typedef bool Charge;
@@ -60,12 +52,14 @@ public:
     bool IsSimple() const                       {return threshold_ == 1;}               //for drawing only
     bool GetBulbCharge() const                  {return bulbCharge_;}                   //for drawing only
     
-    void ModifyThreshold(int v)                 {threshold_ += v;}
+    //void ModifyThreshold(int v)                 {threshold_ += v;}
+    //void Draw(sf::RenderTarget & rt);//, const Neuron & n);
     
 private:
     void FireIfReady();
     bool ReceivedAll() const                    { return receivedNum_ == GetInWiresNum(); }
-
+    void InitVisuals();
+    
     bool hasBulb_;
     Charge bulbCharge_;
     Charge charge_;
@@ -73,7 +67,12 @@ private:
     int receivedSum_;
     int receivedNum_;
 
-    NeuronView v;
+    //NeuronView v;
+    sf::ConvexShape simpleShape;
+    sf::ConvexShape fullShape;
+    sf::ConvexShape bulbShape;
+    sf::Text thresholdText;
+    sf::Text receivedText;
 };
 
 #endif	/* NEURON_HPP */

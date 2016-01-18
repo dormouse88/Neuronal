@@ -228,13 +228,13 @@ bool Serializer::SavePlanRecursively(pugi::xml_node container, std::shared_ptr<C
                 if (p) pID = p->planID;
                 dev.append_attribute("link").set_value(pID);
             }
-            else if (d->SerialName() == "JUMP")
-            {
-                pugi::xml_node dev = plan.append_child("JUMP");
-                dev.append_attribute("i").set_value(d->GetSerial() );
-                dev.append_attribute("x").set_value(d->GetSmartPos().x);
-                dev.append_attribute("y").set_value(d->GetSmartPos().y);
-            }
+//            else if (d->SerialName() == "JUMP")
+//            {
+//                pugi::xml_node dev = plan.append_child("JUMP");
+//                dev.append_attribute("i").set_value(d->GetSerial() );
+//                dev.append_attribute("x").set_value(d->GetSmartPos().x);
+//                dev.append_attribute("y").set_value(d->GetSmartPos().y);
+//            }
         }
         for (auto w: plan_p->wires) {
             //Rather ugly. RTTI using raw pointers.
@@ -295,7 +295,8 @@ std::shared_ptr<ChipPlan> Serializer::LoadPlanRecursively(pugi::xml_node contain
         {
             sf::Vector2i pos { device.attribute("x").as_int(), device.attribute("y").as_int() };
             int serial { device.attribute("i").as_int() };
-            factory->AddJumper(memPlan, serial, pos);
+            auto n = factory->AddNeuron(memPlan, serial, pos, 1);
+            n->Handle(3);
         }
         for (pugi::xml_node wire = xmlPlan.child("WIRE"); wire; wire = wire.next_sibling("WIRE"))
         {

@@ -17,7 +17,9 @@ const sf::Vector2f WIRE_OUT_OFFSET { RECTANGLE.x * 1.f, RECTANGLE.y *.5f };
 
 
 ChipHandle::ChipHandle(int serial_p, sf::Vector2i pos_p, std::shared_ptr<ChipPlan> cont)
-    :Device(serial_p, pos_p, cont), DeviceView( GetWorldPos() ), exploded(false), shape( RECTANGLE )
+    :Device(serial_p, pos_p, cont)
+    , exploded(false)
+    , shape( RECTANGLE )
 {
     shape.setOutlineColor(sf::Color::White);
     shape.setOutlineThickness(3);
@@ -122,7 +124,7 @@ void ChipHandle::Draw(sf::RenderTarget & rt)
     }
     else
     {
-        UpdatePos( CalculateOffset(RECTANGLE) );
+        VectorWorld perceivedPos { CalculateOffset(RECTANGLE) };
         shape.setPosition( perceivedPos );
         shape.setFillColor(sf::Color::Yellow);
         std::string text = patch::to_string( plan->GetPlanID() );

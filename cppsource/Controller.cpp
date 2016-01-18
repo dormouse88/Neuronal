@@ -126,7 +126,7 @@ bool Controller::HandleInput()
                 }
                 if (event.key.code == sf::Keyboard::J)
                 {
-                    theModel.GetFactory()->AddJumper(pos1);
+                    ;//theModel.GetFactory()->AddJumper(pos1);
                 }
                 if (event.key.code == sf::Keyboard::H)
                 {

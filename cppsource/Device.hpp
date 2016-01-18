@@ -16,21 +16,21 @@
 class ChipPlan; //fwd dec
 #include "PlanPos.hpp"
 
-class DeviceView
-{
-public:
-    DeviceView(sf::Vector2f targetPos)
-        {
-            perceivedPos = targetPos;
-        }
-    virtual ~DeviceView() {}
-protected:
-    void UpdatePos(sf::Vector2f targetPos)
-    {
-        perceivedPos += (targetPos - perceivedPos) * 0.08f;
-    }
-    sf::Vector2f perceivedPos;
-};
+//class DeviceView
+//{
+//public:
+//    DeviceView(sf::Vector2f targetPos)
+//        {
+//            perceivedPos = targetPos;
+//        }
+//    virtual ~DeviceView() {}
+//protected:
+//    void UpdatePos(sf::Vector2f targetPos)
+//    {
+//        perceivedPos += (targetPos - perceivedPos) * 0.08f;
+//    }
+//    sf::Vector2f perceivedPos;
+//};
 
 
 

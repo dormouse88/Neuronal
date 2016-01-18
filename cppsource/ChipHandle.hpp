@@ -13,7 +13,7 @@
 #include "Device.hpp"
 #include "ChipPlan.hpp"
 
-class ChipHandle : public Device, public DeviceView, public RefererInterface
+class ChipHandle : public Device, public RefererInterface
 {
 public:
     ChipHandle(int serial_p, sf::Vector2i pos_p, std::shared_ptr<ChipPlan> cont);
