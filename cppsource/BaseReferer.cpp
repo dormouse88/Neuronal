@@ -10,30 +10,24 @@
 #include <iostream>
 #include <set>
 
-const int TIME_OUT_TICKS = 2000;
-
 BaseReferer::BaseReferer()
-    :outputsReady(false)
-{
-}
+{}
 
-
-//RefererInterface...
-//void BaseReferer::StepOut(bool charge, int slot)
-//{
-//    if (outputs.count(slot) > 0)
-//    {
-//        outputs.at(slot).charge = charge;
-//        if (charge) outputsReady = true;
-//    }
-//}
 void BaseReferer::StepOutRefresh(int slot)
+//outputs may have changed
 {
-    
+    RefreshOutputs();
 }
+
 bool BaseReferer::StepOutGetOutgoingCharge(int slot)
+//return outgoing charges from inputs
 {
-    
+    for (auto &x: inputs)
+    {
+        if ( x.second.slot == slot )
+            return x.second.charge;
+    }
+    return false;
 }
 
 
@@ -45,7 +39,6 @@ void BaseReferer::SetSubPlan(std::shared_ptr<ChipPlan> p, std::shared_ptr<Refere
 {
     basePlan = p;
     p->RegisterReferer( myself );
-    outputsReady = false;
 }
 std::shared_ptr<ChipPlan> BaseReferer::GetSubPlan()
 {
@@ -73,26 +66,23 @@ void BaseReferer::DefineXputs(XPuts all, XPutFilter filter)
 void BaseReferer::SetInputState(std::string name, bool charge)
 {
     auto it = inputs.find(name);
-    if (it != inputs.end()) it->second.charge = charge;
+    if (it != inputs.end())
+    {
+        if (it->second.charge != charge)
+        {
+            it->second.charge = charge;
+            basePlan->StepInRefresh(it->second.slot);
+        }
+    }
 }
 void BaseReferer::TickOnce()
 {
-    if (not outputsReady)
-    {
-        for (auto &x: inputs)
-        {
-            //basePlan->StepIn(x.second.charge, x.second.slot);
-        }
-        basePlan->PassOnCalculate();
-        basePlan->PassOnAct();
-    }
+    basePlan->PassOnCalculate();
+    basePlan->PassOnAct();
 }
-std::map<std::string, bool> BaseReferer::RetrieveOutputs()
+
+std::map<std::string, bool> BaseReferer::GetOutputs()
 {
-    for (int i = 0; i<TIME_OUT_TICKS and not outputsReady; i++)
-    {
-        TickOnce();
-    }
     std::map<std::string, bool> retMap;
     //fill retMap with data...
     for (auto &x: outputs)
@@ -100,11 +90,28 @@ std::map<std::string, bool> BaseReferer::RetrieveOutputs()
         retMap.insert( {x.second.name, x.second.charge} );
         //It is seemingly not necessary to clear the outputs. (Outside of the basePlan, 'true' and 'false' charges do not have parity and false is a non-response).
         //Not clearing them allows Draw() to highlight outputs activated.
-        //x.second.charge = false;
+        //    //x.second.charge = false;
     }
-    outputsReady = false;
     return retMap;
 }
+bool BaseReferer::IsAnyOutputOn() const
+{
+    for (auto x: outputs)
+    {
+        if (x.second.charge)
+            return true;
+    }
+    return false;
+}
+
+void BaseReferer::RefreshOutputs()
+{
+    for (auto & x: outputs)
+    {
+        x.second.charge = basePlan->StepInGetOutgoingCharge(x.second.slot);
+    }
+}
+
 
 void BaseReferer::DrawBrain(sf::RenderTarget & rt)
 {

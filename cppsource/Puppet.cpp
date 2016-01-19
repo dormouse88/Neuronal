@@ -58,9 +58,18 @@ Puppet::Puppet(ArenaPoint s_pos, Orientation s_ori, std::shared_ptr<Arena> ar, s
     ,brain_(brain)
 {}
 
+const int TIME_OUT_TICKS = 2000;
 void Puppet::Act()
 {
-    auto outs = brain_->RetrieveOutputs();
+    for (int i = 0; i<TIME_OUT_TICKS and not brain_->IsAnyOutputOn(); i++)
+    {
+        brain_->TickOnce();
+    }
+
+    auto outs = brain_->GetOutputs();
+
+    brain_->TickOnce();  //This is one possibility (an automatic after-tick).
+                         //An alternative that wouldn't progress innerTime automatically would be a check on the loop above that at least 1 innerTime has passed
 
     //Perform an action based on the output information from the brain...
     //Since it is possible to receive requests for multiple commands at once, an order of priority will have to be established and made explicit.

@@ -23,18 +23,18 @@ public:
     virtual ~Wirable() {}
 
     //Virtuals...
-    //virtual void ReceiveCharge(bool charge, int weight, int slot) = 0;
     virtual void Refresh(int slot) = 0;
     virtual bool GetOutgoingCharge(int slot) = 0;
-    
     virtual VectorWorld GetWireAttachPos(WireAttachSide) const = 0;
+
     virtual bool IsWeightedIn() const                   {return false;}
     virtual bool IsSlotted(SlottedSide) const           {return false;}
     virtual bool CanRegisterIn(int slot) const          {return true;}  //Client needs to call this before calling RegisterIn(). RegisterIn() should throw an exception on failure perhaps.
     virtual bool CanRegisterOut(int slot) const         {return true;}
 
-    void RegisterIn(std::shared_ptr<Wire> w)    { inWires.push_back(w);}
-    void RegisterOut(std::shared_ptr<Wire> w)   { outWires.push_back(w);}
+
+    void RegisterIn(std::shared_ptr<Wire> w)                            { inWires.push_back(w);}
+    void RegisterOut(std::shared_ptr<Wire> w)                           { outWires.push_back(w);}
     bool HasWireTo(int fromSlot, Wirable & to, int toSlot) const;
 
     int GetInWiresNum() const               { CleanWireVectors(); return inWires.size(); }
@@ -43,7 +43,6 @@ public:
     bool IsOutSlotFree(int slot) const;
 
 protected:
-    //void PushCharge(bool charge, int slot = 0);
     void PropagateRefresh(int slot = 0);
     int GetTotalIncomingCharge(int slot = 0) const;
 private:

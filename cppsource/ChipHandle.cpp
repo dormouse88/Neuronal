@@ -29,10 +29,6 @@ ChipHandle::ChipHandle(int serial_p, sf::Vector2i pos_p, std::shared_ptr<ChipPla
 }
 
 
-//void ChipHandle::ReceiveCharge(bool charge, int weight, int slot)
-//{
-//    if (plan) plan->StepIn(charge, slot);
-//}
 void ChipHandle::Refresh(int slot)
 {
     if (plan) plan->StepInRefresh(slot);
@@ -75,20 +71,14 @@ bool ChipHandle::CanRegisterOut(int slot) const
     return IsOutSlotFree(slot);
 }
 
-void ChipHandle::LogicAct()
+void ChipHandle::InnerStep()
 {
     if (plan) plan->PassOnAct();
 }
-void ChipHandle::LogicCalculate()
+void ChipHandle::PreInnerStep()
 {
     if (plan) plan->PassOnCalculate();
 }
-
-//RefererInterface...
-//void ChipHandle::StepOut(bool charge, int slot)
-//{
-//    PushCharge(charge, slot);
-//}
 
 //(called by plan onto right hand side of handle)
 void ChipHandle::StepOutRefresh(int slot)
@@ -132,19 +122,19 @@ sf::Vector2f ChipHandle::GetWireAttachPos(WireAttachSide was) const
         RectWorld planBound { plan->GetWorldPaddedBound() };
         VectorWorld objectSize { planBound.width, planBound.height };
         if (was == WireAttachSide::IN) {
-            wirePos = CalculateOffset(objectSize) + VectorWorld {objectSize.x *.0f, objectSize.y *.5f };
+            wirePos = CalculateOffsetForCentering(objectSize) + VectorWorld {objectSize.x *.0f, objectSize.y *.5f };
         }
         else {
-            wirePos = CalculateOffset(objectSize) + VectorWorld {objectSize.x *1.f, objectSize.y *.5f };
+            wirePos = CalculateOffsetForCentering(objectSize) + VectorWorld {objectSize.x *1.f, objectSize.y *.5f };
         }
     }
     else
     {
         if (was == WireAttachSide::IN) {
-            wirePos = CalculateOffset(RECTANGLE) + WIRE_IN_OFFSET;
+            wirePos = CalculateOffsetForCentering(RECTANGLE) + WIRE_IN_OFFSET;
         }
         else {
-            wirePos = CalculateOffset(RECTANGLE) + WIRE_OUT_OFFSET;
+            wirePos = CalculateOffsetForCentering(RECTANGLE) + WIRE_OUT_OFFSET;
         }
     }
     return wirePos;
@@ -159,7 +149,7 @@ void ChipHandle::Draw(sf::RenderTarget & rt)
         RectWorld innerPlanBound { plan->GetWorldPaddedBound() };
         VectorWorld innerPlanTopLeft { innerPlanBound.left, innerPlanBound.top };
         VectorWorld innerPlanSize {innerPlanBound.width, innerPlanBound.height};
-        VectorWorld outerTopLeftPos = CalculateOffset(innerPlanSize);
+        VectorWorld outerTopLeftPos = CalculateOffsetForCentering(innerPlanSize);
         VectorWorld offsetFromZero = outerTopLeftPos - innerPlanTopLeft;
         plan->GetGrid()->SetOffset( offsetFromZero );
         
@@ -167,7 +157,7 @@ void ChipHandle::Draw(sf::RenderTarget & rt)
     }
     else
     {
-        VectorWorld perceivedPos { CalculateOffset(RECTANGLE) };
+        VectorWorld perceivedPos { CalculateOffsetForCentering(RECTANGLE) };
         shape.setPosition( perceivedPos );
         shape.setFillColor(sf::Color::Yellow);
         std::string text = patch::to_string( plan->GetPlanID() );

@@ -25,13 +25,22 @@
 		<WIRE f="1" t="0" w="1" fs="0" ts="2" />
 	</PLAN>
 </LEVEL>
+<LEVEL num="1" name="empty" min_x="-3" min_y="-3" max_x="3" max_y="3">
+	<INPUT name="F_WHISK" />
+	<INPUT name="L_WHISK" />
+	<INPUT name="R_WHISK" />
+	<OUTPUT name="L_FOOT" />
+	<OUTPUT name="R_FOOT" />
+	<MSPAWN pos_x="0" pos_y="0" ori="0" />
+	<CSPAWN pos_x="3" pos_y="3" ori="0" min_t="0" max_t="0" cat_plan="0" />
+</LEVEL>
 <LEVEL num="1x" name="go" min_x="0" min_y="-3" max_x="0" max_y="3">
 	<OUTPUT name="L_FOOT" />
 	<OUTPUT name="R_FOOT" />
 	<MSPAWN pos_x="0" pos_y="3" ori="0" />
 	<GSPAWN pos_x="0" pos_y="-3" />
 </LEVEL>
-<LEVEL num="1" name="wait" min_x="0" min_y="-7" max_x="0" max_y="3">
+<LEVEL num="2" name="wait" min_x="0" min_y="-7" max_x="0" max_y="3">
 	<OUTPUT name="L_FOOT" />
 	<OUTPUT name="R_FOOT" />
 	<MSPAWN pos_x="0" pos_y="3" ori="0" />

@@ -15,8 +15,7 @@ const sf::Vector2f THRESHOLD_OFFSET { -7.f, -19.f };
 const sf::Vector2f WIRE_IN_OFFSET  { -33.f, 0.f };
 const sf::Vector2f WIRE_OUT_OFFSET { +43.f, 0.f }; //RECTANGLE };
 
-//NeuronView::NeuronView(const Neuron & n)
-//{}
+
 void Neuron::InitVisuals()
 {
     // W width, H height, L length, P protrusion
@@ -90,7 +89,7 @@ void Neuron::Draw(sf::RenderTarget & rt)
 {
     sf::ConvexShape & shape = IsSimple() ? simpleShape : fullShape;
     VectorWorld perceivedPos_;
-    perceivedPos_ = CalculateOffset(RECTANGLE);
+    perceivedPos_ = CalculateOffsetForCentering(RECTANGLE);
     shape.setPosition( perceivedPos_ );
     if ( calculatedCharge_ )
         shape.setFillColor(sf::Color::Red);
@@ -140,21 +139,8 @@ Neuron::Neuron(int serial_p, sf::Vector2i pos_p, int threshold_p, std::shared_pt
     InitVisuals();
 }
 
-//void Neuron::ReceiveCharge(bool charge, int weight, int slot)
-//{
-//    receivedNum_++;
-//    if (charge) receivedSum_ += weight;
-//    
-//    FireIfReady();
-//}
 void Neuron::Refresh(int slot)
 {
-    //ask all inWires for charge state
-    //sum it all and set totalIncoming_
-    //compare to threshold and determine new charge state
-    //if (new state is different from current state)
-    //      set (charge_ to new state)
-    //      PropagateRefresh();
     totalIncoming_ = GetTotalIncomingCharge();
     bool newState = false;
     if (totalIncoming_ >= threshold_)
@@ -170,49 +156,32 @@ void Neuron::Refresh(int slot)
         }
     }
 }
+
 bool Neuron::GetOutgoingCharge(int slot)
 {
     return outgoingCharge_;
 }
 
-void Neuron::LogicAct()
+void Neuron::InnerStep()
 {
     outgoingCharge_ = intermediateCharge_;
     PropagateRefresh();
-//    if (hasBulb_)
-//        PushCharge(bulbCharge_, 0);
-//    if (GetInWiresNum() == 0)
-//        FireIfReady();  //should do this ONLY if it has no inputs
 }
 
-void Neuron::LogicCalculate()
+void Neuron::PreInnerStep()
 {
     intermediateCharge_ = calculatedCharge_;
-//    if (hasBulb_)
-//        bulbCharge_ = charge_;
-//    receivedNum_ = 0;
-//    receivedSum_ = 0;
 }
-
-//void Neuron::FireIfReady()
-//{
-//    if (ReceivedAll())
-//    {
-//        charge_ = receivedSum_ >= threshold_;
-//        if (not hasBulb_)
-//            PushCharge(charge_, 0);
-//    }
-//}
 
 
 sf::Vector2f Neuron::GetWireAttachPos(WireAttachSide was) const
 {
     sf::Vector2f wirePos;
     if (was == WireAttachSide::IN) {
-        wirePos = CalculateOffset(RECTANGLE) + WIRE_IN_OFFSET;
+        wirePos = CalculateOffsetForCentering(RECTANGLE) + WIRE_IN_OFFSET;
     }
     else {
-        wirePos = CalculateOffset(RECTANGLE) + WIRE_OUT_OFFSET;
+        wirePos = CalculateOffsetForCentering(RECTANGLE) + WIRE_OUT_OFFSET;
     }
     return wirePos;
 }

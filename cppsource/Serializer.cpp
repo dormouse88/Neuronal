@@ -78,9 +78,12 @@ void Serializer::LoadLevel(int num, std::shared_ptr<Arena> a, std::shared_ptr<Bl
             auto spawner = a->MakeCatSpawner(ArenaPoint{x,y}, ori, TimeRange{min_t,max_t}, planNum);
             spawner->DefineCatXPuts();
             auto brain = spawner->GetCatBrain();
-            auto catPlan = LoadLevelPlan( num, planNum, f );
-            assert(catPlan);
-            brain->SetSubPlan(catPlan, brain);
+            if (planNum != 0)
+            {
+                auto catPlan = LoadLevelPlan( num, planNum, f );
+                assert(catPlan);
+                brain->SetSubPlan(catPlan, brain);
+            }
         }
     }
     {

@@ -35,6 +35,13 @@ CONSIDER: Neurons subsuming jumper functionality.
 			Neuron::ReceiveCharge() will store the accumulated total charge (as it does now) but also store the accumulated number of charges it has received.
 				Each call, it checks if it has received from all its input wires and if so, it calculates its firing state by comparing the total received against the threshold and then propagates that firing state.
 
+		Refresh Imp:
+			Two "harmless" (as in, can be called excessively without negative consequence) functions - Refresh() and GetOutgoingCharge() - allow updating of non-time-dependent charges.
+			Refresh() is called on "consequent" (to the right) elements to tell them they may have been affected by a change.
+			GetOutgoingCharge() is used by refreshed elements and is called on their "antecedent" (to the left) elements to get data for the purposes of refreshment calculations.
+			Refresh() can be freely called whenever a device is modified, etc. to allow instant charges to be immediately reflected.
+			The only time-dependent activity is when Neuron delay bulbs use the "calc" and "act" phases just to update themselves and the brain xputs are changed.
+
 			OBS: Cyclic dependencies of fast neurons will cause affected neurons to never fire. Maybe check for this and highlight it to the user. Simple to check, just iterate thru every device at the end of a tick and they should all have fired.
 			OBS: Sending a 'false' charge is now very different from not sending any charge. Devices rely on counting all charges (including 'false') to know they are ready to calculate their own state.
 		

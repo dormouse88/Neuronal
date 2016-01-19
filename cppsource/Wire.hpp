@@ -42,7 +42,6 @@ public:
 
     virtual std::string SerialName() const { return "WIRE";}
 
-    //void ReceiveCharge(bool f);
     void Refresh();
     int GetOutgoingWeight() const          { if (firing) return weight; else return 0;}
     

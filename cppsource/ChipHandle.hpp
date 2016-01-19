@@ -18,28 +18,26 @@ class ChipHandle : public Device, public RefererInterface
 public:
     ChipHandle(int serial_p, sf::Vector2i pos_p, std::shared_ptr<ChipPlan> cont);
     virtual ~ChipHandle() {}
-    //Misc...
+    //PlanOwned...
     virtual std::string SerialName() const override { return "HAND";}
     virtual void Draw(sf::RenderTarget & rt) override;
     virtual void Handle(int code) override;
     
     //Wirable...
-    //virtual void ReceiveCharge(bool charge, int weight, int slot) override;
     virtual void Refresh(int slot) override;
     virtual bool GetOutgoingCharge(int slot) override;
-
     virtual VectorWorld GetWireAttachPos(WireAttachSide was) const override;
+
     virtual bool IsSlotted(SlottedSide) const override;
     virtual bool CanRegisterIn(int slot) const override;
     virtual bool CanRegisterOut(int slot) const override;
     
     //Device...
-    virtual void LogicAct() override;
-    virtual void LogicCalculate() override;
+    virtual void InnerStep() override;
+    virtual void PreInnerStep() override;
     virtual VectorDumb GetPlodedSize() override;
 
     //RefererInterface...
-    //virtual void StepOut(bool charge, int slot) override;
     virtual void StepOutRefresh(int slot) override;
     virtual bool StepOutGetOutgoingCharge(int slot) override;
     virtual void SetModified() override;

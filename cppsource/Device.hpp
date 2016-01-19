@@ -16,47 +16,30 @@
 class ChipPlan; //fwd dec
 #include "PlanPos.hpp"
 
-//class DeviceView
-//{
-//public:
-//    DeviceView(sf::Vector2f targetPos)
-//        {
-//            perceivedPos = targetPos;
-//        }
-//    virtual ~DeviceView() {}
-//protected:
-//    void UpdatePos(sf::Vector2f targetPos)
-//    {
-//        perceivedPos += (targetPos - perceivedPos) * 0.08f;
-//    }
-//    sf::Vector2f perceivedPos;
-//};
-
-
 
 
 class Device : public Wirable, public PlanOwned
 {
 public:
-    Device(int serial_p, VectorSmart pos_p, std::shared_ptr<ChipPlan> cont);
+    Device(int serial, VectorSmart pos, std::shared_ptr<ChipPlan> cont);
     virtual ~Device() {}
 
     //virtuals...
-    virtual void LogicAct() {}
-    virtual void LogicCalculate() {}
-    virtual VectorDumb GetPlodedSize()          { return VectorDumb {1, 1}; }
+    virtual void PreInnerStep() = 0;
+    virtual void InnerStep() = 0;
+    virtual VectorDumb GetPlodedSize() = 0;
     
-    VectorWorld CalculateOffset(VectorWorld objectSize) const;
+    VectorWorld CalculateOffsetForCentering(VectorWorld objectSize) const;
 
-    VectorWorld GetWorldPos() const             {return ppos.GetWorldPos();}
-    VectorWorld GetWorldSizeOfCell() const      {return ppos.GetWorldSizeOf();}
-    VectorSmart GetSmartPos() const             {return ppos.GetSmartPos();}
-    void SetPosSmart(VectorSmart p)             {ppos.SetPosSmart(p);}
+    VectorWorld GetWorldPos() const             {return ppos_.GetWorldPos();}
+    VectorWorld GetWorldSizeOfCell() const      {return ppos_.GetWorldSizeOf();}
+    VectorSmart GetSmartPos() const             {return ppos_.GetSmartPos();}
+    void SetPosSmart(VectorSmart p)             {ppos_.SetPosSmart(p);}
 
-    int GetSerial() const                       {return serial;}
+    int GetSerial() const                       {return serial_;}
 private:
-    PlanPos ppos;
-    int serial;
+    PlanPos ppos_;
+    int serial_;
     
 };
 

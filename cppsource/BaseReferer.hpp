@@ -38,7 +38,6 @@ public:
     BaseReferer();
     
     //RefererInterface...
-    //virtual void StepOut(bool charge, int slot) override;
     virtual void StepOutRefresh(int slot) override;
     virtual bool StepOutGetOutgoingCharge(int slot) override;
     virtual void SetModified() override;
@@ -48,15 +47,17 @@ public:
     void DefineXputs(XPuts all, XPutFilter filter);
     void SetInputState(std::string, bool);
     void TickOnce();
-    std::map<std::string, bool> RetrieveOutputs();
 
     void DrawBrain(sf::RenderTarget & rt);
     
+    bool IsAnyOutputOn() const;
+    std::map<std::string, bool> GetOutputs();
 private:
+    void RefreshOutputs();
+
     std::map<std::string, SlotData > inputs;
     std::map<int, SlotData > outputs;
     std::shared_ptr<ChipPlan> basePlan;
-    bool outputsReady;
 };
 
 

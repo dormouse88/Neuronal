@@ -25,23 +25,6 @@ std::shared_ptr<Neuron> BlobFactory::AddNeuron(std::shared_ptr<ChipPlan> plan, i
     return nullptr;
 }
 
-//std::shared_ptr<Jumper> BlobFactory::AddJumper(PlanPos pos)
-//{
-//    if (pos.IsLocated()) return AddJumper(pos.GetPlan(), 0, pos.GetSmartPos());
-//    else return nullptr;
-//}
-//std::shared_ptr<Jumper> BlobFactory::AddJumper(std::shared_ptr<ChipPlan> plan, int serial, VectorSmart pos)
-//{
-//    if (serial == 0) serial = plan->GetFreeSerial();
-//    if (plan->IsPositionFree(pos) and plan->IsSerialFree(serial))
-//    {
-//        auto mp = std::make_shared<Jumper> (serial, pos, plan);
-//        plan->ImportDevice(mp);
-//        return mp;
-//    }
-//    return nullptr;
-//}
-
 std::shared_ptr<ChipHandle> BlobFactory::AddHandle(PlanPos pos)
 {
     if (pos.IsLocated()) return AddHandle(pos.GetPlan(), 0, pos.GetSmartPos());
@@ -146,6 +129,7 @@ std::shared_ptr<Wire> BlobFactory::AddWire(std::shared_ptr<ChipPlan> plan, Wirab
         from.RegisterOut(mp);
         to.RegisterIn(mp);
         plan->ImportWire(mp);
+        mp->Refresh();
         return mp;
     }
     return nullptr;
@@ -174,6 +158,12 @@ void BlobFactory::RemoveWire(PlanPos pos1, PlanPos pos2)
     if (w1 and w2)
     {
         auto wire = plan->GetWire(*w1, *w2);
-        if (wire) plan->RemoveWire(wire);
+        if (wire)
+        {
+            int toSlot = wire->GetToSlot();
+            plan->RemoveWire(wire);
+            wire = nullptr;
+            w2->Refresh(toSlot);
+        }
     }
 }

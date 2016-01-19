@@ -31,11 +31,6 @@ std::shared_ptr<ChipHandle> ChipPlan::GetHandle()
 
 
 
-//void ChipPlan::ReceiveCharge(bool charge, int weight, int slot)
-//{
-//    auto notDead = referer.lock();
-//    if (notDead) notDead->StepOut(charge, slot);
-//}
 void ChipPlan::Refresh(int slot)
 {
     referer->StepOutRefresh(slot);
@@ -57,10 +52,6 @@ bool ChipPlan::CanRegisterOut(int slot) const
 }
 
 
-//void ChipPlan::StepIn(bool charge, int slot)
-//{
-//    PushCharge(charge, slot);
-//}
 void ChipPlan::StepInRefresh(int slot)
 {
     PropagateRefresh(slot);
@@ -72,11 +63,11 @@ bool ChipPlan::StepInGetOutgoingCharge(int slot)
 
 void ChipPlan::PassOnAct()
 {
-    for (auto & d: devices) d->LogicAct();
+    for (auto & d: devices) d->InnerStep();
 }
 void ChipPlan::PassOnCalculate()
 {
-    for (auto & d: devices) d->LogicCalculate();
+    for (auto & d: devices) d->PreInnerStep();
 }
 
 /////////////////////////////

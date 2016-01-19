@@ -33,16 +33,15 @@ public:
     std::shared_ptr<ChipHandle> GetHandle();
 
     //Wirable...
-    //virtual void ReceiveCharge(bool charge, int weight, int slot) override;
     virtual void Refresh(int slot) override;
     virtual bool GetOutgoingCharge(int slot) override;
-    
     virtual VectorWorld GetWireAttachPos(WireAttachSide was) const override;
+
     virtual bool IsSlotted(SlottedSide) const override                                                  {return true;}
     virtual bool CanRegisterIn(int slot) const override;
     virtual bool CanRegisterOut(int slot) const override;
-    
-    //void StepIn(bool charge, int slot);
+
+    //"Referred"...
     void StepInRefresh(int slot);
     bool StepInGetOutgoingCharge(int slot);
     void PassOnAct();

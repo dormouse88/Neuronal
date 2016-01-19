@@ -13,7 +13,6 @@ class ChipPlan;
 class RefererInterface
 {
 public:
-    //virtual void StepOut(bool charge, int slot) = 0;
     virtual void StepOutRefresh(int slot) = 0;
     virtual bool StepOutGetOutgoingCharge(int slot) = 0;
     virtual void SetModified() = 0;

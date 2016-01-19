@@ -25,8 +25,10 @@ void Model::OuterTick()
     arena->TimeAdvance();
 }
 void Model::InnerTick()
+//Does an InnerTick ONLY if it won't affect the Outer
 {
-    arena->GetMouseBrain()->TickOnce();
+    if ( not arena->GetMouseBrain()->IsAnyOutputOn() )
+        arena->GetMouseBrain()->TickOnce();
 }
 
 std::shared_ptr<ChipPlan> Model::WipePlan(PlanPos pos, bool forced)

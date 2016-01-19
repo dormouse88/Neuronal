@@ -23,23 +23,22 @@ public:
     Neuron(int serial_p, sf::Vector2i pos_p, int threshold_p, std::shared_ptr<ChipPlan> cont);
     virtual ~Neuron() {;}
 
-    //Misc...
+    //PlanOwned...
     virtual std::string SerialName() const override         { return "NEUR";}
     virtual void Draw(sf::RenderTarget & rt) override;
     virtual void Handle(int code) override;
-
+    
     //Wirable...
-    //virtual void ReceiveCharge(bool charge, int weight, int slot) override;
     virtual void Refresh(int slot) override;
     virtual bool GetOutgoingCharge(int slot) override;
-    
     virtual VectorWorld GetWireAttachPos(WireAttachSide was) const override;
     virtual bool IsWeightedIn() const override              {return true;}
     
     //Device...
-    virtual void LogicAct() override;
-    virtual void LogicCalculate() override;
-
+    virtual void PreInnerStep() override;
+    virtual void InnerStep() override;
+    virtual VectorDumb GetPlodedSize() override          { return VectorDumb {1, 1}; }
+    
     bool IsSimple() const                       {return threshold_ == 1;}
     int GetThreshold() const                    {return threshold_;}   //for serializer
 //    bool IsThresholdMet() const                 {return receivedSum_ >= threshold_; }  //for drawing only
@@ -49,8 +48,6 @@ public:
 //    bool GetBulbCharge() const                  {return outgoingCharge_;}                   //for drawing only
     
 private:
-//    void FireIfReady();
-//    bool ReceivedAll() const                    { return receivedNum_ == GetInWiresNum(); }
     void InitVisuals();
     
     bool hasBulb_;

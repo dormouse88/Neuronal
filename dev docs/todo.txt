@@ -1,12 +1,8 @@
 Do Next
 =======
-Draw neurons as two halves with independent firing states. Change the neuron shape?
-Fix that device movement 'animation feature' so it doesn't trigger on plan loads.
-draw simple neurons more simply
 ---v---
 flexible neurons
 	Deal with fast-only loops
-	Replace jumpers in serialization, etc
 Multichannel wires
 named slots
 
