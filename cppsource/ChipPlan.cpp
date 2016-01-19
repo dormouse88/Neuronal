@@ -22,20 +22,30 @@ void ChipPlan::RegisterReferer(std::shared_ptr<RefererInterface> ref)
 }
 std::shared_ptr<RefererInterface> ChipPlan::GetReferer()
 {
-    return referer.lock();
+    return referer;
 }
 std::shared_ptr<ChipHandle> ChipPlan::GetHandle()
 {
-    return std::dynamic_pointer_cast<ChipHandle>( referer.lock() );
+    return std::dynamic_pointer_cast<ChipHandle>( referer );
 }
 
 
 
-void ChipPlan::ReceiveCharge(bool charge, int weight, int slot)
+//void ChipPlan::ReceiveCharge(bool charge, int weight, int slot)
+//{
+//    auto notDead = referer.lock();
+//    if (notDead) notDead->StepOut(charge, slot);
+//}
+void ChipPlan::Refresh(int slot)
 {
-    auto notDead = referer.lock();
-    if (notDead) notDead->StepOut(charge, slot);
+    referer->StepOutRefresh(slot);
 }
+bool ChipPlan::GetOutgoingCharge(int slot)
+{
+    return referer->StepOutGetOutgoingCharge(slot);
+}
+
+
 
 bool ChipPlan::CanRegisterIn(int slot) const
 {
@@ -47,9 +57,17 @@ bool ChipPlan::CanRegisterOut(int slot) const
 }
 
 
-void ChipPlan::StepIn(bool charge, int slot)
+//void ChipPlan::StepIn(bool charge, int slot)
+//{
+//    PushCharge(charge, slot);
+//}
+void ChipPlan::StepInRefresh(int slot)
 {
-    PushCharge(charge, slot);
+    PropagateRefresh(slot);
+}
+bool ChipPlan::StepInGetOutgoingCharge(int slot)
+{
+    GetTotalIncomingCharge(slot);
 }
 
 void ChipPlan::PassOnAct()
@@ -144,8 +162,8 @@ void ChipPlan::SetModified()
     
     if (not modified)
     {
-        auto refLock = referer.lock();
-        if (refLock) refLock->SetModified();
+        if (referer)
+            referer->SetModified();
         modified = true;
     }
 }

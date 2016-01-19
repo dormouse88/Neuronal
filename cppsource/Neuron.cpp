@@ -86,32 +86,31 @@ void Neuron::InitVisuals()
     receivedText.setColor(sf::Color{100,100,100} );
 }
 
-void Neuron::Draw(sf::RenderTarget & rt) //, const Neuron & n)
+void Neuron::Draw(sf::RenderTarget & rt)
 {
-    const Neuron & n = *this;
-    sf::ConvexShape & shape = n.IsSimple() ? simpleShape : fullShape;
+    sf::ConvexShape & shape = IsSimple() ? simpleShape : fullShape;
     VectorWorld perceivedPos_;
-    perceivedPos_ = n.CalculateOffset(RECTANGLE);
+    perceivedPos_ = CalculateOffset(RECTANGLE);
     shape.setPosition( perceivedPos_ );
-    if (n.GetFiring())
+    if ( calculatedCharge_ )
         shape.setFillColor(sf::Color::Red);
     else
         shape.setFillColor(sf::Color(50,50,200) );
     rt.draw(shape);
     
-    if (not n.IsSimple()) {
-        thresholdText.setString( patch::to_string( n.GetThreshold() ) );
+    if (not IsSimple()) {
+        thresholdText.setString( patch::to_string( threshold_ ) );
         thresholdText.setPosition( perceivedPos_ + THRESHOLD_OFFSET );
         rt.draw(thresholdText);
     }
-    receivedText.setString( patch::to_string( n.GetReceivedCharge() ) );
+    receivedText.setString( patch::to_string( totalIncoming_ ) );
     receivedText.setPosition( perceivedPos_ + RECEIVED_OFFSET );
-    receivedText.setColor( n.IsThresholdMet() ? sf::Color::Red : sf::Color::Black );
+    receivedText.setColor( sf::Color::Yellow );
     rt.draw(receivedText);
 
-    if (n.HasBulb()) {
+    if (hasBulb_) {
         bulbShape.setPosition( perceivedPos_ );
-        if (n.GetBulbCharge())
+        if ( outgoingCharge_ )
             bulbShape.setFillColor(sf::Color::Red);
         else
             bulbShape.setFillColor(sf::Color(50,50,200) );
@@ -132,49 +131,78 @@ void Neuron::Draw(sf::RenderTarget & rt) //, const Neuron & n)
 Neuron::Neuron(int serial_p, sf::Vector2i pos_p, int threshold_p, std::shared_ptr<ChipPlan> cont)
     :Device(serial_p, pos_p, cont)
     ,hasBulb_(true)
-    ,bulbCharge_(false)
-    ,charge_(false)
+    ,calculatedCharge_(false)
+    ,intermediateCharge_(false)
+    ,outgoingCharge_(false)
     ,threshold_(threshold_p)
-    ,receivedNum_(0)
-    ,receivedSum_(0)
-    //,v(*this)
+    ,totalIncoming_(0)
 {
     InitVisuals();
 }
 
-void Neuron::ReceiveCharge(bool charge, int weight, int slot)
+//void Neuron::ReceiveCharge(bool charge, int weight, int slot)
+//{
+//    receivedNum_++;
+//    if (charge) receivedSum_ += weight;
+//    
+//    FireIfReady();
+//}
+void Neuron::Refresh(int slot)
 {
-    receivedNum_++;
-    if (charge) receivedSum_ += weight;
-    
-    FireIfReady();
+    //ask all inWires for charge state
+    //sum it all and set totalIncoming_
+    //compare to threshold and determine new charge state
+    //if (new state is different from current state)
+    //      set (charge_ to new state)
+    //      PropagateRefresh();
+    totalIncoming_ = GetTotalIncomingCharge();
+    bool newState = false;
+    if (totalIncoming_ >= threshold_)
+        newState = true;
+    if (calculatedCharge_ != newState)
+    {
+        calculatedCharge_ = newState;
+        if (not hasBulb_)
+        {
+            intermediateCharge_ = calculatedCharge_;
+            outgoingCharge_ = intermediateCharge_;
+            PropagateRefresh();
+        }
+    }
+}
+bool Neuron::GetOutgoingCharge(int slot)
+{
+    return outgoingCharge_;
 }
 
 void Neuron::LogicAct()
 {
-    if (hasBulb_)
-        PushCharge(bulbCharge_, 0);
-    if (GetInWiresNum() == 0)
-        FireIfReady();  //should do this ONLY if it has no inputs
+    outgoingCharge_ = intermediateCharge_;
+    PropagateRefresh();
+//    if (hasBulb_)
+//        PushCharge(bulbCharge_, 0);
+//    if (GetInWiresNum() == 0)
+//        FireIfReady();  //should do this ONLY if it has no inputs
 }
 
 void Neuron::LogicCalculate()
 {
-    if (hasBulb_)
-        bulbCharge_ = charge_;
-    receivedNum_ = 0;
-    receivedSum_ = 0;
+    intermediateCharge_ = calculatedCharge_;
+//    if (hasBulb_)
+//        bulbCharge_ = charge_;
+//    receivedNum_ = 0;
+//    receivedSum_ = 0;
 }
 
-void Neuron::FireIfReady()
-{
-    if (ReceivedAll())
-    {
-        charge_ = receivedSum_ >= threshold_;
-        if (not hasBulb_)
-            PushCharge(charge_, 0);
-    }
-}
+//void Neuron::FireIfReady()
+//{
+//    if (ReceivedAll())
+//    {
+//        charge_ = receivedSum_ >= threshold_;
+//        if (not hasBulb_)
+//            PushCharge(charge_, 0);
+//    }
+//}
 
 
 sf::Vector2f Neuron::GetWireAttachPos(WireAttachSide was) const
@@ -189,11 +217,20 @@ sf::Vector2f Neuron::GetWireAttachPos(WireAttachSide was) const
     return wirePos;
 }
 
-//void Neuron::Draw(sf::RenderTarget & rt) { v.Draw(rt, *this); }
 void Neuron::Handle(int code)
 {
-    if (code == 1) { threshold_ += 1; }
-    if (code == 2) { threshold_ -= 1;; }
-    if (code == 3) { hasBulb_ = not hasBulb_; bulbCharge_ = false; }
+    if (code == 1) {
+        threshold_ += 1;
+        Refresh(0);
+    }
+    if (code == 2) {
+        threshold_ -= 1;
+        Refresh(0);
+    }
+    if (code == 3) {
+        hasBulb_ = not hasBulb_;
+        outgoingCharge_ = calculatedCharge_;
+        PropagateRefresh();
+    }
     GetContainer()->SetModified();
 }

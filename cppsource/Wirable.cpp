@@ -33,17 +33,41 @@ void Wirable::CleanWireVectors() const //this method is necessary since the limi
     cleanVector(outWires);
 }
 
-void Wirable::PushCharge(bool firing, int slot)
+//void Wirable::PushCharge(bool firing, int slot)
+//{
+//    for (auto & w: outWires)
+//    {
+//        if (auto notDead = w.lock()) {
+//            if (notDead->GetFromSlot() == slot or slot == 0) {
+//                notDead->ReceiveCharge(firing);
+//            }
+//        }
+//    }
+//}
+void Wirable::PropagateRefresh(int slot)
 {
     for (auto & w: outWires)
     {
         if (auto notDead = w.lock()) {
             if (notDead->GetFromSlot() == slot or slot == 0) {
-                notDead->ReceiveCharge(firing);
+                notDead->Refresh();
             }
         }
     }
 }
+
+int Wirable::GetTotalIncomingCharge(int slot) const
+{
+    int total = 0;
+    for (auto w: inWires) {
+        auto lw = w.lock();
+        if (lw and (lw->GetToSlot() == slot or slot == 0) ) {
+            total += lw->GetOutgoingWeight();
+        }
+    }
+    return total;
+}
+
 
 
 bool Wirable::IsInSlotFree(int slot) const

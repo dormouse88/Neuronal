@@ -29,10 +29,37 @@ ChipHandle::ChipHandle(int serial_p, sf::Vector2i pos_p, std::shared_ptr<ChipPla
 }
 
 
-void ChipHandle::ReceiveCharge(bool charge, int weight, int slot)
+//void ChipHandle::ReceiveCharge(bool charge, int weight, int slot)
+//{
+//    if (plan) plan->StepIn(charge, slot);
+//}
+void ChipHandle::Refresh(int slot)
 {
-    if (plan) plan->StepIn(charge, slot);
+    if (plan) plan->StepInRefresh(slot);
+    //Something like this...
+    //(has charge state saved in a map or something (inPorts))
+    //
+    //bool newState = false;
+    //if ( inPorts.at(slot).GetTotalIncomingCharge() >= 1 )
+    //    newState = true;
+    //if (newState != inPorts.at(slot).charge) {
+    //    inPorts.at(slot).charge = newState;
+    //    PropagateRefresh(slot);
+    //}
 }
+
+//(Called on right hand side of handle by other device)
+bool ChipHandle::GetOutgoingCharge(int slot)
+{
+    if (plan)
+        return plan->StepInGetOutgoingCharge(slot);
+    else
+        return false;
+    //this perhaps?...
+    //return outPorts.at(slot).charge;
+}
+
+
 
 bool ChipHandle::IsSlotted(SlottedSide) const
 {
@@ -58,10 +85,26 @@ void ChipHandle::LogicCalculate()
 }
 
 //RefererInterface...
-void ChipHandle::StepOut(bool charge, int slot)
+//void ChipHandle::StepOut(bool charge, int slot)
+//{
+//    PushCharge(charge, slot);
+//}
+
+//(called by plan onto right hand side of handle)
+void ChipHandle::StepOutRefresh(int slot)
 {
-    PushCharge(charge, slot);
+    PropagateRefresh(slot);
 }
+
+//(called by plan onto left hand side of handle)
+bool ChipHandle::StepOutGetOutgoingCharge(int slot)
+{
+    if (GetTotalIncomingCharge(slot) >= 1)
+        return true;
+    else
+        return false;
+}
+
 void ChipHandle::SetModified()
 {
     auto cont = GetContainer();

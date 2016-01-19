@@ -19,14 +19,24 @@ BaseReferer::BaseReferer()
 
 
 //RefererInterface...
-void BaseReferer::StepOut(bool charge, int slot)
+//void BaseReferer::StepOut(bool charge, int slot)
+//{
+//    if (outputs.count(slot) > 0)
+//    {
+//        outputs.at(slot).charge = charge;
+//        if (charge) outputsReady = true;
+//    }
+//}
+void BaseReferer::StepOutRefresh(int slot)
 {
-    if (outputs.count(slot) > 0)
-    {
-        outputs.at(slot).charge = charge;
-        if (charge) outputsReady = true;
-    }
+    
 }
+bool BaseReferer::StepOutGetOutgoingCharge(int slot)
+{
+    
+}
+
+
 void BaseReferer::SetModified()
 {
     ;
@@ -71,7 +81,7 @@ void BaseReferer::TickOnce()
     {
         for (auto &x: inputs)
         {
-            basePlan->StepIn(x.second.charge, x.second.slot);
+            //basePlan->StepIn(x.second.charge, x.second.slot);
         }
         basePlan->PassOnCalculate();
         basePlan->PassOnAct();

@@ -24,7 +24,10 @@ public:
     virtual void Handle(int code) override;
     
     //Wirable...
-    virtual void ReceiveCharge(bool charge, int weight, int slot) override;
+    //virtual void ReceiveCharge(bool charge, int weight, int slot) override;
+    virtual void Refresh(int slot) override;
+    virtual bool GetOutgoingCharge(int slot) override;
+
     virtual VectorWorld GetWireAttachPos(WireAttachSide was) const override;
     virtual bool IsSlotted(SlottedSide) const override;
     virtual bool CanRegisterIn(int slot) const override;
@@ -36,7 +39,9 @@ public:
     virtual VectorDumb GetPlodedSize() override;
 
     //RefererInterface...
-    virtual void StepOut(bool charge, int slot) override;
+    //virtual void StepOut(bool charge, int slot) override;
+    virtual void StepOutRefresh(int slot) override;
+    virtual bool StepOutGetOutgoingCharge(int slot) override;
     virtual void SetModified() override;
     virtual void SetSubPlan(std::shared_ptr<ChipPlan>, std::shared_ptr<RefererInterface>) override;
     virtual std::shared_ptr<ChipPlan> GetSubPlan() override;

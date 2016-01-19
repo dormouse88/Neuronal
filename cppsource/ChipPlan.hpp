@@ -10,7 +10,7 @@
 
 #include <memory>
 #include <vector>
-#include "Gobject.hpp"
+#include "PlanOwned.hpp"
 #include "Wirable.hpp"
 #include "Device.hpp"
 #include "Wire.hpp"
@@ -32,16 +32,19 @@ public:
     std::shared_ptr<RefererInterface> GetReferer();
     std::shared_ptr<ChipHandle> GetHandle();
 
-    //RED//virtual std::string SerialName() const { return "PLAN";}
-    
     //Wirable...
-    virtual void ReceiveCharge(bool charge, int weight, int slot) override;
+    //virtual void ReceiveCharge(bool charge, int weight, int slot) override;
+    virtual void Refresh(int slot) override;
+    virtual bool GetOutgoingCharge(int slot) override;
+    
     virtual VectorWorld GetWireAttachPos(WireAttachSide was) const override;
     virtual bool IsSlotted(SlottedSide) const override                                                  {return true;}
     virtual bool CanRegisterIn(int slot) const override;
     virtual bool CanRegisterOut(int slot) const override;
     
-    void StepIn(bool charge, int slot);
+    //void StepIn(bool charge, int slot);
+    void StepInRefresh(int slot);
+    bool StepInGetOutgoingCharge(int slot);
     void PassOnAct();
     void PassOnCalculate();
 
@@ -89,7 +92,7 @@ private:
     int planID;
     std::shared_ptr<const UserData> userData_;
     std::shared_ptr<PlanGrid> planGrid;
-    std::weak_ptr<RefererInterface> referer;
+    std::shared_ptr<RefererInterface> referer;
     std::vector<std::shared_ptr<Device> > devices;
     std::vector<std::shared_ptr<Wire> > wires;
     bool modified;

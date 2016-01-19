@@ -23,7 +23,10 @@ public:
     virtual ~Wirable() {}
 
     //Virtuals...
-    virtual void ReceiveCharge(bool charge, int weight, int slot) = 0;
+    //virtual void ReceiveCharge(bool charge, int weight, int slot) = 0;
+    virtual void Refresh(int slot) = 0;
+    virtual bool GetOutgoingCharge(int slot) = 0;
+    
     virtual VectorWorld GetWireAttachPos(WireAttachSide) const = 0;
     virtual bool IsWeightedIn() const                   {return false;}
     virtual bool IsSlotted(SlottedSide) const           {return false;}
@@ -38,8 +41,11 @@ public:
     int GetOutWiresNum() const              { CleanWireVectors(); return outWires.size(); }
     bool IsInSlotFree(int slot) const;
     bool IsOutSlotFree(int slot) const;
+
 protected:
-    void PushCharge(bool charge, int slot = 0);
+    //void PushCharge(bool charge, int slot = 0);
+    void PropagateRefresh(int slot = 0);
+    int GetTotalIncomingCharge(int slot = 0) const;
 private:
     void CleanWireVectors() const;
     mutable std::vector<std::weak_ptr<Wire> > inWires;

@@ -11,6 +11,8 @@
 #include <SFML/Graphics.hpp>
 #include "miscUtil.hpp"
 #include "ViewResources.hpp"
+#include "PlanOwned.hpp"
+class Wirable;  //fwd dec
 
 const int SLOT_MAX = 99;
 
@@ -33,10 +35,6 @@ private:
 
 
 
-
-#include "Gobject.hpp"
-class Wirable;
-
 class Wire : public PlanOwned
 {
 public:
@@ -44,11 +42,13 @@ public:
 
     virtual std::string SerialName() const { return "WIRE";}
 
-    void ReceiveCharge(bool f);
+    //void ReceiveCharge(bool f);
+    void Refresh();
+    int GetOutgoingWeight() const          { if (firing) return weight; else return 0;}
     
-    bool GetFiring() const {return firing;}
-    int GetWeight() const {return weight;}
-    void SetWeight(int w) {weight = w;}
+    bool GetFiring() const {return firing;}     //for drawing only
+    int GetWeight() const {return weight;}      //for drawing only
+    void SetWeight(int w) {weight = w;}         //for drawing only
 
     const Wirable& GetFrom() const {return from; }
     const int GetFromSlot() const {return fromSlot; }

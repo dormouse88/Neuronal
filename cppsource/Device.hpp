@@ -11,7 +11,7 @@
 #include <memory>
 #include <SFML/System.hpp>  //for sf::Vector
 #include "Wirable.hpp"
-#include "Gobject.hpp"
+#include "PlanOwned.hpp"
 #include "ViewResources.hpp"
 class ChipPlan; //fwd dec
 #include "PlanPos.hpp"

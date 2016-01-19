@@ -38,7 +38,9 @@ public:
     BaseReferer();
     
     //RefererInterface...
-    virtual void StepOut(bool charge, int slot) override;
+    //virtual void StepOut(bool charge, int slot) override;
+    virtual void StepOutRefresh(int slot) override;
+    virtual bool StepOutGetOutgoingCharge(int slot) override;
     virtual void SetModified() override;
     virtual void SetSubPlan(std::shared_ptr<ChipPlan>, std::shared_ptr<RefererInterface>) override;
     virtual std::shared_ptr<ChipPlan> GetSubPlan() override;

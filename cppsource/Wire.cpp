@@ -7,7 +7,7 @@
 
 #include "Wire.hpp"
 #include "ChipPlan.hpp"  //to call SetModified()
-#include "Wirable.hpp"  //to use all the functions via 'to' and 'from'
+#include "Wirable.hpp"  //fwd dec  //to use all the functions via 'to' and 'from'
 #include <cassert>
 
 const float BACKBOARD_PADDING = 4.f;
@@ -136,11 +136,20 @@ Wire::Wire(Wirable & from_p, int fromSlot_p, Wirable & to_p, int toSlot_p, signe
     :PlanOwned(cont), v(*this), from(from_p), fromSlot(fromSlot_p), to(to_p), toSlot(toSlot_p), weight(weight_p), firing(false)
 {}
 
-void Wire::ReceiveCharge(bool f)
+//void Wire::ReceiveCharge(bool f)
+//{
+//    firing = f;
+//    to.ReceiveCharge(firing, weight, toSlot);
+//}
+void Wire::Refresh()
 {
-    firing = f;
-    to.ReceiveCharge(firing, weight, toSlot);
+    bool newState = from.GetOutgoingCharge(fromSlot);
+    if (newState != firing) {
+        firing = newState;
+        to.Refresh(toSlot);
+    }
 }
+
 
 void Wire::Draw(sf::RenderTarget & rt) { v.Draw(rt, *this); }
 void Wire::Handle(int code)
