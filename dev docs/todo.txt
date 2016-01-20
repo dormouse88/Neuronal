@@ -42,7 +42,7 @@ Inbetween
 	Split view for arena/brain
 	Tools to make cat plans (plan exporting) (related to db trimming)
 	Allow viewing of cat brains. (if only for debugging and level design)
-	More robust XML loading (with feedback on failures) + omit default values when saving.
+	More robust XML loading (with feedback on failures)
 
 
 OuterGame

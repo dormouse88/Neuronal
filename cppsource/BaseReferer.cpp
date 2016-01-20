@@ -39,6 +39,7 @@ void BaseReferer::SetSubPlan(std::shared_ptr<ChipPlan> p, std::shared_ptr<Refere
 {
     basePlan = p;
     p->RegisterReferer( myself );
+    RefreshOutputs();
 }
 std::shared_ptr<ChipPlan> BaseReferer::GetSubPlan()
 {

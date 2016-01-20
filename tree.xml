@@ -36,6 +36,7 @@
 	<NAME i="14" n="4BITDEC" />
 	<NAME i="64" n="NEWADD" />
 	<NAME i="66" n="SIMPLERESPONSE" />
+	<NAME i="67" n="@K" />
 </NAMES>
 <RELATIVES>
 	<REL i="1" anc="0" />
@@ -104,6 +105,7 @@
 	<REL i="64" anc="63" />
 	<REL i="65" anc="0" />
 	<REL i="66" anc="65" />
+	<REL i="67" anc="0" />
 </RELATIVES>
 <PLANS>
 	<PLAN_DB HIGHEST_ID="62" />
@@ -2634,5 +2636,15 @@
 		<WIRE f="6" t="0" w="1" fs="0" ts="3" />
 		<WIRE f="2" t="6" w="1" fs="0" ts="0" />
 		<WIRE f="3" t="5" w="1" fs="0" ts="0" />
+	</PLAN>
+	<PLAN i="67">
+		<NEUR i="1" x="-1" y="0" bulb="1" />
+		<NEUR i="2" x="1" y="0" bulb="1" />
+		<NEUR i="3" x="2" y="-1" bulb="1" />
+		<NEUR i="4" x="3" y="0" bulb="0" />
+		<WIRE f="1" t="2" />
+		<WIRE f="2" t="3" />
+		<WIRE f="3" t="4" />
+		<WIRE f="4" t="0" ts="1" />
 	</PLAN>
 </PLANS>

@@ -33,11 +33,14 @@ std::shared_ptr<ChipHandle> ChipPlan::GetHandle()
 
 void ChipPlan::Refresh(int slot)
 {
-    referer->StepOutRefresh(slot);
+    if (referer)
+        referer->StepOutRefresh(slot);
 }
 bool ChipPlan::GetOutgoingCharge(int slot)
 {
-    return referer->StepOutGetOutgoingCharge(slot);
+    if (referer)
+        return referer->StepOutGetOutgoingCharge(slot);
+    return false;
 }
 
 

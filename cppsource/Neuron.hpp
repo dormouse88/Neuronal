@@ -20,7 +20,7 @@ typedef bool Charge;
 class Neuron : public Device
 {
 public:
-    Neuron(int serial_p, sf::Vector2i pos_p, int threshold_p, std::shared_ptr<ChipPlan> cont);
+    Neuron(int serial, sf::Vector2i pos, int threshold, bool hasBulb, std::shared_ptr<ChipPlan> cont);
     virtual ~Neuron() {;}
 
     //PlanOwned...
@@ -41,6 +41,7 @@ public:
     
     bool IsSimple() const                       {return threshold_ == 1;}
     int GetThreshold() const                    {return threshold_;}   //for serializer
+    bool HasBulb() const                        {return hasBulb_;}     //for serializer
 //    bool IsThresholdMet() const                 {return receivedSum_ >= threshold_; }  //for drawing only
 //    bool GetFiring() const                      {return calculatedCharge_;}                      //for drawing only
 //    int GetReceivedCharge() const               {return receivedSum_;}                 //for drawing only

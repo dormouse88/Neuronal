@@ -10,16 +10,17 @@
 
 std::shared_ptr<Neuron> BlobFactory::AddNeuron(PlanPos pos)
 {
-    if (pos.IsLocated()) return AddNeuron(pos.GetPlan(), 0, pos.GetSmartPos(), 1);
+    if (pos.IsLocated()) return AddNeuron(pos.GetPlan(), 0, pos.GetSmartPos(), 1, false);
     else return nullptr;
 }
-std::shared_ptr<Neuron> BlobFactory::AddNeuron(std::shared_ptr<ChipPlan> plan, int serial, VectorSmart pos, int threshold)
+std::shared_ptr<Neuron> BlobFactory::AddNeuron(std::shared_ptr<ChipPlan> plan, int serial, VectorSmart pos, int threshold, bool hasBulb)
 {
     if (serial == 0) serial = plan->GetFreeSerial();
     if (plan->IsPositionFree(pos) and plan->IsSerialFree(serial))
     {
-        auto mp = std::make_shared<Neuron> (serial, pos, threshold, plan);
+        auto mp = std::make_shared<Neuron> (serial, pos, threshold, hasBulb, plan);
         plan->ImportDevice(mp);
+        mp->Refresh(0);
         return mp;
     }
     return nullptr;

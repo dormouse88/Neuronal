@@ -16,11 +16,14 @@
 #include "UserData.hpp"  //fwd dec
 #include "Arena.hpp" //fwd dec
 
-
-
 const char XML_USER_FILENAME [] = "tree.xml";
 const char XML_LEVELS_FILENAME [] = "levels1.xml";
 
+const int  XMLD_NEUR_THR {1};
+const bool XMLD_NEUR_BULB {true};
+const int XMLD_WIRE_FS {0};
+const int XMLD_WIRE_TS {0};
+const int XMLD_WIRE_W {1};
 
 Serializer::Serializer()
     :userDoc_()
@@ -215,7 +218,9 @@ bool Serializer::SavePlanRecursively(pugi::xml_node container, std::shared_ptr<C
                 dev.append_attribute("i").set_value(d->GetSerial() );
                 dev.append_attribute("x").set_value(d->GetSmartPos().x);
                 dev.append_attribute("y").set_value(d->GetSmartPos().y);
-                dev.append_attribute("thr").set_value(n->GetThreshold() );
+                if (n->GetThreshold() != XMLD_NEUR_THR)
+                    dev.append_attribute("thr").set_value(n->GetThreshold() );
+                dev.append_attribute("bulb").set_value( n->HasBulb() ? 1 : 0 );     //(can stop saving bulb attribute for default value once legacy xml has all gone far away)
             }
             else if (d->SerialName() == "HAND")
             {
@@ -231,13 +236,6 @@ bool Serializer::SavePlanRecursively(pugi::xml_node container, std::shared_ptr<C
                 if (p) pID = p->planID;
                 dev.append_attribute("link").set_value(pID);
             }
-//            else if (d->SerialName() == "JUMP")
-//            {
-//                pugi::xml_node dev = plan.append_child("JUMP");
-//                dev.append_attribute("i").set_value(d->GetSerial() );
-//                dev.append_attribute("x").set_value(d->GetSmartPos().x);
-//                dev.append_attribute("y").set_value(d->GetSmartPos().y);
-//            }
         }
         for (auto w: plan_p->wires) {
             //Rather ugly. RTTI using raw pointers.
@@ -252,9 +250,12 @@ bool Serializer::SavePlanRecursively(pugi::xml_node container, std::shared_ptr<C
             pugi::xml_node wire = plan.append_child("WIRE");
             wire.append_attribute("f").set_value(fserial);
             wire.append_attribute("t").set_value(tserial);
-            wire.append_attribute("w").set_value(w->GetWeight());
-            wire.append_attribute("fs").set_value(w->GetFromSlot());
-            wire.append_attribute("ts").set_value(w->GetToSlot());
+            if (w->GetWeight() != XMLD_WIRE_W)
+                wire.append_attribute("w").set_value(w->GetWeight());
+            if (w->GetFromSlot() != XMLD_WIRE_FS)
+                wire.append_attribute("fs").set_value(w->GetFromSlot());
+            if (w->GetToSlot() != XMLD_WIRE_TS)
+                wire.append_attribute("ts").set_value(w->GetToSlot());
         }
         plan_p->modified = false;
         return true;
@@ -290,24 +291,24 @@ std::shared_ptr<ChipPlan> Serializer::LoadPlanRecursively(pugi::xml_node contain
         for (pugi::xml_node device = xmlPlan.child("NEUR"); device; device = device.next_sibling("NEUR"))
         {
             sf::Vector2i pos { device.attribute("x").as_int(), device.attribute("y").as_int() };
-            int threshold { device.attribute("thr").as_int() };
+            int threshold { device.attribute("thr").as_int(XMLD_NEUR_THR) };
+            bool hasBulb { device.attribute("bulb").as_bool(XMLD_NEUR_BULB) };
             int serial { device.attribute("i").as_int() };
-            factory->AddNeuron(memPlan, serial, pos, threshold);
+            factory->AddNeuron(memPlan, serial, pos, threshold, hasBulb);
         }
         for (pugi::xml_node device = xmlPlan.child("JUMP"); device; device = device.next_sibling("JUMP"))
         {
             sf::Vector2i pos { device.attribute("x").as_int(), device.attribute("y").as_int() };
             int serial { device.attribute("i").as_int() };
-            auto n = factory->AddNeuron(memPlan, serial, pos, 1);
-            n->Handle(3);
+            auto n = factory->AddNeuron(memPlan, serial, pos, 1, false);
         }
         for (pugi::xml_node wire = xmlPlan.child("WIRE"); wire; wire = wire.next_sibling("WIRE"))
         {
             int from { wire.attribute("f").as_int() };
             int to { wire.attribute("t").as_int() };
-            int fromSlot { wire.attribute("fs").as_int() };
-            int toSlot { wire.attribute("ts").as_int() };
-            int weight { wire.attribute("w").as_int() };
+            int fromSlot { wire.attribute("fs").as_int(XMLD_WIRE_FS) };
+            int toSlot { wire.attribute("ts").as_int(XMLD_WIRE_TS) };
+            int weight { wire.attribute("w").as_int(XMLD_WIRE_W) };
             
             std::shared_ptr<Wirable> fromDev = memPlan;
             if (from != 0) fromDev = memPlan->GetDevice(from);

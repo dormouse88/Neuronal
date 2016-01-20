@@ -127,13 +127,13 @@ void Neuron::Draw(sf::RenderTarget & rt)
  * @param pos_p
  * @param threshold_p
  */
-Neuron::Neuron(int serial_p, sf::Vector2i pos_p, int threshold_p, std::shared_ptr<ChipPlan> cont)
-    :Device(serial_p, pos_p, cont)
-    ,hasBulb_(true)
+Neuron::Neuron(int serial, sf::Vector2i pos, int threshold, bool hasBulb, std::shared_ptr<ChipPlan> cont)
+    :Device(serial, pos, cont)
+    ,hasBulb_(hasBulb)
     ,calculatedCharge_(false)
     ,intermediateCharge_(false)
     ,outgoingCharge_(false)
-    ,threshold_(threshold_p)
+    ,threshold_(threshold)
     ,totalIncoming_(0)
 {
     InitVisuals();

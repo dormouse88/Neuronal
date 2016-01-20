@@ -20,9 +20,7 @@ class BlobFactory
 public:
     BlobFactory(std::shared_ptr<UserData> ud) :userData_(ud) {}
     std::shared_ptr<Neuron>     AddNeuron(PlanPos pos);
-    std::shared_ptr<Neuron>     AddNeuron(std::shared_ptr<ChipPlan> plan, int serial, VectorSmart pos, int threshold);
-//    std::shared_ptr<Jumper>     AddJumper(PlanPos pos);
-//    std::shared_ptr<Jumper>     AddJumper(std::shared_ptr<ChipPlan> plan, int serial, VectorSmart pos);
+    std::shared_ptr<Neuron>     AddNeuron(std::shared_ptr<ChipPlan> plan, int serial, VectorSmart pos, int threshold, bool hasBulb);
     std::shared_ptr<ChipHandle> AddHandle(PlanPos pos);
     std::shared_ptr<ChipHandle> AddHandle(std::shared_ptr<ChipPlan> plan, int serial, VectorSmart pos);
     
