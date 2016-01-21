@@ -32,6 +32,8 @@ struct XPuts
 };
 typedef std::shared_ptr<std::set<std::string> > XPutFilter;
 
+
+
 class BaseReferer : public RefererInterface
 {
 public:
@@ -47,17 +49,17 @@ public:
     void DefineXputs(XPuts all, XPutFilter filter);
     void SetInputState(std::string, bool);
     void TickOnce();
+    bool IsAnyOutputOn() const;
+    std::map<std::string, bool> GetOutputs();
 
     void DrawBrain(sf::RenderTarget & rt);
     
-    bool IsAnyOutputOn() const;
-    std::map<std::string, bool> GetOutputs();
 private:
     void RefreshOutputs();
 
-    std::map<std::string, SlotData > inputs;
-    std::map<int, SlotData > outputs;
-    std::shared_ptr<ChipPlan> basePlan;
+    std::map<std::string, SlotData > inputs_;
+    std::map<int, SlotData > outputs_;
+    std::shared_ptr<ChipPlan> subPlan_;
 };
 
 

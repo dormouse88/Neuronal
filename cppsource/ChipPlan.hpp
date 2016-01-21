@@ -37,7 +37,7 @@ public:
     virtual bool GetOutgoingCharge(int slot) override;
     virtual VectorWorld GetWireAttachPos(WireAttachSide was) const override;
 
-    virtual bool IsSlotted(SlottedSide) const override                                                  {return true;}
+    virtual bool IsSlotted(SlottedSide) const override      {return true;}
     virtual bool CanRegisterIn(int slot) const override;
     virtual bool CanRegisterOut(int slot) const override;
 
@@ -52,7 +52,7 @@ public:
     int GetFreeSerial() const;
     bool IsSerialFree(int serial) const;
     bool IsPositionFree(VectorSmart pos) const;
-    int GetPlanID() const                                                                               {return planID;}
+    int GetPlanID() const                                   {return planID;}
 
     void ImportDevice(std::shared_ptr<Device> device);
     void ImportWire(std::shared_ptr<Wire> wire);
@@ -61,10 +61,10 @@ public:
     void CleanVectors();
 
     void SetModified();
-    bool IsModified()                                                                                   {return modified;}
-    bool IsEmpty()                                                                                      {return devices.empty() and wires.empty();}
+    bool IsModified()                                       {return modified;}
+    bool IsEmpty()                                          {return devices.empty() and wires.empty();}
     
-    std::shared_ptr<PlanGrid> GetGrid()                                                                 {return planGrid;}
+    std::shared_ptr<PlanGrid> GetGrid()                     {return planGrid;}
     std::shared_ptr<Device> GetDevice(VectorSmart pos);
     std::shared_ptr<Device> GetDevice(int serial);
     std::shared_ptr<Wire> GetWire(const Wirable& from, const Wirable& to);
@@ -75,10 +75,13 @@ public:
     PlanRect GetSmartPaddedBound() const;
     RectDumb GetDumbPaddedBound() const;
     RectWorld GetWorldPaddedBound() const;
+    RectWorld GetWorldPaddedBoundBox() const;
+    RectWorld GetWorldPaddedBoundPlusPorts() const;
+    RectWorld GetWorldPaddedBoundMinusPorts() const;
     
-    void SetPadding(int thickness)                                                                      {padding = thickness;}
+    void SetPadding(int thickness)                        {padding = thickness;}
     void PlodeRefresh(VectorSmart point);
-    void PlodeRefresh();
+    void PlodeRefreshOutwards();
     
     void DrawBox(sf::RenderTarget & rt);
     void DrawTitle(sf::RenderTarget & rt);

@@ -261,7 +261,7 @@ void View::Clamp()
     auto clampPlan = GetViewBasePlan(); //cursorOne.GetPlanPos().GetPlan();
     if (clampPlan and false) //CLAMP IS TEMPORARILY DISABLED!!  Because the arena and brain are drawn together at the moment.
     {
-        RectWorld b = clampPlan->GetWorldPaddedBound();
+        RectWorld b = clampPlan->GetWorldPaddedBoundPlusPorts();  //unimportant
         auto center = mainView.getCenter();
         auto viewSize = mainView.getSize();
         VectorWorld size = viewSize - VectorWorld{120.f, 120.f};

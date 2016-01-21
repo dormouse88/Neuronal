@@ -25,7 +25,12 @@ CONSIDER: Multichannel wires.
 							On each ChipHandle::ReceiveCharge(), ChipHandle calls the Socket with the corresponding slot to pass it the charge and ask if it is ready to compute its fire value. When it is ready, ChipHandle passes it on to the ChipPlan with the slot value as usual.
 							On each ChipPlan::ReceiveCharge(), the plan passes the charge to ChipHandle using StepOut() as usual. ChipHandle then calls (informs+queries) the appropriate output Socket.
 							That way ChipHandle can contain and manage the input and output sockets. ChipPlan stays oblivious to the change.
-						
+		CONSIDERATION:
+			What does this proposition actually amount to?
+				Loosening the wiring limitation
+					from [wires must have a unique combination of: from, to]
+					to   [wires must have a unique combination of: from, to, fromSlot, toSlot]
+				OBS: This is how the system used to work, but I changed it to avoid the UI issue of wires on top of each other.
 
 CONSIDER: Named Slots.
 	OBS: Handle-to-plan slot matching could work with names just the same as it does with numbers.

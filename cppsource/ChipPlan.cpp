@@ -31,6 +31,7 @@ std::shared_ptr<ChipHandle> ChipPlan::GetHandle()
 
 
 
+//Wirable...
 void ChipPlan::Refresh(int slot)
 {
     if (referer)
@@ -42,8 +43,22 @@ bool ChipPlan::GetOutgoingCharge(int slot)
         return referer->StepOutGetOutgoingCharge(slot);
     return false;
 }
-
-
+VectorWorld ChipPlan::GetWireAttachPos(WireAttachSide was) const
+{
+    sf::Vector2f wirePos;
+    auto bound = GetWorldPaddedBoundBox();  //box
+    //Because ChipPlans are wired internally, the wires come OUT of the left...
+    if (was == WireAttachSide::OUT)
+    {
+        wirePos.x = bound.left;
+    }
+    if (was == WireAttachSide::IN)
+    {
+        wirePos.x = bound.left + bound.width;
+    }
+    wirePos.y = bound.top + (0.5 * bound.height);
+    return wirePos;
+}
 
 bool ChipPlan::CanRegisterIn(int slot) const
 {
@@ -55,15 +70,19 @@ bool ChipPlan::CanRegisterOut(int slot) const
 }
 
 
+
+//"Referred"...
 void ChipPlan::StepInRefresh(int slot)
 {
     PropagateRefresh(slot);
 }
 bool ChipPlan::StepInGetOutgoingCharge(int slot)
 {
-    GetTotalIncomingCharge(slot);
+    if ( GetTotalIncomingWeight(slot) > 1 )
+        return true;
+    else
+        return false;
 }
-
 void ChipPlan::PassOnAct()
 {
     for (auto & d: devices) d->InnerStep();
@@ -73,8 +92,12 @@ void ChipPlan::PassOnCalculate()
     for (auto & d: devices) d->PreInnerStep();
 }
 
-/////////////////////////////
 
+
+
+
+
+/////////////////////////////////////////
 
 void ChipPlan::SetPosition(Device & d, VectorSmart newPos)
 {
@@ -219,23 +242,6 @@ std::vector<std::shared_ptr<Wire> > ChipPlan::GetWires(std::shared_ptr<Wirable> 
 }
 
 
-VectorWorld ChipPlan::GetWireAttachPos(WireAttachSide was) const
-{
-    sf::Vector2f wirePos;
-    auto bound = GetWorldPaddedBound();
-    //Because ChipPlans are wired internally, the wires come OUT of the left...
-    if (was == WireAttachSide::OUT)
-    {
-        wirePos.x = bound.left;
-    }
-    if (was == WireAttachSide::IN)
-    {
-        wirePos.x = bound.left + bound.width;
-    }
-    wirePos.y = bound.top + (0.5 * bound.height);
-    return wirePos;
-}
-
 void ChipPlan::RecalculateSmartInnerBound()
 {
     PlanRect pr;
@@ -267,7 +273,7 @@ void ChipPlan::RecalculateSmartInnerBound()
     if (not (pr == smartInnerBound))
     {
         smartInnerBound = pr;
-        PlodeRefresh();
+        PlodeRefreshOutwards();
     }
 }
 PlanRect ChipPlan::GetSmartInnerBound() const
@@ -286,8 +292,30 @@ RectDumb ChipPlan::GetDumbPaddedBound() const
 }
 RectWorld ChipPlan::GetWorldPaddedBound() const
 {
+    assert(false);
     auto pr = GetSmartPaddedBound();
     return pr.GetRectWorld();
+}
+RectWorld ChipPlan::GetWorldPaddedBoundBox() const
+{
+    PlanRect pr = GetSmartPaddedBound();
+    RectWorld rw = pr.GetRectWorld();
+    rw.left += pr.tl.GetWorldSizeOf().x * 0.5f;
+    rw.width -= pr.br.GetWorldSizeOf().x * 1.0f;
+    return rw;
+}
+RectWorld ChipPlan::GetWorldPaddedBoundPlusPorts() const
+{
+    auto pr = GetSmartPaddedBound();
+    return pr.GetRectWorld();
+}
+RectWorld ChipPlan::GetWorldPaddedBoundMinusPorts() const
+{
+    PlanRect pr = GetSmartPaddedBound();
+    RectWorld rw = pr.GetRectWorld();
+    rw.left += pr.tl.GetWorldSizeOf().x * 1.f;
+    rw.width -= pr.br.GetWorldSizeOf().x * 2.0f;
+    return rw;
 }
 
 
@@ -309,10 +337,10 @@ void ChipPlan::PlodeRefresh(VectorSmart point)
     planGrid->SetSizeX(point.x, xMaxSize);
     planGrid->SetSizeY(point.y, yMaxSize);
     //Propagate recursively...
-    PlodeRefresh();
+    PlodeRefreshOutwards();
 }
 
-void ChipPlan::PlodeRefresh()
+void ChipPlan::PlodeRefreshOutwards()
 {
     //Plode refresh recursively back to base plan...
     auto refLock = GetHandle();
@@ -322,6 +350,11 @@ void ChipPlan::PlodeRefresh()
     }
 }
 
+
+
+
+
+
 void ChipPlan::DrawBox(sf::RenderTarget & rt)
 {
     sf::Color randCol {
@@ -330,11 +363,11 @@ void ChipPlan::DrawBox(sf::RenderTarget & rt)
         ,static_cast<sf::Uint8>( ((GetPlanID()+ 130) * 25000) % 255 )
     };
     if (IsEmpty()) randCol = sf::Color::Black;
-    auto pB = GetWorldPaddedBound();
+    auto pB = GetWorldPaddedBoundBox(); //box
     sf::RectangleShape planBox;
     planBox.setFillColor( randCol * sf::Color{70,70,70} );
     planBox.setOutlineColor( sf::Color{95,95,95} );
-    planBox.setOutlineThickness(6.f);
+    planBox.setOutlineThickness(-5.f);
     planBox.setPosition( sf::Vector2f{pB.left, pB.top} );
     planBox.setSize( sf::Vector2f{pB.width, pB.height} );
     rt.draw(planBox);
@@ -351,7 +384,7 @@ void ChipPlan::DrawBox(sf::RenderTarget & rt)
 }
 void ChipPlan::DrawTitle(sf::RenderTarget & rt)
 {
-    auto pB = GetWorldPaddedBound();
+    auto pB = GetWorldPaddedBoundMinusPorts();  //unimportant
     sf::Text planNumText;
     planNumText.setFont( ViewResources::GetInstance().font );
     std::string textString { patch::to_string(GetPlanID()) };
@@ -374,7 +407,7 @@ void ChipPlan::DrawGridLines(sf::RenderTarget & rt)
 {
     if (IsEmpty()) return;
     sf::Color lineCol {14,24,34};
-    auto pB = GetWorldPaddedBound();
+    auto pB = GetWorldPaddedBoundBox();  //box i guess
     PlanRect r = GetSmartPaddedBound();
     for (int i = r.tl.GetSmartPos().y + 1; i <= r.br.GetSmartPos().y; i++)
     {
@@ -420,6 +453,8 @@ void ChipPlan::Draw(sf::RenderTarget & rt)
 {
     SubDraw(rt);
 }
+
+
 
 
 

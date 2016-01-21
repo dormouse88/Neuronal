@@ -29,124 +29,16 @@ ChipHandle::ChipHandle(int serial_p, sf::Vector2i pos_p, std::shared_ptr<ChipPla
 }
 
 
-void ChipHandle::Refresh(int slot)
-{
-    if (plan) plan->StepInRefresh(slot);
-    //Something like this...
-    //(has charge state saved in a map or something (inPorts))
-    //
-    //bool newState = false;
-    //if ( inPorts.at(slot).GetTotalIncomingCharge() >= 1 )
-    //    newState = true;
-    //if (newState != inPorts.at(slot).charge) {
-    //    inPorts.at(slot).charge = newState;
-    //    PropagateRefresh(slot);
-    //}
-}
-
-//(Called on right hand side of handle by other device)
-bool ChipHandle::GetOutgoingCharge(int slot)
-{
-    if (plan)
-        return plan->StepInGetOutgoingCharge(slot);
-    else
-        return false;
-    //this perhaps?...
-    //return outPorts.at(slot).charge;
-}
 
 
-
-bool ChipHandle::IsSlotted(SlottedSide) const
-{
-    return true;
-}
-
-bool ChipHandle::CanRegisterIn(int slot) const
-{
-    return IsInSlotFree(slot);
-}
-bool ChipHandle::CanRegisterOut(int slot) const
-{
-    return IsOutSlotFree(slot);
-}
-
-void ChipHandle::InnerStep()
-{
-    if (plan) plan->PassOnAct();
-}
-void ChipHandle::PreInnerStep()
-{
-    if (plan) plan->PassOnCalculate();
-}
-
-//(called by plan onto right hand side of handle)
-void ChipHandle::StepOutRefresh(int slot)
-{
-    PropagateRefresh(slot);
-}
-
-//(called by plan onto left hand side of handle)
-bool ChipHandle::StepOutGetOutgoingCharge(int slot)
-{
-    if (GetTotalIncomingCharge(slot) >= 1)
-        return true;
-    else
-        return false;
-}
-
-void ChipHandle::SetModified()
-{
-    auto cont = GetContainer();
-    if (cont) cont->SetModified();
-}
-void ChipHandle::SetSubPlan(std::shared_ptr<ChipPlan> p, std::shared_ptr<RefererInterface> myself)
-{
-    plan = p;
-    p->RegisterReferer( myself );
-    SetModified();
-    p->PlodeRefresh();
-}
-std::shared_ptr<ChipPlan> ChipHandle::GetSubPlan()
-{
-    return plan;
-}
-
-
-
-sf::Vector2f ChipHandle::GetWireAttachPos(WireAttachSide was) const
-{
-    sf::Vector2f wirePos;
-    if (exploded)
-    {
-        RectWorld planBound { plan->GetWorldPaddedBound() };
-        VectorWorld objectSize { planBound.width, planBound.height };
-        if (was == WireAttachSide::IN) {
-            wirePos = CalculateOffsetForCentering(objectSize) + VectorWorld {objectSize.x *.0f, objectSize.y *.5f };
-        }
-        else {
-            wirePos = CalculateOffsetForCentering(objectSize) + VectorWorld {objectSize.x *1.f, objectSize.y *.5f };
-        }
-    }
-    else
-    {
-        if (was == WireAttachSide::IN) {
-            wirePos = CalculateOffsetForCentering(RECTANGLE) + WIRE_IN_OFFSET;
-        }
-        else {
-            wirePos = CalculateOffsetForCentering(RECTANGLE) + WIRE_OUT_OFFSET;
-        }
-    }
-    return wirePos;
-}
-
+//PlanOwned...
 void ChipHandle::Draw(sf::RenderTarget & rt)
 {
     if (exploded)
     {
         //Refresh Plan Offset...
         plan->GetGrid()->SetOffset( VectorWorld{0.f, 0.f} );
-        RectWorld innerPlanBound { plan->GetWorldPaddedBound() };
+        RectWorld innerPlanBound { plan->GetWorldPaddedBoundPlusPorts() };  //plus ports
         VectorWorld innerPlanTopLeft { innerPlanBound.left, innerPlanBound.top };
         VectorWorld innerPlanSize {innerPlanBound.width, innerPlanBound.height};
         VectorWorld outerTopLeftPos = CalculateOffsetForCentering(innerPlanSize);
@@ -180,6 +72,90 @@ void ChipHandle::Handle(int code)
     }
 }
 
+
+
+
+
+//Wirable...
+void ChipHandle::Refresh(int slot)
+{
+    if (plan) plan->StepInRefresh(slot);
+    //Something like this...
+    //(has charge state saved in a map or something (inPorts))
+    //
+    //bool newState = false;
+    //if ( inPorts.at(slot).GetTotalIncomingCharge() >= 1 )
+    //    newState = true;
+    //if (newState != inPorts.at(slot).charge) {
+    //    inPorts.at(slot).charge = newState;
+    //    PropagateRefresh(slot);
+    //}
+}
+
+//(Called on right hand side of handle by other device)
+bool ChipHandle::GetOutgoingCharge(int slot)
+{
+    if (plan)
+        return plan->StepInGetOutgoingCharge(slot);
+    else
+        return false;
+    //this perhaps?...
+    //return outPorts.at(slot).charge;
+}
+
+VectorWorld ChipHandle::GetWireAttachPos(WireAttachSide was) const
+{
+    VectorWorld wirePos;
+    if (exploded)
+    {
+        RectWorld planBound { plan->GetWorldPaddedBoundPlusPorts() };  //not sure
+        VectorWorld objectSize { planBound.width, planBound.height };
+        if (was == WireAttachSide::IN) {
+            wirePos = CalculateOffsetForCentering(objectSize) + VectorWorld {objectSize.x *.0f, objectSize.y *.5f };
+        }
+        else {
+            wirePos = CalculateOffsetForCentering(objectSize) + VectorWorld {objectSize.x *1.f, objectSize.y *.5f };
+        }
+    }
+    else
+    {
+        if (was == WireAttachSide::IN) {
+            wirePos = CalculateOffsetForCentering(RECTANGLE) + WIRE_IN_OFFSET;
+        }
+        else {
+            wirePos = CalculateOffsetForCentering(RECTANGLE) + WIRE_OUT_OFFSET;
+        }
+    }
+    return wirePos;
+}
+
+bool ChipHandle::IsSlotted(SlottedSide) const
+{
+    return true;
+}
+bool ChipHandle::CanRegisterIn(int slot) const
+{
+    return IsInSlotFree(slot);
+}
+bool ChipHandle::CanRegisterOut(int slot) const
+{
+    return IsOutSlotFree(slot);
+}
+
+
+
+
+
+
+//Device...
+void ChipHandle::InnerStep()
+{
+    if (plan) plan->PassOnAct();
+}
+void ChipHandle::PreInnerStep()
+{
+    if (plan) plan->PassOnCalculate();
+}
 VectorDumb ChipHandle::GetPlodedSize()
 {
     if (exploded)
@@ -189,6 +165,48 @@ VectorDumb ChipHandle::GetPlodedSize()
     else return VectorDumb{1,1};
 }
 
+
+
+
+
+
+//RefererInterface...
+//(called by plan onto right hand side of handle)
+void ChipHandle::StepOutRefresh(int slot)
+{
+    PropagateRefresh(slot);
+}
+//(called by plan onto left hand side of handle)
+bool ChipHandle::StepOutGetOutgoingCharge(int slot)
+{
+    if (GetTotalIncomingWeight(slot) >= 1)
+        return true;
+    else
+        return false;
+}
+void ChipHandle::SetModified()
+{
+    auto cont = GetContainer();
+    if (cont) cont->SetModified();
+}
+void ChipHandle::SetSubPlan(std::shared_ptr<ChipPlan> p, std::shared_ptr<RefererInterface> myself)
+{
+    plan = p;
+    p->RegisterReferer( myself );
+    SetModified();
+    p->PlodeRefreshOutwards();
+}
+std::shared_ptr<ChipPlan> ChipHandle::GetSubPlan()
+{
+    return plan;
+}
+
+
+
+
+
+
+//Self...
 bool ChipHandle::IsExploded()
 {
     return exploded;
@@ -210,3 +228,7 @@ void ChipHandle::SetExploded(bool yes)
         GetContainer()->PlodeRefresh(GetSmartPos());
     }
 }
+
+
+
+

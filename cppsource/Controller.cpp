@@ -18,7 +18,7 @@ void Controller::CursorsGoHere(std::shared_ptr<ChipPlan> p)
         theView.cursorOne.SetGridOnly( p->GetGrid() );
         theView.cursorTwo.SetGridOnly( p->GetGrid() );
         
-        auto b = p->GetWorldPaddedBound();
+        auto b = p->GetWorldPaddedBoundBox();  //unimportant
         theView.CentreOn( {b.left + b.width*0.5f, b.top + b.height} );
         theView.Clamp();
     }

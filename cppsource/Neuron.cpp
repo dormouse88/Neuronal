@@ -141,7 +141,7 @@ Neuron::Neuron(int serial, sf::Vector2i pos, int threshold, bool hasBulb, std::s
 
 void Neuron::Refresh(int slot)
 {
-    totalIncoming_ = GetTotalIncomingCharge();
+    totalIncoming_ = GetTotalIncomingWeight();
     bool newState = false;
     if (totalIncoming_ >= threshold_)
         newState = true;

@@ -59,8 +59,8 @@ struct PlanRect
     {}
     PlanRect AddPadding(int thickness)
     {
-        tl.SetPosSmart( tl.GetSmartPos() - sf::Vector2i{ thickness, thickness } );
-        br.SetPosSmart( br.GetSmartPos() + sf::Vector2i{ thickness, thickness } );
+        tl.SetPosSmart( tl.GetSmartPos() - VectorSmart{ thickness, thickness } );
+        br.SetPosSmart( br.GetSmartPos() + VectorSmart{ thickness, thickness } );
         return *this;
     }
     RectDumb GetRectDumb() const
@@ -71,6 +71,11 @@ struct PlanRect
     {
         return RectWorld { tl.GetWorldPos(), br.GetWorldPos() - tl.GetWorldPos() + br.GetWorldSizeOf() };
     }
+//    RectWorld GetRectWorldWithCellMiddles() const
+//    {
+//        return RectWorld { tl.GetWorldPos() + VectorWorld{ tl.GetWorldSizeOf().x * 0.5f, 0.f},
+//                br.GetWorldPos() - tl.GetWorldPos() + br.GetWorldSizeOf() - VectorWorld{br.GetWorldSizeOf().x, 0.f} };
+//    }
     void SetGrid(std::shared_ptr<PlanGrid> newGrid) 
     {
         tl.SetGrid(newGrid);

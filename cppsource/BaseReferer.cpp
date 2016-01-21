@@ -22,7 +22,7 @@ void BaseReferer::StepOutRefresh(int slot)
 bool BaseReferer::StepOutGetOutgoingCharge(int slot)
 //return outgoing charges from inputs
 {
-    for (auto &x: inputs)
+    for (auto &x: inputs_)
     {
         if ( x.second.slot == slot )
             return x.second.charge;
@@ -37,13 +37,13 @@ void BaseReferer::SetModified()
 }
 void BaseReferer::SetSubPlan(std::shared_ptr<ChipPlan> p, std::shared_ptr<RefererInterface> myself)
 {
-    basePlan = p;
+    subPlan_ = p;
     p->RegisterReferer( myself );
     RefreshOutputs();
 }
 std::shared_ptr<ChipPlan> BaseReferer::GetSubPlan()
 {
-    return basePlan;
+    return subPlan_;
 }
 
 
@@ -51,42 +51,42 @@ std::shared_ptr<ChipPlan> BaseReferer::GetSubPlan()
 void BaseReferer::DefineXputs(XPuts all, XPutFilter filter)
 {
     //this is the only thing that actually inserts into the maps
-    inputs.clear();
+    inputs_.clear();
     for (auto sd: all.ins)
     {
         if (filter == nullptr or filter->count( sd.name ) > 0)
-            inputs.insert( {sd.name, sd} );
+            inputs_.insert( {sd.name, sd} );
     }
-    outputs.clear();
+    outputs_.clear();
     for (auto sd: all.outs)
     {
         if (filter == nullptr or filter->count( sd.name ) > 0 or sd.name == "WAIT") //bit naughty but who cares
-            outputs.insert( { sd.slot, sd} );
+            outputs_.insert( { sd.slot, sd} );
     }
 }
 void BaseReferer::SetInputState(std::string name, bool charge)
 {
-    auto it = inputs.find(name);
-    if (it != inputs.end())
+    auto it = inputs_.find(name);
+    if (it != inputs_.end())
     {
         if (it->second.charge != charge)
         {
             it->second.charge = charge;
-            basePlan->StepInRefresh(it->second.slot);
+            subPlan_->StepInRefresh(it->second.slot);
         }
     }
 }
 void BaseReferer::TickOnce()
 {
-    basePlan->PassOnCalculate();
-    basePlan->PassOnAct();
+    subPlan_->PassOnCalculate();
+    subPlan_->PassOnAct();
 }
 
 std::map<std::string, bool> BaseReferer::GetOutputs()
 {
     std::map<std::string, bool> retMap;
     //fill retMap with data...
-    for (auto &x: outputs)
+    for (auto &x: outputs_)
     {
         retMap.insert( {x.second.name, x.second.charge} );
         //It is seemingly not necessary to clear the outputs. (Outside of the basePlan, 'true' and 'false' charges do not have parity and false is a non-response).
@@ -97,7 +97,7 @@ std::map<std::string, bool> BaseReferer::GetOutputs()
 }
 bool BaseReferer::IsAnyOutputOn() const
 {
-    for (auto x: outputs)
+    for (auto x: outputs_)
     {
         if (x.second.charge)
             return true;
@@ -107,16 +107,16 @@ bool BaseReferer::IsAnyOutputOn() const
 
 void BaseReferer::RefreshOutputs()
 {
-    for (auto & x: outputs)
+    for (auto & x: outputs_)
     {
-        x.second.charge = basePlan->StepInGetOutgoingCharge(x.second.slot);
+        x.second.charge = subPlan_->StepInGetOutgoingCharge(x.second.slot);
     }
 }
 
 
 void BaseReferer::DrawBrain(sf::RenderTarget & rt)
 {
-    RectWorld bound = basePlan->GetWorldPaddedBound();
+    RectWorld bound = subPlan_->GetWorldPaddedBoundPlusPorts();
     float xi = bound.left - 20.f;
     float yi = bound.top + 20.f; 
     float xo = bound.left + bound.width + 20.f;
@@ -127,7 +127,7 @@ void BaseReferer::DrawBrain(sf::RenderTarget & rt)
     sf::Text t;
     t.setFont(ViewResources::GetInstance().font);
     t.setCharacterSize(22.f);
-    for (auto p: inputs) {
+    for (auto p: inputs_) {
         if (p.second.charge) t.setColor( BRIGHT );
         else t.setColor( DULL );
         t.setString( patch::to_string(p.second.slot) + ": " + p.second.name );
@@ -135,7 +135,7 @@ void BaseReferer::DrawBrain(sf::RenderTarget & rt)
         rt.draw(t);
         yi += 70.f;
     }
-    for (auto p: outputs) {
+    for (auto p: outputs_) {
         if (p.second.charge) t.setColor( BRIGHT );
         else t.setColor( DULL );
         t.setString( patch::to_string(p.second.slot) + ": " + p.second.name );
@@ -144,5 +144,5 @@ void BaseReferer::DrawBrain(sf::RenderTarget & rt)
         yo += 70.f;
     }
     
-    basePlan->Draw(rt);
+    subPlan_->Draw(rt);
 }

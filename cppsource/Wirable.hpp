@@ -44,7 +44,7 @@ public:
 
 protected:
     void PropagateRefresh(int slot = 0);
-    int GetTotalIncomingCharge(int slot = 0) const;
+    int GetTotalIncomingWeight(int slot = 0) const;
 private:
     void CleanWireVectors() const;
     mutable std::vector<std::weak_ptr<Wire> > inWires;

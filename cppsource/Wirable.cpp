@@ -45,7 +45,7 @@ void Wirable::PropagateRefresh(int slot)
     }
 }
 
-int Wirable::GetTotalIncomingCharge(int slot) const
+int Wirable::GetTotalIncomingWeight(int slot) const
 {
     CleanWireVectors();
     int total = 0;
