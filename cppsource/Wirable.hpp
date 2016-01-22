@@ -33,8 +33,8 @@ public:
     virtual bool CanRegisterOut(int slot) const         {return true;}
 
 
-    void RegisterIn(std::shared_ptr<Wire> w)                            { inWires.push_back(w);}
-    void RegisterOut(std::shared_ptr<Wire> w)                           { outWires.push_back(w);}
+    void RegisterIn(WireShp w)                            { inWires.push_back(w);}
+    void RegisterOut(WireShp w)                           { outWires.push_back(w);}
     bool HasWireTo(int fromSlot, Wirable & to, int toSlot) const;
 
     int GetInWiresNum() const               { CleanWireVectors(); return inWires.size(); }

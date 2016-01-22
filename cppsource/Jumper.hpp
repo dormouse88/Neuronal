@@ -31,7 +31,7 @@
 //class Jumper : public Device
 //{
 //public:
-//    Jumper(int serial, sf::Vector2i pos_p, std::shared_ptr<ChipPlan> cont);
+//    Jumper(int serial, sf::Vector2i pos_p, PlanShp cont);
 //    virtual ~Jumper() {;}
 //
 //    //Misc...

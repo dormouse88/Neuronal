@@ -43,8 +43,8 @@ public:
     virtual void StepOutRefresh(int slot) override;
     virtual bool StepOutGetOutgoingCharge(int slot) override;
     virtual void SetModified() override;
-    virtual void SetSubPlan(std::shared_ptr<ChipPlan>, std::shared_ptr<RefererInterface>) override;
-    virtual std::shared_ptr<ChipPlan> GetSubPlan() override;
+    virtual void SetSubPlan(PlanShp, std::shared_ptr<RefererInterface>) override;
+    virtual PlanShp GetSubPlan() override;
 
     void DefineXputs(XPuts all, XPutFilter filter);
     void SetInputState(std::string, bool);
@@ -59,7 +59,7 @@ private:
 
     std::map<std::string, SlotData > inputs_;
     std::map<int, SlotData > outputs_;
-    std::shared_ptr<ChipPlan> subPlan_;
+    PlanShp subPlan_;
 };
 
 

@@ -16,7 +16,7 @@
 class ChipHandle : public Device, public RefererInterface
 {
 public:
-    ChipHandle(int serial_p, sf::Vector2i pos_p, std::shared_ptr<ChipPlan> cont);
+    ChipHandle(int serial_p, sf::Vector2i pos_p, PlanShp cont);
     virtual ~ChipHandle() {}
     //PlanOwned...
     virtual std::string SerialName() const override { return "HAND";}
@@ -37,20 +37,21 @@ public:
     virtual void PreInnerStep() override;
     virtual VectorDumb GetPlodedSize() override;
 
+
     //RefererInterface...
     virtual void StepOutRefresh(int slot) override;
     virtual bool StepOutGetOutgoingCharge(int slot) override;
     virtual void SetModified() override;
-    virtual void SetSubPlan(std::shared_ptr<ChipPlan>, std::shared_ptr<RefererInterface>) override;
-    virtual std::shared_ptr<ChipPlan> GetSubPlan() override;
+    virtual void SetSubPlan(PlanShp, std::shared_ptr<RefererInterface>) override;
+    virtual PlanShp GetSubPlan() override;
 
     bool IsExploded();
-    void SetExploded(bool yes);
+    void SetExploded(bool);
 private:
-    std::shared_ptr<ChipPlan> plan;
-    bool exploded;
-    sf::RectangleShape shape;
-    sf::Text planNumText;
+    PlanShp subPlan_;
+    bool exploded_;
+    sf::RectangleShape shape_;
+    sf::Text planNumText_;
 };
 
 #endif	/* CHIPHANDLE_HPP */

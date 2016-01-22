@@ -16,16 +16,16 @@ const sf::Vector2f WIRE_IN_OFFSET  { RECTANGLE.x * 0.f, RECTANGLE.y *.5f };
 const sf::Vector2f WIRE_OUT_OFFSET { RECTANGLE.x * 1.f, RECTANGLE.y *.5f };
 
 
-ChipHandle::ChipHandle(int serial_p, sf::Vector2i pos_p, std::shared_ptr<ChipPlan> cont)
+ChipHandle::ChipHandle(int serial_p, sf::Vector2i pos_p, PlanShp cont)
     :Device(serial_p, pos_p, cont)
-    , exploded(false)
-    , shape( RECTANGLE )
+    , exploded_(false)
+    , shape_( RECTANGLE )
 {
-    shape.setOutlineColor(sf::Color::White);
-    shape.setOutlineThickness(3);
-    planNumText.setFont(ViewResources::GetInstance().font);
-    planNumText.setCharacterSize(30);
-    planNumText.setColor(sf::Color::Black);
+    shape_.setOutlineColor(sf::Color::White);
+    shape_.setOutlineThickness(3);
+    planNumText_.setFont(ViewResources::GetInstance().font);
+    planNumText_.setCharacterSize(30);
+    planNumText_.setColor(sf::Color::Black);
 }
 
 
@@ -34,42 +34,36 @@ ChipHandle::ChipHandle(int serial_p, sf::Vector2i pos_p, std::shared_ptr<ChipPla
 //PlanOwned...
 void ChipHandle::Draw(sf::RenderTarget & rt)
 {
-    if (exploded)
+    if (exploded_)
     {
         //Refresh Plan Offset...
-        plan->GetGrid()->SetOffset( VectorWorld{0.f, 0.f} );
-        RectWorld innerPlanBound { plan->GetWorldPaddedBoundPlusPorts() };  //plus ports
+        subPlan_->GetGrid()->SetOffset( VectorWorld{0.f, 0.f} );
+        RectWorld innerPlanBound { subPlan_->GetWorldPaddedBoundPlusPorts() };  //plus ports
         VectorWorld innerPlanTopLeft { innerPlanBound.left, innerPlanBound.top };
         VectorWorld innerPlanSize {innerPlanBound.width, innerPlanBound.height};
         VectorWorld outerTopLeftPos = CalculateOffsetForCentering(innerPlanSize);
         VectorWorld offsetFromZero = outerTopLeftPos - innerPlanTopLeft;
-        plan->GetGrid()->SetOffset( offsetFromZero );
+        subPlan_->GetGrid()->SetOffset( offsetFromZero );
         
-        plan->SubDraw(rt);
+        subPlan_->SubDraw(rt);
     }
     else
     {
         VectorWorld perceivedPos { CalculateOffsetForCentering(RECTANGLE) };
-        shape.setPosition( perceivedPos );
-        shape.setFillColor(sf::Color::Yellow);
-        std::string text = patch::to_string( plan->GetPlanID() );
-        if (plan->IsModified()) text.append("*");
-        planNumText.setString( text );
-        planNumText.setPosition( perceivedPos + PLANID_OFFSET );
-        rt.draw(shape);
-        rt.draw(planNumText);
+        shape_.setPosition( perceivedPos );
+        shape_.setFillColor(sf::Color::Yellow);
+        std::string text = patch::to_string( subPlan_->GetPlanID() );
+        if (subPlan_->IsModified()) text.append("*");
+        planNumText_.setString( text );
+        planNumText_.setPosition( perceivedPos + PLANID_OFFSET );
+        rt.draw(shape_);
+        rt.draw(planNumText_);
     }
 }
 
 void ChipHandle::Handle(int code)
 {
-    if (code == 3) {
-        if (IsExploded()) SetExploded(false);
-        else SetExploded(true);
-    }
-    if (code == 4) {
-        SetExploded(false);
-    }
+    ;
 }
 
 
@@ -79,7 +73,7 @@ void ChipHandle::Handle(int code)
 //Wirable...
 void ChipHandle::Refresh(int slot)
 {
-    if (plan) plan->StepInRefresh(slot);
+    if (subPlan_) subPlan_->StepInRefresh(slot);
     //Something like this...
     //(has charge state saved in a map or something (inPorts))
     //
@@ -95,8 +89,8 @@ void ChipHandle::Refresh(int slot)
 //(Called on right hand side of handle by other device)
 bool ChipHandle::GetOutgoingCharge(int slot)
 {
-    if (plan)
-        return plan->StepInGetOutgoingCharge(slot);
+    if (subPlan_)
+        return subPlan_->StepInGetOutgoingCharge(slot);
     else
         return false;
     //this perhaps?...
@@ -106,9 +100,9 @@ bool ChipHandle::GetOutgoingCharge(int slot)
 VectorWorld ChipHandle::GetWireAttachPos(WireAttachSide was) const
 {
     VectorWorld wirePos;
-    if (exploded)
+    if (exploded_)
     {
-        RectWorld planBound { plan->GetWorldPaddedBoundPlusPorts() };  //not sure
+        RectWorld planBound { subPlan_->GetWorldPaddedBoundPlusPorts() };  //not sure
         VectorWorld objectSize { planBound.width, planBound.height };
         if (was == WireAttachSide::IN) {
             wirePos = CalculateOffsetForCentering(objectSize) + VectorWorld {objectSize.x *.0f, objectSize.y *.5f };
@@ -150,17 +144,17 @@ bool ChipHandle::CanRegisterOut(int slot) const
 //Device...
 void ChipHandle::InnerStep()
 {
-    if (plan) plan->PassOnAct();
+    if (subPlan_) subPlan_->PassOnAct();
 }
 void ChipHandle::PreInnerStep()
 {
-    if (plan) plan->PassOnCalculate();
+    if (subPlan_) subPlan_->PassOnCalculate();
 }
 VectorDumb ChipHandle::GetPlodedSize()
 {
-    if (exploded)
+    if (exploded_)
     {
-        return VectorDumb{ plan->GetDumbPaddedBound().width, plan->GetDumbPaddedBound().height };
+        return VectorDumb{ subPlan_->GetDumbPaddedBound().width, subPlan_->GetDumbPaddedBound().height };
     }
     else return VectorDumb{1,1};
 }
@@ -189,16 +183,16 @@ void ChipHandle::SetModified()
     auto cont = GetContainer();
     if (cont) cont->SetModified();
 }
-void ChipHandle::SetSubPlan(std::shared_ptr<ChipPlan> p, std::shared_ptr<RefererInterface> myself)
+void ChipHandle::SetSubPlan(PlanShp p, std::shared_ptr<RefererInterface> myself)
 {
-    plan = p;
+    subPlan_ = p;
     p->RegisterReferer( myself );
     SetModified();
     p->PlodeRefreshOutwards();
 }
-std::shared_ptr<ChipPlan> ChipHandle::GetSubPlan()
+PlanShp ChipHandle::GetSubPlan()
 {
-    return plan;
+    return subPlan_;
 }
 
 
@@ -209,22 +203,14 @@ std::shared_ptr<ChipPlan> ChipHandle::GetSubPlan()
 //Self...
 bool ChipHandle::IsExploded()
 {
-    return exploded;
+    return exploded_;
 }
 
-void ChipHandle::SetExploded(bool yes)
+void ChipHandle::SetExploded(bool exploded)
 {
-    if (not exploded and yes)
+    if (exploded_ != exploded)
     {
-        if (true)//not plan->IsEmpty())
-        {
-            exploded = true;
-            GetContainer()->PlodeRefresh(GetSmartPos());
-        }
-    }
-    else if (exploded and not yes)
-    {
-        exploded = false;
+        exploded_ = exploded;
         GetContainer()->PlodeRefresh(GetSmartPos());
     }
 }

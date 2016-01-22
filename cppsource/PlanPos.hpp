@@ -9,25 +9,19 @@
 #define	PLANPOS_HPP
 
 #include <memory>
+class ChipPlan; //fwd dec
 #include "PlanGrid.hpp"
 
 class PlanPos
 {
 public:
-    PlanPos();
-    PlanPos(std::shared_ptr<PlanGrid>);
     PlanPos(VectorSmart, std::shared_ptr<PlanGrid>);
     PlanPos(VectorWorld, std::shared_ptr<PlanGrid>);
 
-    std::shared_ptr<PlanGrid> GetGrid() { return planGrid.lock(); }
-    std::shared_ptr<ChipPlan> GetPlan() { auto l = planGrid.lock(); return l ? l->GetPlan() : nullptr; }
-    void SetGrid(std::shared_ptr<PlanGrid>);
+    std::shared_ptr<PlanGrid> GetGrid()             { return planGrid.lock(); }
+    PlanShp GetPlan()             { auto l = planGrid.lock(); return l ? l->GetPlan() : nullptr; }
+    void SetGrid(std::shared_ptr<PlanGrid> newGrid) { planGrid = newGrid;}
     
-    bool IsValid() const;
-    bool IsPlanOnly() const;
-    bool IsLocated() const;
-    void Dislocate();
-
     void SetPosSmart(VectorSmart);
     void SetPosDumb(VectorDumb);
     void SetPosWorld(VectorWorld);
@@ -38,10 +32,13 @@ public:
     
     VectorDumb GetDumbSizeOf() const;
     VectorWorld GetWorldSizeOf() const;
+    
+    DeviceShp GetDevice();
+    HandleShp GetDeviceAsHandle();
+    bool IsPositionFree();
 private:
     VectorSmart pos;
     std::weak_ptr<PlanGrid> planGrid;
-    bool planOnly;
 
     friend bool operator== (const PlanPos& lhs, const PlanPos& rhs);
 };
@@ -49,11 +46,27 @@ private:
 bool operator==(const PlanPos& lhs, const PlanPos& rhs);
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 struct PlanRect
 {
-    PlanRect()
-        :valid(false)
-    {}
+//    PlanRect()
+//        :valid(false)
+//    {}
     PlanRect(PlanPos tl_, PlanPos br_)
         :tl(tl_), br(br_), valid(true)
     {}
@@ -71,11 +84,6 @@ struct PlanRect
     {
         return RectWorld { tl.GetWorldPos(), br.GetWorldPos() - tl.GetWorldPos() + br.GetWorldSizeOf() };
     }
-//    RectWorld GetRectWorldWithCellMiddles() const
-//    {
-//        return RectWorld { tl.GetWorldPos() + VectorWorld{ tl.GetWorldSizeOf().x * 0.5f, 0.f},
-//                br.GetWorldPos() - tl.GetWorldPos() + br.GetWorldSizeOf() - VectorWorld{br.GetWorldSizeOf().x, 0.f} };
-//    }
     void SetGrid(std::shared_ptr<PlanGrid> newGrid) 
     {
         tl.SetGrid(newGrid);

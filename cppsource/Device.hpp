@@ -21,7 +21,7 @@ class ChipPlan; //fwd dec
 class Device : public Wirable, public PlanOwned
 {
 public:
-    Device(int serial, VectorSmart pos, std::shared_ptr<ChipPlan> cont);
+    Device(int serial, VectorSmart pos, PlanShp cont);
     virtual ~Device() {}
 
     //virtuals...

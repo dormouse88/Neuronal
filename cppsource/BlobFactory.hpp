@@ -8,6 +8,7 @@
 #ifndef BLOBFACTORY_HPP
 #define	BLOBFACTORY_HPP
 
+#include "BasicTypes.hpp"
 #include "Wire.hpp"
 #include "Neuron.hpp"
 #include "Jumper.hpp"
@@ -18,21 +19,22 @@
 class BlobFactory
 {
 public:
-    BlobFactory(std::shared_ptr<UserData> ud) :userData_(ud) {}
-    std::shared_ptr<Neuron>     AddNeuron(PlanPos pos);
-    std::shared_ptr<Neuron>     AddNeuron(std::shared_ptr<ChipPlan> plan, int serial, VectorSmart pos, int threshold, bool hasBulb);
-    std::shared_ptr<ChipHandle> AddHandle(PlanPos pos);
-    std::shared_ptr<ChipHandle> AddHandle(std::shared_ptr<ChipPlan> plan, int serial, VectorSmart pos);
+    BlobFactory(Shp<UserData> ud) :userData_(ud) {}
+    NeuronShp     AddNeuron(PlanPos pos);
+    NeuronShp     AddNeuron(PlanShp plan, int serial, VectorSmart pos, int threshold, bool hasBulb);
+    HandleShp     AddHandle(PlanPos pos);
+    HandleShp     AddHandle(PlanShp plan, int serial, VectorSmart pos);
     
-    std::shared_ptr<ChipPlan>   MakePlan();
-    std::shared_ptr<BaseReferer> MakeBrain();
+    PlanShp       MakePlan();
+    Shp<BaseReferer> MakeBrain();
     
-    std::shared_ptr<Wire>       AddWire(PlanPos pos1, PlanPos pos2);
-    std::shared_ptr<Wire>       AddWire(std::shared_ptr<ChipPlan> plan, Wirable & from, Wirable & to, signed weight);
-    std::shared_ptr<Wire>       AddWire(std::shared_ptr<ChipPlan> plan, Wirable & from, int fromSlot, Wirable & to, int toSlot, signed weight);
+//    WireShp       AddWire(PlanPos pos1, PlanPos pos2);
+    WireShp       AddWire(PlanShp plan, Wirable & from, Wirable & to, signed weight);
+    WireShp       AddWire(PlanShp plan, Wirable & from, int fromSlot, Wirable & to, int toSlot, signed weight);
 
     void RemoveDevice(PlanPos pos);
-    void RemoveWire(PlanPos pos1, PlanPos pos2);
+    void RemoveWire(PlanShp plan, WirableShp w1, WirableShp w2);
+
 protected:
     std::shared_ptr<UserData> userData_;
 };

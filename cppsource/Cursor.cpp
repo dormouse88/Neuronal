@@ -12,161 +12,173 @@
 
 
 Cursor::Cursor(std::shared_ptr<PlanGrid> g, sf::Color color)
+    :cursorState_(CursorState::PLAN)
+    ,plan_(g->GetPlan())
 {
-    ppos.SetGrid(g);
-    representation.setFillColor(sf::Color::Transparent);
-    representation.setOutlineColor( color );
-    representation.setOutlineThickness(2.5f);
+    shape_.setFillColor(sf::Color::Transparent);
+    shape_.setOutlineColor( color );
+    shape_.setOutlineThickness(2.5f);
 }
+
+
+
+
 
 void Cursor::Draw(sf::RenderTarget & rt)
 {
-    if (ppos.IsValid())
+    if (cursorState_ != CursorState::ABSENT)
     {
-        if (not ppos.IsPlanOnly())
+        if (cursorState_ == CursorState::LOCATED)
         {
-            representation.setPosition( ppos.GetWorldPos() );
-            representation.setSize( ppos.GetWorldSizeOf() );
-            rt.draw(representation, sf::RenderStates(sf::BlendAdd));
+            PlanPos ppos = GetPlanPos();
+            shape_.setPosition( ppos.GetWorldPos() );
+            shape_.setSize( ppos.GetWorldSizeOf() );
+            rt.draw(shape_, sf::RenderStates(sf::BlendAdd));
         }
-        else
+        else if (cursorState_ == CursorState::PLAN)
         {
-            auto b = ppos.GetPlan()->GetWorldPaddedBoundBox();  //plus ports or box
-            representation.setPosition( b.left, b.top );
-            representation.setSize( sf::Vector2f { b.width, b.height } );
-            rt.draw(representation, sf::RenderStates(sf::BlendAdd));
+            auto b = GetPlan()->GetWorldPaddedBoundBox();  //plus ports or box
+            shape_.setPosition( b.left, b.top );
+            shape_.setSize( sf::Vector2f { b.width, b.height } );
+            rt.draw(shape_, sf::RenderStates(sf::BlendAdd));
         }
     }        
 }
 
 void Cursor::SetPosWorld(VectorWorld point)
 {
+    assert(cursorState_ != CursorState::ABSENT);
     //Check if clicked pos is inside contextPlan boundary...
-    RectWorld b = ppos.GetPlan()->GetWorldPaddedBoundPlusPorts();  //plus ports i think
+    RectWorld b = GetPlan()->GetWorldPaddedBoundPlusPorts();  //plus ports i think
     bool done = false;
 
     while (not b.contains(point) and not done)
     {//zoom out...
-        auto ref = ppos.GetPlan()->GetHandle();
+        auto ref = GetPlan()->GetHandle();
         if (ref)
         {
-            ppos.SetGrid( ref->GetContainer()->GetGrid() );
-            ppos.SetPosSmart( ref->GetSmartPos() );
-            b = ppos.GetPlan()->GetWorldPaddedBoundPlusPorts();  //plus ports i think
+            SetToLocated( ref->GetContainer(), ref->GetSmartPos() );
+            b = GetPlan()->GetWorldPaddedBoundPlusPorts();  //plus ports i think
         }
         else done = true;
     }
     
     while ( not done )
     {//zoom in...
-        ppos.SetPosWorld(point);
-        auto d = ChipPlanFunc::GetDevice(ppos);
-        auto h = std::dynamic_pointer_cast<ChipHandle>(d);
+        SetToLocated(plan_, point);
+
+        auto h = GetPlanPos().GetDeviceAsHandle();
         if (h)
         {
             if (h->IsExploded())
             {
-                ppos.SetGrid(h->GetSubPlan()->GetGrid());
+                SetToPlan(h->GetSubPlan());
             }
             else done = true;
         }
         else done = true;
     }
-    b = ppos.GetPlan()->GetWorldPaddedBoundPlusPorts();  //??
+    b = GetPlan()->GetWorldPaddedBoundPlusPorts();  //??
     //if point is between Plan and its Handle...
-    if (not b.contains(point) ) ppos.Dislocate(); //ppos.GetWorldPos()
+    if (not b.contains(point) ) SetToPlan();
+
     //if point is on a Grabber (cornerBox)...
     RectWorld cb = { b.left, b.top, GRABBER_SIZE.x, GRABBER_SIZE.y };
-    if (cb.contains(point) ) ppos.Dislocate();
+    if (cb.contains(point) ) SetToPlan();
     cb.left = b.left + b.width - GRABBER_SIZE.x;
     cb.top = b.top + b.height - GRABBER_SIZE.y;
-    if (cb.contains(point) ) ppos.Dislocate();
+    if (cb.contains(point) ) SetToPlan();
 }
 
-
-//void Cursor::SetPosWorld(VectorWorld point)
-//{
-//    //Check if clicked pos is inside contextPlan boundary...
-//    auto b = ppos.GetGrid()->GetPlan()->GetWorldBound();
-//    
-//    if (not b.contains(point))
-//    {//(not inside current context plan)
-//        if (ppos.IsLocated())
-//        {
-//            ppos.Dislocate();
-//        }
-//        else
-//        {
-//            auto ref = ppos.GetGrid()->GetPlan()->GetHandle();
-//            if (ref)
-//            {
-//                ppos.SetGrid( ref->GetContainer()->GetGrid() );
-//                ppos.SetPosSmart( ref->GetSmartPos() );
-//                                      //Zooming out directly onto other locations...
-////                                    auto ob = ppos.GetGrid()->GetPlan()->GetWorldBound();
-////                                    if (ob.contains(point))
-////                                    {
-////                                        ppos.SetPosWorld( point );
-////                                    }
-////                                    else
-////                                    {
-////                                        //(GridOnly)
-////                                    }
-//            }
-//        }
-//    }
-//    else
-//    {//(inside current context plan)
-//        ppos.SetPosWorld(point);
-//        //select subPlan where possible...
-//        auto d = ppos.GetGrid()->GetPlan()->GetDevice(ppos.GetSmartPos());
-//        if (d)
-//        {
-//            auto h = std::dynamic_pointer_cast<ChipHandle>(d);
-//            if (h)
-//            {
-//                if (h->IsExploded())
-//                {
-//                    ppos.SetGrid(h->GetPlan()->GetGrid());
-//                }
-//            }
-//        }
-//    }
-//}
 
 
 void Cursor::Revalidate()
 {
-    //Just once, if the cursor is on an exploded handle, select its chip
+    //Just once, if the cursor is on an exploded handle, select its subplan
+    if (GetState() == CursorState::LOCATED)
     {
-        auto d = ChipPlanFunc::GetDevice(ppos);
-        auto h = std::dynamic_pointer_cast<ChipHandle>(d);
+        auto h = GetPlanPos().GetDeviceAsHandle();
         if (h) {
-            if (h->IsExploded()) ppos.SetGrid( h->GetSubPlan()->GetGrid() );
+            if (h->IsExploded())
+                SetToPlan( h->GetSubPlan() );
         }
     }
     //Then work back up (the other way) to the base
     //Ultimately select the nearest plan that is exploded all the way back.
     bool needsChanging = false;
-    std::shared_ptr<ChipPlan> i = ppos.GetPlan();
-    std::shared_ptr<ChipHandle> valid = nullptr;
+    PlanShp i = GetPlan();
+    HandleShp valid = nullptr;
     while (true)
     {
-        auto ref = i->GetHandle();
-        if (ref)
+        auto hand = i->GetHandle();
+        if (hand)
         {
-            if (not ref->IsExploded())
+            if (not hand->IsExploded())
             {
-                valid = ref;
+                valid = hand;
                 needsChanging = true;
             }
-            i = ref->GetContainer();
+            i = hand->GetContainer();
         }
         else break;
     }
     if (needsChanging) 
     {
-        ppos.SetGrid(valid->GetContainer()->GetGrid());
-        ppos.SetPosSmart(valid->GetSmartPos());
+        SetToLocated(i, valid->GetSmartPos());
     }
 }
+
+WirableShp Cursor::GetWirable()
+{
+    if (GetState() == CursorState::LOCATED)
+        return GetPlan()->GetDevice( GetPlanPos().GetSmartPos() );
+    if (GetState() == CursorState::PLAN)
+        return GetPlan();
+    assert(false);
+}
+
+PlanShp Cursor::GetParentPlan()
+{
+    if (GetState() != CursorState::ABSENT)
+    {
+        auto h = GetPlan()->GetHandle();
+        if (h)
+            return h->GetContainer();
+    }
+    return nullptr;
+}
+
+
+
+WiringPair RetrieveWiringPair(Cursor & cu1, Cursor & cu2)
+{
+    assert(cu1.GetState() != CursorState::ABSENT and cu2.GetState() != CursorState::ABSENT);
+
+    HandleShp hand1 = cu1.GetPlan()->GetHandle();
+    HandleShp hand2 = cu2.GetPlan()->GetHandle();
+    PlanShp parent1 = hand1 ? hand1->GetContainer() : nullptr;
+    PlanShp parent2 = hand2 ? hand2->GetContainer() : nullptr;
+    
+    //accept cu1 == cu2 (cu1/cu2 being PLAN or LOCATED)
+    if (cu1.GetPlan() == cu2.GetPlan())
+    {
+        return WiringPair { cu1.GetWirable(), cu2.GetWirable() };
+    }
+    //accept cu1 == parent2 (only if cu2 is PLAN)
+    if ( cu2.GetState() == CursorState::PLAN  and  cu1.GetPlan() == parent2 )
+    {
+        return WiringPair { cu1.GetWirable(), hand2 };
+    }
+    //accept parent1 == cu2 (only if cu1 is PLAN)
+    if ( cu1.GetState() == CursorState::PLAN  and  parent1 == cu2.GetPlan() )
+    {
+        return WiringPair { hand1, cu2.GetWirable() };
+    }
+    //accept parent1 == parent2 (only if both are PLAN)
+    if ( cu1.GetState() == CursorState::PLAN and cu2.GetState() == CursorState::PLAN and parent1 == parent2 )
+    {
+        return WiringPair { hand1, hand2 };
+    }
+    return WiringPair{};
+}
+

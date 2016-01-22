@@ -34,7 +34,7 @@
 //
 //#include "Wire.hpp"
 //
-//Jumper::Jumper(int serial, sf::Vector2i pos_p, std::shared_ptr<ChipPlan> cont)
+//Jumper::Jumper(int serial, sf::Vector2i pos_p, PlanShp cont)
 //    :Device(serial, pos_p, cont), v(*this)
 //{}
 //

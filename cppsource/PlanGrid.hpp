@@ -11,6 +11,7 @@
 #include <memory>
 #include <SFML/System.hpp>  //for sf::Vector
 #include <SFML/Graphics.hpp> //for sf::Rect
+#include "BasicTypes.hpp"
 #include "Pansions.hpp"
 class ChipPlan; //fwd dec only
 
@@ -47,8 +48,8 @@ public:
     void SetOffset(VectorWorld o)           { offset = o; }
     VectorWorld GetOffset() const           {return offset;}
 
-    void RegisterPlan(std::shared_ptr<ChipPlan> p) {owner = p;}
-    std::shared_ptr<ChipPlan> GetPlan() {return owner.lock();}
+    void RegisterPlan(PlanShp p) {owner = p;}
+    PlanShp GetPlan() {return owner.lock();}
 private:
     VectorWorld offset;
     Pansions xPansions;

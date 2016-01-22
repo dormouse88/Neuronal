@@ -79,7 +79,7 @@ public:
 
     sf::RenderWindow & GetWindow()                          {return window;}
     std::shared_ptr<Arena> GetArena()                       {return theModel.GetArena(); }
-    std::shared_ptr<ChipPlan> GetViewBasePlan()             {return theModel.GetMouseBrain()->GetSubPlan(); }
+    PlanShp GetViewBasePlan()             {return theModel.GetMouseBrain()->GetSubPlan(); }
     
 private:
     sf::RenderWindow window;

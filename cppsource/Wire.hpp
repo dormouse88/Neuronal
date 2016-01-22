@@ -38,7 +38,7 @@ private:
 class Wire : public PlanOwned
 {
 public:
-    Wire(Wirable & from_p, int fromSlot_p, Wirable & to_p, int toSlot_p, signed weight_p, std::shared_ptr<ChipPlan> cont);
+    Wire(Wirable & from_p, int fromSlot_p, Wirable & to_p, int toSlot_p, signed weight_p, PlanShp cont);
 
     virtual std::string SerialName() const { return "WIRE";}
 

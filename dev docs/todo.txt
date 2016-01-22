@@ -16,7 +16,7 @@ Visual / Interface
 	Make wire text labels circle-shaped and place them intelligently (on wire but close to device).
 	Allow chip cycling while unexploded and draw name on the handle.
 	Choose highest number plan to load into an empty plan, not lowest.
-	Plan Grabbers are unnecessary if using dedicated keys for collapse and expand. EDIT: Still used for plan selection for wiring.
+	Plan Grabbers are unnecessary if using dedicated keys for collapse and expand. EDIT: Still used for plan selection for wiring. 2ndEDIT: Until Ports
 	View centers in wrong place in both: 1 Plan collapse and 2 Plan Load/Wipe
 	Add a reset all charge button.
 	Add a collapse all/expand! all button.

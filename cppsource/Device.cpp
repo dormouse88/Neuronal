@@ -8,7 +8,7 @@
 #include "Device.hpp"
 #include "ChipPlan.hpp"
 
-Device::Device(int serial, VectorSmart pos, std::shared_ptr<ChipPlan> cont)
+Device::Device(int serial, VectorSmart pos, PlanShp cont)
     :PlanOwned(cont)
     , serial_(serial)
     , ppos_(pos, cont->GetGrid())

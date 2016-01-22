@@ -31,45 +31,34 @@ void Model::InnerTick()
         arena->GetMouseBrain()->TickOnce();
 }
 
-std::shared_ptr<ChipPlan> Model::WipePlan(PlanPos pos, bool forced)
+PlanShp Model::WipePlan(PlanShp plan, bool forced)
 {
-    if (not pos.IsLocated())
+    if (forced or not plan->IsModified())
     {
-        std::shared_ptr<ChipPlan> plan = pos.GetPlan();
-        if (forced or not plan->IsModified())
-        {
-            auto emptyPlan = factory_->MakePlan();
-            auto ref = plan->GetReferer();
-            if (ref) ref->SetSubPlan(emptyPlan, ref);
-            return emptyPlan;
-        }
+        auto emptyPlan = factory_->MakePlan();
+        auto ref = plan->GetReferer();
+        if (ref) ref->SetSubPlan(emptyPlan, ref);
+        return emptyPlan;
     }
-    return nullptr;
 }
-std::shared_ptr<ChipPlan> Model::LoadPlan(PlanPos pos, PlanNav nav)
+PlanShp Model::LoadPlan(PlanShp plan, PlanNav nav)
 {
-    if (not pos.IsLocated())
+    if (not plan->IsModified())
     {
-        std::shared_ptr<ChipPlan> plan = pos.GetPlan();
-        if (not plan->IsModified())
+        int num = userData->GetID(plan->GetPlanID(), nav);
+        auto loadedPlan = serializer->LoadUserPlan(num, factory_);
+        if (loadedPlan)
         {
-            int num = userData->GetID(plan->GetPlanID(), nav);
-            auto loadedPlan = serializer->LoadUserPlan(num, factory_);
-            if (loadedPlan)
-            {
-                auto ref = plan->GetReferer();
-                if (ref) ref->SetSubPlan(loadedPlan, ref);
-                return loadedPlan;
-            }
+            auto ref = plan->GetReferer();
+            if (ref) ref->SetSubPlan(loadedPlan, ref);
+            return loadedPlan;
         }
     }
-    return nullptr;
 }
 
-void Model::SavePlan(PlanPos pos)
+void Model::SavePlan(PlanShp plan)
 {
-    auto plan = pos.GetPlan();
-    if (not pos.IsLocated() and plan->IsModified())
+    if (plan->IsModified())
     {
         int oldID = plan->GetPlanID();
         std::string oldName = userData->GetNameByID( oldID );
@@ -86,10 +75,9 @@ void Model::SavePlan(PlanPos pos)
         }
     }
 }
-void Model::SavePlanAsNew(PlanPos pos)
+void Model::SavePlanAsNew(PlanShp plan)
 {
-    auto plan = pos.GetPlan();
-    if (not pos.IsLocated() and plan->IsModified())
+    if (plan->IsModified())
     {
         int oldID = plan->GetPlanID();
         if ( serializer->SaveUserPlan(plan) )

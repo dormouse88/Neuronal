@@ -121,7 +121,7 @@ View::View(Model & model_p)
     ,mainView(sf::Vector2f{0.f, 0.f}, INITIAL_MAINVIEW_SIZE )
     ,mainOverlay(sf::FloatRect{0.f,0.f, INITIAL_MAINVIEW_SIZE.x, INITIAL_MAINVIEW_SIZE.y})
     ,barOverlay(sf::FloatRect{0.f,0.f, INITIAL_MAINVIEW_SIZE.x, BAR_HEIGHT})
-    ,cursorOne( model_p.GetMouseBrain()->GetSubPlan()->GetGrid() )
+    ,cursorOne( model_p.GetMouseBrain()->GetSubPlan()->GetGrid(), sf::Color::Yellow )
     ,cursorTwo( model_p.GetMouseBrain()->GetSubPlan()->GetGrid(), sf::Color::Cyan )
     ,highlightingMode(1)
 {
@@ -180,22 +180,22 @@ void View::DrawMain() //Main Port...
     //draw selected Gobjects again in full brightness...
     if (highlightingMode == 2)
     {
-        auto d1 = ChipPlanFunc::GetDevice(cursorOne.GetPlanPos());
+        auto d1 = cursorOne.GetPlanPos().GetDevice();
         if (d1) d1->Draw(window);
-        auto d2 = ChipPlanFunc::GetDevice(cursorTwo.GetPlanPos());
+        auto d2 = cursorTwo.GetPlanPos().GetDevice();
         if (d2) d2->Draw(window);
-        auto w1 = ChipPlanFunc::GetWire(cursorOne.GetPlanPos(), cursorTwo.GetPlanPos());
+        auto w1 = ap->GetWire(d1, d2);
         if (w1) w1->Draw(window);
     }
     if (highlightingMode == 3)
     { //this whole GetWires() business is shonky...
-        auto d1 = ChipPlanFunc::GetDevice(cursorOne.GetPlanPos());
+        auto d1 = cursorOne.GetPlanPos().GetDevice();
         if (d1) {
             d1->Draw(window);
-            auto vec = ChipPlanFunc::GetWires(cursorOne.GetPlanPos(), true, false);  //ap->GetWires(d1, true, true);
-            for (auto x: vec) {
-                x->Draw(window);
-            }
+//            auto vec = ChipPlanFunc::GetWires(cursorOne.GetPlanPos(), true, false);  //ap->GetWires(d1, true, true);
+//            for (auto x: vec) {
+//                x->Draw(window);
+//            }
         }
     }
 }
@@ -218,9 +218,11 @@ void View::DrawBar() //Bar Port...
 //    lines[2].color = sf::Color::Yellow;
 //    window.draw(lines);
 
-    
-    auto ap = cursorOne.GetPlanPos().GetPlan();
-    if (not ap) ap = GetViewBasePlan();
+    PlanShp ap;
+    if (cursorOne.GetState() != CursorState::ABSENT)
+        ap = cursorOne.GetPlan();
+    else
+        ap = GetViewBasePlan();
     assert(ap);
     
     //barText1.setString( "text1: " + patch::to_string(ap->GetPlanID()) );
@@ -294,8 +296,8 @@ void View::Clamp()
 //DEL
 //    //Create a string to represent the stack of plans...
 //    std::string planNumStr;
-//    std::shared_ptr<ChipPlan> cont = ap;
-//    std::shared_ptr<ChipHandle> ref = nullptr;
+//    PlanShp cont = ap;
+//    HandleShp ref = nullptr;
 //    while (cont)
 //    {
 //        //(the string is written in reverse using insert(0,"") to prepend to make the active plan come last)

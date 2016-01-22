@@ -97,18 +97,18 @@ void Serializer::LoadLevel(int num, std::shared_ptr<Arena> a, std::shared_ptr<Bl
 
 
 
-bool Serializer::SaveUserPlan(std::shared_ptr<ChipPlan> plan_p)
+bool Serializer::SaveUserPlan(PlanShp plan_p)
 {
     bool saved = SavePlanRecursively(userDoc_.child("PLANS"), plan_p);
     userDoc_.save_file(XML_USER_FILENAME);
     return saved;
 }
-std::shared_ptr<ChipPlan> Serializer::LoadUserPlan(int planID, std::shared_ptr<BlobFactory> factory)
+PlanShp Serializer::LoadUserPlan(int planID, std::shared_ptr<BlobFactory> factory)
 {
     return LoadPlanRecursively(userDoc_.child("PLANS"), planID, factory);
 }
 
-std::shared_ptr<ChipPlan> Serializer::LoadLevelPlan(int levelNum, int planID, std::shared_ptr<BlobFactory> factory)
+PlanShp Serializer::LoadLevelPlan(int levelNum, int planID, std::shared_ptr<BlobFactory> factory)
 {
     pugi::xml_node con = levelsDoc_.find_child_by_attribute("LEVEL", "num", patch::to_string( levelNum ).c_str() );
     return LoadPlanRecursively(con, planID, factory);
@@ -184,7 +184,7 @@ pugi::xml_node Serializer::GetNameNodeByName(std::string name) {
 }
 
 
-bool Serializer::SavePlanRecursively(pugi::xml_node container, std::shared_ptr<ChipPlan> plan_p)
+bool Serializer::SavePlanRecursively(pugi::xml_node container, PlanShp plan_p)
 {
     if (plan_p->IsModified())
     {
@@ -263,9 +263,9 @@ bool Serializer::SavePlanRecursively(pugi::xml_node container, std::shared_ptr<C
     return false;
 }
 
-std::shared_ptr<ChipPlan> Serializer::LoadPlanRecursively(pugi::xml_node container, int planID, std::shared_ptr<BlobFactory> factory)
+PlanShp Serializer::LoadPlanRecursively(pugi::xml_node container, int planID, std::shared_ptr<BlobFactory> factory)
 {
-    std::shared_ptr<ChipPlan> memPlan = nullptr;
+    PlanShp memPlan = nullptr;
     
     //Find plan with matching planID in the XML...
     pugi::xml_node xmlPlan = container.find_child_by_attribute("PLAN", "i", patch::to_string( planID ).c_str() );

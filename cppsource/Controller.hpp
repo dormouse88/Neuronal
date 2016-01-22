@@ -20,17 +20,32 @@ public:
     bool HandleInput();
 
 private:
-    void CursorsGoHere(std::shared_ptr<ChipPlan>);
+    void HandleInputEvents();
+    void HandleInputEventsWritingMode();
+    void HandleInputEventsFreeMode();
+    void EventsPlan(PlanShp);
+    void EventsLocated(PlanPos);
+    void EventsBothLocated(PlanPos, PlanPos);
+    void EventsBothWirable(PlanShp, WiringPair);
+    void HandleInputState();
 
-    Model & theModel;
-    View & theView;
 
-    sf::Vector2f mouseCursorWorldPos;
-    bool mouseCursorSet;
-    bool enteringName;
-    bool enteringFilter;
-    std::string enteringText;
-    sf::Clock textEntryCooldown;
+    void CursorsGoHere(PlanShp);
+
+    Model & model_;
+    View & view_;
+
+    Cursor & cu1;
+    Cursor & cu2;
+    sf::Event event;
+    bool quitYet_;
+
+    sf::Vector2f mouseCursorWorldPos_;
+    bool isMouseCursorSet_;
+    bool isEnteringName_;
+    bool isEnteringFilter_;
+    std::string textBeingEntered_;
+    sf::Clock textEntryCooldownTimer_;
 };
 
 #endif	/* CONTROLLER_HPP */

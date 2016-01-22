@@ -35,13 +35,13 @@ void BaseReferer::SetModified()
 {
     ;
 }
-void BaseReferer::SetSubPlan(std::shared_ptr<ChipPlan> p, std::shared_ptr<RefererInterface> myself)
+void BaseReferer::SetSubPlan(PlanShp p, std::shared_ptr<RefererInterface> myself)
 {
     subPlan_ = p;
     p->RegisterReferer( myself );
     RefreshOutputs();
 }
-std::shared_ptr<ChipPlan> BaseReferer::GetSubPlan()
+PlanShp BaseReferer::GetSubPlan()
 {
     return subPlan_;
 }

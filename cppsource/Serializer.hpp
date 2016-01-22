@@ -27,9 +27,9 @@ public:
     void LoadLevel(int num, std::shared_ptr<Arena> a, std::shared_ptr<BlobFactory> f);
     
     //Model interface...
-    bool                        SaveUserPlan(std::shared_ptr<ChipPlan> plan_p);
-    std::shared_ptr<ChipPlan>   LoadUserPlan(int planID, std::shared_ptr<BlobFactory>);
-    std::shared_ptr<ChipPlan>   LoadLevelPlan(int levelNum, int planID, std::shared_ptr<BlobFactory>);
+    bool                        SaveUserPlan(PlanShp plan_p);
+    PlanShp   LoadUserPlan(int planID, std::shared_ptr<BlobFactory>);
+    PlanShp   LoadLevelPlan(int levelNum, int planID, std::shared_ptr<BlobFactory>);
 
     //UserData interface...
     void LoadUserData(std::shared_ptr<UserData>);
@@ -42,8 +42,8 @@ private:
     pugi::xml_node GetNameNodeByID(int planID);
     pugi::xml_node GetNameNodeByName(std::string name);
 
-    bool SavePlanRecursively(pugi::xml_node container, std::shared_ptr<ChipPlan> plan_p);
-    std::shared_ptr<ChipPlan> LoadPlanRecursively(pugi::xml_node container, int planID, std::shared_ptr<BlobFactory> factory);
+    bool SavePlanRecursively(pugi::xml_node container, PlanShp plan_p);
+    PlanShp LoadPlanRecursively(pugi::xml_node container, int planID, std::shared_ptr<BlobFactory> factory);
     
     pugi::xml_document userDoc_;
     pugi::xml_document levelsDoc_;

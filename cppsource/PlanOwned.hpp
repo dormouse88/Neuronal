@@ -11,12 +11,13 @@
 #include <string>
 #include <memory>
 #include <SFML/Graphics.hpp>
+#include "BasicTypes.hpp"
 class ChipPlan;  //fwd dec
 
 class PlanOwned
 {
 public:
-    PlanOwned(std::shared_ptr<ChipPlan> cont)
+    PlanOwned(PlanShp cont)
         :container(cont)
         , dead(false)
     {}
@@ -28,7 +29,7 @@ public:
     void Zingaya() {dead = true;}
     bool IsDead() const {return dead;}
     //void SetModified();
-    std::shared_ptr<ChipPlan> GetContainer();
+    PlanShp GetContainer();
 private:
     bool dead;
     std::weak_ptr<ChipPlan> container;

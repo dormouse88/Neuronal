@@ -20,7 +20,7 @@ typedef bool Charge;
 class Neuron : public Device
 {
 public:
-    Neuron(int serial, sf::Vector2i pos, int threshold, bool hasBulb, std::shared_ptr<ChipPlan> cont);
+    Neuron(int serial, sf::Vector2i pos, int threshold, bool hasBulb, PlanShp cont);
     virtual ~Neuron() {;}
 
     //PlanOwned...

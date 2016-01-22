@@ -9,37 +9,45 @@
 #include <cassert>
 
 Controller::Controller(Model & model_p, View & view_p)
-    :theModel(model_p), theView(view_p), mouseCursorSet(false), enteringName(false), enteringFilter(false)
+    :model_(model_p), view_(view_p), quitYet_(false), isMouseCursorSet_(false), isEnteringName_(false), isEnteringFilter_(false), cu1(view_.cursorOne), cu2(view_.cursorTwo)
 {}
 
-void Controller::CursorsGoHere(std::shared_ptr<ChipPlan> p)
+
+
+void Controller::CursorsGoHere(PlanShp p)
 {
     if (p) {
-        theView.cursorOne.SetGridOnly( p->GetGrid() );
-        theView.cursorTwo.SetGridOnly( p->GetGrid() );
+        view_.cursorOne.SetToPlan( p );
+        view_.cursorTwo.SetToPlan( p );
         
         auto b = p->GetWorldPaddedBoundBox();  //unimportant
-        theView.CentreOn( {b.left + b.width*0.5f, b.top + b.height} );
-        theView.Clamp();
+        view_.CentreOn( {b.left + b.width*0.5f, b.top + b.height} );
+        view_.Clamp();
     }
 }
 
+
+
 bool Controller::HandleInput()
 {
-    //the event loop...
-    bool quitYet = false;
-    sf::Event event;
-    while (theView.GetWindow().pollEvent(event))
+    HandleInputEvents();
+    HandleInputState();
+    return quitYet_;
+}
+
+
+
+void Controller::HandleInputEvents()
+{
+    //sf::Event event;
+    while (view_.GetWindow().pollEvent(event))
     {
-        PlanPos pos1 = theView.cursorOne.GetPlanPos();
-        PlanPos pos2 = theView.cursorTwo.GetPlanPos();
-        
         if (event.type == sf::Event::Closed)
-            quitYet = true;
+            quitYet_ = true;
         if (event.type == sf::Event::Resized)
         {
             // update the view to the new size of the window
-            theView.Resize( sf::Vector2f{static_cast<float>(event.size.width), static_cast<float>(event.size.height)} );
+            view_.Resize( sf::Vector2f{static_cast<float>(event.size.width), static_cast<float>(event.size.height)} );
         }
         
         //Mouse Events
@@ -48,14 +56,14 @@ bool Controller::HandleInput()
             if (event.mouseButton.button == sf::Mouse::Left)
             {
                 sf::Vector2i pixelPos(event.mouseButton.x, event.mouseButton.y);
-                sf::Vector2f worldPos = theView.GetWindow().mapPixelToCoords(pixelPos);
-                theView.cursorOne.SetPosWorld(worldPos);
+                sf::Vector2f worldPos = view_.GetWindow().mapPixelToCoords(pixelPos);
+                view_.cursorOne.SetPosWorld(worldPos);
             }
             if (event.mouseButton.button == sf::Mouse::Right)
             {
                 sf::Vector2i pixelPos(event.mouseButton.x, event.mouseButton.y);
-                sf::Vector2f worldPos = theView.GetWindow().mapPixelToCoords(pixelPos);
-                theView.cursorTwo.SetPosWorld(worldPos);
+                sf::Vector2f worldPos = view_.GetWindow().mapPixelToCoords(pixelPos);
+                view_.cursorTwo.SetPosWorld(worldPos);
             }
         }
         if (event.type == sf::Event::MouseWheelMoved)
@@ -65,256 +73,327 @@ bool Controller::HandleInput()
                 // get the current mouse position in the window
                 sf::Vector2i pixelPos(event.mouseWheel.x, event.mouseWheel.y);
                 // convert it to world coordinates
-                sf::Vector2f worldPos = theView.GetWindow().mapPixelToCoords(pixelPos);
-                theView.CentreOn(worldPos);
+                sf::Vector2f worldPos = view_.GetWindow().mapPixelToCoords(pixelPos);
+                view_.CentreOn(worldPos);
             }
-            theView.Zoom( 1.f + (-0.4f * event.mouseWheel.delta) );
+            view_.Zoom( 1.f + (-0.4f * event.mouseWheel.delta) );
         }
 
-        if (enteringName or enteringFilter)
+        if (isEnteringName_ or isEnteringFilter_)
         {
-            if (event.type == sf::Event::KeyPressed)
+            HandleInputEventsWritingMode();
+        }
+        else
+        {
+            HandleInputEventsFreeMode();
+        }
+    }
+}
+
+
+
+void Controller::HandleInputEventsWritingMode()
+{
+    if (event.type == sf::Event::KeyPressed)
+    {
+        if (event.key.code == sf::Keyboard::BackSpace)
+        {
+            if (textBeingEntered_.length() > 0) textBeingEntered_.erase(textBeingEntered_.length()-1);
+        }
+        if (event.key.code == sf::Keyboard::Return or event.key.code == sf::Keyboard::Escape)
+        {
+            if (event.key.code == sf::Keyboard::Return)
             {
-                if (event.key.code == sf::Keyboard::BackSpace)
-                {
-                    if (enteringText.length() > 0) enteringText.erase(enteringText.length()-1);
+                if (isEnteringName_) {
+                    model_.AddName(cu1.GetPlan()->GetPlanID(), textBeingEntered_);
                 }
-                if (event.key.code == sf::Keyboard::Return or event.key.code == sf::Keyboard::Escape)
-                {
-                    if (event.key.code == sf::Keyboard::Return)
-                    {
-                        if (enteringName) {
-                            theModel.AddName(pos1.GetPlan()->GetPlanID(), enteringText);
-                        }
-                        if (enteringFilter) {
-                            auto p = theModel.SetNameFilter(pos1, enteringText);
-                            CursorsGoHere(p);
-                        }
-                    }
-                    enteringName = false;
-                    enteringFilter = false;
-                    enteringText.clear();
+                if (isEnteringFilter_) {
+                    auto p = model_.EngageNameFilter(cu1.GetPlan(), textBeingEntered_);
+                    CursorsGoHere(p);
                 }
             }
-            if (event.type == sf::Event::TextEntered and textEntryCooldown.getElapsedTime() > sf::milliseconds(200) )
+            isEnteringName_ = false;
+            isEnteringFilter_ = false;
+            textBeingEntered_.clear();
+        }
+    }
+    if (event.type == sf::Event::TextEntered and textEntryCooldownTimer_.getElapsedTime() > sf::milliseconds(200) )
+    {
+        sf::Uint32 ch = event.text.unicode;
+        if (ch >= 0x61 and ch <= 0x7A) {  //convert lowercase to capitals
+            ch -= 0x20;
+        }
+        if (    (ch >= 0x30 and ch <= 0x39) or  //numbers
+                (ch >= 0x41 and ch <= 0x5A) or  //capitals
+                (ch == 0x23)    )  //#
+        {
+            textBeingEntered_.append( sf::String{ch} );
+        }
+    }
+    view_.SetTextEntering(isEnteringName_ or isEnteringFilter_, textBeingEntered_);
+}
+
+
+
+void Controller::HandleInputEventsFreeMode()
+{
+    //Keyboard Events
+    if (event.type == sf::Event::KeyPressed)
+    {
+        //requires nothing
+        if (event.key.code == sf::Keyboard::Comma)
+        {
+            model_.InnerTick();
+        }
+        if (event.key.code == sf::Keyboard::Period)
+        {
+            model_.OuterTick();
+        }
+        if (event.key.code == sf::Keyboard::Num1)
+        {
+            view_.SetHighlightingMode(1);
+        }
+        if (event.key.code == sf::Keyboard::Num2)
+        {
+            view_.SetHighlightingMode(2);
+        }
+        if (event.key.code == sf::Keyboard::Num3)
+        {
+            view_.SetHighlightingMode(3);
+        }
+
+        PlanShp plan;
+        if (cu1.GetState() != CursorState::ABSENT)
+        {
+            plan = cu1.GetPlan();
+            EventsPlan(plan);
+        }
+        if (cu1.GetState() == CursorState::LOCATED)
+        {
+            PlanPos pos1 = cu1.GetPlanPos();
+            EventsLocated(pos1);
+            if (cu2.GetState() == CursorState::LOCATED)
             {
-                sf::Uint32 ch = event.text.unicode;
-                if (ch >= 0x61 and ch <= 0x7A) {  //convert lowercase to capitals
-                    ch -= 0x20;
-                }
-                if (    (ch >= 0x30 and ch <= 0x39) or  //numbers
-                        (ch >= 0x41 and ch <= 0x5A) or  //capitals
-                        (ch == 0x23)    )  //#
-                {
-                    enteringText.append( sf::String{ch} );
-                }
+                PlanPos pos2 = cu2.GetPlanPos();
+                EventsBothLocated(pos1, pos2);
             }
         }
-        else  //free keyboard response...
+        WiringPair wp = RetrieveWiringPair(cu1, cu2);
+        if (wp.from and wp.to)
         {
-            //Keyboard Events
-            if (event.type == sf::Event::KeyPressed)
-            {
-                if (event.key.code == sf::Keyboard::N)
-                {
-                    if (event.key.shift == false) {
-                        theModel.GetFactory()->AddNeuron(pos1);
-                    }
-                    else {
-                        theModel.GetFactory()->RemoveDevice(pos1);
-                    }
-                }
-                if (event.key.code == sf::Keyboard::J)
-                {
-                    ;//theModel.GetFactory()->AddJumper(pos1);
-                }
-                if (event.key.code == sf::Keyboard::H)
-                {
-                    theModel.GetFactory()->AddHandle(pos1);
-                }
-                if (event.key.code == sf::Keyboard::B)
-                {
-                    if (event.key.shift == false) {
-                        theModel.GetFactory()->AddWire(pos1, pos2);
-                    }
-                    else {
-                        theModel.GetFactory()->RemoveWire(pos1, pos2);
-                    }
-                }
-                if (event.key.code == sf::Keyboard::A) {
-                    theView.PostMessage("Tried to modify a device upwards");
-                    ChipPlanFunc::DeviceHandle(pos1, 1);
-                }
-                if (event.key.code == sf::Keyboard::Z) {
-                    ChipPlanFunc::DeviceHandle(pos1, 2);
-                }
-                if (event.key.code == sf::Keyboard::BackSlash) {
-                    ChipPlanFunc::DeviceHandle(pos1, 3);
-                }
-                if (event.key.code == sf::Keyboard::S) {
-                    ChipPlanFunc::DeviceHandle(pos1, 3);
-                }
-                if (event.key.code == sf::Keyboard::X) {
-                    ChipPlanFunc::DeviceHandle(pos1, 4);
-                }
-                if (event.key.code == sf::Keyboard::D) {
-                    ChipPlanFunc::WireHandle(pos1, pos2, 1);
-                }
-                if (event.key.code == sf::Keyboard::C) {
-                    ChipPlanFunc::WireHandle(pos1, pos2, 2);
-                }
-                if (event.key.code == sf::Keyboard::F) {
-                    ChipPlanFunc::WireHandle(pos1, pos2, 3);
-                }
-                if (event.key.code == sf::Keyboard::V) {
-                    ChipPlanFunc::WireHandle(pos1, pos2, 4);
-                }
-                if (event.key.code == sf::Keyboard::M)
-                {
-                    theView.PostMessage("Tried to move something");
-                    ChipPlanFunc::SetPosition(pos1, pos2);
-                }
-                if (event.key.code == sf::Keyboard::Q)
-                {
-                    if (event.key.shift) theModel.SavePlanAsNew( pos1 );
-                    else theModel.SavePlan( pos1 );
-                }
-                if (event.key.code == sf::Keyboard::W)
-                {
-                    auto p = theModel.WipePlan(pos1, event.key.shift and event.key.control);
-                    CursorsGoHere(p);
-                }
-                
-                if (event.key.code == sf::Keyboard::Numpad1)
-                {
-                    auto p = theModel.LoadPlan(pos1, PlanNav::PREV_ID);
-                    CursorsGoHere(p);
-                }
-                if (event.key.code == sf::Keyboard::Numpad3)
-                {
-                    auto p = theModel.LoadPlan(pos1, PlanNav::NEXT_ID);
-                    CursorsGoHere(p);
-                }
-                if (event.key.code == sf::Keyboard::Numpad7)
-                {
-                    auto p = theModel.LoadPlan(pos1, PlanNav::PREV_NAME);
-                    CursorsGoHere(p);
-                }
-                if (event.key.code == sf::Keyboard::Numpad9)
-                {
-                    auto p = theModel.LoadPlan(pos1, PlanNav::NEXT_NAME);
-                    CursorsGoHere(p);
-                }
-                if (event.key.code == sf::Keyboard::Numpad8)
-                {
-                    auto p = theModel.LoadPlan(pos1, PlanNav::PARENT);
-                    CursorsGoHere(p);
-                }
-                if (event.key.code == sf::Keyboard::Numpad2)
-                {
-                    auto p = theModel.LoadPlan(pos1, PlanNav::FIRST_CHILD);
-                    CursorsGoHere(p);
-                }
-                if (event.key.code == sf::Keyboard::Numpad4)
-                {
-                    auto p = theModel.LoadPlan(pos1, PlanNav::PREV_SIBLING);
-                    CursorsGoHere(p);
-                }
-                if (event.key.code == sf::Keyboard::Numpad6)
-                {
-                    auto p = theModel.LoadPlan(pos1, PlanNav::NEXT_SIBLING);
-                    CursorsGoHere(p);
-                }
-                if (event.key.code == sf::Keyboard::Subtract)
-                {
-                    assert(not enteringName);
-                    assert(not enteringFilter);
-                    auto p = theModel.SetNameFilter(pos1, "");
-                    CursorsGoHere(p);
-                }
-                if (event.key.code == sf::Keyboard::Add)
-                {
-                    assert(not enteringName);
-                    assert(not enteringFilter);
-                    enteringFilter = true;
-                    enteringText = theModel.GetNameFilter();
-                    textEntryCooldown.restart();
-                }
+            EventsBothWirable(plan, wp);
+        }
+    }
+}
+            
+            
+            
+void Controller::EventsPlan(PlanShp plan)
+{
+    //requires cu1 PLAN
+    if (event.key.code == sf::Keyboard::X)
+    {
+        auto h = plan->GetHandle();
+        if (h)
+            h->SetExploded(false);
+    }
 
-                if (event.key.code == sf::Keyboard::R)
-                {
-                    theModel.RemoveName(pos1.GetPlan()->GetPlanID());
-                }
-                if (event.key.code == sf::Keyboard::E and theModel.CanAddName(pos1.GetPlan()->GetPlanID()))
-                {
-                    assert(not enteringName);
-                    assert(not enteringFilter);
-                    enteringName = true;
-                    textEntryCooldown.restart();
-                }
+    if (event.key.code == sf::Keyboard::LBracket)
+    {
+        view_.cursorOne.SetToPlan();
+    }
+    if (event.key.code == sf::Keyboard::RBracket)
+    {
+        view_.cursorTwo.SetToPlan();
+    }
 
-                if (event.key.code == sf::Keyboard::LBracket)
-                {
-                    theView.cursorOne.Dislocate();
-                }
-                if (event.key.code == sf::Keyboard::RBracket)
-                {
-                    theView.cursorTwo.Dislocate();
-                }
-                if (event.key.code == sf::Keyboard::Comma)
-                {
-                    theModel.InnerTick();
-                }
-                if (event.key.code == sf::Keyboard::Period)
-                {
-                    theModel.OuterTick();
-                }
+    if (event.key.code == sf::Keyboard::Q)
+    {
+        if (event.key.shift) model_.SavePlanAsNew( plan );
+        else model_.SavePlan( plan );
+    }
+    if (event.key.code == sf::Keyboard::W)
+    {
+        auto p = model_.WipePlan(plan, event.key.shift and event.key.control);
+        CursorsGoHere(p);
+    }
 
-                if (event.key.code == sf::Keyboard::Num1)
-                {
-                    theView.SetHighlightingMode(1);
-                }
-                if (event.key.code == sf::Keyboard::Num2)
-                {
-                    theView.SetHighlightingMode(2);
-                }
-                if (event.key.code == sf::Keyboard::Num3)
-                {
-                    theView.SetHighlightingMode(3);
-                }
-            } //(if event.type is keyPressed)
-        }//else (not entering text)
-    } //(while events)
-    
+    if (event.key.code == sf::Keyboard::Numpad1)
+    {
+        auto p = model_.LoadPlan(plan, PlanNav::PREV_ID);
+        CursorsGoHere(p);
+    }
+    if (event.key.code == sf::Keyboard::Numpad3)
+    {
+        auto p = model_.LoadPlan(plan, PlanNav::NEXT_ID);
+        CursorsGoHere(p);
+    }
+    if (event.key.code == sf::Keyboard::Numpad7)
+    {
+        auto p = model_.LoadPlan(plan, PlanNav::PREV_NAME);
+        CursorsGoHere(p);
+    }
+    if (event.key.code == sf::Keyboard::Numpad9)
+    {
+        auto p = model_.LoadPlan(plan, PlanNav::NEXT_NAME);
+        CursorsGoHere(p);
+    }
+    if (event.key.code == sf::Keyboard::Numpad8)
+    {
+        auto p = model_.LoadPlan(plan, PlanNav::PARENT);
+        CursorsGoHere(p);
+    }
+    if (event.key.code == sf::Keyboard::Numpad2)
+    {
+        auto p = model_.LoadPlan(plan, PlanNav::FIRST_CHILD);
+        CursorsGoHere(p);
+    }
+    if (event.key.code == sf::Keyboard::Numpad4)
+    {
+        auto p = model_.LoadPlan(plan, PlanNav::PREV_SIBLING);
+        CursorsGoHere(p);
+    }
+    if (event.key.code == sf::Keyboard::Numpad6)
+    {
+        auto p = model_.LoadPlan(plan, PlanNav::NEXT_SIBLING);
+        CursorsGoHere(p);
+    }
+    if (event.key.code == sf::Keyboard::Subtract)
+    {
+        assert(not isEnteringName_);
+        assert(not isEnteringFilter_);
+        auto p = model_.EngageNameFilter(plan, "");
+        CursorsGoHere(p);
+    }
+    if (event.key.code == sf::Keyboard::Add)
+    {
+        assert(not isEnteringName_);
+        assert(not isEnteringFilter_);
+        isEnteringFilter_ = true;
+        textBeingEntered_ = model_.GetNameFilter();
+        textEntryCooldownTimer_.restart();
+    }
+
+    if (event.key.code == sf::Keyboard::R)
+    {
+        model_.RemoveName(plan->GetPlanID());
+    }
+    if (event.key.code == sf::Keyboard::E and model_.CanAddName(plan->GetPlanID()))
+    {
+        assert(not isEnteringName_);
+        assert(not isEnteringFilter_);
+        isEnteringName_ = true;
+        textEntryCooldownTimer_.restart();
+    }
+}
+
+
+
+void Controller::EventsLocated(PlanPos pos1)
+{
+    //requires cu1 LOCATED
+    if (event.key.code == sf::Keyboard::S)
+    {
+        auto h = pos1.GetDeviceAsHandle();
+        if (h)
+            h->SetExploded(true);
+    }
+
+    if (event.key.code == sf::Keyboard::N)
+    {
+        if (event.key.shift == false)
+        {
+            model_.GetFactory()->AddNeuron(pos1);
+        }
+        else
+        {
+            model_.GetFactory()->RemoveDevice(pos1);
+        }
+    }
+    if (event.key.code == sf::Keyboard::H)
+    {
+        model_.GetFactory()->AddHandle(pos1);
+    }
+    if (event.key.code == sf::Keyboard::A)
+    {
+        view_.PostMessage("Tried to modify a device upwards");
+        pos1.GetDevice()->Handle(1);
+    }
+    if (event.key.code == sf::Keyboard::Z)
+    {
+        pos1.GetDevice()->Handle(2);
+    }
+    if (event.key.code == sf::Keyboard::BackSlash)
+    {
+        pos1.GetDevice()->Handle(3);
+    }
+}
+
+
+void Controller::EventsBothLocated(PlanPos pos1, PlanPos pos2)
+{
+    //requires cu1 + cu2 LOCATED
+    if (event.key.code == sf::Keyboard::M)
+    {
+        view_.PostMessage("Tried to move something");
+        pos1.GetPlan()->SetPosition(pos1.GetDevice(), pos2.GetSmartPos());
+        //ChipPlanFunc::SetPosition(pos1, pos2); //allows moving of exploded plans
+    }
+}
+
+
+
+void Controller::EventsBothWirable(PlanShp plan, WiringPair wp)
+{
+    //requires cu1 + cu2 in a VALID WIRING RELATIONSHIP
+    if (event.key.code == sf::Keyboard::B)
+    {
+        if (event.key.shift == false)
+        {
+            model_.GetFactory()->AddWire(plan, *wp.from, *wp.to, 1);
+        }
+        else
+        {
+            model_.GetFactory()->RemoveWire(plan, wp.from, wp.to);
+        }
+    }
+    auto wire = plan->GetWire(wp.from, wp.to);
+    if (wire) 
+    {
+        if (event.key.code == sf::Keyboard::D) {
+            wire->Handle(1);
+        }
+        if (event.key.code == sf::Keyboard::C) {
+            wire->Handle(2);
+        }
+        if (event.key.code == sf::Keyboard::F) {
+            wire->Handle(3);
+        }
+        if (event.key.code == sf::Keyboard::V) {
+            wire->Handle(4);
+        }
+    }
+}
+
+
+
+void Controller::HandleInputState()
+{
     if ( sf::Mouse::isButtonPressed(sf::Mouse::Middle) )
     {
-        sf::Vector2i pixelPos{ sf::Mouse::getPosition(theView.GetWindow()) };
-        sf::Vector2f worldPos{ theView.GetWindow().mapPixelToCoords( pixelPos ) };
-        if (!mouseCursorSet) {
-            mouseCursorSet = true;
+        sf::Vector2i pixelPos{ sf::Mouse::getPosition(view_.GetWindow()) };
+        sf::Vector2f worldPos{ view_.GetWindow().mapPixelToCoords( pixelPos ) };
+        if (!isMouseCursorSet_) {
+            isMouseCursorSet_ = true;
         }
         else {
-            theView.Pan( (-worldPos + mouseCursorWorldPos) /1.00f );
+            view_.Pan( (-worldPos + mouseCursorWorldPos_) /1.00f );
         }
-        sf::Vector2i newPixelPos{ sf::Mouse::getPosition(theView.GetWindow()) };
-        mouseCursorWorldPos = theView.GetWindow().mapPixelToCoords( newPixelPos );
+        sf::Vector2i newPixelPos{ sf::Mouse::getPosition(view_.GetWindow()) };
+        mouseCursorWorldPos_ = view_.GetWindow().mapPixelToCoords( newPixelPos );
     }
     else {
-        mouseCursorSet = false;
+        isMouseCursorSet_ = false;
     }
- 
-    //Too early here because handles haven't gone out of scope...
-//    if (not theView.cursorOne.GetPlanPos().IsValid())
-//    {
-//        theView.cursorOne.SetGridOnly(theModel.GetBasePlan()->GetGrid());
-//    }
-//    if (not theView.cursorTwo.GetPlanPos().IsValid())
-//    {
-//        theView.cursorTwo.SetGridOnly(theView.cursorOne.GetPlanPos().GetGrid());
-//    }
-
-    theView.SetTextEntering(enteringName or enteringFilter, enteringText);
-    
-    return quitYet;
 }
 

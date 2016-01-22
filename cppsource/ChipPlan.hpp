@@ -15,7 +15,7 @@
 #include "Device.hpp"
 #include "Wire.hpp"
 #include "PlanGrid.hpp"
-#include "PlanPos.hpp"
+class PlanRect; //fwd dec
 #include "RefererInterface.hpp"
 class UserData;  //fwd dec
 class ChipHandle;
@@ -30,7 +30,7 @@ public:
 
     void RegisterReferer(std::shared_ptr<RefererInterface> ref);
     std::shared_ptr<RefererInterface> GetReferer();
-    std::shared_ptr<ChipHandle> GetHandle();
+    HandleShp GetHandle();
 
     //Wirable...
     virtual void Refresh(int slot) override;
@@ -48,16 +48,16 @@ public:
     void PassOnCalculate();
 
 
-    void SetPosition(Device & d, VectorSmart newPos);
+    void SetPosition(DeviceShp d, VectorSmart newPos);
     int GetFreeSerial() const;
     bool IsSerialFree(int serial) const;
     bool IsPositionFree(VectorSmart pos) const;
     int GetPlanID() const                                   {return planID;}
 
-    void ImportDevice(std::shared_ptr<Device> device);
-    void ImportWire(std::shared_ptr<Wire> wire);
-    void RemoveDevice(std::shared_ptr<Device> device);
-    void RemoveWire(std::shared_ptr<Wire> wire);
+    void ImportDevice(DeviceShp device);
+    void ImportWire(WireShp wire);
+    void RemoveDevice(DeviceShp device);
+    void RemoveWire(WireShp wire);
     void CleanVectors();
 
     void SetModified();
@@ -65,10 +65,10 @@ public:
     bool IsEmpty()                                          {return devices.empty() and wires.empty();}
     
     std::shared_ptr<PlanGrid> GetGrid()                     {return planGrid;}
-    std::shared_ptr<Device> GetDevice(VectorSmart pos);
-    std::shared_ptr<Device> GetDevice(int serial);
-    std::shared_ptr<Wire> GetWire(const Wirable& from, const Wirable& to);
-    std::vector<std::shared_ptr<Wire> > GetWires(std::shared_ptr<Wirable>, bool from, bool to); 
+    DeviceShp GetDevice(VectorSmart pos);
+    DeviceShp GetDevice(int serial);
+    WireShp GetWire(WirableShp from, WirableShp to);
+    std::vector<WireShp > GetWires(std::shared_ptr<Wirable>, bool from, bool to); 
 
     void RecalculateSmartInnerBound();
     PlanRect GetSmartInnerBound() const;
@@ -79,7 +79,6 @@ public:
     RectWorld GetWorldPaddedBoundPlusPorts() const;
     RectWorld GetWorldPaddedBoundMinusPorts() const;
     
-    void SetPadding(int thickness)                        {padding = thickness;}
     void PlodeRefresh(VectorSmart point);
     void PlodeRefreshOutwards();
     
@@ -95,27 +94,28 @@ private:
     std::shared_ptr<const UserData> userData_;
     std::shared_ptr<PlanGrid> planGrid;
     std::shared_ptr<RefererInterface> referer;
-    std::vector<std::shared_ptr<Device> > devices;
-    std::vector<std::shared_ptr<Wire> > wires;
+    std::vector<DeviceShp > devices;
+    std::vector<WireShp > wires;
     bool modified;
-    int padding;
-    PlanRect smartInnerBound;
+    //PlanRect smartInnerBound;
+    VectorSmart tl_corner;
+    VectorSmart br_corner;
     
     friend class Serializer;
 };
 
 namespace ChipPlanFunc
 {
-    std::shared_ptr<Device> GetDevice(PlanPos pos);
-    std::shared_ptr<Wirable> GetWirable(PlanPos pos);
-    std::shared_ptr<Wire> GetWire(PlanPos pos1, PlanPos pos2);
-    std::vector<std::shared_ptr<Wire> > GetWires(PlanPos pos, bool from, bool to);
-    bool IsPositionFree(PlanPos pos);
-    void SetPosition(PlanPos dPos, PlanPos toPos);
+//    DeviceShp GetDevice(PlanPos pos);
 
-    void DeviceHandle(PlanPos pos, int code);
-    void WireHandle(PlanPos pos1, PlanPos pos2, int code);
-    bool MatchOnPlan(PlanPos & pos1, PlanPos & pos2);
+//    WireShp GetWire(PlanPos pos1, PlanPos pos2);
+//    std::vector<WireShp > GetWires(PlanPos pos, bool from, bool to);
+
+//    void SetPosition(PlanPos dPos, PlanPos toPos);
+//
+//    void DeviceHandle(PlanPos pos, int code);
+//    void WireHandle(PlanPos pos1, PlanPos pos2, int code);
+//    bool MatchOnPlan(PlanPos & pos1, PlanPos & pos2);
 }
 
 
