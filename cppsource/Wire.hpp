@@ -38,34 +38,34 @@ private:
 class Wire : public PlanOwned
 {
 public:
-    Wire(Wirable & from_p, int fromSlot_p, Wirable & to_p, int toSlot_p, signed weight_p, PlanShp cont);
+    Wire(Wirable & from, Tag fromSlot, Wirable & to, Tag toSlot, signed weight, PlanShp cont);
 
     virtual std::string SerialName() const { return "WIRE";}
 
     void Refresh();
-    int GetOutgoingWeight() const          { if (firing) return weight; else return 0;}
+    int GetOutgoingWeight() const          { if (firing_) return weight_; else return 0;}
     
-    bool GetFiring() const {return firing;}     //for drawing only
-    int GetWeight() const {return weight;}      //for drawing only
-    void SetWeight(int w) {weight = w;}         //for drawing only
+    bool GetFiring() const {return firing_;}     //for drawing only
+    int GetWeight() const {return weight_;}      //for drawing only
 
-    const Wirable& GetFrom() const {return from; }
-    const int GetFromSlot() const {return fromSlot; }
-    const Wirable& GetTo() const {return to; }
-    const int GetToSlot() const {return toSlot; }
+    const Wirable& GetFrom() const {return from_; }
+    const int GetFromSlot() const {return fromTag_; }
+    const Wirable& GetTo() const {return to_; }
+    const int GetToSlot() const {return toTag_; }
     
     virtual void Draw(sf::RenderTarget & rt) override;
     virtual void Handle(int code) override;
 
+    void SetWeight(int w);
     void SlotCycle(int step, bool fromSide);
 private:
-    Wirable& from;
-    int fromSlot;
-    Wirable& to;
-    int toSlot;
-    signed weight;
-    bool firing;
-    WireView v;
+    Wirable& from_;
+    int fromTag_;
+    Wirable& to_;
+    int toTag_;
+    signed weight_;
+    bool firing_;
+    WireView v_;
 };
 
 #endif	/* WIRE_HPP */

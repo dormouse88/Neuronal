@@ -35,5 +35,9 @@ class Wirable;
 typedef Shp<Wirable> WirableShp;
 
 
+
+
+typedef int Tag;
+
 #endif	/* BASICTYPES_HPP */
 

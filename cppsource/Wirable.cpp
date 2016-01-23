@@ -9,7 +9,7 @@
 #include "Wire.hpp"
 
 
-bool Wirable::HasWireTo(int fromSlot, Wirable & to, int toSlot) const //slot parameters are now redundant
+bool Wirable::HasWireTo(Tag fromSlot, Wirable & to, Tag toSlot) const //slot parameters are now redundant
 {
     for (const auto w: outWires) {
         auto wire = w.lock();
@@ -33,7 +33,7 @@ void Wirable::CleanWireVectors() const //this method is necessary since the limi
     cleanVector(outWires);
 }
 
-void Wirable::PropagateRefresh(int slot)
+void Wirable::PropagateRefresh(Tag slot)
 {
     for (auto & w: outWires)
     {
@@ -45,7 +45,7 @@ void Wirable::PropagateRefresh(int slot)
     }
 }
 
-int Wirable::GetTotalIncomingWeight(int slot) const
+int Wirable::GetTotalIncomingWeight(Tag slot) const
 {
     CleanWireVectors();
     int total = 0;
@@ -62,7 +62,7 @@ int Wirable::GetTotalIncomingWeight(int slot) const
 
 
 
-bool Wirable::IsInSlotFree(int slot) const
+bool Wirable::IsInSlotFree(Tag slot) const
 {
     CleanWireVectors();
     for (auto w: inWires) {
@@ -70,7 +70,7 @@ bool Wirable::IsInSlotFree(int slot) const
     }
     return true;
 }
-bool Wirable::IsOutSlotFree(int slot) const
+bool Wirable::IsOutSlotFree(Tag slot) const
 {
     CleanWireVectors();
     for (auto w: outWires) {

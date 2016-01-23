@@ -35,12 +35,12 @@ HandleShp ChipPlan::GetHandle()
 
 
 //Wirable...
-void ChipPlan::Refresh(int slot)
+void ChipPlan::Refresh(Tag slot)
 {
     if (referer)
         referer->StepOutRefresh(slot);
 }
-bool ChipPlan::GetOutgoingCharge(int slot)
+bool ChipPlan::GetOutgoingCharge(Tag slot)
 {
     if (referer)
         return referer->StepOutGetOutgoingCharge(slot);
@@ -63,11 +63,11 @@ VectorWorld ChipPlan::GetWireAttachPos(WireAttachSide was) const
     return wirePos;
 }
 
-bool ChipPlan::CanRegisterIn(int slot) const
+bool ChipPlan::CanRegisterIn(Tag slot) const
 {
     return IsInSlotFree(slot);
 }
-bool ChipPlan::CanRegisterOut(int slot) const
+bool ChipPlan::CanRegisterOut(Tag slot) const
 {
     return IsOutSlotFree(slot);
 }
@@ -75,13 +75,13 @@ bool ChipPlan::CanRegisterOut(int slot) const
 
 
 //"Referred"...
-void ChipPlan::StepInRefresh(int slot)
+void ChipPlan::StepInRefresh(Tag slot)
 {
     PropagateRefresh(slot);
 }
-bool ChipPlan::StepInGetOutgoingCharge(int slot)
+bool ChipPlan::StepInGetOutgoingCharge(Tag slot)
 {
-    if ( GetTotalIncomingWeight(slot) > 1 )
+    if ( GetTotalIncomingWeight(slot) >= 1 )
         return true;
     else
         return false;
@@ -104,12 +104,14 @@ void ChipPlan::PassOnCalculate()
 
 void ChipPlan::SetPosition(DeviceShp d, VectorSmart newPos)
 {
-    auto oldPos = d->GetSmartPos();
     if (IsPositionFree(newPos))
+    {
+        auto oldPos = d->GetSmartPos();
         d->SetPosSmart( newPos );
-    SetModified();
-    PlodeRefresh(oldPos);
-    PlodeRefresh(newPos);
+        SetModified();
+        PlodeRefresh(oldPos);
+        PlodeRefresh(newPos);
+    }
 }
 int ChipPlan::GetFreeSerial() const
 {

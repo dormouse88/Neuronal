@@ -15,8 +15,8 @@ class ChipPlan;
 class RefererInterface
 {
 public:
-    virtual void StepOutRefresh(int slot) = 0;
-    virtual bool StepOutGetOutgoingCharge(int slot) = 0;
+    virtual void StepOutRefresh(Tag slot) = 0;
+    virtual bool StepOutGetOutgoingCharge(Tag slot) = 0;
     virtual void SetModified() = 0;
     virtual void SetSubPlan(PlanShp, std::shared_ptr<RefererInterface>) = 0;
     virtual PlanShp GetSubPlan() = 0;

@@ -126,29 +126,36 @@ void WireView::Draw(sf::RenderTarget & rt, const Wire & w)
 
 /**
  * CLASS Wire
- * @param from_p reference to Wirable object the wire is coming from
- * @param fromSlot_p
- * @param to_p reference to Wirable object the wire is going to
- * @param toSlot_p
- * @param weight_p
+ * @param from reference to Wirable object the wire is coming from
+ * @param fromSlot
+ * @param to reference to Wirable object the wire is going to
+ * @param toSlot
+ * @param weight
  */
-Wire::Wire(Wirable & from_p, int fromSlot_p, Wirable & to_p, int toSlot_p, signed weight_p, PlanShp cont)
-    :PlanOwned(cont), v(*this), from(from_p), fromSlot(fromSlot_p), to(to_p), toSlot(toSlot_p), weight(weight_p), firing(false)
+Wire::Wire(Wirable & from, int fromSlot, Wirable & to, int toSlot, signed weight, PlanShp cont)
+    :PlanOwned(cont)
+    , v_(*this)
+    , from_(from)
+    , fromTag_(fromSlot)
+    , to_(to)
+    , toTag_(toSlot)
+    , weight_(weight)
+    , firing_(false)
 {}
 
 void Wire::Refresh()
 {
-    bool newState = from.GetOutgoingCharge(fromSlot);
-    if (newState != firing) {
-        firing = newState;
-        to.Refresh(toSlot);
+    bool newState = from_.GetOutgoingCharge(fromTag_);
+    if (newState != firing_) {
+        firing_ = newState;
+        to_.Refresh(toTag_);
     }
 }
 
 
 void Wire::Draw(sf::RenderTarget & rt)
 {
-    v.Draw(rt, *this);
+    v_.Draw(rt, *this);
 }
 
 void Wire::Handle(int code)
@@ -186,19 +193,39 @@ void Wire::Handle(int code)
     GetContainer()->SetModified();
 }
 
+void Wire::SetWeight(int w)
+{
+    if (weight_ != w)
+    {
+        weight_ = w;
+        to_.Refresh(toTag_);
+    }
+}
+
 void Wire::SlotCycle(int step, bool fromSide)
 {
     assert(step == -1 or step == 1);
-    int & chosenSlot = fromSide == true ? fromSlot : toSlot;
+    Tag & chosenSlot = (fromSide == true) ? fromTag_ : toTag_;
     int newSlot = chosenSlot;
     bool acceptNewSlot = false;
     while (newSlot + step >= 1 and newSlot + step <= SLOT_MAX and not acceptNewSlot)
     {
         newSlot += step;
-        if ( (fromSide and from.CanRegisterOut(newSlot)) or (!fromSide and to.CanRegisterIn(newSlot)) )
+        if ( (fromSide and from_.CanRegisterOut(newSlot)) or (!fromSide and to_.CanRegisterIn(newSlot)) )
         {
             acceptNewSlot = true;
         }
     }
-    if (acceptNewSlot) chosenSlot = newSlot;
+    if (acceptNewSlot)
+    {
+        Tag oldSlot = toTag_;
+        chosenSlot = newSlot;
+        if (fromSide)
+            Refresh();
+        else
+        {
+            to_.Refresh(toTag_);
+            to_.Refresh(oldSlot);
+        }
+    }
 }

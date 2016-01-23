@@ -13,13 +13,13 @@
 BaseReferer::BaseReferer()
 {}
 
-void BaseReferer::StepOutRefresh(int slot)
+void BaseReferer::StepOutRefresh(Tag slot)
 //outputs may have changed
 {
     RefreshOutputs();
 }
 
-bool BaseReferer::StepOutGetOutgoingCharge(int slot)
+bool BaseReferer::StepOutGetOutgoingCharge(Tag slot)
 //return outgoing charges from inputs
 {
     for (auto &x: inputs_)

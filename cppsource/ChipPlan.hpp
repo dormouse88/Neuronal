@@ -33,17 +33,17 @@ public:
     HandleShp GetHandle();
 
     //Wirable...
-    virtual void Refresh(int slot) override;
-    virtual bool GetOutgoingCharge(int slot) override;
+    virtual void Refresh(Tag slot) override;
+    virtual bool GetOutgoingCharge(Tag slot) override;
     virtual VectorWorld GetWireAttachPos(WireAttachSide was) const override;
 
     virtual bool IsSlotted(SlottedSide) const override      {return true;}
-    virtual bool CanRegisterIn(int slot) const override;
-    virtual bool CanRegisterOut(int slot) const override;
+    virtual bool CanRegisterIn(Tag slot) const override;
+    virtual bool CanRegisterOut(Tag slot) const override;
 
     //"Referred"...
-    void StepInRefresh(int slot);
-    bool StepInGetOutgoingCharge(int slot);
+    void StepInRefresh(Tag slot);
+    bool StepInGetOutgoingCharge(Tag slot);
     void PassOnAct();
     void PassOnCalculate();
 

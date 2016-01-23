@@ -139,7 +139,7 @@ Neuron::Neuron(int serial, sf::Vector2i pos, int threshold, bool hasBulb, PlanSh
     InitVisuals();
 }
 
-void Neuron::Refresh(int slot)
+void Neuron::Refresh(Tag slot)
 {
     totalIncoming_ = GetTotalIncomingWeight();
     bool newState = false;
@@ -157,7 +157,7 @@ void Neuron::Refresh(int slot)
     }
 }
 
-bool Neuron::GetOutgoingCharge(int slot)
+bool Neuron::GetOutgoingCharge(Tag slot)
 {
     return outgoingCharge_;
 }

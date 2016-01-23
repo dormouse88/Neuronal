@@ -71,7 +71,7 @@ void ChipHandle::Handle(int code)
 
 
 //Wirable...
-void ChipHandle::Refresh(int slot)
+void ChipHandle::Refresh(Tag slot)
 {
     if (subPlan_) subPlan_->StepInRefresh(slot);
     //Something like this...
@@ -87,7 +87,7 @@ void ChipHandle::Refresh(int slot)
 }
 
 //(Called on right hand side of handle by other device)
-bool ChipHandle::GetOutgoingCharge(int slot)
+bool ChipHandle::GetOutgoingCharge(Tag slot)
 {
     if (subPlan_)
         return subPlan_->StepInGetOutgoingCharge(slot);
@@ -127,11 +127,11 @@ bool ChipHandle::IsSlotted(SlottedSide) const
 {
     return true;
 }
-bool ChipHandle::CanRegisterIn(int slot) const
+bool ChipHandle::CanRegisterIn(Tag slot) const
 {
     return IsInSlotFree(slot);
 }
-bool ChipHandle::CanRegisterOut(int slot) const
+bool ChipHandle::CanRegisterOut(Tag slot) const
 {
     return IsOutSlotFree(slot);
 }
@@ -166,12 +166,12 @@ VectorDumb ChipHandle::GetPlodedSize()
 
 //RefererInterface...
 //(called by plan onto right hand side of handle)
-void ChipHandle::StepOutRefresh(int slot)
+void ChipHandle::StepOutRefresh(Tag slot)
 {
     PropagateRefresh(slot);
 }
 //(called by plan onto left hand side of handle)
-bool ChipHandle::StepOutGetOutgoingCharge(int slot)
+bool ChipHandle::StepOutGetOutgoingCharge(Tag slot)
 {
     if (GetTotalIncomingWeight(slot) >= 1)
         return true;

@@ -20,7 +20,7 @@ struct SlotData
 {
     SlotData()                                  :slot(7), name(), charge(false) {}
     SlotData(int s, std::string n, bool c)      :slot(s), name(n), charge(c) {}
-    int slot;
+    Tag slot;
     std::string name;
     bool charge;
 };
@@ -40,8 +40,8 @@ public:
     BaseReferer();
     
     //RefererInterface...
-    virtual void StepOutRefresh(int slot) override;
-    virtual bool StepOutGetOutgoingCharge(int slot) override;
+    virtual void StepOutRefresh(Tag slot) override;
+    virtual bool StepOutGetOutgoingCharge(Tag slot) override;
     virtual void SetModified() override;
     virtual void SetSubPlan(PlanShp, std::shared_ptr<RefererInterface>) override;
     virtual PlanShp GetSubPlan() override;

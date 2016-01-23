@@ -162,11 +162,11 @@ void Controller::HandleInputEventsFreeMode()
             view_.SetHighlightingMode(3);
         }
 
-        PlanShp plan;
+        PlanShp plan1;
         if (cu1.GetState() != CursorState::ABSENT)
         {
-            plan = cu1.GetPlan();
-            EventsPlan(plan);
+            plan1 = cu1.GetPlan();
+            EventsPlan(plan1);
         }
         if (cu1.GetState() == CursorState::LOCATED)
         {
@@ -178,10 +178,10 @@ void Controller::HandleInputEventsFreeMode()
                 EventsBothLocated(pos1, pos2);
             }
         }
-        WiringPair wp = RetrieveWiringPair(cu1, cu2);
-        if (wp.from and wp.to)
+        Shp<WiringPair> wp = RetrieveWiringPair(cu1, cu2);
+        if (wp)
         {
-            EventsBothWirable(plan, wp);
+            EventsBothWirable(*wp);
         }
     }
 }
@@ -336,28 +336,29 @@ void Controller::EventsBothLocated(PlanPos pos1, PlanPos pos2)
     if (event.key.code == sf::Keyboard::M)
     {
         view_.PostMessage("Tried to move something");
-        pos1.GetPlan()->SetPosition(pos1.GetDevice(), pos2.GetSmartPos());
+        if (pos1.GetPlan() == pos2.GetPlan())
+            pos1.GetPlan()->SetPosition(pos1.GetDevice(), pos2.GetSmartPos());
         //ChipPlanFunc::SetPosition(pos1, pos2); //allows moving of exploded plans
     }
 }
 
 
 
-void Controller::EventsBothWirable(PlanShp plan, WiringPair wp)
+void Controller::EventsBothWirable(WiringPair wp)
 {
     //requires cu1 + cu2 in a VALID WIRING RELATIONSHIP
     if (event.key.code == sf::Keyboard::B)
     {
         if (event.key.shift == false)
         {
-            model_.GetFactory()->AddWire(plan, *wp.from, *wp.to, 1);
+            model_.GetFactory()->AddWire(wp.plan, *wp.from, *wp.to, 1);
         }
         else
         {
-            model_.GetFactory()->RemoveWire(plan, wp.from, wp.to);
+            model_.GetFactory()->RemoveWire(wp.plan, wp.from, wp.to);
         }
     }
-    auto wire = plan->GetWire(wp.from, wp.to);
+    auto wire = wp.plan->GetWire(wp.from, wp.to);
     if (wire) 
     {
         if (event.key.code == sf::Keyboard::D) {

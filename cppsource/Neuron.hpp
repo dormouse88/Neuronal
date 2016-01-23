@@ -29,8 +29,8 @@ public:
     virtual void Handle(int code) override;
     
     //Wirable...
-    virtual void Refresh(int slot) override;
-    virtual bool GetOutgoingCharge(int slot) override;
+    virtual void Refresh(Tag slot) override;
+    virtual bool GetOutgoingCharge(Tag slot) override;
     virtual VectorWorld GetWireAttachPos(WireAttachSide was) const override;
     virtual bool IsWeightedIn() const override              {return true;}
     

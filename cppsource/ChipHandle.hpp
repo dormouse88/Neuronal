@@ -24,13 +24,13 @@ public:
     virtual void Handle(int code) override;
     
     //Wirable...
-    virtual void Refresh(int slot) override;
-    virtual bool GetOutgoingCharge(int slot) override;
+    virtual void Refresh(Tag slot) override;
+    virtual bool GetOutgoingCharge(Tag slot) override;
     virtual VectorWorld GetWireAttachPos(WireAttachSide was) const override;
 
     virtual bool IsSlotted(SlottedSide) const override;
-    virtual bool CanRegisterIn(int slot) const override;
-    virtual bool CanRegisterOut(int slot) const override;
+    virtual bool CanRegisterIn(Tag slot) const override;
+    virtual bool CanRegisterOut(Tag slot) const override;
     
     //Device...
     virtual void InnerStep() override;
@@ -39,8 +39,8 @@ public:
 
 
     //RefererInterface...
-    virtual void StepOutRefresh(int slot) override;
-    virtual bool StepOutGetOutgoingCharge(int slot) override;
+    virtual void StepOutRefresh(Tag slot) override;
+    virtual bool StepOutGetOutgoingCharge(Tag slot) override;
     virtual void SetModified() override;
     virtual void SetSubPlan(PlanShp, std::shared_ptr<RefererInterface>) override;
     virtual PlanShp GetSubPlan() override;

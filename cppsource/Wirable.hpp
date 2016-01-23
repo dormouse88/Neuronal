@@ -23,28 +23,28 @@ public:
     virtual ~Wirable() {}
 
     //Virtuals...
-    virtual void Refresh(int slot) = 0;
-    virtual bool GetOutgoingCharge(int slot) = 0;
+    virtual void Refresh(Tag slot) = 0;
+    virtual bool GetOutgoingCharge(Tag slot) = 0;
     virtual VectorWorld GetWireAttachPos(WireAttachSide) const = 0;
 
     virtual bool IsWeightedIn() const                   {return false;}
     virtual bool IsSlotted(SlottedSide) const           {return false;}
-    virtual bool CanRegisterIn(int slot) const          {return true;}  //Client needs to call this before calling RegisterIn(). RegisterIn() should throw an exception on failure perhaps.
-    virtual bool CanRegisterOut(int slot) const         {return true;}
+    virtual bool CanRegisterIn(Tag slot) const          {return true;}  //Client needs to call this before calling RegisterIn(). RegisterIn() should throw an exception on failure perhaps.
+    virtual bool CanRegisterOut(Tag slot) const         {return true;}
 
 
     void RegisterIn(WireShp w)                            { inWires.push_back(w);}
     void RegisterOut(WireShp w)                           { outWires.push_back(w);}
-    bool HasWireTo(int fromSlot, Wirable & to, int toSlot) const;
+    bool HasWireTo(Tag fromSlot, Wirable & to, Tag toSlot) const;
 
     int GetInWiresNum() const               { CleanWireVectors(); return inWires.size(); }
     int GetOutWiresNum() const              { CleanWireVectors(); return outWires.size(); }
-    bool IsInSlotFree(int slot) const;
-    bool IsOutSlotFree(int slot) const;
+    bool IsInSlotFree(Tag slot) const;
+    bool IsOutSlotFree(Tag slot) const;
 
 protected:
-    void PropagateRefresh(int slot = 0);
-    int GetTotalIncomingWeight(int slot = 0) const;
+    void PropagateRefresh(Tag slot = 0);
+    int GetTotalIncomingWeight(Tag slot = 0) const;
 private:
     void CleanWireVectors() const;
     mutable std::vector<std::weak_ptr<Wire> > inWires;

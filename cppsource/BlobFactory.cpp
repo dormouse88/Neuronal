@@ -83,8 +83,8 @@ std::shared_ptr<BaseReferer> BlobFactory::MakeBrain()
 
 WireShp BlobFactory::AddWire(PlanShp plan, Wirable & from, Wirable & to, signed weight)
 {
-    int fromSlot = 0;
-    int toSlot = 0;
+    Tag fromSlot = 0;
+    Tag toSlot = 0;
     
     //Initialize toSlot to the first available valid number.
     if (to.IsSlotted(SlottedSide::IN))
@@ -120,7 +120,7 @@ WireShp BlobFactory::AddWire(PlanShp plan, Wirable & from, Wirable & to, signed 
     return nullptr;
 }
 
-WireShp BlobFactory::AddWire(PlanShp plan, Wirable & from, int fromSlot, Wirable & to, int toSlot, signed weight)
+WireShp BlobFactory::AddWire(PlanShp plan, Wirable & from, Tag fromSlot, Wirable & to, Tag toSlot, signed weight)
 {    
     //if the wire will be valid...
     if (from.HasWireTo(fromSlot, to, toSlot) == false and from.CanRegisterOut(fromSlot) and to.CanRegisterIn(toSlot) and &from != &to)
@@ -152,7 +152,7 @@ void BlobFactory::RemoveWire(PlanShp plan, WirableShp w1, WirableShp w2)
     auto wire = plan->GetWire(w1, w2);
     if (wire)
     {
-        int toSlot = wire->GetToSlot();
+        Tag toSlot = wire->GetToSlot();
         plan->RemoveWire(wire);
         wire = nullptr;
         w2->Refresh(toSlot);

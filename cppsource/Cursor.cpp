@@ -149,8 +149,8 @@ PlanShp Cursor::GetParentPlan()
 }
 
 
-
-WiringPair RetrieveWiringPair(Cursor & cu1, Cursor & cu2)
+//Maybe "Match on Plan" was a better system :(
+Shp<WiringPair> RetrieveWiringPair(Cursor & cu1, Cursor & cu2)
 {
     assert(cu1.GetState() != CursorState::ABSENT and cu2.GetState() != CursorState::ABSENT);
 
@@ -162,23 +162,23 @@ WiringPair RetrieveWiringPair(Cursor & cu1, Cursor & cu2)
     //accept cu1 == cu2 (cu1/cu2 being PLAN or LOCATED)
     if (cu1.GetPlan() == cu2.GetPlan())
     {
-        return WiringPair { cu1.GetWirable(), cu2.GetWirable() };
+        return std::make_shared<WiringPair> ( cu1.GetPlan(), cu1.GetWirable(), cu2.GetWirable() );
     }
     //accept cu1 == parent2 (only if cu2 is PLAN)
     if ( cu2.GetState() == CursorState::PLAN  and  cu1.GetPlan() == parent2 )
     {
-        return WiringPair { cu1.GetWirable(), hand2 };
+        return std::make_shared<WiringPair> ( cu1.GetPlan(), cu1.GetWirable(), hand2 );
     }
     //accept parent1 == cu2 (only if cu1 is PLAN)
     if ( cu1.GetState() == CursorState::PLAN  and  parent1 == cu2.GetPlan() )
     {
-        return WiringPair { hand1, cu2.GetWirable() };
+        return std::make_shared<WiringPair> ( parent1, hand1, cu2.GetWirable() );
     }
     //accept parent1 == parent2 (only if both are PLAN)
     if ( cu1.GetState() == CursorState::PLAN and cu2.GetState() == CursorState::PLAN and parent1 == parent2 )
     {
-        return WiringPair { hand1, hand2 };
+        return std::make_shared<WiringPair> ( parent1, hand1, hand2 );
     }
-    return WiringPair{};
+    return nullptr;
 }
 

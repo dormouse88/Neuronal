@@ -31,6 +31,9 @@ CONSIDER: Multichannel wires.
 					from [wires must have a unique combination of: from, to]
 					to   [wires must have a unique combination of: from, to, fromSlot, toSlot]
 				OBS: This is how the system used to work, but I changed it to avoid the UI issue of wires on top of each other.
+				
+		PROP: (implementation)
+			
 
 CONSIDER: Named Slots.
 	OBS: Handle-to-plan slot matching could work with names just the same as it does with numbers.

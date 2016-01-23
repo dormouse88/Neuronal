@@ -7,7 +7,7 @@ TERMINOLOGY:
 	HANDLE			- A DEVICE that has a space to hold a PLAN
 	NEURON			- A DEVICE that acts as the sole logic primitive.
 	BULB			- An optional feature of a NEURON that delays the output.
-	SLOT			- The property that determines CHARGE transmission between a HANDLE and its contained PLAN.
+	SLOT/TAG		- The property that determines CHARGE transmission between a HANDLE and its contained PLAN.
 	?PORT?			- Pseudo-elements of a HANDLE that correlate to SLOTs and can be wired similarly to default NEURONs.
 	CHARGE			- The two-state "data" that DEVICEs and WIREs carry.
 	(CHIP			- (no longer used)(redundant term)

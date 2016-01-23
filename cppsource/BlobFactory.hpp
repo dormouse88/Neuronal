@@ -11,7 +11,6 @@
 #include "BasicTypes.hpp"
 #include "Wire.hpp"
 #include "Neuron.hpp"
-#include "Jumper.hpp"
 #include "ChipHandle.hpp"
 #include "ChipPlan.hpp"
 #include "BaseReferer.hpp"
@@ -30,7 +29,7 @@ public:
     
 //    WireShp       AddWire(PlanPos pos1, PlanPos pos2);
     WireShp       AddWire(PlanShp plan, Wirable & from, Wirable & to, signed weight);
-    WireShp       AddWire(PlanShp plan, Wirable & from, int fromSlot, Wirable & to, int toSlot, signed weight);
+    WireShp       AddWire(PlanShp plan, Wirable & from, Tag fromSlot, Wirable & to, Tag toSlot, signed weight);
 
     void RemoveDevice(PlanPos pos);
     void RemoveWire(PlanShp plan, WirableShp w1, WirableShp w2);

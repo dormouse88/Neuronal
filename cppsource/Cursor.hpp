@@ -67,13 +67,13 @@ private:
 
 struct WiringPair
 {
-    WiringPair() :from(nullptr), to(nullptr) {}
-    WiringPair(WirableShp f, WirableShp t) :from(f), to(t) {}
+    WiringPair(PlanShp p, WirableShp f, WirableShp t) :plan(p), from(f), to(t) {}
+    PlanShp plan;
     WirableShp from;
     WirableShp to;
 };
 
-WiringPair RetrieveWiringPair(Cursor & cu1, Cursor & cu2);
+Shp<WiringPair> RetrieveWiringPair(Cursor & cu1, Cursor & cu2);
 
 
 #endif	/* CURSOR_HPP */

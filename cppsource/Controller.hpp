@@ -26,7 +26,7 @@ private:
     void EventsPlan(PlanShp);
     void EventsLocated(PlanPos);
     void EventsBothLocated(PlanPos, PlanPos);
-    void EventsBothWirable(PlanShp, WiringPair);
+    void EventsBothWirable(WiringPair);
     void HandleInputState();
 
 
