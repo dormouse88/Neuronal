@@ -211,7 +211,7 @@ void Wire::SlotCycle(int step, bool fromSide)
     while (newSlot + step >= 1 and newSlot + step <= SLOT_MAX and not acceptNewSlot)
     {
         newSlot += step;
-        if ( (fromSide and from_.CanRegisterOut(newSlot)) or (!fromSide and to_.CanRegisterIn(newSlot)) )
+        if ( (fromSide and from_.CanRegisterWire(InOut::OUT, newSlot)) or (!fromSide and to_.CanRegisterWire(InOut::IN, newSlot)) )
         {
             acceptNewSlot = true;
         }

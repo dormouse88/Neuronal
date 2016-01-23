@@ -127,16 +127,13 @@ bool ChipHandle::IsSlotted(SlottedSide) const
 {
     return true;
 }
-bool ChipHandle::CanRegisterIn(Tag slot) const
+bool ChipHandle::CanRegisterWire(InOut side, Tag slot) const
 {
-    return IsInSlotFree(slot);
+    if (side == InOut::IN)
+        return IsTagFree(InOut::IN, slot);
+    else
+        return IsTagFree(InOut::OUT, slot);
 }
-bool ChipHandle::CanRegisterOut(Tag slot) const
-{
-    return IsOutSlotFree(slot);
-}
-
-
 
 
 

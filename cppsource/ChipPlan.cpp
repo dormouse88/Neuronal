@@ -63,13 +63,12 @@ VectorWorld ChipPlan::GetWireAttachPos(WireAttachSide was) const
     return wirePos;
 }
 
-bool ChipPlan::CanRegisterIn(Tag slot) const
+bool ChipPlan::CanRegisterWire(InOut side, Tag slot) const
 {
-    return IsInSlotFree(slot);
-}
-bool ChipPlan::CanRegisterOut(Tag slot) const
-{
-    return IsOutSlotFree(slot);
+    if (side == InOut::IN)
+        return IsTagFree(InOut::IN, slot);
+    else
+        return IsTagFree(InOut::OUT, slot);
 }
 
 
@@ -353,6 +352,17 @@ void ChipPlan::PlodeRefreshOutwards()
 
 
 
+void ChipPlan::Draw(sf::RenderTarget & rt)
+{
+    SubDraw(rt);
+}
+void ChipPlan::SubDraw(sf::RenderTarget & rt)
+{
+    DrawBox(rt);
+    DrawGridLines(rt);
+    DrawTitle(rt);
+    DrawParts(rt);
+}
 
 void ChipPlan::DrawBox(sf::RenderTarget & rt)
 {
@@ -428,6 +438,7 @@ void ChipPlan::DrawGridLines(sf::RenderTarget & rt)
     }
 }
 
+
 void ChipPlan::DrawParts(sf::RenderTarget & rt)
 {
     for (auto & w: wires)
@@ -438,20 +449,73 @@ void ChipPlan::DrawParts(sf::RenderTarget & rt)
     {
         x->Draw(rt);
     }
+    
+//    sf::CircleShape shape;
+//    shape.setRadius( 17.f );
+//    shape.setFillColor( sf::Color::Magenta );
+//
+//    
+//    std::vector<Port> inPorts;
+//    inPorts = GetPorts(in);
+//
+//    for (auto & x: inPorts)
+//    {
+////        pos;
+//        auto pos = getXY( x.num );
+//        shape.setPosition( pos );
+////        tag;
+//        Tag tag = x.tag;
+//
+//        rt.draw(shape);
+//    }
 }
 
-void ChipPlan::SubDraw(sf::RenderTarget & rt)
+std::vector<Port> ChipPlan::GetPorts(bool in)
 {
-    DrawBox(rt);
-    DrawGridLines(rt);
-    DrawTitle(rt);
-    DrawParts(rt);
+//    std::vector<Port> ret;
+//    std::set<Tag> allTags;
+//    if (in)
+//    {
+//        for (auto & x: outWires)
+//        {
+//            allTags.insert( outWires.GetFromSlot() );
+//        }
+//        for (auto & x: GetHandle()->inWires)
+//        {
+//            allTags.insert( inWires.GetToSlot() );
+//        }
+//    }
+//    if (not in) {} //etc
+//    for (int i = 0; i<allTags.size(); i++)
+//    {
+//        Port temp;
+//        temp.num = i + 1;
+//        temp.tag = x;
+//        ret.emplace_back(temp);
+//    }
+//    return ret;
 }
 
-void ChipPlan::Draw(sf::RenderTarget & rt)
-{
-    SubDraw(rt);
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -29,8 +29,7 @@ public:
     virtual VectorWorld GetWireAttachPos(WireAttachSide was) const override;
 
     virtual bool IsSlotted(SlottedSide) const override;
-    virtual bool CanRegisterIn(Tag slot) const override;
-    virtual bool CanRegisterOut(Tag slot) const override;
+    virtual bool CanRegisterWire(InOut side, Tag slot) const override;
     
     //Device...
     virtual void InnerStep() override;

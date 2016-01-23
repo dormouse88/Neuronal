@@ -9,6 +9,15 @@
 #define	BASICTYPES_HPP
 
 #include <memory>
+#include <cassert>
+#include <vector>
+#include <map>
+#include <set>
+#include <string>
+#include <SFML/System.hpp>  //for sf::Vector
+#include <SFML/Graphics.hpp> //for sf::Rect
+#include "miscUtil.hpp"
+
 
 template<typename T>
 using Shp = std::shared_ptr<T>;
@@ -35,9 +44,32 @@ class Wirable;
 typedef Shp<Wirable> WirableShp;
 
 
+typedef int Smart;
+typedef int Dumb;
+typedef float World;
+
+typedef sf::Vector2<Dumb> VectorDumb;
+typedef sf::Vector2<Smart> VectorSmart;
+typedef sf::Vector2<World> VectorWorld;
+
+typedef sf::Rect<Dumb> RectDumb;
+typedef sf::Rect<Smart> RectSmart;
+typedef sf::Rect<World> RectWorld;
+
 
 
 typedef int Tag;
+
+
+
+enum class InOut { IN, OUT };
+
+struct Port
+{
+    int num;
+    Tag tag;
+};
+
 
 #endif	/* BASICTYPES_HPP */
 

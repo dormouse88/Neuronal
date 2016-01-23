@@ -10,6 +10,7 @@
 
 #include <memory>
 #include <vector>
+#include "BasicTypes.hpp"
 #include "PlanOwned.hpp"
 #include "Wirable.hpp"
 #include "Device.hpp"
@@ -38,8 +39,7 @@ public:
     virtual VectorWorld GetWireAttachPos(WireAttachSide was) const override;
 
     virtual bool IsSlotted(SlottedSide) const override      {return true;}
-    virtual bool CanRegisterIn(Tag slot) const override;
-    virtual bool CanRegisterOut(Tag slot) const override;
+    virtual bool CanRegisterWire(InOut side, Tag slot) const override;
 
     //"Referred"...
     void StepInRefresh(Tag slot);
@@ -82,14 +82,17 @@ public:
     void PlodeRefresh(VectorSmart point);
     void PlodeRefreshOutwards();
     
+    void Draw(sf::RenderTarget & rt);
+    void SubDraw(sf::RenderTarget & rt);
+
+    std::vector<Port> GetPorts(bool in);
+
+private:
     void DrawBox(sf::RenderTarget & rt);
     void DrawTitle(sf::RenderTarget & rt);
     void DrawGridLines(sf::RenderTarget & rt);
     void DrawParts(sf::RenderTarget & rt);
-    void SubDraw(sf::RenderTarget & rt);
-    void Draw(sf::RenderTarget & rt);
 
-private:
     int planID;
     std::shared_ptr<const UserData> userData_;
     std::shared_ptr<PlanGrid> planGrid;

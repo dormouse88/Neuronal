@@ -9,9 +9,7 @@
 #define	PANSIONS_HPP
 
 #include <map>
-
-typedef int Smart;
-typedef int Dumb;
+#include "BasicTypes.hpp"
 
 class Pansions
 {

@@ -60,21 +60,59 @@ int Wirable::GetTotalIncomingWeight(Tag slot) const
     return total;
 }
 
-
-
-bool Wirable::IsInSlotFree(Tag slot) const
+void Wirable::RegisterWire(InOut side, WireShp w)
 {
-    CleanWireVectors();
-    for (auto w: inWires) {
-        if (w.lock()->GetToSlot() == slot) return false;
-    }
-    return true;
+    if(side == InOut::IN)
+        inWires.emplace_back(w);
+    else
+        outWires.emplace_back(w);
 }
-bool Wirable::IsOutSlotFree(Tag slot) const
+
+
+int Wirable::CountWires(InOut side) const
 {
     CleanWireVectors();
-    for (auto w: outWires) {
-        if (w.lock()->GetToSlot() == slot) return false;
+    if (side == InOut::IN)
+        return inWires.size();
+    else
+        return outWires.size();
+}
+
+//bool Wirable::IsInSlotFree(Tag slot) const
+//{
+//    CleanWireVectors();
+//    for (auto w: inWires) {
+//        if (w.lock()->GetToSlot() == slot) return false;
+//    }
+//    return true;
+//}
+//bool Wirable::IsOutSlotFree(Tag slot) const
+//{
+//    CleanWireVectors();
+//    for (auto w: outWires) {
+//        if (w.lock()->GetToSlot() == slot) return false;
+//    }
+//    return true;
+//}
+
+bool Wirable::IsTagFree(InOut side, Tag tag) const
+{
+    CleanWireVectors();
+    if (side == InOut::IN)
+    {
+        for (auto w: inWires)
+        {
+            if (w.lock()->GetToSlot() == tag)
+                return false;
+        }
+    }
+    if (side == InOut::OUT)
+    {
+        for (auto w: outWires)
+        {
+            if (w.lock()->GetFromSlot() == tag)
+                return false;
+        }
     }
     return true;
 }

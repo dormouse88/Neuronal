@@ -9,21 +9,9 @@
 #define	PLANGRID_HPP
 
 #include <memory>
-#include <SFML/System.hpp>  //for sf::Vector
-#include <SFML/Graphics.hpp> //for sf::Rect
 #include "BasicTypes.hpp"
 #include "Pansions.hpp"
 class ChipPlan; //fwd dec only
-
-typedef float World;
-
-typedef sf::Vector2<Dumb> VectorDumb;
-typedef sf::Vector2<Smart> VectorSmart;
-typedef sf::Vector2<World> VectorWorld;
-
-typedef sf::Rect<Dumb> RectDumb;
-typedef sf::Rect<Smart> RectSmart;
-typedef sf::Rect<World> RectWorld;
 
 
 class PlanGrid
