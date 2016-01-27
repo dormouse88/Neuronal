@@ -58,15 +58,24 @@ typedef sf::Rect<World> RectWorld;
 
 
 
+//enum class Charge { ON, OFF };
+typedef bool Charge;
+
 typedef int Tag;
 
+typedef int PortNum;
 
+const sf::Vector2f GRID_SIZE { 115.f, 75.f };
 
+// In/Out with regard to wiring. Relates to from/to on wires.
 enum class InOut { IN, OUT };
+
+// Refers to the interface between a handle and plan. Head is the first interface encountered where it zooms in. Tail is the way out.
+enum class ZoomSide { HEAD, TAIL };
 
 struct Port
 {
-    int num;
+    PortNum num;
     Tag tag;
 };
 

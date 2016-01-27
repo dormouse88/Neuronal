@@ -153,6 +153,8 @@ PlanShp Cursor::GetParentPlan()
 Shp<WiringPair> RetrieveWiringPair(Cursor & cu1, Cursor & cu2)
 {
     assert(cu1.GetState() != CursorState::ABSENT and cu2.GetState() != CursorState::ABSENT);
+    if (cu1.GetWirable() == nullptr or cu2.GetWirable() == nullptr)
+        return nullptr;
 
     HandleShp hand1 = cu1.GetPlan()->GetHandle();
     HandleShp hand2 = cu2.GetPlan()->GetHandle();

@@ -97,19 +97,29 @@ bool ChipHandle::GetOutgoingCharge(Tag slot)
     //return outPorts.at(slot).charge;
 }
 
-VectorWorld ChipHandle::GetWireAttachPos(WireAttachSide was) const
+VectorWorld ChipHandle::GetWireAttachPos(WireAttachSide was, Tag tag) const
 {
     VectorWorld wirePos;
     if (exploded_)
     {
-        RectWorld planBound { subPlan_->GetWorldPaddedBoundPlusPorts() };  //not sure
-        VectorWorld objectSize { planBound.width, planBound.height };
-        if (was == WireAttachSide::IN) {
-            wirePos = CalculateOffsetForCentering(objectSize) + VectorWorld {objectSize.x *.0f, objectSize.y *.5f };
-        }
-        else {
-            wirePos = CalculateOffsetForCentering(objectSize) + VectorWorld {objectSize.x *1.f, objectSize.y *.5f };
-        }
+        ZoomSide portSide = (was == WireAttachSide::IN) ? ZoomSide::HEAD : ZoomSide::TAIL ;
+        PortNum portNum = subPlan_->MapTagToPort(portSide, tag);
+        //VectorSmart cell = subPlan_->GetPortSmartPos(portSide, portNum);
+        PlanPos ppos { subPlan_->GetPortSmartPos(portSide, portNum), subPlan_->GetGrid() };
+        wirePos = ppos.GetWorldPos();
+        //wirePos = planGrid->MapSmartToWorld( cell );
+        wirePos.y += GRID_SIZE.y * 0.5f;
+        if (was == WireAttachSide::OUT)
+            wirePos.x += GRID_SIZE.x;
+        
+//        RectWorld planBound { subPlan_->GetWorldPaddedBoundPlusPorts() };  //not sure
+//        VectorWorld objectSize { planBound.width, planBound.height };
+//        if (was == WireAttachSide::IN) {
+//            wirePos = CalculateOffsetForCentering(objectSize) + VectorWorld {objectSize.x *.0f, objectSize.y *.5f };
+//        }
+//        else {
+//            wirePos = CalculateOffsetForCentering(objectSize) + VectorWorld {objectSize.x *1.f, objectSize.y *.5f };
+//        }
     }
     else
     {

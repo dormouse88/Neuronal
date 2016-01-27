@@ -172,11 +172,6 @@ void Controller::HandleInputEventsFreeMode()
         {
             PlanPos pos1 = cu1.GetPlanPos();
             EventsLocated(pos1);
-            if (cu2.GetState() == CursorState::LOCATED)
-            {
-                PlanPos pos2 = cu2.GetPlanPos();
-                EventsBothLocated(pos1, pos2);
-            }
         }
         Shp<WiringPair> wp = RetrieveWiringPair(cu1, cu2);
         if (wp)
@@ -314,32 +309,44 @@ void Controller::EventsLocated(PlanPos pos1)
     {
         model_.GetFactory()->AddHandle(pos1);
     }
-    if (event.key.code == sf::Keyboard::A)
+    //if PlanPos sucessfully selects a device...
+    DeviceShp dev1 = pos1.GetDevice();
+    if (dev1)
     {
-        view_.PostMessage("Tried to modify a device upwards");
-        pos1.GetDevice()->Handle(1);
-    }
-    if (event.key.code == sf::Keyboard::Z)
-    {
-        pos1.GetDevice()->Handle(2);
-    }
-    if (event.key.code == sf::Keyboard::BackSlash)
-    {
-        pos1.GetDevice()->Handle(3);
+        if (event.key.code == sf::Keyboard::A)
+        {
+            view_.PostMessage("Tried to modify a device upwards");
+            dev1->Handle(1);
+        }
+        if (event.key.code == sf::Keyboard::Z)
+        {
+            dev1->Handle(2);
+        }
+        if (event.key.code == sf::Keyboard::BackSlash)
+        {
+            dev1->Handle(3);
+        }
+
+        //if cu1 DEVICE + cu2 LOCATED
+        if (cu2.GetState() == CursorState::LOCATED)
+        {
+            PlanPos pos2 = cu2.GetPlanPos();
+            //EventsBothLocated(pos1, pos2);
+            if (event.key.code == sf::Keyboard::M)
+            {
+                view_.PostMessage("Tried to move something");
+                if (dev1->GetContainer() == pos2.GetPlan())
+                    dev1->GetContainer()->SetPosition(dev1, pos2.GetSmartPos());
+                //ChipPlanFunc::SetPosition(pos1, pos2); //allows moving of exploded plans
+            }
+        }
     }
 }
 
 
 void Controller::EventsBothLocated(PlanPos pos1, PlanPos pos2)
 {
-    //requires cu1 + cu2 LOCATED
-    if (event.key.code == sf::Keyboard::M)
-    {
-        view_.PostMessage("Tried to move something");
-        if (pos1.GetPlan() == pos2.GetPlan())
-            pos1.GetPlan()->SetPosition(pos1.GetDevice(), pos2.GetSmartPos());
-        //ChipPlanFunc::SetPosition(pos1, pos2); //allows moving of exploded plans
-    }
+    //defunct
 }
 
 

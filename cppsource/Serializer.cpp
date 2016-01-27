@@ -198,10 +198,6 @@ bool Serializer::SavePlanRecursively(pugi::xml_node container, PlanShp plan_p)
             }
         }
         assert(newID > 0);
-//        Old method of saving highest int used...
-//        pugi::xml_node db = plansNode.child("PLAN_DB");
-//        int newID = db.attribute("HIGHEST_ID").as_int() + 1;
-//        db.attribute("HIGHEST_ID") = newID;
         
         //update the plan in memory with the new ID...
         plan_p->planID = newID;
@@ -252,10 +248,10 @@ bool Serializer::SavePlanRecursively(pugi::xml_node container, PlanShp plan_p)
             wire.append_attribute("t").set_value(tserial);
             if (w->GetWeight() != XMLD_WIRE_W)
                 wire.append_attribute("w").set_value(w->GetWeight());
-            if (w->GetFromSlot() != XMLD_WIRE_FS)
-                wire.append_attribute("fs").set_value(w->GetFromSlot());
-            if (w->GetToSlot() != XMLD_WIRE_TS)
-                wire.append_attribute("ts").set_value(w->GetToSlot());
+            if (w->GetFromTag() != XMLD_WIRE_FS)
+                wire.append_attribute("fs").set_value(w->GetFromTag());
+            if (w->GetToTag() != XMLD_WIRE_TS)
+                wire.append_attribute("ts").set_value(w->GetToTag());
         }
         plan_p->modified = false;
         return true;

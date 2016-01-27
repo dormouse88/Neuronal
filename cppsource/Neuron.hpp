@@ -9,13 +9,10 @@
 #define	NEURON_HPP
 
 #include <SFML/Graphics.hpp>
-#include "miscUtil.hpp"
+#include "BasicTypes.hpp"
 #include "ViewResources.hpp"
 #include "Device.hpp"
 
-
-//enum class Charge { ON, OFF };
-typedef bool Charge;
 
 class Neuron : public Device
 {
@@ -29,9 +26,9 @@ public:
     virtual void Handle(int code) override;
     
     //Wirable...
-    virtual void Refresh(Tag slot) override;
-    virtual bool GetOutgoingCharge(Tag slot) override;
-    virtual VectorWorld GetWireAttachPos(WireAttachSide was) const override;
+    virtual void Refresh(Tag) override;
+    virtual bool GetOutgoingCharge(Tag) override;
+    virtual VectorWorld GetWireAttachPos(WireAttachSide, Tag) const override;
     virtual bool IsWeightedIn() const override              {return true;}
     
     //Device...

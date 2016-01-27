@@ -51,9 +51,9 @@ void WireView::Draw(sf::RenderTarget & rt, const Wire & w)
         colTo = sf::Color(180,180,180);   //(210,210,210);
     }
     std::vector<sf::Vertex> line;
-    sf::Vector2f posFrom = w.GetFrom().GetWireAttachPos(WireAttachSide::OUT);
+    sf::Vector2f posFrom = w.GetFrom().GetWireAttachPos(WireAttachSide::OUT, w.GetFromTag());
     line.push_back( sf::Vertex( posFrom, colFrom ) );
-    sf::Vector2f posTo = w.GetTo().GetWireAttachPos(WireAttachSide::IN);
+    sf::Vector2f posTo = w.GetTo().GetWireAttachPos(WireAttachSide::IN, w.GetToTag());
     line.push_back( sf::Vertex(posTo, colTo ) );
     rt.draw(&line[0], line.size(), sf::LinesStrip);
 
@@ -89,7 +89,7 @@ void WireView::Draw(sf::RenderTarget & rt, const Wire & w)
 
     if (w.GetFrom().IsSlotted(SlottedSide::OUT)) {
         //align text on wire...
-        fromSlotText.setString( patch::to_string(w.GetFromSlot()) );
+        fromSlotText.setString( patch::to_string(w.GetFromTag()) );
         sf::Vector2f pointOnWire { line[1].position - (line[1].position - line[0].position)*0.75f };
         sf::FloatRect loc{ fromSlotText.getLocalBounds() };
         sf::Vector2f textCentreOffset { -loc.width/2.f, -loc.top-loc.height/2.f };
@@ -106,7 +106,7 @@ void WireView::Draw(sf::RenderTarget & rt, const Wire & w)
 
     if (w.GetTo().IsSlotted(SlottedSide::IN)) {
         //align text on wire...
-        toSlotText.setString( patch::to_string(w.GetToSlot()) );
+        toSlotText.setString( patch::to_string(w.GetToTag()) );
         sf::Vector2f pointOnWire { line[1].position - (line[1].position - line[0].position)*0.25f };
         sf::FloatRect loc{ toSlotText.getLocalBounds() };
         sf::Vector2f textCentreOffset { -loc.width/2.f, -loc.top-loc.height/2.f };
@@ -132,13 +132,13 @@ void WireView::Draw(sf::RenderTarget & rt, const Wire & w)
  * @param toSlot
  * @param weight
  */
-Wire::Wire(Wirable & from, int fromSlot, Wirable & to, int toSlot, signed weight, PlanShp cont)
+Wire::Wire(Wirable & from, int fromTag, Wirable & to, int toTag, signed weight, PlanShp cont)
     :PlanOwned(cont)
     , v_(*this)
     , from_(from)
-    , fromTag_(fromSlot)
+    , fromTag_(fromTag)
     , to_(to)
-    , toTag_(toSlot)
+    , toTag_(toTag)
     , weight_(weight)
     , firing_(false)
 {}

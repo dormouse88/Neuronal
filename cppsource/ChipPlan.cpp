@@ -8,6 +8,8 @@
 #include "ChipPlan.hpp"
 #include "ChipHandle.hpp"
 #include <cassert>
+#include <algorithm>
+#include <iterator>
 #include "UserData.hpp" //fwd dec
 #include "PlanPos.hpp"  //fwd dec
 
@@ -46,20 +48,17 @@ bool ChipPlan::GetOutgoingCharge(Tag slot)
         return referer->StepOutGetOutgoingCharge(slot);
     return false;
 }
-VectorWorld ChipPlan::GetWireAttachPos(WireAttachSide was) const
+VectorWorld ChipPlan::GetWireAttachPos(WireAttachSide was, Tag tag) const
 {
     sf::Vector2f wirePos;
-    auto bound = GetWorldPaddedBoundBox();  //box
     //Because ChipPlans are wired internally, the wires come OUT of the left...
+    ZoomSide portSide = (was == WireAttachSide::IN) ? ZoomSide::TAIL : ZoomSide::HEAD ;
+    PortNum portNum = MapTagToPort(portSide, tag);
+    VectorSmart cell = GetPortSmartPos(portSide, portNum);
+    wirePos = planGrid->MapSmartToWorld( cell );
+    wirePos.y += GRID_SIZE.y * 0.5f;
     if (was == WireAttachSide::OUT)
-    {
-        wirePos.x = bound.left;
-    }
-    if (was == WireAttachSide::IN)
-    {
-        wirePos.x = bound.left + bound.width;
-    }
-    wirePos.y = bound.top + (0.5 * bound.height);
+        wirePos.x += GRID_SIZE.x;
     return wirePos;
 }
 
@@ -376,7 +375,7 @@ void ChipPlan::DrawBox(sf::RenderTarget & rt)
     sf::RectangleShape planBox;
     planBox.setFillColor( randCol * sf::Color{70,70,70} );
     planBox.setOutlineColor( sf::Color{95,95,95} );
-    planBox.setOutlineThickness(-5.f);
+    planBox.setOutlineThickness(-4.f);
     planBox.setPosition( sf::Vector2f{pB.left, pB.top} );
     planBox.setSize( sf::Vector2f{pB.width, pB.height} );
     rt.draw(planBox);
@@ -450,53 +449,138 @@ void ChipPlan::DrawParts(sf::RenderTarget & rt)
         x->Draw(rt);
     }
     
-//    sf::CircleShape shape;
-//    shape.setRadius( 17.f );
-//    shape.setFillColor( sf::Color::Magenta );
-//
-//    
-//    std::vector<Port> inPorts;
-//    inPorts = GetPorts(in);
-//
-//    for (auto & x: inPorts)
-//    {
-////        pos;
-//        auto pos = getXY( x.num );
-//        shape.setPosition( pos );
-////        tag;
-//        Tag tag = x.tag;
-//
-//        rt.draw(shape);
-//    }
+    sf::ConvexShape shape;
+    shape.setPointCount(8);
+    const float BIG_H = GRID_SIZE.y * 0.5f;
+    const float SMALL_H = GRID_SIZE.y * 0.35f;
+    const float BIG_W = GRID_SIZE.x * 0.5f;
+    const float SMALL_W = GRID_SIZE.x * 0.35f;
+    shape.setPoint(0, sf::Vector2f{ 0,          BIG_H } );
+    shape.setPoint(1, sf::Vector2f{ SMALL_W,    SMALL_H } );
+    shape.setPoint(2, sf::Vector2f{ BIG_W,      0 } );
+    shape.setPoint(3, sf::Vector2f{ SMALL_W,    -SMALL_H } );
+    shape.setPoint(4, sf::Vector2f{ 0,          -BIG_H } );
+    shape.setPoint(5, sf::Vector2f{ -SMALL_W,   -SMALL_H } );
+    shape.setPoint(6, sf::Vector2f{ -BIG_W,     0 } );
+    shape.setPoint(7, sf::Vector2f{ -SMALL_W,   SMALL_H } );
+    shape.setFillColor( sf::Color { 150,0,150 } );
+    shape.setOutlineColor( sf::Color{95,95,95} );
+    shape.setOutlineThickness(-4.f);
+    sf::Text text;
+    text.setFont( ViewResources::GetInstance().font );
+    text.setColor( sf::Color::Cyan );
+    
+    ReCalculatePorts(ZoomSide::HEAD);
+    ReCalculatePorts(ZoomSide::TAIL);
+    for (auto & p: inPorts_)
+    {
+        VectorSmart s_pos = GetPortSmartPos(ZoomSide::HEAD, p.second);
+        VectorWorld pos = planGrid->MapSmartToWorld(s_pos) + (planGrid->WorldSizeOf(s_pos) * 0.5f);
+        shape.setPosition( pos );
+        text.setPosition( pos );
+        Tag tag = p.first;
+        text.setString( patch::to_string(tag) );
+        rt.draw(shape);
+        rt.draw(text);
+    }
+    for (auto & p: outPorts_)
+    {
+        VectorSmart s_pos = GetPortSmartPos(ZoomSide::TAIL, p.second);
+        VectorWorld pos = planGrid->MapSmartToWorld(s_pos) + (planGrid->WorldSizeOf(s_pos) * 0.5f);
+        shape.setPosition( pos );
+        text.setPosition( pos );
+        Tag tag = p.first;
+        text.setString( patch::to_string(tag) );
+        rt.draw(shape);
+        rt.draw(text);
+    }
 }
 
-std::vector<Port> ChipPlan::GetPorts(bool in)
+VectorSmart ChipPlan::GetPortSmartPos(ZoomSide side, PortNum portNum) const
 {
+    PlanRect r = GetSmartPaddedBound();
+    if (side == ZoomSide::HEAD)
+    {
+        VectorSmart in_start = r.tl.GetSmartPos();
+        return { in_start.x, in_start.y + portNum };
+    }
+    else
+    {
+        VectorSmart out_start = { r.br.GetSmartPos().x, r.tl.GetSmartPos().y };
+        return { out_start.x, out_start.y + portNum };
+    }
+}
+
+//std::vector<Port>
+void ChipPlan::ReCalculatePorts(ZoomSide side)
+{
+    std::set<Tag> allTags;
+    {
+        std::set<Tag> inSet;
+        std::set<Tag> outSet;
+        if (side == ZoomSide::HEAD)
+        {
+            auto h = GetHandle();
+            if (h)
+                inSet  = h->GetTagCloud(InOut::IN);
+            outSet = GetTagCloud(InOut::OUT);
+        }
+        else
+        {
+            inSet  = GetTagCloud(InOut::IN);
+            auto h = GetHandle();
+            if (h)
+                outSet = h->GetTagCloud(InOut::OUT);
+        }
+        std::set_union(
+            inSet.begin(), inSet.end(),
+            outSet.begin(), outSet.end(),
+            std::inserter(allTags, allTags.begin())
+        );
+    }
+    auto & ports = (side == ZoomSide::HEAD) ? inPorts_ : outPorts_ ;
+    ports.clear();
+    PortNum num = 1;
+    for (auto & x: allTags)
+    {
+        ports[x] = num;
+        num++;
+    }
 //    std::vector<Port> ret;
-//    std::set<Tag> allTags;
-//    if (in)
-//    {
-//        for (auto & x: outWires)
-//        {
-//            allTags.insert( outWires.GetFromSlot() );
-//        }
-//        for (auto & x: GetHandle()->inWires)
-//        {
-//            allTags.insert( inWires.GetToSlot() );
-//        }
-//    }
-//    if (not in) {} //etc
-//    for (int i = 0; i<allTags.size(); i++)
+//    for (auto & x :allTags)
 //    {
 //        Port temp;
-//        temp.num = i + 1;
+//        temp.num = num;
 //        temp.tag = x;
 //        ret.emplace_back(temp);
+//        num++;
 //    }
 //    return ret;
 }
 
+PortNum ChipPlan::MapTagToPort(ZoomSide pSide, Tag tag) const
+{
+    const auto & ports = (pSide == ZoomSide::HEAD) ? inPorts_ : outPorts_ ;
+    for (auto x: ports)
+    {
+        if (x.first == tag)
+            return x.second;
+    }
+    return 0;
+    //return ports.at(tag);
+}
 
+Tag ChipPlan::MapPortToTag(ZoomSide pSide, PortNum portNum) const
+{
+    const auto & ports = (pSide == ZoomSide::HEAD) ? inPorts_ : outPorts_ ;
+    for (auto x: ports)
+    {
+        if (x.second == portNum)
+            return x.first;
+    }
+    return 0;
+    //return ports.at(portNum);
+}
 
 
 

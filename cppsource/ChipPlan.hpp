@@ -34,9 +34,9 @@ public:
     HandleShp GetHandle();
 
     //Wirable...
-    virtual void Refresh(Tag slot) override;
-    virtual bool GetOutgoingCharge(Tag slot) override;
-    virtual VectorWorld GetWireAttachPos(WireAttachSide was) const override;
+    virtual void Refresh(Tag) override;
+    virtual bool GetOutgoingCharge(Tag) override;
+    virtual VectorWorld GetWireAttachPos(WireAttachSide, Tag) const override;
 
     virtual bool IsSlotted(SlottedSide) const override      {return true;}
     virtual bool CanRegisterWire(InOut side, Tag slot) const override;
@@ -85,7 +85,10 @@ public:
     void Draw(sf::RenderTarget & rt);
     void SubDraw(sf::RenderTarget & rt);
 
-    std::vector<Port> GetPorts(bool in);
+    VectorSmart GetPortSmartPos(ZoomSide, PortNum) const;
+    void ReCalculatePorts(ZoomSide);
+    PortNum MapTagToPort(ZoomSide, Tag) const;
+    Tag MapPortToTag(ZoomSide, PortNum) const;
 
 private:
     void DrawBox(sf::RenderTarget & rt);
@@ -99,6 +102,10 @@ private:
     std::shared_ptr<RefererInterface> referer;
     std::vector<DeviceShp > devices;
     std::vector<WireShp > wires;
+    std::map<Tag, PortNum> inPorts_;
+    std::map<Tag, PortNum> outPorts_;
+//    std::vector<Port> inPorts_;
+//    std::vector<Port> outPorts_;
     bool modified;
     //PlanRect smartInnerBound;
     VectorSmart tl_corner;

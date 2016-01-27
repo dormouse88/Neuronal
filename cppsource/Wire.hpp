@@ -38,7 +38,7 @@ private:
 class Wire : public PlanOwned
 {
 public:
-    Wire(Wirable & from, Tag fromSlot, Wirable & to, Tag toSlot, signed weight, PlanShp cont);
+    Wire(Wirable & from, Tag fromTag, Wirable & to, Tag toTag, signed weight, PlanShp cont);
 
     virtual std::string SerialName() const { return "WIRE";}
 
@@ -49,9 +49,9 @@ public:
     int GetWeight() const {return weight_;}      //for drawing only
 
     const Wirable& GetFrom() const {return from_; }
-    const int GetFromSlot() const {return fromTag_; }
+    const int GetFromTag() const {return fromTag_; }
     const Wirable& GetTo() const {return to_; }
-    const int GetToSlot() const {return toTag_; }
+    const int GetToTag() const {return toTag_; }
     
     virtual void Draw(sf::RenderTarget & rt) override;
     virtual void Handle(int code) override;

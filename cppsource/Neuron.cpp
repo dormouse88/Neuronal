@@ -174,7 +174,7 @@ void Neuron::PreInnerStep()
 }
 
 
-sf::Vector2f Neuron::GetWireAttachPos(WireAttachSide was) const
+sf::Vector2f Neuron::GetWireAttachPos(WireAttachSide was, Tag tag) const
 {
     sf::Vector2f wirePos;
     if (was == WireAttachSide::IN) {

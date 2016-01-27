@@ -24,9 +24,9 @@ public:
     virtual ~Wirable() {}
 
     //Virtuals...
-    virtual void Refresh(Tag slot) = 0;
-    virtual bool GetOutgoingCharge(Tag slot) = 0;
-    virtual VectorWorld GetWireAttachPos(WireAttachSide) const = 0;
+    virtual void Refresh(Tag) = 0;
+    virtual bool GetOutgoingCharge(Tag) = 0;
+    virtual VectorWorld GetWireAttachPos(WireAttachSide, Tag) const = 0;
 
     virtual bool IsWeightedIn() const                   {return false;}
     virtual bool IsSlotted(SlottedSide) const           {return false;}
@@ -36,6 +36,8 @@ public:
     bool HasWireTo(Tag fromSlot, Wirable & to, Tag toSlot) const;
     int CountWires(InOut side) const;
     bool IsTagFree(InOut side, Tag tag) const;
+    std::set<Tag> GetTagCloud(InOut side);
+    
     
 protected:
     void PropagateRefresh(Tag slot = 0);

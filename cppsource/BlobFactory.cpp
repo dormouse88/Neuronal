@@ -152,7 +152,7 @@ void BlobFactory::RemoveWire(PlanShp plan, WirableShp w1, WirableShp w2)
     auto wire = plan->GetWire(w1, w2);
     if (wire)
     {
-        Tag toSlot = wire->GetToSlot();
+        Tag toSlot = wire->GetToTag();
         plan->RemoveWire(wire);
         wire = nullptr;
         w2->Refresh(toSlot);

@@ -38,7 +38,7 @@ void Wirable::PropagateRefresh(Tag slot)
     for (auto & w: outWires)
     {
         if (auto notDead = w.lock()) {
-            if (notDead->GetFromSlot() == slot or slot == 0) {
+            if (notDead->GetFromTag() == slot or slot == 0) {
                 notDead->Refresh();
             }
         }
@@ -52,7 +52,7 @@ int Wirable::GetTotalIncomingWeight(Tag slot) const
     for (auto w: inWires)
     {
         auto lw = w.lock();
-        if (lw and (lw->GetToSlot() == slot or slot == 0) )
+        if (lw and (lw->GetToTag() == slot or slot == 0) )
         {
             total += lw->GetOutgoingWeight();
         }
@@ -78,23 +78,6 @@ int Wirable::CountWires(InOut side) const
         return outWires.size();
 }
 
-//bool Wirable::IsInSlotFree(Tag slot) const
-//{
-//    CleanWireVectors();
-//    for (auto w: inWires) {
-//        if (w.lock()->GetToSlot() == slot) return false;
-//    }
-//    return true;
-//}
-//bool Wirable::IsOutSlotFree(Tag slot) const
-//{
-//    CleanWireVectors();
-//    for (auto w: outWires) {
-//        if (w.lock()->GetToSlot() == slot) return false;
-//    }
-//    return true;
-//}
-
 bool Wirable::IsTagFree(InOut side, Tag tag) const
 {
     CleanWireVectors();
@@ -102,7 +85,7 @@ bool Wirable::IsTagFree(InOut side, Tag tag) const
     {
         for (auto w: inWires)
         {
-            if (w.lock()->GetToSlot() == tag)
+            if (w.lock()->GetToTag() == tag)
                 return false;
         }
     }
@@ -110,10 +93,30 @@ bool Wirable::IsTagFree(InOut side, Tag tag) const
     {
         for (auto w: outWires)
         {
-            if (w.lock()->GetFromSlot() == tag)
+            if (w.lock()->GetFromTag() == tag)
                 return false;
         }
     }
     return true;
 }
 
+std::set<Tag> Wirable::GetTagCloud(InOut side)
+{
+    CleanWireVectors();
+    std::set<Tag> ret;
+    if (side == InOut::IN)
+    {
+        for (auto & x: inWires)
+        {
+            ret.insert( x.lock()->GetToTag() );
+        }
+    }
+    else
+    {
+        for (auto & x: outWires)
+        {
+            ret.insert( x.lock()->GetFromTag() );
+        }
+    }
+    return ret;
+}

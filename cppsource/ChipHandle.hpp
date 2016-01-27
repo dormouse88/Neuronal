@@ -24,9 +24,9 @@ public:
     virtual void Handle(int code) override;
     
     //Wirable...
-    virtual void Refresh(Tag slot) override;
-    virtual bool GetOutgoingCharge(Tag slot) override;
-    virtual VectorWorld GetWireAttachPos(WireAttachSide was) const override;
+    virtual void Refresh(Tag) override;
+    virtual bool GetOutgoingCharge(Tag) override;
+    virtual VectorWorld GetWireAttachPos(WireAttachSide, Tag) const override;
 
     virtual bool IsSlotted(SlottedSide) const override;
     virtual bool CanRegisterWire(InOut side, Tag slot) const override;

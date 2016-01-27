@@ -11,8 +11,6 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/System.hpp>
 
-const sf::Vector2f GRID_SIZE { 115.f, 75.f };
-
 class ViewResources
 {
 private:
@@ -23,9 +21,6 @@ public:
     static const ViewResources & GetInstance();
     sf::Font font;
     sf::Clock clock;
-// wtf is this
-//    std::function<std::string(int)> getNameByID;
-//        getNameByID = std::bind( &UserData::GetNameByID, sh_ptr, std::placeholders::_1 );
 };
 
 
