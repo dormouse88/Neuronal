@@ -40,6 +40,7 @@ PlanShp Model::WipePlan(PlanShp plan, bool forced)
         if (ref) ref->SetSubPlan(emptyPlan, ref);
         return emptyPlan;
     }
+    return nullptr;
 }
 PlanShp Model::LoadPlan(PlanShp plan, PlanNav nav)
 {
@@ -54,6 +55,7 @@ PlanShp Model::LoadPlan(PlanShp plan, PlanNav nav)
             return loadedPlan;
         }
     }
+    return nullptr;
 }
 
 void Model::SavePlan(PlanShp plan)

@@ -93,5 +93,5 @@ bool PlanPos::IsPositionFree()
 
 bool operator==(const PlanRect& lhs, const PlanRect& rhs)
 {
-    return lhs.br == rhs.br && lhs.tl == rhs.tl && lhs.valid == rhs.valid;
+    return lhs.br == rhs.br && lhs.tl == rhs.tl; // && lhs.valid == rhs.valid;
 }

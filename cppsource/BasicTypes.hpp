@@ -73,11 +73,32 @@ enum class InOut { IN, OUT };
 // Refers to the interface between a handle and plan. Head is the first interface encountered where it zooms in. Tail is the way out.
 enum class ZoomSide { HEAD, TAIL };
 
-struct Port
+//struct Port
+//{
+//    PortNum num;
+//    Tag tag;
+//};
+
+struct PortLocation
 {
+    ZoomSide side;
     PortNum num;
-    Tag tag;
 };
+
+enum class PlanRegion { NONE, WHOLEPLAN, PORTS, CONTENTS };
+
+//struct PlanRegionAndPort
+//{
+//    PlanRegion region;
+//    PortLocation port;
+//};
+//struct PlanRegionData
+//{
+//    PlanRegion region;
+//    ZoomSide side;
+//    PortNum num;
+//};
+
 
 
 #endif	/* BASICTYPES_HPP */

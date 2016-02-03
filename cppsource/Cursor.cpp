@@ -78,16 +78,32 @@ void Cursor::SetPosWorld(VectorWorld point)
         }
         else done = true;
     }
-    b = GetPlan()->GetWorldPaddedBoundPlusPorts();  //??
+    
+    VectorSmart sPos = plan_->GetGrid()->MapWorldtoSmart( point );
+    PlanRegion reg = plan_->GetRegion(sPos);
+    if (reg == PlanRegion::WHOLEPLAN)
+    {
+        SetToPlan();
+    }
+    else if (reg == PlanRegion::PORTS)
+    {
+        PortLocation port = plan_->GetPort(sPos);
+        port_.side = port.side;
+        port_.num = port.num;
+    }
+    
+//    b = GetPlan()->GetWorldPaddedBoundPlusPorts();  //??
+
     //if point is between Plan and its Handle...
-    if (not b.contains(point) ) SetToPlan();
+//    if ( not b.contains(point) )
+//        SetToPlan();
 
     //if point is on a Grabber (cornerBox)...
-    RectWorld cb = { b.left, b.top, GRABBER_SIZE.x, GRABBER_SIZE.y };
-    if (cb.contains(point) ) SetToPlan();
-    cb.left = b.left + b.width - GRABBER_SIZE.x;
-    cb.top = b.top + b.height - GRABBER_SIZE.y;
-    if (cb.contains(point) ) SetToPlan();
+//    RectWorld cb = { b.left, b.top, GRABBER_SIZE.x, GRABBER_SIZE.y };
+//    if (cb.contains(point) ) SetToPlan();
+//    cb.left = b.left + b.width - GRABBER_SIZE.x;
+//    cb.top = b.top + b.height - GRABBER_SIZE.y;
+//    if (cb.contains(point) ) SetToPlan();
 }
 
 

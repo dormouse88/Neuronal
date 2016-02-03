@@ -15,13 +15,6 @@
 #include "ChipPlan.hpp"  //class PlanGrid;
 #include "PlanPos.hpp"
 
-//move this somewhere better...
-struct PortData 
-{
-    bool portSide_;
-    int portNumber_;
-};
-
 
 enum class CursorState { ABSENT, PLAN, LOCATED, PORT };
 
@@ -59,7 +52,7 @@ private:
     CursorState cursorState_;
     PlanShp plan_;
     VectorSmart pos_;
-    //std::shared_ptr<PortData> port_;
+    PortLocation port_;
 
     sf::RectangleShape shape_;
 };

@@ -18,7 +18,7 @@ const int PADDING { 2 };
 ChipPlan::ChipPlan(std::shared_ptr<PlanGrid> g, std::shared_ptr<UserData> u)
     :Wirable(), planID(0), modified(false), planGrid(g), userData_(u)
 {
-    RecalculateSmartInnerBound();
+    RecalculateBounds();
 }
 
 void ChipPlan::RegisterReferer(std::shared_ptr<RefererInterface> ref)
@@ -56,9 +56,10 @@ VectorWorld ChipPlan::GetWireAttachPos(WireAttachSide was, Tag tag) const
     PortNum portNum = MapTagToPort(portSide, tag);
     VectorSmart cell = GetPortSmartPos(portSide, portNum);
     wirePos = planGrid->MapSmartToWorld( cell );
-    wirePos.y += GRID_SIZE.y * 0.5f;
+    wirePos.y += planGrid->WorldSizeOf( cell ).y * 0.5f;
+    //wirePos.y += GRID_SIZE.y * 0.5f;
     if (was == WireAttachSide::OUT)
-        wirePos.x += GRID_SIZE.x;
+        wirePos.x += planGrid->WorldSizeOf( cell ).x; //GRID_SIZE.x;
     return wirePos;
 }
 
@@ -179,7 +180,7 @@ void ChipPlan::CleanVectors()
 
 void ChipPlan::SetModified()
 {
-    RecalculateSmartInnerBound();
+    RecalculateBounds();
     
     if (not modified)
     {
@@ -190,6 +191,38 @@ void ChipPlan::SetModified()
 }
 
 
+PlanRegion ChipPlan::GetRegion(VectorSmart pos)
+{
+    if (pos.x == box_tl_.x or pos.x == box_br_.x)
+    {
+        if (pos.y == box_tl_.y or pos.y == box_br_.y)
+            return PlanRegion::WHOLEPLAN;
+        else
+            return PlanRegion::PORTS;
+    }
+    else if (pos.x > box_tl_.x and pos.x < box_br_.x and pos.y >= box_tl_.y and pos.y <= box_br_.y)
+        return PlanRegion::CONTENTS;
+    else if ( not (pos.y >= box_tl_.y and pos.y <= box_br_.y and pos.x >= box_tl_.x and pos.x <= box_br_.x) )
+        return PlanRegion::NONE;
+    assert(false);
+}
+
+PortLocation ChipPlan::GetPort(VectorSmart pos)
+{
+    assert(GetRegion(pos) == PlanRegion::PORTS);
+    PortLocation ret;
+
+    if (pos.x == box_tl_.x)
+        ret.side = ZoomSide::HEAD;
+    else if (pos.x == box_br_.x)
+        ret.side = ZoomSide::TAIL;
+    else
+        assert(false);
+    
+    ret.num = pos.y - box_tl_.y;
+
+    return ret;
+}
 
 
 DeviceShp ChipPlan::GetDevice(VectorSmart pos)
@@ -246,8 +279,9 @@ std::vector<WireShp > ChipPlan::GetWires(std::shared_ptr<Wirable> wirable, bool 
 }
 
 
-void ChipPlan::RecalculateSmartInnerBound()
+void ChipPlan::RecalculateBounds()
 {
+    //Calculate inner (contents) bound...
     VectorSmart tl;
     VectorSmart br;
     if (devices.size() > 0)
@@ -265,22 +299,43 @@ void ChipPlan::RecalculateSmartInnerBound()
             if (p.y > br.y) br.y = p.y;
         }
     }
-    if (not (tl == tl_corner and br == br_corner) )
+
+    //Calculate outer (box) bound...
+    VectorSmart o_tl = tl;
+    VectorSmart o_br = br;
     {
-        tl_corner = tl;
-        br_corner = br;
+        o_tl -= VectorSmart { PADDING, PADDING };
+        o_br += VectorSmart { PADDING, PADDING };
+        int portsNeeded = std::max(inPorts_.size(), outPorts_.size());
+        int portOverflow = (portsNeeded + 2) - (o_br.y - o_tl.y + 1);
+        if (portOverflow > 0)
+            o_br.y += portOverflow;
+    }
+    
+    //Set member variables and refresh if anything has changed...
+    if (not (tl == inner_tl_ and br == inner_br_ and o_tl == box_tl_ and o_br == box_br_) )
+    {
+        inner_tl_ = tl;
+        inner_br_ = br;
+        box_tl_ = o_tl;
+        box_br_ = o_br;
         PlodeRefreshOutwards();
     }
 }
+
 PlanRect ChipPlan::GetSmartInnerBound() const
 {
-    PlanRect b { PlanPos{ tl_corner, planGrid }, PlanPos{ br_corner, planGrid } };
+    PlanRect b { PlanPos{ inner_tl_, planGrid }, PlanPos{ inner_br_, planGrid } };
     return b;
 }
 PlanRect ChipPlan::GetSmartPaddedBound() const
 {
-    PlanRect b { PlanPos{ tl_corner, planGrid }, PlanPos{ br_corner, planGrid } };
-    return b.AddPadding(PADDING);
+    assert(planGrid);
+    PlanPos temp1 { box_tl_, planGrid };
+    PlanPos temp2 { box_br_, planGrid };
+    return PlanRect {temp1, temp2};
+    PlanRect b { PlanPos{ box_tl_, planGrid }, PlanPos{ box_br_, planGrid } };
+    return b;
 }
 RectDumb ChipPlan::GetDumbPaddedBound() const
 {

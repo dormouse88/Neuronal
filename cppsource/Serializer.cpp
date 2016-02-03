@@ -266,7 +266,7 @@ PlanShp Serializer::LoadPlanRecursively(pugi::xml_node container, int planID, st
     //Find plan with matching planID in the XML...
     pugi::xml_node xmlPlan = container.find_child_by_attribute("PLAN", "i", patch::to_string( planID ).c_str() );
     
-    if (xmlPlan)
+    if (xmlPlan and planID != 0)
     {
         memPlan = factory->MakePlan();
         memPlan->planID = planID;

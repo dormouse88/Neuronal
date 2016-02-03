@@ -65,12 +65,14 @@ public:
     bool IsEmpty()                                          {return devices.empty() and wires.empty();}
     
     std::shared_ptr<PlanGrid> GetGrid()                     {return planGrid;}
+    PlanRegion GetRegion(VectorSmart pos);
+    PortLocation GetPort(VectorSmart pos);
     DeviceShp GetDevice(VectorSmart pos);
     DeviceShp GetDevice(int serial);
     WireShp GetWire(WirableShp from, WirableShp to);
     std::vector<WireShp > GetWires(std::shared_ptr<Wirable>, bool from, bool to); 
 
-    void RecalculateSmartInnerBound();
+    void RecalculateBounds();
     PlanRect GetSmartInnerBound() const;
     PlanRect GetSmartPaddedBound() const;
     RectDumb GetDumbPaddedBound() const;
@@ -107,15 +109,16 @@ private:
 //    std::vector<Port> inPorts_;
 //    std::vector<Port> outPorts_;
     bool modified;
-    //PlanRect smartInnerBound;
-    VectorSmart tl_corner;
-    VectorSmart br_corner;
+    VectorSmart inner_tl_;
+    VectorSmart inner_br_;
+    VectorSmart box_tl_;
+    VectorSmart box_br_;
     
     friend class Serializer;
 };
 
-namespace ChipPlanFunc
-{
+//namespace ChipPlanFunc
+//{
 //    DeviceShp GetDevice(PlanPos pos);
 
 //    WireShp GetWire(PlanPos pos1, PlanPos pos2);
@@ -126,7 +129,7 @@ namespace ChipPlanFunc
 //    void DeviceHandle(PlanPos pos, int code);
 //    void WireHandle(PlanPos pos1, PlanPos pos2, int code);
 //    bool MatchOnPlan(PlanPos & pos1, PlanPos & pos2);
-}
+//}
 
 
 

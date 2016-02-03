@@ -64,18 +64,15 @@ bool operator==(const PlanPos& lhs, const PlanPos& rhs);
 
 struct PlanRect
 {
-//    PlanRect()
-//        :valid(false)
-//    {}
     PlanRect(PlanPos tl_, PlanPos br_)
-        :tl(tl_), br(br_), valid(true)
+        :tl(tl_), br(br_)
     {}
-    PlanRect AddPadding(int thickness)
-    {
-        tl.SetPosSmart( tl.GetSmartPos() - VectorSmart{ thickness, thickness } );
-        br.SetPosSmart( br.GetSmartPos() + VectorSmart{ thickness, thickness } );
-        return *this;
-    }
+//    PlanRect AddPadding(int thickness)
+//    {
+//        tl.SetPosSmart( tl.GetSmartPos() - VectorSmart{ thickness, thickness } );
+//        br.SetPosSmart( br.GetSmartPos() + VectorSmart{ thickness, thickness } );
+//        return *this;
+//    }
     RectDumb GetRectDumb() const
     {
         return RectDumb { tl.GetDumbPos(), br.GetDumbPos() - tl.GetDumbPos() + br.GetDumbSizeOf() };
@@ -91,7 +88,6 @@ struct PlanRect
     }
     PlanPos tl;
     PlanPos br;
-    bool valid;
 };
 
 bool operator==(const PlanRect& lhs, const PlanRect& rhs);
