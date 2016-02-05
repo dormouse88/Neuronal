@@ -6,6 +6,7 @@
  */
 
 #include "BlobFactory.hpp"
+#include "Cursor.hpp"
 #include <iostream>
 #include <cassert>
 
@@ -81,59 +82,33 @@ std::shared_ptr<BaseReferer> BlobFactory::MakeBrain()
 //    return nullptr;
 //}
 
-WireShp BlobFactory::AddWire(PlanShp plan, Wirable & from, Wirable & to, signed weight)
+WireShp BlobFactory::AddWire(Shp<WiringPair> wp, signed weight)
 {
-    Tag fromSlot = 0;
-    Tag toSlot = 0;
-    
-    //Initialize toSlot to the first available valid number.
-    if (to.IsSlotted(SlottedSide::IN))
-    {
-        toSlot = -1;
-        for (int i = 1; i<=SLOT_MAX; i++)
-        {
-            if (to.CanRegisterWire(InOut::IN, i))
-            {
-                toSlot = i;
-                break;
-            }
-        }
-    }
-
-    //Initialize fromSlot to the first available valid number.
-    if (from.IsSlotted(SlottedSide::OUT))
-    {
-        fromSlot = -1;
-        for (int i = 1; i<=SLOT_MAX; i++)
-        {
-            if (from.CanRegisterWire(InOut::OUT, i))
-            {
-                fromSlot = i;
-                break;
-            }
-        }
-    }
-    
-    if (fromSlot != -1 and toSlot != -1) {
-        return AddWire(plan, from, fromSlot, to, toSlot, weight);
-    }
-    return nullptr;
-}
-
-WireShp BlobFactory::AddWire(PlanShp plan, Wirable & from, Tag fromSlot, Wirable & to, Tag toSlot, signed weight)
-{    
     //if the wire will be valid...
-    if (from.HasWireTo(fromSlot, to, toSlot) == false and from.CanRegisterWire(InOut::OUT, fromSlot) and to.CanRegisterWire(InOut::IN, toSlot) and &from != &to)
+    if (wp->CanAddWire())
     {
-        auto mp = std::make_shared<Wire> (from, fromSlot, to, toSlot, weight, plan);
-        from.RegisterWire(InOut::OUT, mp);
-        to.RegisterWire(InOut::IN, mp);
-        plan->ImportWire(mp);
+        auto mp = std::make_shared<Wire> (*wp->from, wp->fromTag, *wp->to, wp->toTag, weight, wp->plan);
+        wp->from->RegisterWire(InOut::OUT, mp);
+        wp->to->RegisterWire(InOut::IN, mp);
+        wp->plan->ImportWire(mp);
         mp->Refresh();
         return mp;
     }
     return nullptr;
 }
+
+//WireShp BlobFactory::AddWire(PlanShp plan, Wirable & from, Tag fromSlot, Wirable & to, Tag toSlot, signed weight)
+    //if the wire will be valid...
+//    if (from.HasWireTo(fromSlot, to, toSlot) == false and from.CanRegisterWire(InOut::OUT, fromSlot) and to.CanRegisterWire(InOut::IN, toSlot) and &from != &to)
+//    {
+//        auto mp = std::make_shared<Wire> (from, fromSlot, to, toSlot, weight, plan);
+//        from.RegisterWire(InOut::OUT, mp);
+//        to.RegisterWire(InOut::IN, mp);
+//        plan->ImportWire(mp);
+//        mp->Refresh();
+//        return mp;
+//    }
+//    return nullptr;
 
 
 void BlobFactory::RemoveDevice(PlanPos pos)
@@ -158,3 +133,5 @@ void BlobFactory::RemoveWire(PlanShp plan, WirableShp w1, WirableShp w2)
         w2->Refresh(toSlot);
     }
 }
+
+

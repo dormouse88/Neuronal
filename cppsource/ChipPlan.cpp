@@ -63,12 +63,13 @@ VectorWorld ChipPlan::GetWireAttachPos(WireAttachSide was, Tag tag) const
     return wirePos;
 }
 
-bool ChipPlan::CanRegisterWire(InOut side, Tag slot) const
+bool ChipPlan::CanRegisterAnyWire(InOut side, Tag slot) const
 {
-    if (side == InOut::IN)
-        return IsTagFree(InOut::IN, slot);
-    else
-        return IsTagFree(InOut::OUT, slot);
+    return true;
+//    if (side == InOut::IN)
+//        return IsTagFree(InOut::IN, slot);
+//    else
+//        return IsTagFree(InOut::OUT, slot);
 }
 
 
@@ -220,6 +221,8 @@ PortLocation ChipPlan::GetPort(VectorSmart pos)
         assert(false);
     
     ret.num = pos.y - box_tl_.y;
+    if ( ret.num < 1 or (ret.side == ZoomSide::HEAD and ret.num > inPorts_.size()) or (ret.side == ZoomSide::TAIL and ret.num > outPorts_.size()) )
+        ret.num = 0;
 
     return ret;
 }
@@ -436,13 +439,19 @@ void ChipPlan::DrawBox(sf::RenderTarget & rt)
     rt.draw(planBox);
     
     //Grabber
+    const sf::Vector2f GRABBER_SIZE { GRID_SIZE * 1.0f };
+    //VectorWorld bPos = planBox.getPosition();
     sf::RectangleShape cornerBox;
-    cornerBox.setSize( GRABBER_SIZE );
-    cornerBox.setPosition( planBox.getPosition() );
     cornerBox.setFillColor( sf::Color{95,95,95} );
-    rt.draw(cornerBox);
+    cornerBox.setOrigin(GRABBER_SIZE.x * 0.5f, 0.f);
     cornerBox.setSize( GRABBER_SIZE );
-    cornerBox.setPosition( pB.left + pB.width - GRABBER_SIZE.x, pB.top + pB.height - GRABBER_SIZE.y );
+    cornerBox.setPosition( pB.left, pB.top );
+    rt.draw(cornerBox);
+    cornerBox.setPosition( pB.left + pB.width, pB.top );
+    rt.draw(cornerBox);
+    cornerBox.setPosition( pB.left, pB.top + pB.height - GRABBER_SIZE.y );
+    rt.draw(cornerBox);
+    cornerBox.setPosition( pB.left + pB.width, pB.top + pB.height - GRABBER_SIZE.y );
     rt.draw(cornerBox);
 }
 void ChipPlan::DrawTitle(sf::RenderTarget & rt)
@@ -635,6 +644,33 @@ Tag ChipPlan::MapPortToTag(ZoomSide pSide, PortNum portNum) const
     }
     return 0;
     //return ports.at(portNum);
+}
+
+Tag ChipPlan::GetFirstFreeTag(ZoomSide side)
+{
+    //Initialize tag to the first available valid number.
+    auto & ports = (side == ZoomSide::HEAD) ? inPorts_ : outPorts_ ;
+    Tag ret = -1;
+    bool invalidated;
+    for (int i = 1; i<=SLOT_MAX; i++)
+    {
+        invalidated = false;
+            //if (IsTagFree(side, i))
+        for (auto p: ports)
+        {
+            if (p.first == i)
+            {
+                invalidated = true;
+                break;
+            }
+        }
+        if (not invalidated)
+        {
+            ret = i;
+            break;
+        }
+    }
+    return ret;
 }
 
 

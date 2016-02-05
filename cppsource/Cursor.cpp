@@ -28,11 +28,16 @@ void Cursor::Draw(sf::RenderTarget & rt)
 {
     if (cursorState_ != CursorState::ABSENT)
     {
+        if (cursorState_ == CursorState::PORT)
+        {
+            shape_.setPosition( plan_->GetGrid()->MapSmartToWorld(pos_) );
+            shape_.setSize( plan_->GetGrid()->WorldSizeOf(pos_) );
+            rt.draw(shape_, sf::RenderStates(sf::BlendAdd));
+        }
         if (cursorState_ == CursorState::LOCATED)
         {
-            PlanPos ppos = GetPlanPos();
-            shape_.setPosition( ppos.GetWorldPos() );
-            shape_.setSize( ppos.GetWorldSizeOf() );
+            shape_.setPosition( plan_->GetGrid()->MapSmartToWorld(pos_) );
+            shape_.setSize( plan_->GetGrid()->WorldSizeOf(pos_) );
             rt.draw(shape_, sf::RenderStates(sf::BlendAdd));
         }
         else if (cursorState_ == CursorState::PLAN)
@@ -88,8 +93,7 @@ void Cursor::SetPosWorld(VectorWorld point)
     else if (reg == PlanRegion::PORTS)
     {
         PortLocation port = plan_->GetPort(sPos);
-        port_.side = port.side;
-        port_.num = port.num;
+        SetToPort(port);
     }
     
 //    b = GetPlan()->GetWorldPaddedBoundPlusPorts();  //??
@@ -148,9 +152,9 @@ WirableShp Cursor::GetWirable()
 {
     if (GetState() == CursorState::LOCATED)
         return GetPlan()->GetDevice( GetPlanPos().GetSmartPos() );
-    if (GetState() == CursorState::PLAN)
+    if (GetState() == CursorState::PORT)
         return GetPlan();
-    assert(false);
+    return nullptr;
 }
 
 PlanShp Cursor::GetParentPlan()
@@ -168,35 +172,67 @@ PlanShp Cursor::GetParentPlan()
 //Maybe "Match on Plan" was a better system :(
 Shp<WiringPair> RetrieveWiringPair(Cursor & cu1, Cursor & cu2)
 {
-    assert(cu1.GetState() != CursorState::ABSENT and cu2.GetState() != CursorState::ABSENT);
-    if (cu1.GetWirable() == nullptr or cu2.GetWirable() == nullptr)
+    //assert(cu1.GetState() != CursorState::ABSENT and cu2.GetState() != CursorState::ABSENT);
+    WirableShp wib1 = cu1.GetWirable();
+    WirableShp wib2 = cu2.GetWirable();
+    PlanShp plan1 = cu1.GetPlan();
+    PlanShp plan2 = cu2.GetPlan();
+    if ( not (wib1 and wib2) )
         return nullptr;
-
-    HandleShp hand1 = cu1.GetPlan()->GetHandle();
-    HandleShp hand2 = cu2.GetPlan()->GetHandle();
+    assert(plan1 and plan2);
+    HandleShp hand1 = (cu1.GetState() == CursorState::PORT) ? plan1->GetHandle() : nullptr;
+    HandleShp hand2 = (cu2.GetState() == CursorState::PORT) ? plan2->GetHandle() : nullptr;
     PlanShp parent1 = hand1 ? hand1->GetContainer() : nullptr;
     PlanShp parent2 = hand2 ? hand2->GetContainer() : nullptr;
+    ZoomSide fromSide;
+    ZoomSide toSide;
     
+    Shp<WiringPair> ret = nullptr;
     //accept cu1 == cu2 (cu1/cu2 being PLAN or LOCATED)
-    if (cu1.GetPlan() == cu2.GetPlan())
+    if ( plan1 and plan1 == plan2 )
     {
-        return std::make_shared<WiringPair> ( cu1.GetPlan(), cu1.GetWirable(), cu2.GetWirable() );
+        ret = std::make_shared<WiringPair> ( plan1, cu1.GetWirable(), cu2.GetWirable() );
+        fromSide = ZoomSide::HEAD;
+        toSide   = ZoomSide::TAIL;
     }
     //accept cu1 == parent2 (only if cu2 is PLAN)
-    if ( cu2.GetState() == CursorState::PLAN  and  cu1.GetPlan() == parent2 )
+    else if ( parent2 and plan1 == parent2 )
     {
-        return std::make_shared<WiringPair> ( cu1.GetPlan(), cu1.GetWirable(), hand2 );
+        ret = std::make_shared<WiringPair> ( plan1, cu1.GetWirable(), hand2 );
+        fromSide = ZoomSide::HEAD;
+        toSide   = ZoomSide::HEAD;
     }
     //accept parent1 == cu2 (only if cu1 is PLAN)
-    if ( cu1.GetState() == CursorState::PLAN  and  parent1 == cu2.GetPlan() )
+    else if ( parent1 and parent1 == plan2 )
     {
-        return std::make_shared<WiringPair> ( parent1, hand1, cu2.GetWirable() );
+        ret = std::make_shared<WiringPair> ( plan2, hand1, cu2.GetWirable() );
+        fromSide = ZoomSide::TAIL;
+        toSide   = ZoomSide::TAIL;
     }
     //accept parent1 == parent2 (only if both are PLAN)
-    if ( cu1.GetState() == CursorState::PLAN and cu2.GetState() == CursorState::PLAN and parent1 == parent2 )
+    else if ( parent1 and parent2 and parent1 == parent2 )
     {
-        return std::make_shared<WiringPair> ( parent1, hand1, hand2 );
+        ret = std::make_shared<WiringPair> ( parent1, hand1, hand2 );
+        fromSide = ZoomSide::TAIL;
+        toSide   = ZoomSide::HEAD;
     }
-    return nullptr;
+    
+    if ( ret and ret->from->IsSlotted(SlottedSide::OUT) )
+    {
+        if ( (cu1.GetState() == CursorState::PORT) and cu1.GetPort().num > 0 )
+            ret->fromTag = plan1->MapPortToTag( cu1.GetPort().side, cu1.GetPort().num );
+        else
+            ret->fromTag = plan1->GetFirstFreeTag(fromSide);
+    }
+    if ( ret and ret->to->IsSlotted(SlottedSide::IN) )
+    {
+        if ( (cu2.GetState() == CursorState::PORT) and cu2.GetPort().num > 0 )
+            ret->toTag = plan2->MapPortToTag( cu2.GetPort().side, cu2.GetPort().num );
+        else
+            ret->toTag = plan2->GetFirstFreeTag(toSide);
+    }
+    
+    return ret;
+    //return nullptr;
 }
 

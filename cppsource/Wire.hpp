@@ -57,7 +57,7 @@ public:
     virtual void Handle(int code) override;
 
     void SetWeight(int w);
-    void SlotCycle(int step, bool fromSide);
+    void TagCycle(int step, bool fromSide);
 private:
     Wirable& from_;
     int fromTag_;

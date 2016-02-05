@@ -163,19 +163,19 @@ void Wire::Handle(int code)
     if (code == 1)
     {
         if (GetFrom().IsSlotted(SlottedSide::OUT)) {
-            SlotCycle(1, true);
+            TagCycle(1, true);
         }
     }
     if (code == 2)
     {
         if (GetFrom().IsSlotted(SlottedSide::OUT)) {
-            SlotCycle(-1, true);
+            TagCycle(-1, true);
         }
     }
     if (code == 3)
     {
         if (GetTo().IsSlotted(SlottedSide::IN)) {
-            SlotCycle(1, false);
+            TagCycle(1, false);
         }
         else {
             SetWeight( GetWeight() + 1);
@@ -184,7 +184,7 @@ void Wire::Handle(int code)
     if (code == 4)
     {
         if (GetTo().IsSlotted(SlottedSide::IN)) {
-            SlotCycle(-1, false);
+            TagCycle(-1, false);
         }
         else {
             SetWeight( GetWeight() - 1);
@@ -202,16 +202,20 @@ void Wire::SetWeight(int w)
     }
 }
 
-void Wire::SlotCycle(int step, bool fromSide)
+void Wire::TagCycle(int step, bool fromSide)
 {
     assert(step == -1 or step == 1);
-    Tag & chosenSlot = (fromSide == true) ? fromTag_ : toTag_;
-    int newSlot = chosenSlot;
+    //Tag & chosenSlot = (fromSide == true) ? fromTag_ : toTag_;
+    Tag newFrom = fromTag_;
+    Tag newTo = toTag_;
+    Tag & changingTag = (fromSide == true) ? newFrom : newTo ;
+
     bool acceptNewSlot = false;
-    while (newSlot + step >= 1 and newSlot + step <= SLOT_MAX and not acceptNewSlot)
+    while (changingTag + step >= 1 and changingTag + step <= SLOT_MAX and not acceptNewSlot)
     {
-        newSlot += step;
-        if ( (fromSide and from_.CanRegisterWire(InOut::OUT, newSlot)) or (!fromSide and to_.CanRegisterWire(InOut::IN, newSlot)) )
+        changingTag += step;
+        //if ( (fromSide and from_.CanRegisterAnyWire(InOut::OUT, changingTag)) or (!fromSide and to_.CanRegisterAnyWire(InOut::IN, changingTag)) )
+        if (from_.CanRegisterExactWire(newFrom, to_, newTo))
         {
             acceptNewSlot = true;
         }
@@ -219,7 +223,7 @@ void Wire::SlotCycle(int step, bool fromSide)
     if (acceptNewSlot)
     {
         Tag oldSlot = toTag_;
-        chosenSlot = newSlot;
+        (fromSide == true) ? fromTag_ = changingTag : toTag_ = changingTag ;
         if (fromSide)
             Refresh();
         else

@@ -307,10 +307,13 @@ PlanShp Serializer::LoadPlanRecursively(pugi::xml_node container, int planID, st
             int weight { wire.attribute("w").as_int(XMLD_WIRE_W) };
             
             std::shared_ptr<Wirable> fromDev = memPlan;
-            if (from != 0) fromDev = memPlan->GetDevice(from);
+            if (from != 0)
+                fromDev = memPlan->GetDevice(from);
             std::shared_ptr<Wirable> toDev = memPlan;
-            if (to != 0) toDev = memPlan->GetDevice(to);
-            factory->AddWire(memPlan, *fromDev, fromSlot, *toDev, toSlot, weight);
+            if (to != 0)
+                toDev = memPlan->GetDevice(to);
+            Shp<WiringPair> wp = std::make_shared<WiringPair>(memPlan, fromDev, toDev, fromSlot, toSlot);
+            factory->AddWire(wp, weight);
         }
         memPlan->modified = false;
     }//if (xmlPlan)

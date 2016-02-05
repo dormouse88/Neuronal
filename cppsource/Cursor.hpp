@@ -11,6 +11,7 @@
 #include <memory>
 #include <cassert>
 #include <SFML/Graphics.hpp>
+#include "BasicTypes.hpp"
 #include "ViewResources.hpp"
 #include "ChipPlan.hpp"  //class PlanGrid;
 #include "PlanPos.hpp"
@@ -27,6 +28,7 @@ public:
     CursorState GetState() const                        { return cursorState_; }
     PlanShp GetPlan()                                   { assert(cursorState_ != CursorState::ABSENT); return plan_; }
     PlanPos GetPlanPos()                                { assert(cursorState_ == CursorState::LOCATED); return PlanPos(pos_, plan_->GetGrid()); }
+    PortLocation GetPort()                              { assert(cursorState_ == CursorState::PORT); return port_; }
     
     void SetToAbsent()
         { cursorState_ = CursorState::ABSENT; }
@@ -40,7 +42,8 @@ public:
         { assert(plan); cursorState_ = CursorState::LOCATED; plan_ = plan; pos_ = sp;}
     void SetToLocated(PlanShp plan, VectorWorld wp)
         { cursorState_ = CursorState::LOCATED; plan_ = plan; pos_ = plan->GetGrid()->MapWorldtoSmart(wp);}
-    //void SetToPort(PlanShp g,
+    void SetToPort(PortLocation pl)
+        { cursorState_ = CursorState::PORT; port_ = pl;}
 
     void SetPosWorld(VectorWorld);
 
@@ -57,14 +60,6 @@ private:
     sf::RectangleShape shape_;
 };
 
-
-struct WiringPair
-{
-    WiringPair(PlanShp p, WirableShp f, WirableShp t) :plan(p), from(f), to(t) {}
-    PlanShp plan;
-    WirableShp from;
-    WirableShp to;
-};
 
 Shp<WiringPair> RetrieveWiringPair(Cursor & cu1, Cursor & cu2);
 

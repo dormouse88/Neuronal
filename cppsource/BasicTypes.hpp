@@ -61,9 +61,9 @@ typedef sf::Rect<World> RectWorld;
 //enum class Charge { ON, OFF };
 typedef bool Charge;
 
-typedef int Tag;
+typedef int Tag;  //(Zero is a special value indicating "no tag")
 
-typedef int PortNum;
+typedef int PortNum;  //(Zero is a special value indicating "no port")
 
 const sf::Vector2f GRID_SIZE { 115.f, 75.f };
 
@@ -73,12 +73,6 @@ enum class InOut { IN, OUT };
 // Refers to the interface between a handle and plan. Head is the first interface encountered where it zooms in. Tail is the way out.
 enum class ZoomSide { HEAD, TAIL };
 
-//struct Port
-//{
-//    PortNum num;
-//    Tag tag;
-//};
-
 struct PortLocation
 {
     ZoomSide side;
@@ -87,17 +81,7 @@ struct PortLocation
 
 enum class PlanRegion { NONE, WHOLEPLAN, PORTS, CONTENTS };
 
-//struct PlanRegionAndPort
-//{
-//    PlanRegion region;
-//    PortLocation port;
-//};
-//struct PlanRegionData
-//{
-//    PlanRegion region;
-//    ZoomSide side;
-//    PortNum num;
-//};
+
 
 
 

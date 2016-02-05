@@ -176,7 +176,7 @@ void Controller::HandleInputEventsFreeMode()
         Shp<WiringPair> wp = RetrieveWiringPair(cu1, cu2);
         if (wp)
         {
-            EventsBothWirable(*wp);
+            EventsBothWirable(wp);
         }
     }
 }
@@ -351,21 +351,21 @@ void Controller::EventsBothLocated(PlanPos pos1, PlanPos pos2)
 
 
 
-void Controller::EventsBothWirable(WiringPair wp)
+void Controller::EventsBothWirable(Shp<WiringPair> wp)
 {
     //requires cu1 + cu2 in a VALID WIRING RELATIONSHIP
     if (event.key.code == sf::Keyboard::B)
     {
         if (event.key.shift == false)
         {
-            model_.GetFactory()->AddWire(wp.plan, *wp.from, *wp.to, 1);
+            model_.GetFactory()->AddWire(wp, 1);
         }
         else
         {
-            model_.GetFactory()->RemoveWire(wp.plan, wp.from, wp.to);
+            model_.GetFactory()->RemoveWire(wp->plan, wp->from, wp->to);
         }
     }
-    auto wire = wp.plan->GetWire(wp.from, wp.to);
+    auto wire = wp->plan->GetWire(wp->from, wp->to);
     if (wire) 
     {
         if (event.key.code == sf::Keyboard::D) {

@@ -21,8 +21,6 @@ class PlanRect; //fwd dec
 class UserData;  //fwd dec
 class ChipHandle;
 
-const sf::Vector2f GRABBER_SIZE { GRID_SIZE * 0.5f };
-
 class ChipPlan : public Wirable
 {
 public:
@@ -39,7 +37,7 @@ public:
     virtual VectorWorld GetWireAttachPos(WireAttachSide, Tag) const override;
 
     virtual bool IsSlotted(SlottedSide) const override      {return true;}
-    virtual bool CanRegisterWire(InOut side, Tag slot) const override;
+    virtual bool CanRegisterAnyWire(InOut side, Tag slot) const override;
 
     //"Referred"...
     void StepInRefresh(Tag slot);
@@ -91,6 +89,7 @@ public:
     void ReCalculatePorts(ZoomSide);
     PortNum MapTagToPort(ZoomSide, Tag) const;
     Tag MapPortToTag(ZoomSide, PortNum) const;
+    Tag GetFirstFreeTag(ZoomSide);
 
 private:
     void DrawBox(sf::RenderTarget & rt);
@@ -106,8 +105,6 @@ private:
     std::vector<WireShp > wires;
     std::map<Tag, PortNum> inPorts_;
     std::map<Tag, PortNum> outPorts_;
-//    std::vector<Port> inPorts_;
-//    std::vector<Port> outPorts_;
     bool modified;
     VectorSmart inner_tl_;
     VectorSmart inner_br_;
@@ -130,6 +127,20 @@ private:
 //    void WireHandle(PlanPos pos1, PlanPos pos2, int code);
 //    bool MatchOnPlan(PlanPos & pos1, PlanPos & pos2);
 //}
+
+//probably shouldn't be here...
+struct WiringPair
+{
+    WiringPair(PlanShp p, WirableShp f, WirableShp t) :plan(p), from(f), to(t), fromTag(0), toTag(0) {}
+    WiringPair(PlanShp p, WirableShp f, WirableShp t, Tag fTag, Tag tTag) :plan(p), from(f), to(t), fromTag(fTag), toTag(tTag) {}
+    PlanShp plan;
+    WirableShp from;
+    WirableShp to;
+    Tag fromTag;
+    Tag toTag;
+    bool IsWired() const { return from->HasWireTo(fromTag, *to, toTag); }
+    bool CanAddWire() const { return from->CanRegisterExactWire(fromTag, *to, toTag); } //{ return (IsWired() == false and from->CanRegisterAnyWire(InOut::OUT, fromTag) and to->CanRegisterAnyWire(InOut::IN, toTag) and from != to) ;}
+};
 
 
 

@@ -1,7 +1,7 @@
 Do Next
 =======
 ---v---
-Multichannel wires
+Multichannel wire bug fixing
 named slots
 
 
@@ -10,7 +10,7 @@ General
 	Why CPU load + Framerate loss when exploded?
 Visual / Interface
 ==================
-	Draw slot matching + valency (to show how many slots are ignored in both directions) between handles and chips.
+	Draw slot valency (to show how many slots are ignored in both directions) between handles and chips.
 	Set discrete zoom levels + use a smarter better centering algo (like googlemaps).
 	Solve: No space to see wires between exploded chips when adjacent. Disallow adjacency? Draw plan boundary half a cell inwards? (changing GRID_SIZE doesn't help exploded chips)
 	Make wire text labels circle-shaped and place them intelligently (on wire but close to device).
@@ -34,7 +34,6 @@ InnerSim
 		read-only loading,
 		containment tree traversal.
 
-	CONSIDER: Multichannel wires?
 	CONSIDER: Named slots?
 
 Inbetween

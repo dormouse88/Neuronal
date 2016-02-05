@@ -28,8 +28,7 @@ public:
     Shp<BaseReferer> MakeBrain();
     
 //    WireShp       AddWire(PlanPos pos1, PlanPos pos2);
-    WireShp       AddWire(PlanShp plan, Wirable & from, Wirable & to, signed weight);
-    WireShp       AddWire(PlanShp plan, Wirable & from, Tag fromSlot, Wirable & to, Tag toSlot, signed weight);
+    WireShp       AddWire(Shp<WiringPair> wp, signed weight);
 
     void RemoveDevice(PlanPos pos);
     void RemoveWire(PlanShp plan, WirableShp w1, WirableShp w2);
@@ -37,6 +36,8 @@ public:
 protected:
     std::shared_ptr<UserData> userData_;
 };
+
+
 
 #endif	/* BLOBFACTORY_HPP */
 

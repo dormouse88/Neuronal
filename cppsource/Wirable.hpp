@@ -30,9 +30,10 @@ public:
 
     virtual bool IsWeightedIn() const                   {return false;}
     virtual bool IsSlotted(SlottedSide) const           {return false;}
-    virtual bool CanRegisterWire(InOut side, Tag slot) const          {return true;}  //Client needs to call this before calling RegisterWire(). RegisterWire() should throw an exception on failure perhaps.
+    virtual bool CanRegisterAnyWire(InOut side, Tag slot) const          {return true;}  //Client needs to call this before calling RegisterWire(). RegisterWire() should throw an exception on failure perhaps.
 
     void RegisterWire(InOut side, WireShp w);
+    bool CanRegisterExactWire(Tag fromSlot, Wirable & to, Tag toSlot) const;
     bool HasWireTo(Tag fromSlot, Wirable & to, Tag toSlot) const;
     int CountWires(InOut side) const;
     bool IsTagFree(InOut side, Tag tag) const;
