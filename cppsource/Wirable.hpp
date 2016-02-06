@@ -24,8 +24,8 @@ public:
     virtual ~Wirable() {}
 
     //Virtuals...
-    virtual void Refresh(Tag) = 0;
-    virtual bool GetOutgoingCharge(Tag) = 0;
+    virtual void ReCalculateCharge(Tag) = 0;
+    virtual Charge GetOutgoingCharge(Tag) = 0;
     virtual VectorWorld GetWireAttachPos(WireAttachSide, Tag) const = 0;
 
     virtual bool IsWeightedIn() const                   {return false;}
@@ -41,8 +41,8 @@ public:
     
     
 protected:
-    void PropagateRefresh(Tag slot = 0);
-    int GetTotalIncomingWeight(Tag slot = 0) const;
+    void PropagateRefresh(Tag slot = NULL_TAG);
+    int GetTotalIncomingWeight(Tag) const;
 private:
     void CleanWireVectors() const;
     mutable std::vector<std::weak_ptr<Wire> > inWires;

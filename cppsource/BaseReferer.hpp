@@ -18,11 +18,12 @@
 
 struct SlotData
 {
-    SlotData()                                  :slot(7), name(), charge(false) {}
-    SlotData(int s, std::string n, bool c)      :slot(s), name(n), charge(c) {}
-    Tag slot;
+    SlotData()                                      :tag("NTAG"), name("NNAME"), charge(Charge::MAYBE) {}
+    SlotData(Tag t, std::string n)                  :tag(t), name(n), charge(Charge::OFF) {}
+    SlotData(Tag t, std::string n, Charge c)        :tag(t), name(n), charge(c) {}
+    Tag tag;
     std::string name;
-    bool charge;
+    Charge charge;
 };
 
 struct XPuts
@@ -40,8 +41,8 @@ public:
     BaseReferer();
     
     //RefererInterface...
-    virtual void StepOutRefresh(Tag slot) override;
-    virtual bool StepOutGetOutgoingCharge(Tag slot) override;
+    virtual void StepOutReCalculateCharge(Tag slot) override;
+    virtual Charge StepOutGetOutgoingCharge(Tag slot) override;
     virtual void SetModified() override;
     virtual void SetSubPlan(PlanShp, std::shared_ptr<RefererInterface>) override;
     virtual PlanShp GetSubPlan() override;
@@ -50,7 +51,7 @@ public:
     void SetInputState(std::string, bool);
     void TickOnce();
     bool IsAnyOutputOn() const;
-    std::map<std::string, bool> GetOutputs();
+    std::map<std::string, Charge> GetOutputs();
 
     void DrawBrain(sf::RenderTarget & rt);
     
@@ -58,7 +59,7 @@ private:
     void RefreshOutputs();
 
     std::map<std::string, SlotData > inputs_;
-    std::map<int, SlotData > outputs_;
+    std::map<Tag, SlotData > outputs_;
     PlanShp subPlan_;
 };
 

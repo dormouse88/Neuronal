@@ -12,6 +12,7 @@
 #include <iterator>
 #include "UserData.hpp" //fwd dec
 #include "PlanPos.hpp"  //fwd dec
+#include "WiringPair.hpp"  //fwd dec
 
 const int PADDING { 2 };
 
@@ -37,16 +38,20 @@ HandleShp ChipPlan::GetHandle()
 
 
 //Wirable...
-void ChipPlan::Refresh(Tag slot)
+void ChipPlan::ReCalculateCharge(Tag slot)
 {
+//    ReCalculatePorts(ZoomSide::HEAD);
+//    ReCalculatePorts(ZoomSide::TAIL);
     if (referer)
-        referer->StepOutRefresh(slot);
+        referer->StepOutReCalculateCharge(slot);
 }
-bool ChipPlan::GetOutgoingCharge(Tag slot)
+Charge ChipPlan::GetOutgoingCharge(Tag slot)
 {
+//    ReCalculatePorts(ZoomSide::HEAD);
+//    ReCalculatePorts(ZoomSide::TAIL);
     if (referer)
         return referer->StepOutGetOutgoingCharge(slot);
-    return false;
+    return Charge::OFF;
 }
 VectorWorld ChipPlan::GetWireAttachPos(WireAttachSide was, Tag tag) const
 {
@@ -57,9 +62,8 @@ VectorWorld ChipPlan::GetWireAttachPos(WireAttachSide was, Tag tag) const
     VectorSmart cell = GetPortSmartPos(portSide, portNum);
     wirePos = planGrid->MapSmartToWorld( cell );
     wirePos.y += planGrid->WorldSizeOf( cell ).y * 0.5f;
-    //wirePos.y += GRID_SIZE.y * 0.5f;
     if (was == WireAttachSide::OUT)
-        wirePos.x += planGrid->WorldSizeOf( cell ).x; //GRID_SIZE.x;
+        wirePos.x += planGrid->WorldSizeOf( cell ).x;
     return wirePos;
 }
 
@@ -75,22 +79,22 @@ bool ChipPlan::CanRegisterAnyWire(InOut side, Tag slot) const
 
 
 //"Referred"...
-void ChipPlan::StepInRefresh(Tag slot)
+void ChipPlan::StepInReCalculateCharge(Tag slot)
 {
     PropagateRefresh(slot);
 }
-bool ChipPlan::StepInGetOutgoingCharge(Tag slot)
+Charge ChipPlan::StepInGetOutgoingCharge(Tag slot)
 {
     if ( GetTotalIncomingWeight(slot) >= 1 )
-        return true;
+        return Charge::ON;
     else
-        return false;
+        return Charge::OFF;
 }
-void ChipPlan::PassOnAct()
+void ChipPlan::PassOnInnerStep()
 {
     for (auto & d: devices) d->InnerStep();
 }
-void ChipPlan::PassOnCalculate()
+void ChipPlan::PassOnPreInnerStep()
 {
     for (auto & d: devices) d->PreInnerStep();
 }
@@ -145,28 +149,38 @@ void ChipPlan::ImportWire(WireShp wire)
     wires.emplace_back(wire);
     SetModified();
 }
-void ChipPlan::RemoveDevice(DeviceShp device)
+void ChipPlan::RemoveDevice(PlanPos pos)
 {
-    if (device) {
+    DeviceShp device = pos.GetDevice();
+    HandleShp h = pos.GetDeviceAsHandle();
+    if ( device and (not h or h->GetSubPlan()->IsEmpty()) )
+    {
         for (auto w : GetWires(device, true, true))
         {
-            w->Zingaya();
+            RemoveWire(w);
+            //w->Zingaya();
         }
         device->Zingaya();
         CleanVectors();
         SetModified();
     }
 }
-void ChipPlan::RemoveWire(WireShp wire)
+void ChipPlan::RemoveWire(WireShp wire) //Shp<WiringPair> wp)
 {
-    if (wire) {
+    if (wire)
+    {
+        Tag toTag = wire->GetToTag();
+        Wirable & toRef = const_cast<Wirable&>(wire->GetTo());
         wire->Zingaya();
+        wire = nullptr;
+        toRef.ReCalculateCharge(toTag);
         CleanVectors();
         SetModified();
     }
 }
 void ChipPlan::CleanVectors()
 {
+//    int before = wires.size();
     {
         auto remove_func = [] (DeviceShp eachDevice) {return eachDevice->IsDead();};
         auto new_end = std::remove_if(std::begin(devices), std::end(devices), remove_func );
@@ -177,10 +191,14 @@ void ChipPlan::CleanVectors()
         auto new_end = std::remove_if(std::begin(wires), std::end(wires), remove_func);
         wires.erase(new_end, std::end(wires) );
     }
+//    int after = wires.size();
+//    int diff = after - before;
 }
 
 void ChipPlan::SetModified()
 {
+    ReCalculatePorts(ZoomSide::HEAD);
+    ReCalculatePorts(ZoomSide::TAIL);
     RecalculateBounds();
     
     if (not modified)
@@ -247,18 +265,22 @@ DeviceShp ChipPlan::GetDevice(int serial)
     return nullptr;
 }
 
-/**
- * Returns the wire (or a null pointer) between two passed-in devices.
- * @param from device
- * @param to device
- * @return 
- */
-WireShp ChipPlan::GetWire(WirableShp from, WirableShp to)
+//WireShp ChipPlan::GetWire(WirableShp from, WirableShp to)
+//{
+//    for (auto & x: wires) {
+//        if (from.get() == &x->GetFrom() and to.get() == &x->GetTo()) {
+//            return x;
+//        }
+//    }
+//    return nullptr;
+//}
+
+WireShp ChipPlan::GetWire(Shp<WiringPair> wp)
 {
-    for (auto & x: wires) {
-        if (from.get() == &x->GetFrom() and to.get() == &x->GetTo()) {
+    for (auto & x: wires)
+    {
+        if ( wp->from.get() == &x->GetFrom() and wp->to.get() == &x->GetTo() and wp->fromTag == x->GetFromTag() and wp->toTag == x->GetToTag() )
             return x;
-        }
     }
     return nullptr;
 }
@@ -310,7 +332,8 @@ void ChipPlan::RecalculateBounds()
         o_tl -= VectorSmart { PADDING, PADDING };
         o_br += VectorSmart { PADDING, PADDING };
         int portsNeeded = std::max(inPorts_.size(), outPorts_.size());
-        int portOverflow = (portsNeeded + 2) - (o_br.y - o_tl.y + 1);
+        int portOverflow = (portsNeeded + 2) - (o_br.y - o_tl.y + 1);  //2 is for the corners, 1 is because br is inclusive.
+        portOverflow += 1; //to ensure there is always a "null" port
         if (portOverflow > 0)
             o_br.y += portOverflow;
     }
@@ -534,8 +557,6 @@ void ChipPlan::DrawParts(sf::RenderTarget & rt)
     text.setFont( ViewResources::GetInstance().font );
     text.setColor( sf::Color::Cyan );
     
-    ReCalculatePorts(ZoomSide::HEAD);
-    ReCalculatePorts(ZoomSide::TAIL);
     for (auto & p: inPorts_)
     {
         VectorSmart s_pos = GetPortSmartPos(ZoomSide::HEAD, p.second);
@@ -575,7 +596,6 @@ VectorSmart ChipPlan::GetPortSmartPos(ZoomSide side, PortNum portNum) const
     }
 }
 
-//std::vector<Port>
 void ChipPlan::ReCalculatePorts(ZoomSide side)
 {
     std::set<Tag> allTags;
@@ -610,16 +630,6 @@ void ChipPlan::ReCalculatePorts(ZoomSide side)
         ports[x] = num;
         num++;
     }
-//    std::vector<Port> ret;
-//    for (auto & x :allTags)
-//    {
-//        Port temp;
-//        temp.num = num;
-//        temp.tag = x;
-//        ret.emplace_back(temp);
-//        num++;
-//    }
-//    return ret;
 }
 
 PortNum ChipPlan::MapTagToPort(ZoomSide pSide, Tag tag) const
@@ -648,30 +658,51 @@ Tag ChipPlan::MapPortToTag(ZoomSide pSide, PortNum portNum) const
 
 Tag ChipPlan::GetFirstFreeTag(ZoomSide side)
 {
-    //Initialize tag to the first available valid number.
+    const int AUTO_TAG_MAX_LENGTH = 20;
+    const std::string AUTO_TAG_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     auto & ports = (side == ZoomSide::HEAD) ? inPorts_ : outPorts_ ;
-    Tag ret = -1;
-    bool invalidated;
-    for (int i = 1; i<=SLOT_MAX; i++)
+
+    //Initialize tag to the first available value.
+    Tag autoTag;
+    for (int i = 0; i <= AUTO_TAG_MAX_LENGTH; ++i)
     {
-        invalidated = false;
-            //if (IsTagFree(side, i))
-        for (auto p: ports)
+        autoTag.push_back( AUTO_TAG_CHARS.front() );
+        for (auto c: AUTO_TAG_CHARS)
         {
-            if (p.first == i)
+            autoTag.back() = c;
+            if (ports.count(autoTag) == 0)
             {
-                invalidated = true;
-                break;
+                return autoTag;
             }
         }
-        if (not invalidated)
-        {
-            ret = i;
-            break;
-        }
+        autoTag.back() = AUTO_TAG_CHARS.front();
     }
-    return ret;
+    throw "NAME MAX LENGTH Reached!"; // Highly unlikely to reach this point with Max of 30, but still bad form.;
 }
+
+//{
+//    auto & ports = (side == ZoomSide::HEAD) ? inPorts_ : outPorts_ ;
+//    Tag ret = -1;
+//    bool invalidated;
+//    for (int i = 1; i<=SLOT_MAX; i++)
+//    {
+//        invalidated = false;
+//        for (auto p: ports)
+//        {
+//            if (p.first == i)
+//            {
+//                invalidated = true;
+//                break;
+//            }
+//        }
+//        if (not invalidated)
+//        {
+//            ret = i;
+//            break;
+//        }
+//    }
+//    return ret;
+//}
 
 
 

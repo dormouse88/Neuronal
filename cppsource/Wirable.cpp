@@ -53,26 +53,26 @@ void Wirable::CleanWireVectors() const //this method is necessary since the limi
     cleanVector(outWires);
 }
 
-void Wirable::PropagateRefresh(Tag slot)
+void Wirable::PropagateRefresh(Tag tag)
 {
     for (auto & w: outWires)
     {
         if (auto notDead = w.lock()) {
-            if (notDead->GetFromTag() == slot or slot == 0) {
+            if (notDead->GetFromTag() == tag or tag == NULL_TAG) {
                 notDead->Refresh();
             }
         }
     }
 }
 
-int Wirable::GetTotalIncomingWeight(Tag slot) const
+int Wirable::GetTotalIncomingWeight(Tag tag) const
 {
     CleanWireVectors();
     int total = 0;
     for (auto w: inWires)
     {
         auto lw = w.lock();
-        if (lw and (lw->GetToTag() == slot or slot == 0) )
+        if (lw and (lw->GetToTag() == tag or tag == NULL_TAG) )
         {
             total += lw->GetOutgoingWeight();
         }
@@ -128,14 +128,18 @@ std::set<Tag> Wirable::GetTagCloud(InOut side)
     {
         for (auto & x: inWires)
         {
-            ret.insert( x.lock()->GetToTag() );
+            auto l = x.lock();
+            if (l)
+                ret.insert( l->GetToTag() );
         }
     }
     else
     {
         for (auto & x: outWires)
         {
-            ret.insert( x.lock()->GetFromTag() );
+            auto l = x.lock();
+            if (l)
+                ret.insert( l->GetFromTag() );
         }
     }
     return ret;

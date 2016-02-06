@@ -17,7 +17,7 @@ Cursor::Cursor(std::shared_ptr<PlanGrid> g, sf::Color color)
 {
     shape_.setFillColor(sf::Color::Transparent);
     shape_.setOutlineColor( color );
-    shape_.setOutlineThickness(2.5f);
+    shape_.setOutlineThickness(-2.5f);
 }
 
 
@@ -42,7 +42,7 @@ void Cursor::Draw(sf::RenderTarget & rt)
         }
         else if (cursorState_ == CursorState::PLAN)
         {
-            auto b = GetPlan()->GetWorldPaddedBoundBox();  //plus ports or box
+            auto b = GetPlan()->GetWorldPaddedBoundPlusPorts();  //plus ports or box
             shape_.setPosition( b.left, b.top );
             shape_.setSize( sf::Vector2f { b.width, b.height } );
             rt.draw(shape_, sf::RenderStates(sf::BlendAdd));

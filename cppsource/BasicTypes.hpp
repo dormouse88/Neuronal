@@ -58,10 +58,11 @@ typedef sf::Rect<World> RectWorld;
 
 
 
-//enum class Charge { ON, OFF };
-typedef bool Charge;
+enum class Charge { MAYBE, ON, OFF };
+//typedef bool Charge;
 
-typedef int Tag;  //(Zero is a special value indicating "no tag")
+typedef std::string Tag; 
+const Tag NULL_TAG {"NULLZ"}; //(Empty string is a special value indicating "no tag")
 
 typedef int PortNum;  //(Zero is a special value indicating "no port")
 

@@ -180,12 +180,12 @@ void View::DrawMain() //Main Port...
     //draw selected Gobjects again in full brightness...
     if (highlightingMode == 2)
     {
-        auto d1 = cursorOne.GetPlanPos().GetDevice();
-        if (d1) d1->Draw(window);
-        auto d2 = cursorTwo.GetPlanPos().GetDevice();
-        if (d2) d2->Draw(window);
-        auto w1 = ap->GetWire(d1, d2);
-        if (w1) w1->Draw(window);
+//        auto d1 = cursorOne.GetPlanPos().GetDevice();
+//        if (d1) d1->Draw(window);
+//        auto d2 = cursorTwo.GetPlanPos().GetDevice();
+//        if (d2) d2->Draw(window);
+//        auto w1 = ap->GetWire(d1, d2);
+//        if (w1) w1->Draw(window);
     }
     if (highlightingMode == 3)
     { //this whole GetWires() business is shonky...

@@ -13,21 +13,21 @@
 BaseReferer::BaseReferer()
 {}
 
-void BaseReferer::StepOutRefresh(Tag slot)
+void BaseReferer::StepOutReCalculateCharge(Tag slot)
 //outputs may have changed
 {
     RefreshOutputs();
 }
 
-bool BaseReferer::StepOutGetOutgoingCharge(Tag slot)
+Charge BaseReferer::StepOutGetOutgoingCharge(Tag slot)
 //return outgoing charges from inputs
 {
     for (auto &x: inputs_)
     {
-        if ( x.second.slot == slot )
+        if ( x.second.tag == slot )
             return x.second.charge;
     }
-    return false;
+    return Charge::OFF;
 }
 
 
@@ -61,30 +61,31 @@ void BaseReferer::DefineXputs(XPuts all, XPutFilter filter)
     for (auto sd: all.outs)
     {
         if (filter == nullptr or filter->count( sd.name ) > 0 or sd.name == "WAIT") //bit naughty but who cares
-            outputs_.insert( { sd.slot, sd} );
+            outputs_.insert( { sd.tag, sd} );
     }
 }
-void BaseReferer::SetInputState(std::string name, bool charge)
+void BaseReferer::SetInputState(std::string name, bool bcharge)
 {
+    Charge charge = (bcharge) ? Charge::ON : Charge::OFF ;
     auto it = inputs_.find(name);
     if (it != inputs_.end())
     {
         if (it->second.charge != charge)
         {
             it->second.charge = charge;
-            subPlan_->StepInRefresh(it->second.slot);
+            subPlan_->StepInReCalculateCharge(it->second.tag);
         }
     }
 }
 void BaseReferer::TickOnce()
 {
-    subPlan_->PassOnCalculate();
-    subPlan_->PassOnAct();
+    subPlan_->PassOnPreInnerStep();
+    subPlan_->PassOnInnerStep();
 }
 
-std::map<std::string, bool> BaseReferer::GetOutputs()
+std::map<std::string, Charge> BaseReferer::GetOutputs()
 {
-    std::map<std::string, bool> retMap;
+    std::map<std::string, Charge> retMap;
     //fill retMap with data...
     for (auto &x: outputs_)
     {
@@ -99,7 +100,7 @@ bool BaseReferer::IsAnyOutputOn() const
 {
     for (auto x: outputs_)
     {
-        if (x.second.charge)
+        if (x.second.charge == Charge::ON)
             return true;
     }
     return false;
@@ -109,7 +110,7 @@ void BaseReferer::RefreshOutputs()
 {
     for (auto & x: outputs_)
     {
-        x.second.charge = subPlan_->StepInGetOutgoingCharge(x.second.slot);
+        x.second.charge = subPlan_->StepInGetOutgoingCharge(x.second.tag);
     }
 }
 
@@ -128,17 +129,17 @@ void BaseReferer::DrawBrain(sf::RenderTarget & rt)
     t.setFont(ViewResources::GetInstance().font);
     t.setCharacterSize(22.f);
     for (auto p: inputs_) {
-        if (p.second.charge) t.setColor( BRIGHT );
+        if (p.second.charge == Charge::ON) t.setColor( BRIGHT );
         else t.setColor( DULL );
-        t.setString( patch::to_string(p.second.slot) + ": " + p.second.name );
+        t.setString( patch::to_string(p.second.tag) + ": " + p.second.name );
         t.setPosition(xi - t.getGlobalBounds().width, yi);
         rt.draw(t);
         yi += 70.f;
     }
     for (auto p: outputs_) {
-        if (p.second.charge) t.setColor( BRIGHT );
+        if (p.second.charge == Charge::ON) t.setColor( BRIGHT );
         else t.setColor( DULL );
-        t.setString( patch::to_string(p.second.slot) + ": " + p.second.name );
+        t.setString( patch::to_string(p.second.tag) + ": " + p.second.name );
         t.setPosition(xo, yo);
         rt.draw(t);
         yo += 70.f;

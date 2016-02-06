@@ -302,7 +302,7 @@ void Controller::EventsLocated(PlanPos pos1)
         }
         else
         {
-            model_.GetFactory()->RemoveDevice(pos1);
+            pos1.GetPlan()->RemoveDevice(pos1);
         }
     }
     if (event.key.code == sf::Keyboard::H)
@@ -362,10 +362,12 @@ void Controller::EventsBothWirable(Shp<WiringPair> wp)
         }
         else
         {
-            model_.GetFactory()->RemoveWire(wp->plan, wp->from, wp->to);
+            //assert(wp and wp->from and wp->to);
+            //auto wire = 
+            wp->plan->RemoveWire(wp->plan->GetWire(wp));
         }
     }
-    auto wire = wp->plan->GetWire(wp->from, wp->to);
+    auto wire = wp->plan->GetWire(wp);
     if (wire) 
     {
         if (event.key.code == sf::Keyboard::D) {

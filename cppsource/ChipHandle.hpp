@@ -24,8 +24,8 @@ public:
     virtual void Handle(int code) override;
     
     //Wirable...
-    virtual void Refresh(Tag) override;
-    virtual bool GetOutgoingCharge(Tag) override;
+    virtual void ReCalculateCharge(Tag) override;
+    virtual Charge GetOutgoingCharge(Tag) override;
     virtual VectorWorld GetWireAttachPos(WireAttachSide, Tag) const override;
 
     virtual bool IsSlotted(SlottedSide) const override;
@@ -36,14 +36,14 @@ public:
     virtual void PreInnerStep() override;
     virtual VectorDumb GetPlodedSize() override;
 
-
     //RefererInterface...
-    virtual void StepOutRefresh(Tag slot) override;
-    virtual bool StepOutGetOutgoingCharge(Tag slot) override;
+    virtual void StepOutReCalculateCharge(Tag slot) override;
+    virtual Charge StepOutGetOutgoingCharge(Tag slot) override;
     virtual void SetModified() override;
     virtual void SetSubPlan(PlanShp, std::shared_ptr<RefererInterface>) override;
     virtual PlanShp GetSubPlan() override;
 
+    void ReCalculatePorts();
     bool IsExploded();
     void SetExploded(bool);
 private:

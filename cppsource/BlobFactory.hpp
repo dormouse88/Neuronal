@@ -9,6 +9,7 @@
 #define	BLOBFACTORY_HPP
 
 #include "BasicTypes.hpp"
+#include "WiringPair.hpp"
 #include "Wire.hpp"
 #include "Neuron.hpp"
 #include "ChipHandle.hpp"
@@ -27,11 +28,10 @@ public:
     PlanShp       MakePlan();
     Shp<BaseReferer> MakeBrain();
     
-//    WireShp       AddWire(PlanPos pos1, PlanPos pos2);
     WireShp       AddWire(Shp<WiringPair> wp, signed weight);
 
-    void RemoveDevice(PlanPos pos);
-    void RemoveWire(PlanShp plan, WirableShp w1, WirableShp w2);
+//    void RemoveDevice(PlanPos pos);
+//    void RemoveWire(Shp<WiringPair> wp);
 
 protected:
     std::shared_ptr<UserData> userData_;

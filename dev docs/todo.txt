@@ -1,9 +1,7 @@
 Do Next
 =======
 ---v---
-Multichannel wire bug fixing
-named slots
-
+Overhaul ownership (shared ptrs, weak ptrs, references, deletion, etc. Devices own wires?)
 
 General
 =======
@@ -34,7 +32,12 @@ InnerSim
 		read-only loading,
 		containment tree traversal.
 
-	CONSIDER: Named slots?
+	Multichannel wire bug fixing:
+		adding wires to collapsed handles (could just disallow),
+		modifying the tags on wires (and the cursor selection of that wire),
+		adding a wire involving a port with the cursors reversed is highly surprising.
+	named slots bug fixes
+
 
 Inbetween
 =========

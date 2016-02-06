@@ -15,6 +15,7 @@
 #include "ViewResources.hpp"
 #include "ChipPlan.hpp"  //class PlanGrid;
 #include "PlanPos.hpp"
+#include "WiringPair.hpp"
 
 
 enum class CursorState { ABSENT, PLAN, LOCATED, PORT };

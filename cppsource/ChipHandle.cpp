@@ -71,30 +71,21 @@ void ChipHandle::Handle(int code)
 
 
 //Wirable...
-void ChipHandle::Refresh(Tag slot)
+void ChipHandle::ReCalculateCharge(Tag slot)
 {
-    if (subPlan_) subPlan_->StepInRefresh(slot);
-    //Something like this...
-    //(has charge state saved in a map or something (inPorts))
-    //
-    //bool newState = false;
-    //if ( inPorts.at(slot).GetTotalIncomingCharge() >= 1 )
-    //    newState = true;
-    //if (newState != inPorts.at(slot).charge) {
-    //    inPorts.at(slot).charge = newState;
-    //    PropagateRefresh(slot);
-    //}
+    ReCalculatePorts();
+    if (subPlan_)
+        subPlan_->StepInReCalculateCharge(slot);
 }
 
 //(Called on right hand side of handle by other device)
-bool ChipHandle::GetOutgoingCharge(Tag slot)
+Charge ChipHandle::GetOutgoingCharge(Tag tag)
 {
+    ReCalculatePorts();
     if (subPlan_)
-        return subPlan_->StepInGetOutgoingCharge(slot);
+        return subPlan_->StepInGetOutgoingCharge(tag);
     else
-        return false;
-    //this perhaps?...
-    //return outPorts.at(slot).charge;
+        return Charge::OFF;
 }
 
 VectorWorld ChipHandle::GetWireAttachPos(WireAttachSide was, Tag tag) const
@@ -111,24 +102,13 @@ VectorWorld ChipHandle::GetWireAttachPos(WireAttachSide was, Tag tag) const
         wirePos.y += GRID_SIZE.y * 0.5f;
         if (was == WireAttachSide::OUT)
             wirePos.x += GRID_SIZE.x;
-        
-//        RectWorld planBound { subPlan_->GetWorldPaddedBoundPlusPorts() };  //not sure
-//        VectorWorld objectSize { planBound.width, planBound.height };
-//        if (was == WireAttachSide::IN) {
-//            wirePos = CalculateOffsetForCentering(objectSize) + VectorWorld {objectSize.x *.0f, objectSize.y *.5f };
-//        }
-//        else {
-//            wirePos = CalculateOffsetForCentering(objectSize) + VectorWorld {objectSize.x *1.f, objectSize.y *.5f };
-//        }
     }
     else
     {
-        if (was == WireAttachSide::IN) {
+        if (was == WireAttachSide::IN)
             wirePos = CalculateOffsetForCentering(RECTANGLE) + WIRE_IN_OFFSET;
-        }
-        else {
+        else
             wirePos = CalculateOffsetForCentering(RECTANGLE) + WIRE_OUT_OFFSET;
-        }
     }
     return wirePos;
 }
@@ -152,11 +132,11 @@ bool ChipHandle::CanRegisterAnyWire(InOut side, Tag slot) const
 //Device...
 void ChipHandle::InnerStep()
 {
-    if (subPlan_) subPlan_->PassOnAct();
+    if (subPlan_) subPlan_->PassOnInnerStep();
 }
 void ChipHandle::PreInnerStep()
 {
-    if (subPlan_) subPlan_->PassOnCalculate();
+    if (subPlan_) subPlan_->PassOnPreInnerStep();
 }
 VectorDumb ChipHandle::GetPlodedSize()
 {
@@ -174,17 +154,17 @@ VectorDumb ChipHandle::GetPlodedSize()
 
 //RefererInterface...
 //(called by plan onto right hand side of handle)
-void ChipHandle::StepOutRefresh(Tag slot)
+void ChipHandle::StepOutReCalculateCharge(Tag slot)
 {
     PropagateRefresh(slot);
 }
 //(called by plan onto left hand side of handle)
-bool ChipHandle::StepOutGetOutgoingCharge(Tag slot)
+Charge ChipHandle::StepOutGetOutgoingCharge(Tag slot)
 {
     if (GetTotalIncomingWeight(slot) >= 1)
-        return true;
+        return Charge::ON;
     else
-        return false;
+        return Charge::OFF;
 }
 void ChipHandle::SetModified()
 {
@@ -209,6 +189,16 @@ PlanShp ChipHandle::GetSubPlan()
 
 
 //Self...
+void ChipHandle::ReCalculatePorts()
+{
+    if (subPlan_)
+    {
+        subPlan_->ReCalculatePorts(ZoomSide::HEAD);
+        subPlan_->ReCalculatePorts(ZoomSide::TAIL);
+        subPlan_->RecalculateBounds();
+    }
+}
+
 bool ChipHandle::IsExploded()
 {
     return exploded_;

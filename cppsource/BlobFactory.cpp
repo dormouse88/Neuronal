@@ -21,7 +21,7 @@ NeuronShp BlobFactory::AddNeuron(PlanShp plan, int serial, VectorSmart pos, int 
     {
         auto mp = std::make_shared<Neuron> (serial, pos, threshold, hasBulb, plan);
         plan->ImportDevice(mp);
-        mp->Refresh(0);
+        mp->ReCalculateCharge(NULL_TAG);
         return mp;
     }
     return nullptr;
@@ -66,21 +66,6 @@ std::shared_ptr<BaseReferer> BlobFactory::MakeBrain()
 
 
 
-//WireShp BlobFactory::AddWire(PlanPos pos1, PlanPos pos2)
-//{
-//    if (ChipPlanFunc::MatchOnPlan(pos1, pos2))
-//    {
-//        PlanShp plan = pos1.GetPlan();
-//        std::shared_ptr<Wirable> w1 = ChipPlanFunc::GetWirable( pos1 );
-//        std::shared_ptr<Wirable> w2 = ChipPlanFunc::GetWirable( pos2 );
-//
-//        if (w1 and w2)
-//        {
-//            return AddWire(plan, *w1, *w2, 1);
-//        }
-//    }
-//    return nullptr;
-//}
 
 WireShp BlobFactory::AddWire(Shp<WiringPair> wp, signed weight)
 {
@@ -97,41 +82,27 @@ WireShp BlobFactory::AddWire(Shp<WiringPair> wp, signed weight)
     return nullptr;
 }
 
-//WireShp BlobFactory::AddWire(PlanShp plan, Wirable & from, Tag fromSlot, Wirable & to, Tag toSlot, signed weight)
-    //if the wire will be valid...
-//    if (from.HasWireTo(fromSlot, to, toSlot) == false and from.CanRegisterWire(InOut::OUT, fromSlot) and to.CanRegisterWire(InOut::IN, toSlot) and &from != &to)
+
+//void BlobFactory::RemoveDevice(PlanPos pos)
+//{
+//    DeviceShp d = pos.GetDevice();
+//    HandleShp h = pos.GetDeviceAsHandle();
+//    if (not h or h->GetSubPlan()->IsEmpty())
 //    {
-//        auto mp = std::make_shared<Wire> (from, fromSlot, to, toSlot, weight, plan);
-//        from.RegisterWire(InOut::OUT, mp);
-//        to.RegisterWire(InOut::IN, mp);
-//        plan->ImportWire(mp);
-//        mp->Refresh();
-//        return mp;
+//        pos.GetPlan()->RemoveDevice(d);
 //    }
-//    return nullptr;
+//}
 
-
-void BlobFactory::RemoveDevice(PlanPos pos)
-{
-    DeviceShp d = pos.GetDevice();
-    HandleShp h = pos.GetDeviceAsHandle();
-    if (not h or h->GetSubPlan()->IsEmpty())
-    {
-        pos.GetPlan()->RemoveDevice(d);
-    }
-}
-
-void BlobFactory::RemoveWire(PlanShp plan, WirableShp w1, WirableShp w2)
-{
-    assert(w1 and w2);
-    auto wire = plan->GetWire(w1, w2);
-    if (wire)
-    {
-        Tag toSlot = wire->GetToTag();
-        plan->RemoveWire(wire);
-        wire = nullptr;
-        w2->Refresh(toSlot);
-    }
-}
-
-
+//void BlobFactory::RemoveWire(Shp<WiringPair> wp)
+//{
+//    assert(wp and wp->from and wp->to);
+//    auto wire = wp->plan->GetWire(wp);
+//    if (wire)
+//    {
+//        Tag toSlot = wire->GetToTag();
+//        wp->plan->RemoveWire(wire);
+//        wire = nullptr;
+//        wp->to->ReCalculateCharge(toSlot);
+//    }
+//}
+//

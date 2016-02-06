@@ -74,7 +74,7 @@ void Puppet::Act()
     //Perform an action based on the output information from the brain...
     //Since it is possible to receive requests for multiple commands at once, an order of priority will have to be established and made explicit.
     //As an example, a preliminary order might be: (Moving or Turning) > Marking Scents > Reading Scents > Waiting
-    auto lamb = [&outs] (std::string n) { return outs.count(n) > 0 and outs.at(n) == true; };
+    auto lamb = [&outs] (std::string n) { return outs.count(n) > 0 and outs.at(n) == Charge::ON; };
     if (lamb(L_FOOT.name) and lamb(R_FOOT.name)) {
         WalkForward();
     }

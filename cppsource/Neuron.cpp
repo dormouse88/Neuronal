@@ -91,7 +91,7 @@ void Neuron::Draw(sf::RenderTarget & rt)
     VectorWorld perceivedPos_;
     perceivedPos_ = CalculateOffsetForCentering(RECTANGLE);
     shape.setPosition( perceivedPos_ );
-    if ( calculatedCharge_ )
+    if ( calculatedCharge_ == Charge::ON )
         shape.setFillColor(sf::Color::Red);
     else
         shape.setFillColor(sf::Color(50,50,200) );
@@ -109,7 +109,7 @@ void Neuron::Draw(sf::RenderTarget & rt)
 
     if (hasBulb_) {
         bulbShape.setPosition( perceivedPos_ );
-        if ( outgoingCharge_ )
+        if ( outgoingCharge_ == Charge::ON)
             bulbShape.setFillColor(sf::Color::Red);
         else
             bulbShape.setFillColor(sf::Color(50,50,200) );
@@ -130,21 +130,21 @@ void Neuron::Draw(sf::RenderTarget & rt)
 Neuron::Neuron(int serial, sf::Vector2i pos, int threshold, bool hasBulb, PlanShp cont)
     :Device(serial, pos, cont)
     ,hasBulb_(hasBulb)
-    ,calculatedCharge_(false)
-    ,intermediateCharge_(false)
-    ,outgoingCharge_(false)
+    ,calculatedCharge_(Charge::OFF)
+    ,intermediateCharge_(Charge::OFF)
+    ,outgoingCharge_(Charge::OFF)
     ,threshold_(threshold)
     ,totalIncoming_(0)
 {
     InitVisuals();
 }
 
-void Neuron::Refresh(Tag slot)
+void Neuron::ReCalculateCharge(Tag tag)
 {
-    totalIncoming_ = GetTotalIncomingWeight();
-    bool newState = false;
+    totalIncoming_ = GetTotalIncomingWeight(tag);
+    Charge newState = Charge::OFF;
     if (totalIncoming_ >= threshold_)
-        newState = true;
+        newState = Charge::ON;
     if (calculatedCharge_ != newState)
     {
         calculatedCharge_ = newState;
@@ -157,7 +157,7 @@ void Neuron::Refresh(Tag slot)
     }
 }
 
-bool Neuron::GetOutgoingCharge(Tag slot)
+Charge Neuron::GetOutgoingCharge(Tag slot)
 {
     return outgoingCharge_;
 }
@@ -190,11 +190,11 @@ void Neuron::Handle(int code)
 {
     if (code == 1) {
         threshold_ += 1;
-        Refresh(0);
+        ReCalculateCharge(NULL_TAG);
     }
     if (code == 2) {
         threshold_ -= 1;
-        Refresh(0);
+        ReCalculateCharge(NULL_TAG);
     }
     if (code == 3) {
         hasBulb_ = not hasBulb_;

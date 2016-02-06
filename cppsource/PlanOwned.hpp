@@ -26,8 +26,8 @@ public:
     virtual void Handle(int code) = 0;
     virtual std::string SerialName() const = 0;
 
-    void Zingaya() {dead = true;}
-    bool IsDead() const {return dead;}
+    void Zingaya()          {dead = true;}
+    bool IsDead() const     {return dead;}
     //void SetModified();
     PlanShp GetContainer();
 private:

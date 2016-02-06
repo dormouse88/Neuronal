@@ -12,13 +12,13 @@
 //enum class BrainInput { WAIT = 0, F_WHISK = 1, L_WHISK = 2, R_WHISK = 3 };
 
 //senses
-const SlotData F_WHISK {1,"F_WHISK",false};
-const SlotData L_WHISK {2,"L_WHISK",false};
-const SlotData R_WHISK {3,"R_WHISK",false};
+const SlotData F_WHISK {"A","F_WHISK"};
+const SlotData L_WHISK {"B","L_WHISK"};
+const SlotData R_WHISK {"C","R_WHISK"};
 //actions
-const SlotData WAIT {1,"WAIT",false};
-const SlotData L_FOOT {2,"L_FOOT",false};
-const SlotData R_FOOT {3,"R_FOOT",false};
+const SlotData WAIT   {"A","WAIT"};
+const SlotData L_FOOT {"B","L_FOOT"};
+const SlotData R_FOOT {"C","R_FOOT"};
 inline XPuts GetAllXPuts()
 {
     XPuts ret;

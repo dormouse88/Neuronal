@@ -132,7 +132,7 @@ void WireView::Draw(sf::RenderTarget & rt, const Wire & w)
  * @param toSlot
  * @param weight
  */
-Wire::Wire(Wirable & from, int fromTag, Wirable & to, int toTag, signed weight, PlanShp cont)
+Wire::Wire(Wirable & from, Tag fromTag, Wirable & to, Tag toTag, signed weight, PlanShp cont)
     :PlanOwned(cont)
     , v_(*this)
     , from_(from)
@@ -140,15 +140,15 @@ Wire::Wire(Wirable & from, int fromTag, Wirable & to, int toTag, signed weight, 
     , to_(to)
     , toTag_(toTag)
     , weight_(weight)
-    , firing_(false)
+    , charge_(Charge::MAYBE)
 {}
 
 void Wire::Refresh()
 {
-    bool newState = from_.GetOutgoingCharge(fromTag_);
-    if (newState != firing_) {
-        firing_ = newState;
-        to_.Refresh(toTag_);
+    Charge newState = from_.GetOutgoingCharge(fromTag_);
+    if (newState != charge_) {
+        charge_ = newState;
+        to_.ReCalculateCharge(toTag_);
     }
 }
 
@@ -198,38 +198,70 @@ void Wire::SetWeight(int w)
     if (weight_ != w)
     {
         weight_ = w;
-        to_.Refresh(toTag_);
+        to_.ReCalculateCharge(toTag_);
     }
 }
 
 void Wire::TagCycle(int step, bool fromSide)
 {
     assert(step == -1 or step == 1);
-    //Tag & chosenSlot = (fromSide == true) ? fromTag_ : toTag_;
-    Tag newFrom = fromTag_;
-    Tag newTo = toTag_;
-    Tag & changingTag = (fromSide == true) ? newFrom : newTo ;
-
-    bool acceptNewSlot = false;
-    while (changingTag + step >= 1 and changingTag + step <= SLOT_MAX and not acceptNewSlot)
+    Tag & tagRef = (fromSide == true) ? fromTag_ : toTag_;
+    
+    std::set<Tag> cloud = (fromSide) ? from_.GetTagCloud(InOut::OUT) : to_.GetTagCloud(InOut::IN) ;
+    auto it = cloud.find(tagRef);
+    assert(it != cloud.end());
+    if (it != cloud.begin() and step == -1)
+        it--;
+    else if (step == 1)
+        it++;
+    
+    Tag oldSlot = toTag_;
+    if (it != cloud.end())
     {
-        changingTag += step;
-        //if ( (fromSide and from_.CanRegisterAnyWire(InOut::OUT, changingTag)) or (!fromSide and to_.CanRegisterAnyWire(InOut::IN, changingTag)) )
-        if (from_.CanRegisterExactWire(newFrom, to_, newTo))
-        {
-            acceptNewSlot = true;
-        }
+        tagRef = *it;
     }
-    if (acceptNewSlot)
+    else
+        tagRef = "xOx";
+        //tagRef = std::dynamic_cast<ChipPlan>(from_).GetFirstFreeTag(ZoomSide::HEAD);
+    if (fromSide)
+        Refresh();
+    else
     {
-        Tag oldSlot = toTag_;
-        (fromSide == true) ? fromTag_ = changingTag : toTag_ = changingTag ;
-        if (fromSide)
-            Refresh();
-        else
-        {
-            to_.Refresh(toTag_);
-            to_.Refresh(oldSlot);
-        }
+        to_.ReCalculateCharge(toTag_);
+        to_.ReCalculateCharge(oldSlot);
     }
 }
+
+
+
+//void Wire::TagCycle(int step, bool fromSide)
+//{
+//    assert(step == -1 or step == 1);
+//    //Tag & chosenSlot = (fromSide == true) ? fromTag_ : toTag_;
+//    Tag newFrom = fromTag_;
+//    Tag newTo = toTag_;
+//    Tag & changingTag = (fromSide == true) ? newFrom : newTo ;
+//
+//    bool acceptNewSlot = false;
+//    while (changingTag + step >= 1 and changingTag + step <= SLOT_MAX and not acceptNewSlot)
+//    {
+//        changingTag += step;
+//        if (from_.CanRegisterExactWire(newFrom, to_, newTo))
+//        {
+//            acceptNewSlot = true;
+//        }
+//    }
+//    if (acceptNewSlot)
+//    {
+//        Tag oldSlot = toTag_;
+//        (fromSide == true) ? fromTag_ = changingTag : toTag_ = changingTag ;
+//        if (fromSide)
+//            Refresh();
+//        else
+//        {
+//            to_.ReCalculateCharge(toTag_);
+//            to_.ReCalculateCharge(oldSlot);
+//        }
+//    }
+//}
+//

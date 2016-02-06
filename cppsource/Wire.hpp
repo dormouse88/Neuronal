@@ -12,6 +12,7 @@
 #include "miscUtil.hpp"
 #include "ViewResources.hpp"
 #include "PlanOwned.hpp"
+#include "Wirable.hpp"
 class Wirable;  //fwd dec
 
 const int SLOT_MAX = 99;
@@ -40,19 +41,18 @@ class Wire : public PlanOwned
 public:
     Wire(Wirable & from, Tag fromTag, Wirable & to, Tag toTag, signed weight, PlanShp cont);
 
-    virtual std::string SerialName() const { return "WIRE";}
-
     void Refresh();
-    int GetOutgoingWeight() const          { if (firing_) return weight_; else return 0;}
+    int GetOutgoingWeight() const          { if (charge_ == Charge::ON and not IsDead()) return weight_; else return 0; }
     
-    bool GetFiring() const {return firing_;}     //for drawing only
+    bool GetFiring() const {return charge_ == Charge::ON ;}     //for drawing only
     int GetWeight() const {return weight_;}      //for drawing only
 
     const Wirable& GetFrom() const {return from_; }
-    const int GetFromTag() const {return fromTag_; }
+    const Tag GetFromTag() const {return fromTag_; }
     const Wirable& GetTo() const {return to_; }
-    const int GetToTag() const {return toTag_; }
+    const Tag GetToTag() const {return toTag_; }
     
+    virtual std::string SerialName() const { return "WIRE";}
     virtual void Draw(sf::RenderTarget & rt) override;
     virtual void Handle(int code) override;
 
@@ -60,11 +60,11 @@ public:
     void TagCycle(int step, bool fromSide);
 private:
     Wirable& from_;
-    int fromTag_;
+    Tag fromTag_;
     Wirable& to_;
-    int toTag_;
+    Tag toTag_;
     signed weight_;
-    bool firing_;
+    Charge charge_;
     WireView v_;
 };
 

@@ -21,8 +21,8 @@ const char XML_LEVELS_FILENAME [] = "levels1.xml";
 
 const int  XMLD_NEUR_THR {1};
 const bool XMLD_NEUR_BULB {true};
-const int XMLD_WIRE_FS {0};
-const int XMLD_WIRE_TS {0};
+const char XMLD_WIRE_FS [] {""};
+const char XMLD_WIRE_TS [] {""};
 const int XMLD_WIRE_W {1};
 
 Serializer::Serializer()
@@ -249,9 +249,9 @@ bool Serializer::SavePlanRecursively(pugi::xml_node container, PlanShp plan_p)
             if (w->GetWeight() != XMLD_WIRE_W)
                 wire.append_attribute("w").set_value(w->GetWeight());
             if (w->GetFromTag() != XMLD_WIRE_FS)
-                wire.append_attribute("fs").set_value(w->GetFromTag());
+                wire.append_attribute("fs").set_value(w->GetFromTag().c_str());
             if (w->GetToTag() != XMLD_WIRE_TS)
-                wire.append_attribute("ts").set_value(w->GetToTag());
+                wire.append_attribute("ts").set_value(w->GetToTag().c_str());
         }
         plan_p->modified = false;
         return true;
@@ -302,8 +302,8 @@ PlanShp Serializer::LoadPlanRecursively(pugi::xml_node container, int planID, st
         {
             int from { wire.attribute("f").as_int() };
             int to { wire.attribute("t").as_int() };
-            int fromSlot { wire.attribute("fs").as_int(XMLD_WIRE_FS) };
-            int toSlot { wire.attribute("ts").as_int(XMLD_WIRE_TS) };
+            Tag fromSlot { wire.attribute("fs").as_string(XMLD_WIRE_FS) };
+            Tag toSlot { wire.attribute("ts").as_string(XMLD_WIRE_TS) };
             int weight { wire.attribute("w").as_int(XMLD_WIRE_W) };
             
             std::shared_ptr<Wirable> fromDev = memPlan;
