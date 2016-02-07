@@ -45,7 +45,7 @@ bool Wirable::CanRegisterExactWire(Tag fromTag, Wirable & to, Tag toTag) const
 void Wirable::CleanWireVectors() const //this method is necessary since the limits work by checking vector size.
 {
     auto cleanVector = [&] (std::vector<std::weak_ptr<Wire> > & wv) {
-        auto remove_func = [] (std::weak_ptr<Wire> & w) { return w.expired(); } ;
+        auto remove_func = [] (std::weak_ptr<Wire> & w) { return w.expired() or w.lock()->IsDead(); } ;
         auto new_end = std::remove_if(begin(wv), end(wv), remove_func );
         wv.erase(new_end, end(wv));
     };
@@ -98,27 +98,28 @@ int Wirable::CountWires(InOut side) const
         return outWires.size();
 }
 
-bool Wirable::IsTagFree(InOut side, Tag tag) const
-{
-    CleanWireVectors();
-    if (side == InOut::IN)
-    {
-        for (auto w: inWires)
-        {
-            if (w.lock()->GetToTag() == tag)
-                return false;
-        }
-    }
-    if (side == InOut::OUT)
-    {
-        for (auto w: outWires)
-        {
-            if (w.lock()->GetFromTag() == tag)
-                return false;
-        }
-    }
-    return true;
-}
+//RED
+//bool Wirable::IsTagFree(InOut side, Tag tag) const
+//{
+//    CleanWireVectors();
+//    if (side == InOut::IN)
+//    {
+//        for (auto w: inWires)
+//        {
+//            if (w.lock()->GetToTag() == tag)
+//                return false;
+//        }
+//    }
+//    if (side == InOut::OUT)
+//    {
+//        for (auto w: outWires)
+//        {
+//            if (w.lock()->GetFromTag() == tag)
+//                return false;
+//        }
+//    }
+//    return true;
+//}
 
 std::set<Tag> Wirable::GetTagCloud(InOut side)
 {
@@ -129,7 +130,7 @@ std::set<Tag> Wirable::GetTagCloud(InOut side)
         for (auto & x: inWires)
         {
             auto l = x.lock();
-            if (l)
+            if (l and not l->IsDead())
                 ret.insert( l->GetToTag() );
         }
     }
@@ -138,7 +139,7 @@ std::set<Tag> Wirable::GetTagCloud(InOut side)
         for (auto & x: outWires)
         {
             auto l = x.lock();
-            if (l)
+            if (l and not l->IsDead())
                 ret.insert( l->GetFromTag() );
         }
     }

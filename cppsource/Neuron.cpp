@@ -139,6 +139,12 @@ Neuron::Neuron(int serial, sf::Vector2i pos, int threshold, bool hasBulb, PlanSh
     InitVisuals();
 }
 
+//Wirable...
+void Neuron::StructuralRefresh()
+{
+    ReCalculateCharge(NULL_TAG);
+}
+
 void Neuron::ReCalculateCharge(Tag tag)
 {
     totalIncoming_ = GetTotalIncomingWeight(tag);

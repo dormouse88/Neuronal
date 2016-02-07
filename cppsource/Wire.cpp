@@ -204,32 +204,44 @@ void Wire::SetWeight(int w)
 
 void Wire::TagCycle(int step, bool fromSide)
 {
-    assert(step == -1 or step == 1);
-    Tag & tagRef = (fromSide == true) ? fromTag_ : toTag_;
-    
-    std::set<Tag> cloud = (fromSide) ? from_.GetTagCloud(InOut::OUT) : to_.GetTagCloud(InOut::IN) ;
-    auto it = cloud.find(tagRef);
-    assert(it != cloud.end());
-    if (it != cloud.begin() and step == -1)
-        it--;
-    else if (step == 1)
-        it++;
-    
-    Tag oldSlot = toTag_;
-    if (it != cloud.end())
-    {
-        tagRef = *it;
-    }
-    else
-        tagRef = "xOx";
-        //tagRef = std::dynamic_cast<ChipPlan>(from_).GetFirstFreeTag(ZoomSide::HEAD);
-    if (fromSide)
-        Refresh();
-    else
-    {
-        to_.ReCalculateCharge(toTag_);
-        to_.ReCalculateCharge(oldSlot);
-    }
+//    assert(step == -1 or step == 1);
+//    Tag & tagRef = (fromSide == true) ? fromTag_ : toTag_;
+//    
+//    std::set<Tag> cloud = (fromSide) ? from_.GetTagCloud(InOut::OUT) : to_.GetTagCloud(InOut::IN) ;
+//    auto it = cloud.find(tagRef);
+//    assert(it != cloud.end());
+//    if (it != cloud.begin() and step == -1)
+//        it--;
+//    else if (step == 1)
+//        it++;
+//
+//    Tag newTag;
+//    if (it != cloud.end())
+//    {
+//        newTag = *it;
+//    }
+//    else
+//    {
+//        if (fromSide)
+//            newTag = from_.GetFirstFreeTag( InOut::OUT );
+//        else
+//            newTag = to_.GetFirstFreeTag( InOut::IN );
+//    }
+//
+//    Tag newFrom = (fromSide) ? newTag : fromTag_ ;
+//    Tag newTo = (fromSide) ? toTag_ : newTag ;
+//    if (from_.CanRegisterExactWire(newFrom, to_, newTo))
+//    {
+//        Tag oldSlot = toTag_;
+//        tagRef = newTag;
+//        if (fromSide)
+//            Refresh();
+//        else
+//        {
+//            to_.ReCalculateCharge(toTag_);
+//            to_.ReCalculateCharge(oldSlot);
+//        }
+//    }
 }
 
 

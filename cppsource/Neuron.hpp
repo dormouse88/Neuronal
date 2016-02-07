@@ -26,6 +26,7 @@ public:
     virtual void Handle(int code) override;
     
     //Wirable...
+    virtual void StructuralRefresh() override;
     virtual void ReCalculateCharge(Tag) override;
     virtual Charge GetOutgoingCharge(Tag) override;
     virtual VectorWorld GetWireAttachPos(WireAttachSide, Tag) const override;

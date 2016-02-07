@@ -6,7 +6,8 @@ CONSIDER: Named Slots.
 		When a new slot is created (by adding a wire) it is currently assigned the first available int. This could be made to be the first available capital letter instead (A,B,C,AB,AC,etc). This would provide an easy default value and also allow for a single, simple mechanic (just matching on exact string equality). Note that unlike with plan naming, "auto names" should not be denoted by a special symbol and are effectively not differentiated from real names.
 	OBS: A plan/handle complex will draw a single interface "array" of slots. The slots in this array will be the union of the slots on the handle and the plan (sorted alphabetically).
 	OBS: Interface: There must be a novel string input control. Controls to cycle up/down the slots are optional (if provided, the "end" could be the first available capital letter).
-	OBS: Drawing: I guess having a fairly low maximum character limit is necessary to not take up too much space. Unless I use tooltips or something (nah).
+	OBS: Drawing: I guess having a fairly low maximum character limit is necessary to not take up too much space.
+		CONC: Display some (4?) chars in main window and full Tag (16?) in status bar.
 
 
 

@@ -38,33 +38,60 @@ HandleShp ChipPlan::GetHandle()
 
 
 //Wirable...
+void ChipPlan::StructuralRefresh()
+{
+    ReCalculatePorts(ZoomSide::HEAD);
+    ReCalculatePorts(ZoomSide::TAIL);
+    RecalculateBounds();
+}
 void ChipPlan::ReCalculateCharge(Tag slot)
 {
-//    ReCalculatePorts(ZoomSide::HEAD);
-//    ReCalculatePorts(ZoomSide::TAIL);
     if (referer)
         referer->StepOutReCalculateCharge(slot);
 }
 Charge ChipPlan::GetOutgoingCharge(Tag slot)
 {
-//    ReCalculatePorts(ZoomSide::HEAD);
-//    ReCalculatePorts(ZoomSide::TAIL);
     if (referer)
         return referer->StepOutGetOutgoingCharge(slot);
     return Charge::OFF;
 }
 VectorWorld ChipPlan::GetWireAttachPos(WireAttachSide was, Tag tag) const
 {
-    sf::Vector2f wirePos;
     //Because ChipPlans are wired internally, the wires come OUT of the left...
-    ZoomSide portSide = (was == WireAttachSide::IN) ? ZoomSide::TAIL : ZoomSide::HEAD ;
-    PortNum portNum = MapTagToPort(portSide, tag);
-    VectorSmart cell = GetPortSmartPos(portSide, portNum);
+    PortLocation port;
+    port.side = (was == WireAttachSide::IN) ? ZoomSide::TAIL : ZoomSide::HEAD ;
+    port.num = MapTagToPort(port.side, tag);
+    VectorSmart cell = GetPortSmartPos(port);
+    VectorWorld wirePos;
     wirePos = planGrid->MapSmartToWorld( cell );
     wirePos.y += planGrid->WorldSizeOf( cell ).y * 0.5f;
     if (was == WireAttachSide::OUT)
         wirePos.x += planGrid->WorldSizeOf( cell ).x;
     return wirePos;
+}
+
+Tag ChipPlan::GetFirstFreeTag(InOut was)
+{
+    const int AUTO_TAG_MAX_LENGTH = 20;
+    const std::string AUTO_TAG_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    auto & ports = (was == InOut::OUT) ? inPorts_ : outPorts_ ;
+
+    //Initialize tag to the first available value.
+    Tag autoTag;
+    for (int i = 0; i <= AUTO_TAG_MAX_LENGTH; ++i)
+    {
+        autoTag.push_back( AUTO_TAG_CHARS.front() );
+        for (auto c: AUTO_TAG_CHARS)
+        {
+            autoTag.back() = c;
+            if (ports.count(autoTag) == 0)
+            {
+                return autoTag;
+            }
+        }
+        autoTag.back() = AUTO_TAG_CHARS.front();
+    }
+    throw "NAME MAX LENGTH Reached!"; // Highly unlikely to reach this point with Max of 30, but still bad form.;
 }
 
 bool ChipPlan::CanRegisterAnyWire(InOut side, Tag slot) const
@@ -147,6 +174,8 @@ void ChipPlan::ImportDevice(DeviceShp device)
 void ChipPlan::ImportWire(WireShp wire)
 {
     wires.emplace_back(wire);
+    const_cast<Wirable&>(wire->GetFrom()).StructuralRefresh();
+    const_cast<Wirable&>(wire->GetTo()).StructuralRefresh();
     SetModified();
 }
 void ChipPlan::RemoveDevice(PlanPos pos)
@@ -165,22 +194,21 @@ void ChipPlan::RemoveDevice(PlanPos pos)
         SetModified();
     }
 }
-void ChipPlan::RemoveWire(WireShp wire) //Shp<WiringPair> wp)
+void ChipPlan::RemoveWire(WireShp wire)
 {
     if (wire)
     {
-        Tag toTag = wire->GetToTag();
+        Wirable & fromRef = const_cast<Wirable&>(wire->GetFrom());
         Wirable & toRef = const_cast<Wirable&>(wire->GetTo());
         wire->Zingaya();
-        wire = nullptr;
-        toRef.ReCalculateCharge(toTag);
+        fromRef.StructuralRefresh();
+        toRef.StructuralRefresh();
         CleanVectors();
         SetModified();
     }
 }
 void ChipPlan::CleanVectors()
 {
-//    int before = wires.size();
     {
         auto remove_func = [] (DeviceShp eachDevice) {return eachDevice->IsDead();};
         auto new_end = std::remove_if(std::begin(devices), std::end(devices), remove_func );
@@ -191,16 +219,12 @@ void ChipPlan::CleanVectors()
         auto new_end = std::remove_if(std::begin(wires), std::end(wires), remove_func);
         wires.erase(new_end, std::end(wires) );
     }
-//    int after = wires.size();
-//    int diff = after - before;
 }
 
 void ChipPlan::SetModified()
 {
-    ReCalculatePorts(ZoomSide::HEAD);
-    ReCalculatePorts(ZoomSide::TAIL);
-    RecalculateBounds();
-    
+    StructuralRefresh();
+
     if (not modified)
     {
         if (referer)
@@ -559,7 +583,7 @@ void ChipPlan::DrawParts(sf::RenderTarget & rt)
     
     for (auto & p: inPorts_)
     {
-        VectorSmart s_pos = GetPortSmartPos(ZoomSide::HEAD, p.second);
+        VectorSmart s_pos = GetPortSmartPos( PortLocation{ZoomSide::HEAD, p.second} );
         VectorWorld pos = planGrid->MapSmartToWorld(s_pos) + (planGrid->WorldSizeOf(s_pos) * 0.5f);
         shape.setPosition( pos );
         text.setPosition( pos );
@@ -570,7 +594,7 @@ void ChipPlan::DrawParts(sf::RenderTarget & rt)
     }
     for (auto & p: outPorts_)
     {
-        VectorSmart s_pos = GetPortSmartPos(ZoomSide::TAIL, p.second);
+        VectorSmart s_pos = GetPortSmartPos( PortLocation{ZoomSide::TAIL, p.second} );
         VectorWorld pos = planGrid->MapSmartToWorld(s_pos) + (planGrid->WorldSizeOf(s_pos) * 0.5f);
         shape.setPosition( pos );
         text.setPosition( pos );
@@ -581,19 +605,25 @@ void ChipPlan::DrawParts(sf::RenderTarget & rt)
     }
 }
 
-VectorSmart ChipPlan::GetPortSmartPos(ZoomSide side, PortNum portNum) const
+
+
+bool ChipPlan::HasPort(PortLocation port) const
 {
-    PlanRect r = GetSmartPaddedBound();
-    if (side == ZoomSide::HEAD)
-    {
-        VectorSmart in_start = r.tl.GetSmartPos();
-        return { in_start.x, in_start.y + portNum };
-    }
+    if ( (port.side == ZoomSide::HEAD and port.num <= inPorts_.size()) or (port.side == ZoomSide::TAIL and port.num <= outPorts_.size()) )
+        return true;
     else
-    {
-        VectorSmart out_start = { r.br.GetSmartPos().x, r.tl.GetSmartPos().y };
-        return { out_start.x, out_start.y + portNum };
-    }
+        return false;
+}
+
+VectorSmart ChipPlan::GetPortSmartPos(PortLocation port) const
+{
+    if (port.num == 0)
+        port.num = (port.side == ZoomSide::HEAD) ? inPorts_.size() +1 : outPorts_.size() +1 ;
+    PlanRect r = GetSmartPaddedBound();
+    VectorSmart start;
+    start.x = (port.side == ZoomSide::HEAD) ? r.tl.GetSmartPos().x : start.x = r.br.GetSmartPos().x ;
+    start.y = r.tl.GetSmartPos().y;
+    return { start.x, start.y + port.num };
 }
 
 void ChipPlan::ReCalculatePorts(ZoomSide side)
@@ -641,7 +671,6 @@ PortNum ChipPlan::MapTagToPort(ZoomSide pSide, Tag tag) const
             return x.second;
     }
     return 0;
-    //return ports.at(tag);
 }
 
 Tag ChipPlan::MapPortToTag(ZoomSide pSide, PortNum portNum) const
@@ -652,32 +681,7 @@ Tag ChipPlan::MapPortToTag(ZoomSide pSide, PortNum portNum) const
         if (x.second == portNum)
             return x.first;
     }
-    return 0;
-    //return ports.at(portNum);
-}
-
-Tag ChipPlan::GetFirstFreeTag(ZoomSide side)
-{
-    const int AUTO_TAG_MAX_LENGTH = 20;
-    const std::string AUTO_TAG_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    auto & ports = (side == ZoomSide::HEAD) ? inPorts_ : outPorts_ ;
-
-    //Initialize tag to the first available value.
-    Tag autoTag;
-    for (int i = 0; i <= AUTO_TAG_MAX_LENGTH; ++i)
-    {
-        autoTag.push_back( AUTO_TAG_CHARS.front() );
-        for (auto c: AUTO_TAG_CHARS)
-        {
-            autoTag.back() = c;
-            if (ports.count(autoTag) == 0)
-            {
-                return autoTag;
-            }
-        }
-        autoTag.back() = AUTO_TAG_CHARS.front();
-    }
-    throw "NAME MAX LENGTH Reached!"; // Highly unlikely to reach this point with Max of 30, but still bad form.;
+    return NULL_TAG;
 }
 
 //{

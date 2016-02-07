@@ -1,20 +1,22 @@
 Do Next
 =======
 ---v---
-Overhaul ownership (shared ptrs, weak ptrs, references, deletion, etc. Devices own wires?)
+Overhaul ownership (shared ptrs, weak ptrs, references, deletion, etc. Devices own wires? Port-Arrays are their own entity- shared between handles and plans?)
+
+
 
 General
 =======
 	Why CPU load + Framerate loss when exploded?
 Visual / Interface
 ==================
-	Draw slot valency (to show how many slots are ignored in both directions) between handles and chips.
+	Draw slot valency number (to show how many slots are ignored in both directions) between handles and chips.
 	Set discrete zoom levels + use a smarter better centering algo (like googlemaps).
 	Solve: No space to see wires between exploded chips when adjacent. Disallow adjacency? Draw plan boundary half a cell inwards? (changing GRID_SIZE doesn't help exploded chips)
 	Make wire text labels circle-shaped and place them intelligently (on wire but close to device).
 	Allow chip cycling while unexploded and draw name on the handle.
 	Choose highest number plan to load into an empty plan, not lowest.
-	Plan Grabbers are unnecessary if using dedicated keys for collapse and expand. EDIT: Still used for plan selection for wiring. 2ndEDIT: Until Ports
+	Plan Grabbers becoming a bit unnecessary. Only used for loading/saving now.
 	View centers in wrong place in both: 1 Plan collapse and 2 Plan Load/Wipe
 	Add a reset all charge button.
 	Add a collapse all/expand! all button.
@@ -34,10 +36,10 @@ InnerSim
 
 	Multichannel wire bug fixing:
 		adding wires to collapsed handles (could just disallow),
-		modifying the tags on wires (and the cursor selection of that wire),
+		modifying the tags on wires (and the cursor selection of that wire) (could just disallow),
 		adding a wire involving a port with the cursors reversed is highly surprising.
 	named slots bug fixes
-
+		Add some interface method to enter a Tag string with the keyboard.
 
 Inbetween
 =========

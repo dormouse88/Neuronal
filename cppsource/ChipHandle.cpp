@@ -71,9 +71,17 @@ void ChipHandle::Handle(int code)
 
 
 //Wirable...
+void ChipHandle::StructuralRefresh()
+{
+    if (subPlan_)
+    {
+        subPlan_->ReCalculatePorts(ZoomSide::HEAD);
+        subPlan_->ReCalculatePorts(ZoomSide::TAIL);
+        subPlan_->RecalculateBounds();
+    }
+}
 void ChipHandle::ReCalculateCharge(Tag slot)
 {
-    ReCalculatePorts();
     if (subPlan_)
         subPlan_->StepInReCalculateCharge(slot);
 }
@@ -81,7 +89,6 @@ void ChipHandle::ReCalculateCharge(Tag slot)
 //(Called on right hand side of handle by other device)
 Charge ChipHandle::GetOutgoingCharge(Tag tag)
 {
-    ReCalculatePorts();
     if (subPlan_)
         return subPlan_->StepInGetOutgoingCharge(tag);
     else
@@ -93,15 +100,18 @@ VectorWorld ChipHandle::GetWireAttachPos(WireAttachSide was, Tag tag) const
     VectorWorld wirePos;
     if (exploded_)
     {
-        ZoomSide portSide = (was == WireAttachSide::IN) ? ZoomSide::HEAD : ZoomSide::TAIL ;
-        PortNum portNum = subPlan_->MapTagToPort(portSide, tag);
-        //VectorSmart cell = subPlan_->GetPortSmartPos(portSide, portNum);
-        PlanPos ppos { subPlan_->GetPortSmartPos(portSide, portNum), subPlan_->GetGrid() };
-        wirePos = ppos.GetWorldPos();
-        //wirePos = planGrid->MapSmartToWorld( cell );
-        wirePos.y += GRID_SIZE.y * 0.5f;
+        PortLocation port;
+        port.side = (was == WireAttachSide::IN) ? ZoomSide::HEAD : ZoomSide::TAIL ;
+        port.num = subPlan_->MapTagToPort(port.side, tag);
+
+//        PlanPos ppos { subPlan_->GetPortSmartPos(port), subPlan_->GetGrid() };
+//        wirePos = ppos.GetWorldPos();
+        VectorSmart cell = subPlan_->GetPortSmartPos(port);
+        wirePos = subPlan_->GetGrid()->MapSmartToWorld( cell );
+        wirePos.y += subPlan_->GetGrid()->WorldSizeOf( cell ).y * 0.5f;
+
         if (was == WireAttachSide::OUT)
-            wirePos.x += GRID_SIZE.x;
+            wirePos.x += subPlan_->GetGrid()->WorldSizeOf( cell ).x;
     }
     else
     {
@@ -117,6 +127,14 @@ bool ChipHandle::IsSlotted(SlottedSide) const
 {
     return true;
 }
+
+Tag ChipHandle::GetFirstFreeTag(InOut side)
+{
+    if (subPlan_)
+        return subPlan_->GetFirstFreeTag( (side==InOut::IN)? InOut::OUT : InOut::IN );
+    return NULL_TAG;
+}
+
 bool ChipHandle::CanRegisterAnyWire(InOut side, Tag slot) const
 {
     return true;
@@ -189,16 +207,6 @@ PlanShp ChipHandle::GetSubPlan()
 
 
 //Self...
-void ChipHandle::ReCalculatePorts()
-{
-    if (subPlan_)
-    {
-        subPlan_->ReCalculatePorts(ZoomSide::HEAD);
-        subPlan_->ReCalculatePorts(ZoomSide::TAIL);
-        subPlan_->RecalculateBounds();
-    }
-}
-
 bool ChipHandle::IsExploded()
 {
     return exploded_;

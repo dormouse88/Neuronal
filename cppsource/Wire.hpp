@@ -15,8 +15,6 @@
 #include "Wirable.hpp"
 class Wirable;  //fwd dec
 
-const int SLOT_MAX = 99;
-
 class Wire;
 
 class WireView

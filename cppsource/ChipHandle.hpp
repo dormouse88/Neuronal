@@ -24,11 +24,13 @@ public:
     virtual void Handle(int code) override;
     
     //Wirable...
+    virtual void StructuralRefresh() override;
     virtual void ReCalculateCharge(Tag) override;
     virtual Charge GetOutgoingCharge(Tag) override;
     virtual VectorWorld GetWireAttachPos(WireAttachSide, Tag) const override;
 
     virtual bool IsSlotted(SlottedSide) const override;
+    virtual Tag GetFirstFreeTag(InOut);
     virtual bool CanRegisterAnyWire(InOut side, Tag slot) const override;
     
     //Device...
@@ -43,7 +45,6 @@ public:
     virtual void SetSubPlan(PlanShp, std::shared_ptr<RefererInterface>) override;
     virtual PlanShp GetSubPlan() override;
 
-    void ReCalculatePorts();
     bool IsExploded();
     void SetExploded(bool);
 private:

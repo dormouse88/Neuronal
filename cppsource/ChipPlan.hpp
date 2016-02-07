@@ -33,11 +33,13 @@ public:
     HandleShp GetHandle();
 
     //Wirable...
+    virtual void StructuralRefresh() override;
     virtual void ReCalculateCharge(Tag) override;
     virtual Charge GetOutgoingCharge(Tag) override;
     virtual VectorWorld GetWireAttachPos(WireAttachSide, Tag) const override;
 
     virtual bool IsSlotted(SlottedSide) const override      {return true;}
+    virtual Tag GetFirstFreeTag(InOut);
     virtual bool CanRegisterAnyWire(InOut side, Tag slot) const override;
 
     //"Referred"...
@@ -86,11 +88,11 @@ public:
     void Draw(sf::RenderTarget & rt);
     void SubDraw(sf::RenderTarget & rt);
 
-    VectorSmart GetPortSmartPos(ZoomSide, PortNum) const;
+    bool HasPort(PortLocation) const;
+    VectorSmart GetPortSmartPos(PortLocation) const;
     void ReCalculatePorts(ZoomSide);
     PortNum MapTagToPort(ZoomSide, Tag) const;
     Tag MapPortToTag(ZoomSide, PortNum) const;
-    Tag GetFirstFreeTag(ZoomSide);
 
 private:
     void DrawBox(sf::RenderTarget & rt);

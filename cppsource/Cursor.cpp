@@ -30,8 +30,9 @@ void Cursor::Draw(sf::RenderTarget & rt)
     {
         if (cursorState_ == CursorState::PORT)
         {
-            shape_.setPosition( plan_->GetGrid()->MapSmartToWorld(pos_) );
-            shape_.setSize( plan_->GetGrid()->WorldSizeOf(pos_) );
+            VectorSmart portPos = plan_->GetPortSmartPos(port_);
+            shape_.setPosition( plan_->GetGrid()->MapSmartToWorld( portPos ) );
+            shape_.setSize( plan_->GetGrid()->WorldSizeOf(portPos) );
             rt.draw(shape_, sf::RenderStates(sf::BlendAdd));
         }
         if (cursorState_ == CursorState::LOCATED)
@@ -114,6 +115,11 @@ void Cursor::SetPosWorld(VectorWorld point)
 
 void Cursor::Revalidate()
 {
+    if (GetState() == CursorState::PORT)
+    {
+        if (not plan_->HasPort(port_))
+            port_.num = 0;
+    }
     //Just once, if the cursor is on an exploded handle, select its subplan
     if (GetState() == CursorState::LOCATED)
     {
@@ -222,14 +228,16 @@ Shp<WiringPair> RetrieveWiringPair(Cursor & cu1, Cursor & cu2)
         if ( (cu1.GetState() == CursorState::PORT) and cu1.GetPort().num > 0 )
             ret->fromTag = plan1->MapPortToTag( cu1.GetPort().side, cu1.GetPort().num );
         else
-            ret->fromTag = plan1->GetFirstFreeTag(fromSide);
+            ret->fromTag = ret->from->GetFirstFreeTag(InOut::OUT);
+            //ret->fromTag = plan1->GetFirstFreeTag(fromSide);
     }
     if ( ret and ret->to->IsSlotted(SlottedSide::IN) )
     {
         if ( (cu2.GetState() == CursorState::PORT) and cu2.GetPort().num > 0 )
             ret->toTag = plan2->MapPortToTag( cu2.GetPort().side, cu2.GetPort().num );
         else
-            ret->toTag = plan2->GetFirstFreeTag(toSide);
+            ret->toTag = ret->to->GetFirstFreeTag(InOut::IN);
+            //ret->toTag = plan2->GetFirstFreeTag(toSide);
     }
     
     return ret;

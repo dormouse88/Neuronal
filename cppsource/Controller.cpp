@@ -362,9 +362,9 @@ void Controller::EventsBothWirable(Shp<WiringPair> wp)
         }
         else
         {
-            //assert(wp and wp->from and wp->to);
-            //auto wire = 
-            wp->plan->RemoveWire(wp->plan->GetWire(wp));
+            auto wire = wp->plan->GetWire(wp);
+            if (wire)
+                wp->plan->RemoveWire(wire);
         }
     }
     auto wire = wp->plan->GetWire(wp);
