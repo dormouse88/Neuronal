@@ -10,14 +10,14 @@
 #include <cassert>
 #include <algorithm>
 #include <iterator>
-#include "UserData.hpp" //fwd dec
+#include "PlanGroupData.hpp" //fwd dec
 #include "PlanPos.hpp"  //fwd dec
 #include "WiringPair.hpp"  //fwd dec
 
 const int PADDING { 2 };
 
-ChipPlan::ChipPlan(std::shared_ptr<PlanGrid> g, std::shared_ptr<UserData> u)
-    :Wirable(), planID(0), modified(false), planGrid(g), userData_(u)
+ChipPlan::ChipPlan(std::shared_ptr<PlanGrid> g, std::shared_ptr<PlanGroupData> u)
+    :Wirable(), planID(0), modified(false), planGrid(g), planGroupData_(u)
 {
     RecalculateBounds();
 }
@@ -144,17 +144,17 @@ void ChipPlan::SetPosition(DeviceShp d, VectorSmart newPos)
         PlodeRefresh(newPos);
     }
 }
-int ChipPlan::GetFreeSerial() const
+PlanID ChipPlan::GetFreeSerial() const
 {
     for (int i = 1; true; i++)
     {
         if (IsSerialFree(i)) return i;
     }
 }
-bool ChipPlan::IsSerialFree(int serial) const
+bool ChipPlan::IsSerialFree(PlanID pid) const
 {
     for (const auto & x : devices) {
-        if (x->GetSerial() == serial) return false;
+        if (x->GetPlanID() == pid) return false;
     }
     return true;
 }
@@ -279,10 +279,10 @@ DeviceShp ChipPlan::GetDevice(VectorSmart pos)
     }
     return nullptr;
 }
-DeviceShp ChipPlan::GetDevice(int serial)
+DeviceShp ChipPlan::GetDevice(PlanID pid)
 {
     for (auto & x: devices) {
-        if (serial == x->GetSerial()) {
+        if (pid == x->GetPlanID()) {
             return x;
         }
     }
@@ -507,9 +507,9 @@ void ChipPlan::DrawTitle(sf::RenderTarget & rt)
     sf::Text planNumText;
     planNumText.setFont( ViewResources::GetInstance().font );
     std::string textString { patch::to_string(GetPlanID()) };
-    if (userData_) {
-        textString.append(" -- " + userData_->GetNameByID(GetPlanID()));
-        auto rels = userData_->GetRelatives(GetPlanID());
+    if (planGroupData_) {
+        textString.append(" -- " + planGroupData_->GetNameByID(GetPlanID()));
+        auto rels = planGroupData_->GetRelatives(GetPlanID());
         if (rels and rels->parent) textString.append(" // " + patch::to_string(rels->parent) + " ");
     }
     if (IsModified()) {

@@ -11,11 +11,11 @@
 
 Model::Model()
     :serializer(std::make_shared<Serializer>())
-    ,userData(std::make_shared<UserData>(serializer))
-    ,factory_(std::make_shared<BlobFactory>(userData))
+    ,planGroupData_(std::make_shared<PlanGroupData>())
+    ,factory_(std::make_shared<BlobFactory>(planGroupData_))
     ,arena(std::make_shared<Arena>(factory_))
 {
-    serializer->LoadUserData(userData);
+    serializer->LoadPlanGroupData(planGroupData_);
     serializer->LoadLevel(1, arena, factory_);
     arena->Specify();
 }
@@ -31,61 +31,46 @@ void Model::InnerTick()
         arena->GetMouseBrain()->TickOnce();
 }
 
-PlanShp Model::WipePlan(PlanShp plan, bool forced)
+PlanShp Model::LoadPlan(PlanShp plan, PlanNav nav, bool forced)
 {
     if (forced or not plan->IsModified())
     {
-        auto emptyPlan = factory_->MakePlan();
-        auto ref = plan->GetReferer();
-        if (ref) ref->SetSubPlan(emptyPlan, ref);
-        return emptyPlan;
-    }
-    return nullptr;
-}
-PlanShp Model::LoadPlan(PlanShp plan, PlanNav nav)
-{
-    if (not plan->IsModified())
-    {
-        int num = userData->GetID(plan->GetPlanID(), nav);
-        auto loadedPlan = serializer->LoadUserPlan(num, factory_);
-        if (loadedPlan)
+        PlanID newID = planGroupData_->GetID(plan->GetPlanID(), nav);
+        auto newPlan = factory_->MakePlan();
+        if (newID != 0)
+            newPlan = serializer->LoadUserPlan(newID, factory_);
+        assert(newPlan);
         {
             auto ref = plan->GetReferer();
-            if (ref) ref->SetSubPlan(loadedPlan, ref);
-            return loadedPlan;
+            if (ref) ref->SetSubPlan(newPlan, ref);
+            return newPlan;
         }
     }
     return nullptr;
 }
 
-void Model::SavePlan(PlanShp plan)
+void Model::SavePlan(PlanShp plan, PlanSaveMode mode)
 {
     if (plan->IsModified())
     {
-        int oldID = plan->GetPlanID();
-        std::string oldName = userData->GetNameByID( oldID );
-        if ( serializer->SaveUserPlan(plan) )
+        PlanID oldID = plan->GetPlanID();
+        std::string oldName = planGroupData_->GetNameByID( oldID );
+        if (oldName.empty())
+            mode = PlanSaveMode::ASNEW; //Saving as UPDATE on a nameless plan should be disabled in the UI really, so an assert instead.
+        std::string newName = (mode == PlanSaveMode::ASNEW) ? planGroupData_->GetUnusedAutoName() : oldName;
+        bool success = serializer->SaveUserPlan(plan);
+        assert(success);
+        PlanID newID = plan->GetPlanID();
+        planGroupData_->AddAncestryEntry(newID, oldID);
+        //serializer->SaveAddAncestryEntry(newID, oldID);
+        if (mode == PlanSaveMode::UPDATE)
         {
-            userData->AddAncestryEntry(plan->GetPlanID(), oldID);
-            if (not oldName.empty()) {
-                userData->RemoveName(oldID);
-                userData->AddName(plan->GetPlanID(), oldName);
-            }
-            else {
-                userData->AddAutoName(plan->GetPlanID());
-            }
+            planGroupData_->RemoveName(oldID);
+            //serializer->SaveRemoveName(oldID);
         }
+        planGroupData_->AddName(newID, newName);
+        //serializer->SaveAddName(newID, newName);
+        serializer->SavePlanGroupData(planGroupData_);
     }
 }
-void Model::SavePlanAsNew(PlanShp plan)
-{
-    if (plan->IsModified())
-    {
-        int oldID = plan->GetPlanID();
-        if ( serializer->SaveUserPlan(plan) )
-        {
-            userData->AddAncestryEntry(plan->GetPlanID(), oldID);
-            userData->AddAutoName(plan->GetPlanID());
-        }
-    }
-}
+

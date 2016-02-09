@@ -204,12 +204,12 @@ void Controller::EventsPlan(PlanShp plan)
 
     if (event.key.code == sf::Keyboard::Q)
     {
-        if (event.key.shift) model_.SavePlanAsNew( plan );
-        else model_.SavePlan( plan );
+        if (event.key.shift) model_.SavePlan( plan, PlanSaveMode::ASNEW );
+        else model_.SavePlan( plan, PlanSaveMode::UPDATE );
     }
     if (event.key.code == sf::Keyboard::W)
     {
-        auto p = model_.WipePlan(plan, event.key.shift and event.key.control);
+        auto p = model_.LoadPlan(plan, PlanNav::EMPTY, event.key.shift and event.key.control);
         CursorsGoHere(p);
     }
 

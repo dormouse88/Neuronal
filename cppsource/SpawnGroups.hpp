@@ -20,7 +20,7 @@ class SpawnGroup
 public:
     virtual void Specify() = 0;
     virtual void DeSpecify() = 0;
-    virtual void TimeIsNow(int t, std::shared_ptr<Arena> arena) = 0;
+    virtual void TimeIsNow(OTime t, std::shared_ptr<Arena> arena) = 0;
     virtual void Draw(sf::RenderTarget &rt, std::shared_ptr<Arena> ar) = 0;
 };
 
@@ -35,7 +35,7 @@ public:
     
     void Specify()                                          override;
     void DeSpecify()                                        override {} //?set whoWillSpawn to zero?
-    void TimeIsNow(int t, std::shared_ptr<Arena> arena)     override;
+    void TimeIsNow(OTime t, std::shared_ptr<Arena> arena)     override;
     void Draw(sf::RenderTarget &rt, std::shared_ptr<Arena> ar) override;
 
 private:
@@ -49,12 +49,12 @@ class CatSpawnGroup : public SpawnGroup
 {
 public:
     CatSpawnGroup(std::shared_ptr<BlobFactory>);
-    std::shared_ptr<CatSpawner> AddSpawner(ArenaPoint, Orientation, TimeRange timeRange, int planNum);
-    int CalculateEarliestTime() const;
+    std::shared_ptr<CatSpawner> AddSpawner(ArenaPoint, Orientation, TimeRange timeRange, PlanID planNum);
+    OTime CalculateEarliestTime() const;
 
     void Specify()                                          override;
     void DeSpecify()                                        override {} //?disable all timeExacts?
-    void TimeIsNow(int t, std::shared_ptr<Arena> arena)     override;
+    void TimeIsNow(OTime t, std::shared_ptr<Arena> arena)     override;
     void Draw(sf::RenderTarget &rt, std::shared_ptr<Arena> ar) override;
 
 private:

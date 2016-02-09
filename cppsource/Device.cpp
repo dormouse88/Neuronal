@@ -8,9 +8,9 @@
 #include "Device.hpp"
 #include "ChipPlan.hpp"
 
-Device::Device(int serial, VectorSmart pos, PlanShp cont)
+Device::Device(PlanID pid, VectorSmart pos, PlanShp cont)
     :PlanOwned(cont)
-    , serial_(serial)
+    , pid_(pid)
     , ppos_(pos, cont->GetGrid())
 {}
 

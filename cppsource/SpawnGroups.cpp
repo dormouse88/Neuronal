@@ -33,7 +33,7 @@ void MouseSpawnGroup::Specify()
     }
 }
 
-void MouseSpawnGroup::TimeIsNow(int t, std::shared_ptr<Arena> arena)
+void MouseSpawnGroup::TimeIsNow(OTime t, std::shared_ptr<Arena> arena)
 {
     if (t == 0 and whoWillSpawn_ != -1)
     {
@@ -79,16 +79,16 @@ CatSpawnGroup::CatSpawnGroup(std::shared_ptr<BlobFactory> factory)
     :factory_(factory)
 {}
 
-std::shared_ptr<CatSpawner> CatSpawnGroup::AddSpawner(ArenaPoint p, Orientation o, TimeRange timeRange, int planNum)
+std::shared_ptr<CatSpawner> CatSpawnGroup::AddSpawner(ArenaPoint p, Orientation o, TimeRange timeRange, PlanID planNum)
 {
     auto sp = std::make_shared<CatSpawner>(p, o, timeRange, planNum, factory_);
     spawns_.emplace_back(sp);
     return sp;
 }
 
-int CatSpawnGroup::CalculateEarliestTime() const
+OTime CatSpawnGroup::CalculateEarliestTime() const
 {
-    int et = 0;
+    OTime et = 0;
     for (auto &c: spawns_) {
         if (c->timeExact_ < et) et = c->timeExact_;
     }
@@ -104,7 +104,7 @@ void CatSpawnGroup::Specify()
     }
 }
 
-void CatSpawnGroup::TimeIsNow(int t, std::shared_ptr<Arena> arena)
+void CatSpawnGroup::TimeIsNow(OTime t, std::shared_ptr<Arena> arena)
 {
     for (auto &x: spawns_)
     {

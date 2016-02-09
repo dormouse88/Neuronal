@@ -28,7 +28,7 @@ struct MouseSpawner
 class CatSpawner
 {
 public:
-    CatSpawner(ArenaPoint s_pos, Orientation s_ori, TimeRange timeRange, int planNum, std::shared_ptr<BlobFactory> factory)
+    CatSpawner(ArenaPoint s_pos, Orientation s_ori, TimeRange timeRange, PlanID planNum, std::shared_ptr<BlobFactory> factory)
         :pos_(s_pos)
         ,ori_(s_ori)
         ,timeRange_(timeRange)
@@ -42,7 +42,7 @@ public:
     Orientation ori_;
     TimeRange timeRange_;
     TimeExact timeExact_;
-    int planNum_;
+    PlanID planNum_;
     std::shared_ptr<BaseReferer> brain_;
 };
 

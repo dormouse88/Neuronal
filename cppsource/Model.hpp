@@ -11,12 +11,13 @@
 #include <memory>
 #include "BlobFactory.hpp"
 #include "Serializer.hpp"
-#include "UserData.hpp"
+#include "PlanGroupData.hpp"
 #include "ChipPlan.hpp"
 #include "Arena.hpp"
 #include "Puppet.hpp"
 #include "BasicTypes.hpp"
 
+enum class PlanSaveMode { UPDATE, ASNEW };
 
 class Model
 {
@@ -30,23 +31,22 @@ public:
     Shp<Arena> GetArena()                                       {return arena;} //for View
     Shp<BaseReferer> GetMouseBrain()                            {return arena->GetMouseBrain(); }
 
-    PlanShp WipePlan(PlanShp, bool forced);
-    PlanShp LoadPlan(PlanShp, PlanNav nav);
-    void SavePlan(PlanShp);
-    void SavePlanAsNew(PlanShp);
+    //PlanShp WipePlan(PlanShp, bool forced);
+    PlanShp LoadPlan(PlanShp, PlanNav nav, bool forced = false);
+    void SavePlan(PlanShp, PlanSaveMode);
 
-    PlanShp EngageNameFilter(PlanShp plan, std::string filter)        { userData->SetNameFilter(filter); return LoadPlan(plan, PlanNav::FILTER_NAME); }
-    std::string GetNameFilter() const                                               { return userData->GetNameFilter(); }
+    PlanShp EngageNameFilter(PlanShp plan, std::string filter)        { planGroupData_->SetNameFilter(filter); return LoadPlan(plan, PlanNav::FILTER_NAME); }
+    std::string GetNameFilter() const                                 { return planGroupData_->GetNameFilter(); }
     
-    bool CanAddName(int planID) const                       {userData->CanAddName(planID);}
-    void AddName(int id, std::string name)                  {userData->AddName(id, name); }
-    void RemoveName(int id)                                 {userData->RemoveName(id);    }
+    bool CanAddName(PlanID id) const                            {planGroupData_->CanAddName(id);}
+    void AddName(PlanID id, std::string name)                   {if (planGroupData_->CanAddName(id, name)) { planGroupData_->RemoveName(id); planGroupData_->AddName(id, name); serializer->SavePlanGroupData(planGroupData_); } }
+    void RemoveName(PlanID id)                                  {planGroupData_->RemoveName(id); serializer->SavePlanGroupData(planGroupData_); }
 
-    Shp<const UserData> GetUserData() const     {return userData;}
-    Shp<BlobFactory> GetFactory()               {return factory_;}
+    Shp<const PlanGroupData> GetPlanGroupData() const       {return planGroupData_;}
+    Shp<BlobFactory> GetFactory()                           {return factory_;}
 private:
     Shp<Serializer> serializer;
-    Shp<UserData> userData;
+    Shp<PlanGroupData> planGroupData_;
     Shp<BlobFactory> factory_;
 
     Shp<Arena> arena;

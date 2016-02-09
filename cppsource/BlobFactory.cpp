@@ -14,12 +14,12 @@ NeuronShp BlobFactory::AddNeuron(PlanPos pos)
 {
     return AddNeuron(pos.GetPlan(), 0, pos.GetSmartPos(), 1, false);
 }
-NeuronShp BlobFactory::AddNeuron(PlanShp plan, int serial, VectorSmart pos, int threshold, bool hasBulb)
+NeuronShp BlobFactory::AddNeuron(PlanShp plan, PlanID pid, VectorSmart pos, int threshold, bool hasBulb)
 {
-    if (serial == 0) serial = plan->GetFreeSerial();
-    if (plan->IsPositionFree(pos) and plan->IsSerialFree(serial))
+    if (pid == 0) pid = plan->GetFreeSerial();
+    if (plan->IsPositionFree(pos) and plan->IsSerialFree(pid))
     {
-        auto mp = std::make_shared<Neuron> (serial, pos, threshold, hasBulb, plan);
+        auto mp = std::make_shared<Neuron> (pid, pos, threshold, hasBulb, plan);
         plan->ImportDevice(mp);
         mp->ReCalculateCharge(NULL_TAG);
         return mp;
@@ -31,13 +31,13 @@ HandleShp BlobFactory::AddHandle(PlanPos pos)
 {
     return AddHandle(pos.GetPlan(), 0, pos.GetSmartPos());
 }
-HandleShp BlobFactory::AddHandle(PlanShp plan, int serial, VectorSmart pos)
+HandleShp BlobFactory::AddHandle(PlanShp plan, PlanID pid, VectorSmart pos)
 {
     HandleShp ret = nullptr;
-    if (serial == 0) serial = plan->GetFreeSerial();
-    if (plan->IsPositionFree(pos) and plan->IsSerialFree(serial))
+    if (pid == 0) pid = plan->GetFreeSerial();
+    if (plan->IsPositionFree(pos) and plan->IsSerialFree(pid))
     {
-        auto handle = std::make_shared<ChipHandle> (serial, pos, plan);
+        auto handle = std::make_shared<ChipHandle> (pid, pos, plan);
         auto subPlan = MakePlan();
         handle->SetSubPlan( subPlan, handle );
         
@@ -51,7 +51,7 @@ HandleShp BlobFactory::AddHandle(PlanShp plan, int serial, VectorSmart pos)
 PlanShp BlobFactory::MakePlan()
 {
     auto g = std::make_shared<PlanGrid>();
-    auto p = std::make_shared<ChipPlan>(g, userData_);
+    auto p = std::make_shared<ChipPlan>(g, planGroupData_);
     g->RegisterPlan(p);
     return p;
 }
@@ -82,27 +82,3 @@ WireShp BlobFactory::AddWire(Shp<WiringPair> wp, signed weight)
     return nullptr;
 }
 
-
-//void BlobFactory::RemoveDevice(PlanPos pos)
-//{
-//    DeviceShp d = pos.GetDevice();
-//    HandleShp h = pos.GetDeviceAsHandle();
-//    if (not h or h->GetSubPlan()->IsEmpty())
-//    {
-//        pos.GetPlan()->RemoveDevice(d);
-//    }
-//}
-
-//void BlobFactory::RemoveWire(Shp<WiringPair> wp)
-//{
-//    assert(wp and wp->from and wp->to);
-//    auto wire = wp->plan->GetWire(wp);
-//    if (wire)
-//    {
-//        Tag toSlot = wire->GetToTag();
-//        wp->plan->RemoveWire(wire);
-//        wire = nullptr;
-//        wp->to->ReCalculateCharge(toSlot);
-//    }
-//}
-//

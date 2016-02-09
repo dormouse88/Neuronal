@@ -16,7 +16,7 @@
 class ChipHandle : public Device, public RefererInterface
 {
 public:
-    ChipHandle(int serial_p, sf::Vector2i pos_p, PlanShp cont);
+    ChipHandle(PlanID, VectorSmart, PlanShp cont);
     virtual ~ChipHandle() {}
     //PlanOwned...
     virtual std::string SerialName() const override { return "HAND";}

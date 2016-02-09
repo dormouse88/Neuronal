@@ -65,10 +65,10 @@ void Wirable::PropagateRefresh(Tag tag)
     }
 }
 
-int Wirable::GetTotalIncomingWeight(Tag tag) const
+CWeight Wirable::GetTotalIncomingWeight(Tag tag) const
 {
     CleanWireVectors();
-    int total = 0;
+    CWeight total = 0;
     for (auto w: inWires)
     {
         auto lw = w.lock();

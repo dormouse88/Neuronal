@@ -1,11 +1,11 @@
 /* 
- * File:   UserData.cpp
+ * File:   PlanGroupData.cpp
  * Author: Dormouse
  * 
  * Created on 24 November 2015, 15:05
  */
 
-#include "UserData.hpp"
+#include "PlanGroupData.hpp"
 #include <cassert>
 #include <map>
 
@@ -15,15 +15,19 @@ const int AUTO_NAME_MAX_LENGTH = NAME_MAX_LENGTH - 1; //to account for the @ ide
 const std::string AUTO_NAME_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
 
-UserData::UserData(std::shared_ptr<Serializer> s)
-    :serializer(s)
+PlanGroupData::PlanGroupData()
 {}
 
-int UserData::GetID(int planID, PlanNav nav) const
+PlanID PlanGroupData::GetID(PlanID planID, PlanNav nav) const
 {
-    int target = planID;
+    //assert(planID != 0); //May receive zero
+    PlanID target = planID;
 
-    if (nav == PlanNav::PREV_NAME or nav == PlanNav::NEXT_NAME or nav == PlanNav::FILTER_NAME)  //access the name maps
+    if (nav == PlanNav::EMPTY)
+    {
+        target = NULL_PID;
+    }
+    else if (nav == PlanNav::PREV_NAME or nav == PlanNav::NEXT_NAME or nav == PlanNav::FILTER_NAME)  //access the name maps
     {
         auto nn_it = namesByName.find( GetNameByID(planID) );
         auto nn_end = namesByName.end();
@@ -40,7 +44,7 @@ int UserData::GetID(int planID, PlanNav nav) const
 
         if (lower == upper) //(filtered)range is empty
         {
-            target = 0;
+            target = NULL_PID;
         }
         else if (nn_it == nn_end) //planID has no name
         {
@@ -66,7 +70,7 @@ int UserData::GetID(int planID, PlanNav nav) const
 
         if (begin == end) //ancestry is empty
         {
-            target = 0;
+            target = NULL_PID;
         }
         else if (it == end) //planID was not found in ancestry
         {
@@ -87,7 +91,7 @@ int UserData::GetID(int planID, PlanNav nav) const
         }
         else if (nav == PlanNav::PARENT)
         {
-            if (it->second->parent > 0) target = it->second->parent;
+            if (it->second->parent != NULL_PID) target = it->second->parent;
             else target = it->first;
         }
         else if (nav == PlanNav::FIRST_CHILD)
@@ -97,7 +101,7 @@ int UserData::GetID(int planID, PlanNav nav) const
         }
         else if (nav == PlanNav::PREV_SIBLING or nav == PlanNav::NEXT_SIBLING)
         {
-            int parentID = it->second->parent;
+            PlanID parentID = it->second->parent;
             if (ancestry.count(parentID) > 0)
             {
                 auto & sibs = ancestry.at(parentID)->kids;
@@ -115,28 +119,24 @@ int UserData::GetID(int planID, PlanNav nav) const
         }
         else assert(false);
     }
+    //assert(target != 0); //May return zero
     return target;
 }
 
 
 //Ancestry //Getters
-std::shared_ptr<const Relatives> UserData::GetRelatives(int id) const
+std::shared_ptr<const Relatives> PlanGroupData::GetRelatives(PlanID id) const
 {
     if (ancestry.count(id) > 0) return ancestry.at(id);
     else return nullptr;
 }
 
 //Ancestry //Setters
-void UserData::AddAncestryEntry(int id, int anc)
+void PlanGroupData::AddAncestryEntry(PlanID id, PlanID anc)
 {
     assert(ancestry.count(id) == 0);
-    MakeAncestryEntry(id, anc);
-    serializer->SaveAddAncestryEntry(id, anc);
-}
-void UserData::MakeAncestryEntry(int id, int anc)
-{
     //Note that map::insert() won't do anything if key is already present
-    assert(id > 0);
+    assert(id != NULL_PID);
     {
         auto r = std::make_shared<Relatives>();
         ancestry.insert( std::make_pair(id, r) );
@@ -155,68 +155,53 @@ void UserData::MakeAncestryEntry(int id, int anc)
 
 
 //Names //Getters
-int UserData::GetIDByName(std::string name) const
+PlanID PlanGroupData::GetIDByName(PlanName name) const
 {
     if (namesByName.count(name) > 0) return namesByName.at(name);
-    else return 0;
+    else return NULL_PID;
 }
-std::string UserData::GetNameByID(int planID) const
+PlanName PlanGroupData::GetNameByID(PlanID planID) const
 {
     if (namesByID.count(planID) > 0) return namesByID.at(planID);
-    else return "";
+    else return NULL_PLAN_NAME;
 }
-bool UserData::CanAddName(int planID) const
+bool PlanGroupData::CanAddName(PlanID planID) const
 {
-    return planID != 0 and (GetNameByID(planID) == "" or GetNameByID(planID).substr(0,1) == AUTO_NAME_PREFIX);
+    return planID != NULL_PID and (GetNameByID(planID) == NULL_PLAN_NAME or GetNameByID(planID).substr(0,1) == AUTO_NAME_PREFIX);
 }
-bool UserData::CanAddName(int planID, std::string name) const
+bool PlanGroupData::CanAddName(PlanID planID, PlanName name) const
 {
-    return CanAddName(planID) and name != "" and GetIDByName(name) == 0;
+    return CanAddName(planID) and name != NULL_PLAN_NAME and GetIDByName(name) == NULL_PID;
 }
 
 //Names //Setters
-void UserData::RemoveName(int planID)
+void PlanGroupData::RemoveName(PlanID planID)
 {
-    if ( GetNameByID(planID) != "")
+    if ( GetNameByID(planID) != NULL_PLAN_NAME )
     {
         namesByName.erase( GetNameByID(planID) );
         namesByID.erase(planID);
-        serializer->SaveRemoveName(planID);
     }
 }
-void UserData::AddName(int planID, std::string name)
+void PlanGroupData::AddName(PlanID planID, PlanName name)
 {
-    if (CanAddName(planID, name))
-    {
-        RemoveName(planID);
-        namesByID.insert( std::make_pair(planID, name) );
-        namesByName.insert( std::make_pair(name, planID) );
-        serializer->SaveAddName(planID, name);
-    }
-}
-void UserData::AddAutoName(int planID)
-{
-    AddName(planID, GetUnusedAutoName());
+    assert(CanAddName(planID, name));
+    namesByID.insert( std::make_pair(planID, name) );
+    namesByName.insert( std::make_pair(name, planID) );
 }
 
-
-
-
-
-//////////////////////////////////////////////////////////////////////////PRIVATE
-
-std::string UserData::GetUnusedAutoName()
+PlanName PlanGroupData::GetUnusedAutoName() const
 {
-    std::string randomName;
+    PlanName randomName;
     for (int i = 0; i <= AUTO_NAME_MAX_LENGTH; ++i)
     {
         randomName.push_back( AUTO_NAME_CHARS.at( rand() % AUTO_NAME_CHARS.length() ) );
-        if (namesByName.count(randomName) == 0)
+        if (namesByName.count(AUTO_NAME_PREFIX + randomName) == 0)
         {
             return AUTO_NAME_PREFIX + randomName;
         }
     }
-    throw "NAME MAX LENGTH Reached!"; // Highly unlikely to reach this point with Max of 30, but still bad form.;
+    return NULL_PLAN_NAME;
 }
 
 

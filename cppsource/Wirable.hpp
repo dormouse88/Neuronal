@@ -44,7 +44,7 @@ public:
     
 protected:
     void PropagateRefresh(Tag slot = NULL_TAG);
-    int GetTotalIncomingWeight(Tag) const;
+    CWeight GetTotalIncomingWeight(Tag) const;
 private:
     void CleanWireVectors() const;
     mutable std::vector<std::weak_ptr<Wire> > inWires;

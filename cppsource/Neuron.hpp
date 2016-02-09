@@ -17,13 +17,13 @@
 class Neuron : public Device
 {
 public:
-    Neuron(int serial, sf::Vector2i pos, int threshold, bool hasBulb, PlanShp cont);
+    Neuron(PlanID serial, sf::Vector2i pos, CWeight threshold, bool hasBulb, PlanShp cont);
     virtual ~Neuron() {;}
 
     //PlanOwned...
     virtual std::string SerialName() const override         { return "NEUR";}
     virtual void Draw(sf::RenderTarget & rt) override;
-    virtual void Handle(int code) override;
+    virtual void Handle(HandleCode code) override;
     
     //Wirable...
     virtual void StructuralRefresh() override;
@@ -38,11 +38,11 @@ public:
     virtual VectorDumb GetPlodedSize() override          { return VectorDumb {1, 1}; }
     
     bool IsSimple() const                       {return threshold_ == 1;}
-    int GetThreshold() const                    {return threshold_;}   //for serializer
+    CWeight GetThreshold() const                {return threshold_;}   //for serializer
     bool HasBulb() const                        {return hasBulb_;}     //for serializer
 //    bool IsThresholdMet() const                 {return receivedSum_ >= threshold_; }  //for drawing only
 //    bool GetFiring() const                      {return calculatedCharge_;}                      //for drawing only
-//    int GetReceivedCharge() const               {return receivedSum_;}                 //for drawing only
+//    CWeight GetReceivedCharge() const               {return receivedSum_;}                 //for drawing only
 //    bool HasBulb() const                        {return hasBulb_;}                     //for drawing only
 //    bool GetBulbCharge() const                  {return outgoingCharge_;}                   //for drawing only
     
@@ -53,8 +53,8 @@ private:
     Charge outgoingCharge_;
     Charge intermediateCharge_;
     Charge calculatedCharge_;
-    int threshold_;
-    int totalIncoming_;
+    CWeight threshold_;
+    CWeight totalIncoming_;
 
     sf::ConvexShape simpleShape;
     sf::ConvexShape fullShape;

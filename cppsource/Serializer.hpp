@@ -16,7 +16,7 @@
 #include "Device.hpp"
 #include "Wire.hpp"
 #include "ChipPlan.hpp"
-class UserData; //fwd dec
+class PlanGroupData; //fwd dec
 class Arena; //fwd dec
 
 class Serializer
@@ -24,26 +24,28 @@ class Serializer
 public:
     Serializer();
 
-    void LoadLevel(int num, std::shared_ptr<Arena> a, std::shared_ptr<BlobFactory> f);
+    void LoadLevel(LevelNum num, std::shared_ptr<Arena> a, std::shared_ptr<BlobFactory> f);
     
-    //Model interface...
-    bool                        SaveUserPlan(PlanShp plan_p);
-    PlanShp   LoadUserPlan(int planID, std::shared_ptr<BlobFactory>);
-    PlanShp   LoadLevelPlan(int levelNum, int planID, std::shared_ptr<BlobFactory>);
+    //Plan...
+    bool      SaveUserPlan(PlanShp);
+    PlanShp   LoadUserPlan(PlanID, std::shared_ptr<BlobFactory>);
+    PlanShp   LoadLevelPlan(LevelNum, PlanID, std::shared_ptr<BlobFactory>);
 
-    //UserData interface...
-    void LoadUserData(std::shared_ptr<UserData>);
-    void SaveAddAncestryEntry(int id, int anc);
-    void SaveRemoveName(int planID);
-    void SaveAddName(int planID, std::string name);
+    //PlanGroups...
+    void LoadPlanGroupData(std::shared_ptr<PlanGroupData>);
+    void SavePlanGroupData(std::shared_ptr<PlanGroupData>);
+    
+//    void SaveAddAncestryEntry(PlanID id, PlanID anc);
+//    void SaveRemoveName(PlanID);
+//    void SaveAddName(PlanID, std::string name);
 
 private:
     void OpenFile(pugi::xml_document & doc, const char * fileName);
-    pugi::xml_node GetNameNodeByID(int planID);
-    pugi::xml_node GetNameNodeByName(std::string name);
+    pugi::xml_node GetNameNodeByID(PlanID);
+    pugi::xml_node GetNameNodeByName(std::string);
 
     bool SavePlanRecursively(pugi::xml_node container, PlanShp plan_p);
-    PlanShp LoadPlanRecursively(pugi::xml_node container, int planID, std::shared_ptr<BlobFactory> factory);
+    PlanShp LoadPlanRecursively(pugi::xml_node container, PlanID id, std::shared_ptr<BlobFactory> factory);
     
     pugi::xml_document userDoc_;
     pugi::xml_document levelsDoc_;

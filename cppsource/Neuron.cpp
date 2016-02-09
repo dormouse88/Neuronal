@@ -127,8 +127,8 @@ void Neuron::Draw(sf::RenderTarget & rt)
  * @param pos_p
  * @param threshold_p
  */
-Neuron::Neuron(int serial, sf::Vector2i pos, int threshold, bool hasBulb, PlanShp cont)
-    :Device(serial, pos, cont)
+Neuron::Neuron(PlanID pid, sf::Vector2i pos, CWeight threshold, bool hasBulb, PlanShp cont)
+    :Device(pid, pos, cont)
     ,hasBulb_(hasBulb)
     ,calculatedCharge_(Charge::OFF)
     ,intermediateCharge_(Charge::OFF)
@@ -192,7 +192,7 @@ sf::Vector2f Neuron::GetWireAttachPos(WireAttachSide was, Tag tag) const
     return wirePos;
 }
 
-void Neuron::Handle(int code)
+void Neuron::Handle(HandleCode code)
 {
     if (code == 1) {
         threshold_ += 1;

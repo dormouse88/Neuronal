@@ -40,10 +40,10 @@ public:
     Wire(Wirable & from, Tag fromTag, Wirable & to, Tag toTag, signed weight, PlanShp cont);
 
     void Refresh();
-    int GetOutgoingWeight() const          { if (charge_ == Charge::ON and not IsDead()) return weight_; else return 0; }
+    CWeight GetOutgoingWeight() const          { if (charge_ == Charge::ON and not IsDead()) return weight_; else return 0; }
     
     bool GetFiring() const {return charge_ == Charge::ON ;}     //for drawing only
-    int GetWeight() const {return weight_;}      //for drawing only
+    CWeight GetWeight() const {return weight_;}      //for drawing only
 
     const Wirable& GetFrom() const {return from_; }
     const Tag GetFromTag() const {return fromTag_; }
@@ -52,9 +52,9 @@ public:
     
     virtual std::string SerialName() const { return "WIRE";}
     virtual void Draw(sf::RenderTarget & rt) override;
-    virtual void Handle(int code) override;
+    virtual void Handle(HandleCode code) override;
 
-    void SetWeight(int w);
+    void SetWeight(CWeight w);
     void TagCycle(int step, bool fromSide);
 private:
     Wirable& from_;

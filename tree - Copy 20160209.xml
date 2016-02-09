@@ -1,4 +1,51 @@
 <?xml version="1.0"?>
+<NAMES>
+	<NAME i="1" n="WAIT10" />
+	<NAME i="6" n="MOVELINK" />
+	<NAME i="7" n="4CHAINSPIRAL" />
+	<NAME i="8" n="4SEQSPIRAL" />
+	<NAME i="9" n="LATCH" />
+	<NAME i="13" n="DECREMENTER" />
+	<NAME i="17" n="GATEDLATCH" />
+	<NAME i="18" n="4BGM" />
+	<NAME i="24" n="INCREMENTER" />
+	<NAME i="27" n="4BINC" />
+	<NAME i="28" n="4BINCCOUNTER" />
+	<NAME i="30" n="4BDECCOUNTMEM" />
+	<NAME i="33" n="EVERYOTHERPULSE" />
+	<NAME i="32" n="4BITSPIRAL" />
+	<NAME i="34" n="4BITALTSPIRAL" />
+	<NAME i="36" n="MOVEIFDETECT" />
+	<NAME i="38" n="COUNTTO5" />
+	<NAME i="39" n="PULSEEVERY4" />
+	<NAME i="41" n="IFPOS" />
+	<NAME i="40" n="CORRIDEATH" />
+	<NAME i="42" n="PULSEEVERY10" />
+	<NAME i="45" n="WIDEBLOCK" />
+	<NAME i="47" n="PULSIFY2ND" />
+	<NAME i="48" n="CORRIBLOCK" />
+	<NAME i="50" n="DIN4BGM" />
+	<NAME i="51" n="4BITGATE" />
+	<NAME i="52" n="4BITGATEDOR" />
+	<NAME i="53" n="1BITDIMEM" />
+	<NAME i="54" n="4BITDIMEM" />
+	<NAME i="55" n="8BITDIMEM" />
+	<NAME i="56" n="@Q" />
+	<NAME i="57" n="@F" />
+	<NAME i="61" n="BREADCRUMB" />
+	<NAME i="14" n="4BITDEC" />
+	<NAME i="64" n="NEWADD" />
+	<NAME i="66" n="SIMPLERESPONSE" />
+	<NAME i="67" n="@K" />
+	<NAME i="69" n="NEWINNER" />
+	<NAME i="70" n="NEWOUTER" />
+	<NAME i="71" n="@R" />
+	<NAME i="72" n="@J" />
+	<NAME i="73" n="@O" />
+	<NAME i="75" n="@M" />
+	<NAME i="80" n="OVERNAME" />
+	<NAME i="81" n="@G" />
+</NAMES>
 <RELATIVES>
 	<REL i="1" anc="0" />
 	<REL i="2" anc="0" />
@@ -2771,143 +2818,4 @@
 	<PLAN i="82" anc="0">
 		<NEUR i="1" x="0" y="0" bulb="0" />
 	</PLAN>
-	<PLAN i="83" anc="0">
-		<NEUR i="1" x="-1" y="0" bulb="0" />
-		<HAND i="2" x="0" y="0" link="0" />
-	</PLAN>
-	<PLAN i="84" anc="0">
-		<NEUR i="1" x="0" y="0" bulb="0" />
-		<NEUR i="2" x="0" y="-1" bulb="0" />
-		<HAND i="3" x="0" y="-2" link="0" />
-	</PLAN>
-	<PLAN i="85" anc="0">
-		<NEUR i="1" x="0" y="0" bulb="0" />
-		<HAND i="2" x="1" y="0" link="0" />
-	</PLAN>
-	<PLAN i="86" anc="0">
-		<NEUR i="1" x="0" y="0" bulb="0" />
-		<HAND i="2" x="1" y="0" link="0" />
-	</PLAN>
-	<PLAN i="87" anc="0">
-		<HAND i="1" x="0" y="1" link="0" />
-		<NEUR i="2" x="-1" y="0" bulb="0" />
-	</PLAN>
-	<PLAN i="88" anc="0">
-		<NEUR i="1" x="0" y="0" bulb="0" />
-	</PLAN>
-	<PLAN i="89" anc="0">
-		<NEUR i="1" x="-1" y="0" bulb="0" />
-	</PLAN>
-	<PLAN i="90" anc="0">
-		<NEUR i="1" x="0" y="0" bulb="0" />
-	</PLAN>
-	<PLAN i="91" anc="0">
-		<NEUR i="1" x="0" y="0" bulb="0" />
-	</PLAN>
-	<PLAN i="92" anc="0">
-		<NEUR i="1" x="0" y="0" bulb="0" />
-	</PLAN>
-	<PLAN i="93" anc="0">
-		<NEUR i="1" x="0" y="0" bulb="0" />
-	</PLAN>
-	<PLAN i="94" anc="0">
-		<NEUR i="1" x="0" y="0" bulb="0" />
-		<NEUR i="2" x="-1" y="-1" bulb="0" />
-	</PLAN>
-	<PLAN i="95" anc="0">
-		<NEUR i="1" x="0" y="0" bulb="0" />
-	</PLAN>
-	<PLAN i="96" anc="0">
-		<NEUR i="1" x="0" y="0" bulb="0" />
-	</PLAN>
-	<PLAN i="97" anc="0">
-		<HAND i="1" x="0" y="-1" link="98" />
-	</PLAN>
-	<PLAN i="98" anc="0">
-		<NEUR i="1" x="0" y="0" bulb="0" />
-	</PLAN>
-	<PLAN i="99" anc="0">
-		<HAND i="1" x="0" y="0" link="0" />
-	</PLAN>
-	<PLAN i="100" anc="96">
-		<NEUR i="1" x="0" y="0" bulb="0" />
-		<HAND i="2" x="-1" y="0" link="101" />
-	</PLAN>
-	<PLAN i="101" anc="97">
-		<HAND i="1" x="0" y="-1" link="102" />
-	</PLAN>
-	<PLAN i="102" anc="98">
-		<NEUR i="1" x="0" y="0" bulb="0" />
-		<HAND i="2" x="0" y="1" link="99" />
-	</PLAN>
-	<PLAN i="103" anc="100">
-		<NEUR i="1" x="0" y="0" bulb="0" />
-		<HAND i="2" x="-1" y="0" link="104" />
-	</PLAN>
-	<PLAN i="104" anc="101">
-		<HAND i="1" x="0" y="-1" link="105" />
-	</PLAN>
-	<PLAN i="105" anc="102">
-		<NEUR i="1" x="0" y="0" bulb="0" />
-		<HAND i="2" x="0" y="1" link="100" />
-	</PLAN>
 </PLANS>
-<NAMES>
-	<NAME i="1" n="WAIT10" />
-	<NAME i="6" n="MOVELINK" />
-	<NAME i="7" n="4CHAINSPIRAL" />
-	<NAME i="8" n="4SEQSPIRAL" />
-	<NAME i="9" n="LATCH" />
-	<NAME i="13" n="DECREMENTER" />
-	<NAME i="14" n="4BITDEC" />
-	<NAME i="17" n="GATEDLATCH" />
-	<NAME i="18" n="4BGM" />
-	<NAME i="24" n="INCREMENTER" />
-	<NAME i="27" n="4BINC" />
-	<NAME i="28" n="4BINCCOUNTER" />
-	<NAME i="30" n="4BDECCOUNTMEM" />
-	<NAME i="32" n="4BITSPIRAL" />
-	<NAME i="33" n="EVERYOTHERPULSE" />
-	<NAME i="34" n="4BITALTSPIRAL" />
-	<NAME i="36" n="MOVEIFDETECT" />
-	<NAME i="38" n="COUNTTO5" />
-	<NAME i="39" n="PULSEEVERY4" />
-	<NAME i="40" n="CORRIDEATH" />
-	<NAME i="41" n="IFPOS" />
-	<NAME i="42" n="PULSEEVERY10" />
-	<NAME i="45" n="WIDEBLOCK" />
-	<NAME i="47" n="PULSIFY2ND" />
-	<NAME i="48" n="CORRIBLOCK" />
-	<NAME i="50" n="DIN4BGM" />
-	<NAME i="51" n="4BITGATE" />
-	<NAME i="52" n="4BITGATEDOR" />
-	<NAME i="53" n="1BITDIMEM" />
-	<NAME i="54" n="4BITDIMEM" />
-	<NAME i="55" n="8BITDIMEM" />
-	<NAME i="56" n="@Q" />
-	<NAME i="57" n="@F" />
-	<NAME i="61" n="BREADCRUMB" />
-	<NAME i="64" n="NEWADD" />
-	<NAME i="66" n="SIMPLERESPONSE" />
-	<NAME i="67" n="@K" />
-	<NAME i="69" n="NEWINNER" />
-	<NAME i="70" n="NEWOUTER" />
-	<NAME i="71" n="@R" />
-	<NAME i="72" n="@J" />
-	<NAME i="73" n="@O" />
-	<NAME i="75" n="@M" />
-	<NAME i="80" n="OVERNAME" />
-	<NAME i="81" n="@G" />
-	<NAME i="85" n="@C" />
-	<NAME i="86" n="@Z" />
-	<NAME i="89" n="@U" />
-	<NAME i="90" n="@X" />
-	<NAME i="91" n="@E" />
-	<NAME i="92" n="@I" />
-	<NAME i="93" n="@N" />
-	<NAME i="94" n="@Y" />
-	<NAME i="96" n="@QO" />
-	<NAME i="97" n="@QI" />
-	<NAME i="99" n="WREAL" />
-	<NAME i="103" n="ECHHY" />
-</NAMES>

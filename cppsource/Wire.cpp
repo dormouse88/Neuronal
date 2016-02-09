@@ -158,7 +158,7 @@ void Wire::Draw(sf::RenderTarget & rt)
     v_.Draw(rt, *this);
 }
 
-void Wire::Handle(int code)
+void Wire::Handle(HandleCode code)
 {
     if (code == 1)
     {
@@ -193,7 +193,7 @@ void Wire::Handle(int code)
     GetContainer()->SetModified();
 }
 
-void Wire::SetWeight(int w)
+void Wire::SetWeight(CWeight w)
 {
     if (weight_ != w)
     {

@@ -37,20 +37,19 @@ ViewPanel::ViewPanel()
     kidsPlanText.setColor( sf::Color::Green );
 }
 
-void ViewPanel::SetPlanID(int plan, std::shared_ptr<const UserData> uData)
+void ViewPanel::SetPlanID(PlanID pid, std::shared_ptr<const PlanGroupData> pData)
 {
-    planID = plan;
-    auto userData = uData;
+    pid_ = pid;
     
-    int parent = 0;
+    PlanID parent = 0;
     int numKids = 0;
-    auto relatives = userData->GetRelatives(planID);
+    auto relatives = pData->GetRelatives(pid);
     if (relatives) {
         parent = relatives->parent;
         numKids = relatives->kids.size();
     }
-    mainPlanText.setString( patch::to_string(planID) + ": " + userData->GetNameByID(planID) );
-    parentPlanText.setString( patch::to_string(parent) + ": " + userData->GetNameByID(parent) );
+    mainPlanText.setString( patch::to_string(pid) + ": " + pData->GetNameByID(pid) );
+    parentPlanText.setString( patch::to_string(parent) + ": " + pData->GetNameByID(parent) );
     kidsPlanText.setString( "< kids: " + patch::to_string(numKids) + "   >" );
 }
 
@@ -230,7 +229,7 @@ void View::DrawBar() //Bar Port...
 
     marquee.Draw(window);
     
-    viewPanel.SetPlanID( ap->GetPlanID(), theModel.GetUserData() );
+    viewPanel.SetPlanID( ap->GetPlanID(), theModel.GetPlanGroupData() );
     viewPanel.Draw(window);
 }
 

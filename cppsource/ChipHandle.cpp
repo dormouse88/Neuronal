@@ -16,8 +16,8 @@ const sf::Vector2f WIRE_IN_OFFSET  { RECTANGLE.x * 0.f, RECTANGLE.y *.5f };
 const sf::Vector2f WIRE_OUT_OFFSET { RECTANGLE.x * 1.f, RECTANGLE.y *.5f };
 
 
-ChipHandle::ChipHandle(int serial_p, sf::Vector2i pos_p, PlanShp cont)
-    :Device(serial_p, pos_p, cont)
+ChipHandle::ChipHandle(PlanID pid, VectorSmart pos, PlanShp cont)
+    :Device(pid, pos, cont)
     , exploded_(false)
     , shape_( RECTANGLE )
 {

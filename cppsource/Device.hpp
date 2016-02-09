@@ -21,7 +21,7 @@ class ChipPlan; //fwd dec
 class Device : public Wirable, public PlanOwned
 {
 public:
-    Device(int serial, VectorSmart pos, PlanShp cont);
+    Device(PlanID, VectorSmart, PlanShp cont);
     virtual ~Device() {}
 
     //virtuals...
@@ -36,10 +36,10 @@ public:
     VectorSmart GetSmartPos() const             {return ppos_.GetSmartPos();}
     void SetPosSmart(VectorSmart p)             {ppos_.SetPosSmart(p);}
 
-    int GetSerial() const                       {return serial_;}
+    PlanID GetPlanID() const                       {return pid_;}
 private:
     PlanPos ppos_;
-    int serial_;
+    PlanID pid_;
     
 };
 

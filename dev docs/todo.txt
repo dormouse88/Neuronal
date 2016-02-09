@@ -2,7 +2,9 @@ Do Next
 =======
 ---v---
 Overhaul ownership (shared ptrs, weak ptrs, references, deletion, etc. Devices own wires? Port-Arrays are their own entity- shared between handles and plans?)
-
+Bugs:
+	Ancestry data are not saved for indirectly saved plans.
+	
 
 
 General

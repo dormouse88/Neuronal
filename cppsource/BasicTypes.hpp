@@ -59,12 +59,28 @@ typedef sf::Rect<World> RectWorld;
 
 
 enum class Charge { MAYBE, ON, OFF };
-//typedef bool Charge;
+
+typedef int CWeight;
 
 typedef std::string Tag; 
-const Tag NULL_TAG {"NULLZ"}; //(Empty string is a special value indicating "no tag")
+const Tag NULL_TAG {""}; //(Empty string is a special value indicating "no tag")
 
-typedef int PortNum;  //(Zero is a special value indicating "no port")
+typedef int PortNum;
+const PortNum NULL_PORT {0}; //(Zero is a special value indicating "no port")
+
+typedef std::string PlanName;
+const PlanName NULL_PLAN_NAME {""};  //(Empty string is a special value indicating "no plan name")
+
+typedef int PlanID;
+const PlanID NULL_PID {0}; //(Zero is a special value indicating "no plan id")
+
+typedef int LevelNum;
+
+typedef int HandleCode;
+
+typedef int OTime;
+
+
 
 const sf::Vector2f GRID_SIZE { 115.f, 75.f };
 

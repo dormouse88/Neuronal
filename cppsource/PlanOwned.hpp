@@ -23,7 +23,7 @@ public:
     {}
     virtual ~PlanOwned() = 0;
     virtual void Draw(sf::RenderTarget & rt) = 0;
-    virtual void Handle(int code) = 0;
+    virtual void Handle(HandleCode code) = 0;
     virtual std::string SerialName() const = 0;
 
     void Zingaya()          {dead = true;}

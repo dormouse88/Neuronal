@@ -19,12 +19,12 @@ class ViewPanel
 {
 public:
     ViewPanel();
-    void SetPlanID(int, std::shared_ptr<const UserData>);
+    void SetPlanID(PlanID, std::shared_ptr<const PlanGroupData>);
     void Draw(sf::RenderTarget &rt);
 
 private:
-    std::shared_ptr<UserData> userData;
-    int planID;
+    std::shared_ptr<PlanGroupData> planGroupData;
+    PlanID pid_;
     
     sf::RectangleShape mainOutlineBox;
     sf::Text parentPlanText;

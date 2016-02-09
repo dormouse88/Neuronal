@@ -18,14 +18,14 @@
 #include "PlanGrid.hpp"
 class PlanRect; //fwd dec
 #include "RefererInterface.hpp"
-class UserData;  //fwd dec
+class PlanGroupData;  //fwd dec
 class WiringPair; //fwd dec
 class ChipHandle;
 
 class ChipPlan : public Wirable
 {
 public:
-    ChipPlan(std::shared_ptr<PlanGrid> g, std::shared_ptr<UserData> u);
+    ChipPlan(std::shared_ptr<PlanGrid> g, std::shared_ptr<PlanGroupData> u);
     virtual ~ChipPlan() {}
 
     void RegisterReferer(std::shared_ptr<RefererInterface> ref);
@@ -50,10 +50,10 @@ public:
 
 
     void SetPosition(DeviceShp d, VectorSmart newPos);
-    int GetFreeSerial() const;
-    bool IsSerialFree(int serial) const;
-    bool IsPositionFree(VectorSmart pos) const;
-    int GetPlanID() const                                   {return planID;}
+    PlanID GetFreeSerial() const;
+    bool IsSerialFree(PlanID) const;
+    bool IsPositionFree(VectorSmart) const;
+    PlanID GetPlanID() const                                   {return planID;}
 
     void ImportDevice(DeviceShp device);
     void ImportWire(WireShp wire);
@@ -66,10 +66,10 @@ public:
     bool IsEmpty()                                          {return devices.empty() and wires.empty();}
     
     std::shared_ptr<PlanGrid> GetGrid()                     {return planGrid;}
-    PlanRegion GetRegion(VectorSmart pos);
-    PortLocation GetPort(VectorSmart pos);
-    DeviceShp GetDevice(VectorSmart pos);
-    DeviceShp GetDevice(int serial);
+    PlanRegion GetRegion(VectorSmart);
+    PortLocation GetPort(VectorSmart);
+    DeviceShp GetDevice(VectorSmart);
+    DeviceShp GetDevice(PlanID);
     WireShp GetWire(Shp<WiringPair> wp);
     std::vector<WireShp > GetWires(std::shared_ptr<Wirable>, bool from, bool to); 
 
@@ -100,8 +100,8 @@ private:
     void DrawGridLines(sf::RenderTarget & rt);
     void DrawParts(sf::RenderTarget & rt);
 
-    int planID;
-    std::shared_ptr<const UserData> userData_;
+    PlanID planID;
+    std::shared_ptr<const PlanGroupData> planGroupData_;
     std::shared_ptr<PlanGrid> planGrid;
     std::shared_ptr<RefererInterface> referer;
     std::vector<DeviceShp > devices;

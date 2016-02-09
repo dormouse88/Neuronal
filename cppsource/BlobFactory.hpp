@@ -19,22 +19,19 @@
 class BlobFactory
 {
 public:
-    BlobFactory(Shp<UserData> ud) :userData_(ud) {}
+    BlobFactory(Shp<PlanGroupData> pgd) :planGroupData_(pgd) {}
     NeuronShp     AddNeuron(PlanPos pos);
-    NeuronShp     AddNeuron(PlanShp plan, int serial, VectorSmart pos, int threshold, bool hasBulb);
+    NeuronShp     AddNeuron(PlanShp plan, PlanID, VectorSmart, int threshold, bool hasBulb);
     HandleShp     AddHandle(PlanPos pos);
-    HandleShp     AddHandle(PlanShp plan, int serial, VectorSmart pos);
+    HandleShp     AddHandle(PlanShp plan, PlanID, VectorSmart);
     
     PlanShp       MakePlan();
     Shp<BaseReferer> MakeBrain();
     
     WireShp       AddWire(Shp<WiringPair> wp, signed weight);
 
-//    void RemoveDevice(PlanPos pos);
-//    void RemoveWire(Shp<WiringPair> wp);
-
 protected:
-    std::shared_ptr<UserData> userData_;
+    std::shared_ptr<PlanGroupData> planGroupData_;
 };
 
 
