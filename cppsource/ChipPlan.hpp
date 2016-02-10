@@ -101,6 +101,7 @@ private:
     void DrawParts(sf::RenderTarget & rt);
 
     PlanID planID;
+    PlanID ancID;
     std::shared_ptr<const PlanGroupData> planGroupData_;
     std::shared_ptr<PlanGrid> planGrid;
     std::shared_ptr<RefererInterface> referer;
@@ -115,6 +116,7 @@ private:
     VectorSmart box_br_;
     
     friend class Serializer;
+    friend class Model;
 };
 
 

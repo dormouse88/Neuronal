@@ -204,8 +204,10 @@ void Controller::EventsPlan(PlanShp plan)
 
     if (event.key.code == sf::Keyboard::Q)
     {
-        if (event.key.shift) model_.SavePlan( plan, PlanSaveMode::ASNEW );
-        else model_.SavePlan( plan, PlanSaveMode::UPDATE );
+        if (not event.key.shift and (model_.GetPlanGroupData()->GetNameByID(plan->GetPlanID()) != NULL_PLAN_NAME))  //ouch
+            model_.SavePlan( plan, PlanNamingMode::TRANSFER );
+        else;
+            model_.SavePlan( plan, PlanNamingMode::AUTONAME );
     }
     if (event.key.code == sf::Keyboard::W)
     {

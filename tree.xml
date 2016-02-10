@@ -2851,6 +2851,26 @@
 		<NEUR i="1" x="0" y="0" bulb="0" />
 		<HAND i="2" x="0" y="1" link="100" />
 	</PLAN>
+	<PLAN i="106" anc="99">
+		<HAND i="1" x="0" y="0" link="0" />
+		<NEUR i="2" x="-1" y="0" bulb="0" />
+	</PLAN>
+	<PLAN i="107" anc="102">
+		<HAND i="2" x="0" y="1" link="106" />
+		<NEUR i="1" x="0" y="0" bulb="0" />
+	</PLAN>
+	<PLAN i="108" anc="101">
+		<HAND i="1" x="0" y="-1" link="107" />
+	</PLAN>
+	<PLAN i="109" anc="97">
+		<HAND i="1" x="0" y="-1" link="98" />
+		<NEUR i="2" x="-1" y="-1" bulb="1" />
+		<NEUR i="3" x="1" y="-1" bulb="1" />
+	</PLAN>
+	<PLAN i="110" anc="0">
+		<HAND i="1" x="0" y="0" link="0" />
+		<HAND i="2" x="1" y="0" link="0" />
+	</PLAN>
 </PLANS>
 <NAMES>
 	<NAME i="1" n="WAIT10" />
@@ -2910,4 +2930,7 @@
 	<NAME i="97" n="@QI" />
 	<NAME i="99" n="WREAL" />
 	<NAME i="103" n="ECHHY" />
+	<NAME i="108" n="@KE" />
+	<NAME i="109" n="@II" />
+	<NAME i="110" n="@ZT" />
 </NAMES>

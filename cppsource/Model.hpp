@@ -17,7 +17,7 @@
 #include "Puppet.hpp"
 #include "BasicTypes.hpp"
 
-enum class PlanSaveMode { UPDATE, ASNEW };
+enum class PlanNamingMode { TRANSFER, AUTONAME, ANON };
 
 class Model
 {
@@ -31,9 +31,8 @@ public:
     Shp<Arena> GetArena()                                       {return arena;} //for View
     Shp<BaseReferer> GetMouseBrain()                            {return arena->GetMouseBrain(); }
 
-    //PlanShp WipePlan(PlanShp, bool forced);
     PlanShp LoadPlan(PlanShp, PlanNav nav, bool forced = false);
-    void SavePlan(PlanShp, PlanSaveMode);
+    void SavePlan(PlanShp, PlanNamingMode);
 
     PlanShp EngageNameFilter(PlanShp plan, std::string filter)        { planGroupData_->SetNameFilter(filter); return LoadPlan(plan, PlanNav::FILTER_NAME); }
     std::string GetNameFilter() const                                 { return planGroupData_->GetNameFilter(); }
@@ -45,6 +44,8 @@ public:
     Shp<const PlanGroupData> GetPlanGroupData() const       {return planGroupData_;}
     Shp<BlobFactory> GetFactory()                           {return factory_;}
 private:
+    void SavePlanRecursively(PlanShp, PlanNamingMode);
+    
     Shp<Serializer> serializer;
     Shp<PlanGroupData> planGroupData_;
     Shp<BlobFactory> factory_;

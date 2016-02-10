@@ -27,6 +27,7 @@ public:
     void LoadLevel(LevelNum num, std::shared_ptr<Arena> a, std::shared_ptr<BlobFactory> f);
     
     //Plan...
+    PlanID    GetFirstFreePlanID() const;
     bool      SaveUserPlan(PlanShp);
     PlanShp   LoadUserPlan(PlanID, std::shared_ptr<BlobFactory>);
     PlanShp   LoadLevelPlan(LevelNum, PlanID, std::shared_ptr<BlobFactory>);
@@ -35,16 +36,12 @@ public:
     void LoadPlanGroupData(std::shared_ptr<PlanGroupData>);
     void SavePlanGroupData(std::shared_ptr<PlanGroupData>);
     
-//    void SaveAddAncestryEntry(PlanID id, PlanID anc);
-//    void SaveRemoveName(PlanID);
-//    void SaveAddName(PlanID, std::string name);
-
 private:
     void OpenFile(pugi::xml_document & doc, const char * fileName);
     pugi::xml_node GetNameNodeByID(PlanID);
     pugi::xml_node GetNameNodeByName(std::string);
 
-    bool SavePlanRecursively(pugi::xml_node container, PlanShp plan_p);
+    bool DoSavePlan(pugi::xml_node container, PlanShp);
     PlanShp LoadPlanRecursively(pugi::xml_node container, PlanID id, std::shared_ptr<BlobFactory> factory);
     
     pugi::xml_document userDoc_;

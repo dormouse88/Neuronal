@@ -96,10 +96,26 @@ void Serializer::LoadLevel(LevelNum num, std::shared_ptr<Arena> a, std::shared_p
 }
 
 
+PlanID Serializer::GetFirstFreePlanID() const
+{
+    const int MAX_PLAN_ID = 100000;
+    //check highest used planID in the XML and use next number as new planID...
+    PlanID ret = NULL_PID;
+    for (int i = 1; i<MAX_PLAN_ID; i++)
+    {
+        if ( not userDoc_.child("PLANS").find_child_by_attribute("PLAN", "i", patch::to_string( i ).c_str() ) )
+        {
+            ret = i;
+            break;
+        }
+    }
+    assert(ret != NULL_PID);
+    return ret;
+}
 
 bool Serializer::SaveUserPlan(PlanShp plan_p)
 {
-    bool saved = SavePlanRecursively(userDoc_.child("PLANS"), plan_p);
+    bool saved = DoSavePlan(userDoc_.child("PLANS"), plan_p);
     userDoc_.save_file(XML_USER_FILENAME);
     return saved;
 }
@@ -117,12 +133,6 @@ PlanShp Serializer::LoadLevelPlan(LevelNum levelNum, PlanID planID, std::shared_
 void Serializer::LoadPlanGroupData(std::shared_ptr<PlanGroupData> ud)
 {
     //Ancestry...
-//    for (pugi::xml_node node: userDoc_.child("RELATIVES").children("REL"))
-//    {
-//        int id = node.attribute("i").as_int(0);
-//        int anc = node.attribute("anc").as_int(0);
-//        ud->AddAncestryEntry(id, anc);
-//    }
     for (pugi::xml_node node: userDoc_.child("PLANS").children("PLAN"))
     {
         int id = node.attribute("i").as_int(0);
@@ -136,8 +146,6 @@ void Serializer::LoadPlanGroupData(std::shared_ptr<PlanGroupData> ud)
         int i = node.attribute("i").as_int(0);
         std::string name = node.attribute("n").as_string(0);
         ud->AddName(i, name);
-//        ud->namesByID.insert( std::make_pair(i, name) );
-//        ud->namesByName.insert( std::make_pair(name, i) );
     }
 }
 
@@ -154,40 +162,6 @@ void Serializer::SavePlanGroupData(std::shared_ptr<PlanGroupData> pgd)
     }
     userDoc_.save_file(XML_USER_FILENAME);
 }
-
-
-//void Serializer::SaveAddAncestryEntry(PlanID id, PlanID anc)
-//{
-//    assert(id > 0);
-//    pugi::xml_node entry = userDoc_.child("RELATIVES").append_child("REL");
-//    entry.append_attribute("i") = id;
-//    entry.append_attribute("anc") = anc;
-//    userDoc_.save_file(XML_USER_FILENAME);
-//}
-//
-//void Serializer::SaveRemoveName(PlanID planID)
-//{
-//    pugi::xml_node p = GetNameNodeByID(planID);
-//    assert(p);
-//    userDoc_.child("NAMES").remove_child(p);
-//    userDoc_.save_file(XML_USER_FILENAME);
-//}
-//
-//void Serializer::SaveAddName(PlanID planID, std::string name)
-//{
-//    assert(not GetNameNodeByName(name) and not GetNameNodeByID(planID));
-//    pugi::xml_node names = userDoc_.child("NAMES");
-////    pugi::xml_node nodeWithID = GetNameNodeByID(planID);
-////    if (nodeWithID)
-////    {
-////        assert(nodeWithID.attribute("n").as_string()[0] == AUTO_NAME_PREFIX);
-////        names.remove_child(nodeWithID);
-////    }
-//    pugi::xml_node entry = names.append_child("NAME");
-//    entry.append_attribute("i") = planID;
-//    entry.append_attribute("n") = name.c_str();
-//    userDoc_.save_file(XML_USER_FILENAME);
-//}
 
 
 
@@ -213,35 +187,21 @@ pugi::xml_node Serializer::GetNameNodeByName(std::string name) {
 }
 
 
-bool Serializer::SavePlanRecursively(pugi::xml_node container, PlanShp plan_p)
+bool Serializer::DoSavePlan(pugi::xml_node container, PlanShp plan)
 {
-    const int MAX_PLAN_ID = 100000;
-    if(plan_p->IsModified())  //Plan may not be modified because this method is calls itself recursively
+    assert(plan->IsModified());
     {
-        int oldID = plan_p->planID;
-        //check highest used planID in the XML and use next number as new planID...
-        int newID = 0;
-        for (int i = 1; i<MAX_PLAN_ID; i++) {
-            if ( not container.find_child_by_attribute("PLAN", "i", patch::to_string( i ).c_str() ) ) {
-                newID = i;
-                break;
-            }
-        }
-        assert(newID > 0);
-        
-        //update the plan in memory with the new ID...
-        plan_p->planID = newID;
-
         //create the new plan in the xml...
-        pugi::xml_node plan = container.append_child("PLAN");
-        plan.append_attribute("i") = newID;
-        plan.append_attribute("anc") = oldID;
+        pugi::xml_node pNode = container.append_child("PLAN");
+        pNode.append_attribute("i") = plan->planID;
+        pNode.append_attribute("anc") = plan->ancID;
 
-        for (auto d: plan_p->devices) {
+        for (auto d: plan->devices)
+        {
             if (d->SerialName() == "NEUR")
             {
                 auto n = std::dynamic_pointer_cast<Neuron>(d);
-                pugi::xml_node dev = plan.append_child("NEUR");
+                pugi::xml_node dev = pNode.append_child("NEUR");
                 dev.append_attribute("i").set_value(d->GetPlanID() );
                 dev.append_attribute("x").set_value(d->GetSmartPos().x);
                 dev.append_attribute("y").set_value(d->GetSmartPos().y);
@@ -254,17 +214,19 @@ bool Serializer::SavePlanRecursively(pugi::xml_node container, PlanShp plan_p)
                 auto h = std::dynamic_pointer_cast<ChipHandle>(d);
                 auto p = h->GetSubPlan();
                 //holy recursion batman!?!...
-                if (p) SavePlanRecursively(container, p);
-                pugi::xml_node dev = plan.append_child("HAND");
+                //if (p) SavePlanRecursively(container, p);
+                pugi::xml_node dev = pNode.append_child("HAND");
                 dev.append_attribute("i").set_value(d->GetPlanID() );
                 dev.append_attribute("x").set_value(d->GetSmartPos().x);
                 dev.append_attribute("y").set_value(d->GetSmartPos().y);
-                int pID = 0;
-                if (p) pID = p->planID;
+                PlanID pID = NULL_PID;
+                if (p)
+                    pID = p->planID;
                 dev.append_attribute("link").set_value(pID);
             }
         }
-        for (auto w: plan_p->wires) {
+        for (auto w: plan->wires)
+        {
             //Rather ugly. RTTI using raw pointers.
             //Needed a way to get serial numbers of devices.
             //Had to try casting Wirable references down to device references...
@@ -274,7 +236,7 @@ bool Serializer::SavePlanRecursively(pugi::xml_node container, PlanShp plan_p)
             int tserial = 0;
             if (fd) fserial = fd->GetPlanID();
             if (td) tserial = td->GetPlanID();
-            pugi::xml_node wire = plan.append_child("WIRE");
+            pugi::xml_node wire = pNode.append_child("WIRE");
             wire.append_attribute("f").set_value(fserial);
             wire.append_attribute("t").set_value(tserial);
             if (w->GetWeight() != XMLD_WIRE_W)
@@ -284,7 +246,7 @@ bool Serializer::SavePlanRecursively(pugi::xml_node container, PlanShp plan_p)
             if (w->GetToTag() != XMLD_WIRE_TS)
                 wire.append_attribute("ts").set_value(w->GetToTag().c_str());
         }
-        plan_p->modified = false;
+        plan->modified = false;
         return true;
     }
     return false;

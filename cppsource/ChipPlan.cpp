@@ -17,7 +17,12 @@
 const int PADDING { 2 };
 
 ChipPlan::ChipPlan(std::shared_ptr<PlanGrid> g, std::shared_ptr<PlanGroupData> u)
-    :Wirable(), planID(0), modified(false), planGrid(g), planGroupData_(u)
+    :Wirable()
+    , planID(NULL_PID)
+    , ancID(NULL_PID)
+    , modified(false)
+    , planGrid(g)
+    , planGroupData_(u)
 {
     RecalculateBounds();
 }
