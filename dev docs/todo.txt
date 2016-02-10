@@ -2,9 +2,11 @@ Do Next
 =======
 ---v---
 Overhaul ownership (shared ptrs, weak ptrs, references, deletion, etc. Devices own wires? Port-Arrays are their own entity- shared between handles and plans?)
-Bugs:
-	Ancestry data are not saved for indirectly saved plans.
 	
+Name sorting:
+	Make sure autoname symbol (@) doesn't get sorted between numbers and letters.
+	Should autonames be included in name searching at all?
+	Have an auto-added symbol for real names too? Would allow easy selection between autos and reals using name filter.
 
 
 General
@@ -24,9 +26,7 @@ Visual / Interface
 	Add a collapse all/expand! all button.
 	Add a device copy button? (useful for non-empty handles)
 	Add an encapsulate button. This will put all devices (and their wires) within a rectangular area bounded by the cursors into a newly created sub-plan. Fucking groovy. May require multiwires.
-	Make sure autoname symbol (@) doesn't get sorted between numbers and letters.
-	Allow spaces or underscores in names.
-	Add flashing insert cursor when entering text.
+	Draw active name filter.
 
 InnerSim
 ========

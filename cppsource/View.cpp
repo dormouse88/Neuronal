@@ -142,8 +142,8 @@ View::View(Model & model_p)
 
 void View::Draw()
 {
-    cursorOne.Revalidate();
-    cursorTwo.Revalidate();
+//    cursorOne.Revalidate();
+//    cursorTwo.Revalidate();
     window.clear();
 
     DrawMain();
@@ -225,7 +225,10 @@ void View::DrawBar() //Bar Port...
     assert(ap);
     
     //barText1.setString( "text1: " + patch::to_string(ap->GetPlanID()) );
-    if (drawTextEntering) window.draw(barText1);
+    if (drawTextEntering)
+    {
+        window.draw(barText1);
+    }
 
     marquee.Draw(window);
     

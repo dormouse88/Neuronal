@@ -11,6 +11,27 @@
 #include "Model.hpp"
 #include "View.hpp"
 
+class TextEnterer
+{
+public:
+    TextEnterer(){}        //textEntryCooldownTimer_.restart();
+    
+    void Dispatch()                                                     { dispatchTarget_(textBeingEntered_); }
+    void SetDispatchTarget(std::function<void(std::string)> dt)         { dispatchTarget_ = dt; }
+
+    void Clear()                        { textBeingEntered_.clear(); }
+    void SetText(std::string s)         { textBeingEntered_ = s; }
+    std::string GetText() const         { return textBeingEntered_; }
+    void Append(sf::Uint32 ch);
+    void BackSpace()                    { if (textBeingEntered_.length() > 0) textBeingEntered_.erase(textBeingEntered_.length()-1); }
+    
+private:    
+    std::string textBeingEntered_;
+    sf::Clock textEntryCooldownTimer_;
+    std::function<void(std::string)> dispatchTarget_;
+};
+
+
 class Controller
 {
 public:
@@ -40,12 +61,10 @@ private:
     sf::Event event;
     bool quitYet_;
 
-    sf::Vector2f mouseCursorWorldPos_;
+    std::shared_ptr<TextEnterer> textEnterer_;
+
+    VectorWorld mouseCursorWorldPos_;
     bool isMouseCursorSet_;
-    bool isEnteringName_;
-    bool isEnteringFilter_;
-    std::string textBeingEntered_;
-    sf::Clock textEntryCooldownTimer_;
 };
 
 #endif	/* CONTROLLER_HPP */

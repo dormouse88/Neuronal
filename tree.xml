@@ -2871,9 +2871,48 @@
 		<HAND i="1" x="0" y="0" link="0" />
 		<HAND i="2" x="1" y="0" link="0" />
 	</PLAN>
+	<PLAN i="111" anc="0">
+		<NEUR i="1" x="0" y="0" bulb="0" />
+		<NEUR i="2" x="1" y="-1" bulb="0" />
+		<WIRE f="1" t="2" />
+	</PLAN>
+	<PLAN i="112" anc="111">
+		<NEUR i="1" x="0" y="0" bulb="0" />
+		<NEUR i="2" x="1" y="-1" bulb="0" />
+		<NEUR i="3" x="1" y="1" bulb="0" />
+		<WIRE f="1" t="2" />
+		<WIRE f="1" t="3" />
+	</PLAN>
+	<PLAN i="113" anc="112">
+		<NEUR i="1" x="0" y="0" bulb="0" />
+		<NEUR i="2" x="1" y="-1" bulb="0" />
+		<NEUR i="3" x="1" y="1" bulb="0" />
+		<NEUR i="4" x="-1" y="0" bulb="0" />
+		<WIRE f="1" t="2" />
+		<WIRE f="1" t="3" />
+	</PLAN>
+	<PLAN i="114" anc="0">
+		<NEUR i="1" x="0" y="0" bulb="0" />
+		<NEUR i="2" x="1" y="0" bulb="0" />
+		<HAND i="3" x="0" y="-1" link="0" />
+	</PLAN>
+	<PLAN i="115" anc="99">
+		<HAND i="1" x="0" y="0" link="0" />
+		<NEUR i="2" x="-1" y="1" bulb="0" />
+		<NEUR i="3" x="1" y="-1" bulb="0" />
+	</PLAN>
+	<PLAN i="116" anc="115">
+		<HAND i="1" x="0" y="0" link="0" />
+		<NEUR i="2" x="-1" y="1" bulb="0" />
+		<NEUR i="3" x="1" y="-1" bulb="0" />
+		<NEUR i="4" x="-1" y="-1" bulb="0" />
+		<NEUR i="5" x="1" y="1" bulb="0" />
+	</PLAN>
 </PLANS>
 <NAMES>
 	<NAME i="1" n="WAIT10" />
+	<NAME i="2" n="BOUNDED" />
+	<NAME i="3" n="REBOUNDED" />
 	<NAME i="6" n="MOVELINK" />
 	<NAME i="7" n="4CHAINSPIRAL" />
 	<NAME i="8" n="4SEQSPIRAL" />
@@ -2928,9 +2967,12 @@
 	<NAME i="94" n="@Y" />
 	<NAME i="96" n="@QO" />
 	<NAME i="97" n="@QI" />
-	<NAME i="99" n="WREAL" />
 	<NAME i="103" n="ECHHY" />
 	<NAME i="108" n="@KE" />
 	<NAME i="109" n="@II" />
 	<NAME i="110" n="@ZT" />
+	<NAME i="113" n="ENTRY_OK" />
+	<NAME i="114" n="A_NAME_HERE" />
+	<NAME i="115" n="WREAL" />
+	<NAME i="116" n="#M" />
 </NAMES>

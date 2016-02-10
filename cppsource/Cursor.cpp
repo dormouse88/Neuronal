@@ -96,29 +96,22 @@ void Cursor::SetPosWorld(VectorWorld point)
         PortLocation port = plan_->GetPort(sPos);
         SetToPort(port);
     }
-    
-//    b = GetPlan()->GetWorldPaddedBoundPlusPorts();  //??
-
-    //if point is between Plan and its Handle...
-//    if ( not b.contains(point) )
-//        SetToPlan();
-
-    //if point is on a Grabber (cornerBox)...
-//    RectWorld cb = { b.left, b.top, GRABBER_SIZE.x, GRABBER_SIZE.y };
-//    if (cb.contains(point) ) SetToPlan();
-//    cb.left = b.left + b.width - GRABBER_SIZE.x;
-//    cb.top = b.top + b.height - GRABBER_SIZE.y;
-//    if (cb.contains(point) ) SetToPlan();
 }
 
 
 
 void Cursor::Revalidate()
 {
+    assert(GetState() != CursorState::ABSENT);
+    if (plan_ != plan_->GetReferer()->GetSubPlan())
+    {
+        SetToPlan( plan_->GetReferer()->GetSubPlan() );
+    }
+    
     if (GetState() == CursorState::PORT)
     {
         if (not plan_->HasPort(port_))
-            port_.num = 0;
+            port_.num = NULL_PORT;
     }
     //Just once, if the cursor is on an exploded handle, select its subplan
     if (GetState() == CursorState::LOCATED)

@@ -9,7 +9,7 @@
 #include <cassert>
 #include <map>
 
-const std::string AUTO_NAME_PREFIX = "@";
+const std::string AUTO_NAME_PREFIX = "#";
 const int NAME_MAX_LENGTH = 30;
 const int AUTO_NAME_MAX_LENGTH = NAME_MAX_LENGTH - 1; //to account for the @ identifier
 const std::string AUTO_NAME_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";

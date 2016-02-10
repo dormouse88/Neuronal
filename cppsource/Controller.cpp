@@ -8,22 +8,53 @@
 #include "Controller.hpp"
 #include <cassert>
 
+void TextEnterer::Append(sf::Uint32 ch)
+{
+    if (textEntryCooldownTimer_.getElapsedTime() > sf::milliseconds(200) )
+    {
+        //A few conversions...
+        if (ch >= 0x61 and ch <= 0x7A)  //convert lowercase to capitals
+            ch -= 0x20;
+        if (ch == 0x20)                 //convert space to underscore
+            ch = 0x5F;
+        //Accepted characters...
+        if (
+                (ch >= 0x30 and ch <= 0x39) or  //numbers
+                (ch >= 0x41 and ch <= 0x5A) or  //capitals
+                (ch == 0x2B) or                 //+
+                (ch == 0x5F)                    //_
+            )
+        {
+            textBeingEntered_.append( sf::String{ch} );
+        }
+    }
+}
+
+
+
+
+
+
 Controller::Controller(Model & model_p, View & view_p)
-    :model_(model_p), view_(view_p), quitYet_(false), isMouseCursorSet_(false), isEnteringName_(false), isEnteringFilter_(false), cu1(view_.cursorOne), cu2(view_.cursorTwo)
+    :model_(model_p)
+    , view_(view_p)
+    , quitYet_(false)
+    , isMouseCursorSet_(false)
+    , textEnterer_(nullptr)
+    , cu1(view_.cursorOne)
+    , cu2(view_.cursorTwo)
 {}
-
-
 
 void Controller::CursorsGoHere(PlanShp p)
 {
-    if (p) {
-        view_.cursorOne.SetToPlan( p );
-        view_.cursorTwo.SetToPlan( p );
-        
-        auto b = p->GetWorldPaddedBoundBox();  //unimportant
-        view_.CentreOn( {b.left + b.width*0.5f, b.top + b.height} );
-        view_.Clamp();
-    }
+//    if (p) {
+//        view_.cursorOne.SetToPlan( p );
+//        view_.cursorTwo.SetToPlan( p );
+//        
+//        auto b = p->GetWorldPaddedBoundBox();  //unimportant
+//        view_.CentreOn( {b.left + b.width*0.5f, b.top + b.height} );
+//        view_.Clamp();
+//    }
 }
 
 
@@ -32,6 +63,8 @@ bool Controller::HandleInput()
 {
     HandleInputEvents();
     HandleInputState();
+    cu1.Revalidate();
+    cu2.Revalidate();
     return quitYet_;
 }
 
@@ -79,7 +112,7 @@ void Controller::HandleInputEvents()
             view_.Zoom( 1.f + (-0.4f * event.mouseWheel.delta) );
         }
 
-        if (isEnteringName_ or isEnteringFilter_)
+        if (textEnterer_)
         {
             HandleInputEventsWritingMode();
         }
@@ -98,39 +131,26 @@ void Controller::HandleInputEventsWritingMode()
     {
         if (event.key.code == sf::Keyboard::BackSpace)
         {
-            if (textBeingEntered_.length() > 0) textBeingEntered_.erase(textBeingEntered_.length()-1);
+            textEnterer_->BackSpace();
         }
         if (event.key.code == sf::Keyboard::Return or event.key.code == sf::Keyboard::Escape)
         {
             if (event.key.code == sf::Keyboard::Return)
             {
-                if (isEnteringName_) {
-                    model_.AddName(cu1.GetPlan()->GetPlanID(), textBeingEntered_);
-                }
-                if (isEnteringFilter_) {
-                    auto p = model_.EngageNameFilter(cu1.GetPlan(), textBeingEntered_);
-                    CursorsGoHere(p);
-                }
+                textEnterer_->Dispatch();
             }
-            isEnteringName_ = false;
-            isEnteringFilter_ = false;
-            textBeingEntered_.clear();
+            textEnterer_ = nullptr;
         }
     }
-    if (event.type == sf::Event::TextEntered and textEntryCooldownTimer_.getElapsedTime() > sf::milliseconds(200) )
+    if (event.type == sf::Event::TextEntered)
     {
-        sf::Uint32 ch = event.text.unicode;
-        if (ch >= 0x61 and ch <= 0x7A) {  //convert lowercase to capitals
-            ch -= 0x20;
-        }
-        if (    (ch >= 0x30 and ch <= 0x39) or  //numbers
-                (ch >= 0x41 and ch <= 0x5A) or  //capitals
-                (ch == 0x23)    )  //#
-        {
-            textBeingEntered_.append( sf::String{ch} );
-        }
+        if (textEnterer_)
+            textEnterer_->Append(event.text.unicode);
     }
-    view_.SetTextEntering(isEnteringName_ or isEnteringFilter_, textBeingEntered_);
+    if (textEnterer_)
+        view_.SetTextEntering(true, textEnterer_->GetText());
+    else
+        view_.SetTextEntering(false);
 }
 
 
@@ -257,30 +277,31 @@ void Controller::EventsPlan(PlanShp plan)
     }
     if (event.key.code == sf::Keyboard::Subtract)
     {
-        assert(not isEnteringName_);
-        assert(not isEnteringFilter_);
+        assert(not textEnterer_);
         auto p = model_.EngageNameFilter(plan, "");
         CursorsGoHere(p);
     }
     if (event.key.code == sf::Keyboard::Add)
     {
-        assert(not isEnteringName_);
-        assert(not isEnteringFilter_);
-        isEnteringFilter_ = true;
-        textBeingEntered_ = model_.GetNameFilter();
-        textEntryCooldownTimer_.restart();
+        assert(not textEnterer_);
+        textEnterer_ = std::make_shared<TextEnterer>();
+        auto bound = std::bind( &Model::EngageNameFilter, &model_, cu1.GetPlan(), std::placeholders::_1 );
+        textEnterer_->SetDispatchTarget( bound );
+        textEnterer_->SetText( model_.GetNameFilter() );
     }
 
     if (event.key.code == sf::Keyboard::R)
     {
+        assert(not textEnterer_);
         model_.RemoveName(plan->GetPlanID());
     }
     if (event.key.code == sf::Keyboard::E and model_.CanAddName(plan->GetPlanID()))
     {
-        assert(not isEnteringName_);
-        assert(not isEnteringFilter_);
-        isEnteringName_ = true;
-        textEntryCooldownTimer_.restart();
+        assert(not textEnterer_);
+        textEnterer_ = std::make_shared<TextEnterer>();
+        auto bound = std::bind( &Model::AddName, &model_, cu1.GetPlan()->GetPlanID(), std::placeholders::_1 );
+        textEnterer_->SetDispatchTarget( bound );
+        textEnterer_->SetText( model_.GetPlanName(cu1.GetPlan()->GetPlanID()) );
     }
 }
 
