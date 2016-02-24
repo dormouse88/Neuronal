@@ -74,6 +74,9 @@ const PlanName NULL_PLAN_NAME {""};  //(Empty string is a special value indicati
 typedef int PlanID;
 const PlanID NULL_PID {0}; //(Zero is a special value indicating "no plan id")
 
+typedef int DevSerial;
+const DevSerial NULL_DEV {0}; //(Zero is a special value indicating "no serial")
+
 typedef int LevelNum;
 
 typedef int HandleCode;

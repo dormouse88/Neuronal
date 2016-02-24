@@ -12,14 +12,15 @@
 
 NeuronShp BlobFactory::AddNeuron(PlanPos pos)
 {
-    return AddNeuron(pos.GetPlan(), 0, pos.GetSmartPos(), 1, false);
+    return AddNeuron(pos.GetPlan(), NULL_DEV, pos.GetSmartPos(), 1, false);
 }
-NeuronShp BlobFactory::AddNeuron(PlanShp plan, PlanID pid, VectorSmart pos, int threshold, bool hasBulb)
+NeuronShp BlobFactory::AddNeuron(PlanShp plan, DevSerial ds, VectorSmart pos, int threshold, bool hasBulb)
 {
-    if (pid == 0) pid = plan->GetFreeSerial();
-    if (plan->IsPositionFree(pos) and plan->IsSerialFree(pid))
+    if (ds == NULL_DEV)
+        ds = plan->GetFreeSerial();
+    if (plan->IsPositionFree(pos) and plan->IsSerialFree(ds))
     {
-        auto mp = std::make_shared<Neuron> (pid, pos, threshold, hasBulb, plan);
+        auto mp = std::make_shared<Neuron> (ds, pos, threshold, hasBulb, plan);
         plan->ImportDevice(mp);
         mp->ReCalculateCharge(NULL_TAG);
         return mp;
@@ -29,15 +30,16 @@ NeuronShp BlobFactory::AddNeuron(PlanShp plan, PlanID pid, VectorSmart pos, int 
 
 HandleShp BlobFactory::AddHandle(PlanPos pos)
 {
-    return AddHandle(pos.GetPlan(), 0, pos.GetSmartPos());
+    return AddHandle(pos.GetPlan(), NULL_DEV, pos.GetSmartPos());
 }
-HandleShp BlobFactory::AddHandle(PlanShp plan, PlanID pid, VectorSmart pos)
+HandleShp BlobFactory::AddHandle(PlanShp plan, DevSerial ds, VectorSmart pos)
 {
     HandleShp ret = nullptr;
-    if (pid == 0) pid = plan->GetFreeSerial();
-    if (plan->IsPositionFree(pos) and plan->IsSerialFree(pid))
+    if (ds == NULL_DEV)
+        ds = plan->GetFreeSerial();
+    if (plan->IsPositionFree(pos) and plan->IsSerialFree(ds))
     {
-        auto handle = std::make_shared<ChipHandle> (pid, pos, plan);
+        auto handle = std::make_shared<ChipHandle> (ds, pos, plan);
         auto subPlan = MakePlan();
         handle->SetSubPlan( subPlan, handle );
         

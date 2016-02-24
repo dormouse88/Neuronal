@@ -23,24 +23,24 @@ public:
     Wirable() {}
     virtual ~Wirable() {}
 
-    //Virtuals...
+    //Pure Virtuals...
     virtual void StructuralRefresh() = 0;
     virtual void ReCalculateCharge(Tag) = 0;
     virtual Charge GetOutgoingCharge(Tag) = 0;
     virtual VectorWorld GetWireAttachPos(WireAttachSide, Tag) const = 0;
 
+    //Virtuals...
     virtual bool IsWeightedIn() const                   {return false;}
     virtual bool IsSlotted(SlottedSide) const           {return false;}
     virtual Tag GetFirstFreeTag(InOut)                  {}
     virtual bool CanRegisterAnyWire(InOut side, Tag slot) const          {return true;}  //Client needs to call this before calling RegisterWire(). RegisterWire() should throw an exception on failure perhaps.
 
+    //Concrete...
     void RegisterWire(InOut side, WireShp w);
     bool CanRegisterExactWire(Tag fromSlot, Wirable & to, Tag toSlot) const;
     bool HasWireTo(Tag fromSlot, Wirable & to, Tag toSlot) const;
     int CountWires(InOut side) const;
-    //RED //bool IsTagFree(InOut side, Tag tag) const;
     std::set<Tag> GetTagCloud(InOut side);
-    
     
 protected:
     void PropagateRefresh(Tag slot = NULL_TAG);
@@ -50,6 +50,8 @@ private:
     mutable std::vector<std::weak_ptr<Wire> > inWires;
     mutable std::vector<std::weak_ptr<Wire> > outWires;
 };
+
+    //RED //bool IsTagFree(InOut side, Tag tag) const;
 
 #endif	/* WIRABLE_HPP */
 

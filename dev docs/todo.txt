@@ -1,11 +1,14 @@
 Do Next
 =======
-adding wires to collapsed handles. EDIT: Seems to already work fine
-fixed autoTag generator as it wasn't exhaustive.
 ---v---
-Overhaul ownership (shared ptrs, weak ptrs, references, deletion, etc. Devices own wires? Port-Arrays are their own entity- shared between handles and plans?)
-	named slots bug fixes
-		Add some interface method to enter a Tag string with the keyboard.
+Overhaul ownership (shared ptrs, weak ptrs, references, deletion, etc.)
+	Devices own wires?
+	Port-Arrays are their own entity- shared between handles and plans?
+	Plans store handles and neurons separately to avoid RTTI?
+	Wires have polymorphic plug ends to determine possible attributes (Tag, weight)?
+	Eliminate InOut duplication?
+named slots bug fixes
+	Add some interface method to enter a Tag string with the keyboard.
 	
 
 General

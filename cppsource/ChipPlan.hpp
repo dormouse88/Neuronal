@@ -50,8 +50,8 @@ public:
 
 
     void SetPosition(DeviceShp d, VectorSmart newPos);
-    PlanID GetFreeSerial() const;
-    bool IsSerialFree(PlanID) const;
+    DevSerial GetFreeSerial() const;
+    bool IsSerialFree(DevSerial) const;
     bool IsPositionFree(VectorSmart) const;
     PlanID GetPlanID() const                                   {return planID;}
 
@@ -69,7 +69,7 @@ public:
     PlanRegion GetRegion(VectorSmart);
     PortLocation GetPort(VectorSmart);
     DeviceShp GetDevice(VectorSmart);
-    DeviceShp GetDevice(PlanID);
+    DeviceShp GetDevice(DevSerial);
     WireShp GetWire(Shp<WiringPair> wp);
     std::vector<WireShp > GetWires(std::shared_ptr<Wirable>, bool from, bool to); 
 

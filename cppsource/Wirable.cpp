@@ -9,6 +9,22 @@
 #include "Wire.hpp"
 
 
+void Wirable::RegisterWire(InOut side, WireShp w)
+{
+    if(side == InOut::IN)
+        inWires.emplace_back(w);
+    else
+        outWires.emplace_back(w);
+}
+
+bool Wirable::CanRegisterExactWire(Tag fromTag, Wirable & to, Tag toTag) const
+{
+    return not HasWireTo(fromTag, to, toTag) and
+            CanRegisterAnyWire(InOut::OUT, fromTag) and
+            to.CanRegisterAnyWire(InOut::IN, toTag) and
+            this != &to;
+}
+
 bool Wirable::HasWireTo(Tag fromSlot, Wirable & to, Tag toSlot) const
 {
     for (const auto w: outWires) {
@@ -25,33 +41,50 @@ bool Wirable::HasWireTo(Tag fromSlot, Wirable & to, Tag toSlot) const
             )
                 return true;
         }
-//        {
-//            //disallows identically located wires with different slots...
-//            if ( &wire->GetTo() == &to )
-//                return true;
-//        }
     }
     return false;
 }
 
-bool Wirable::CanRegisterExactWire(Tag fromTag, Wirable & to, Tag toTag) const
+int Wirable::CountWires(InOut side) const
 {
-    return not HasWireTo(fromTag, to, toTag) and
-            CanRegisterAnyWire(InOut::OUT, fromTag) and
-            to.CanRegisterAnyWire(InOut::IN, toTag) and
-            this != &to;
+    CleanWireVectors();
+    if (side == InOut::IN)
+        return inWires.size();
+    else
+        return outWires.size();
 }
 
-void Wirable::CleanWireVectors() const //this method is necessary since the limits work by checking vector size.
+std::set<Tag> Wirable::GetTagCloud(InOut side)
 {
-    auto cleanVector = [&] (std::vector<std::weak_ptr<Wire> > & wv) {
-        auto remove_func = [] (std::weak_ptr<Wire> & w) { return w.expired() or w.lock()->IsDead(); } ;
-        auto new_end = std::remove_if(begin(wv), end(wv), remove_func );
-        wv.erase(new_end, end(wv));
-    };
-    cleanVector(inWires);
-    cleanVector(outWires);
+    CleanWireVectors();
+    std::set<Tag> ret;
+    if (side == InOut::IN)
+    {
+        for (auto & x: inWires)
+        {
+            auto l = x.lock();
+            if (l and not l->IsDead())
+                ret.insert( l->GetToTag() );
+        }
+    }
+    else
+    {
+        for (auto & x: outWires)
+        {
+            auto l = x.lock();
+            if (l and not l->IsDead())
+                ret.insert( l->GetFromTag() );
+        }
+    }
+    return ret;
 }
+
+
+
+
+
+
+//////////////////////////////////////////////////protected or private
 
 void Wirable::PropagateRefresh(Tag tag)
 {
@@ -80,23 +113,18 @@ CWeight Wirable::GetTotalIncomingWeight(Tag tag) const
     return total;
 }
 
-void Wirable::RegisterWire(InOut side, WireShp w)
+void Wirable::CleanWireVectors() const //this method is necessary since the limits work by checking vector size.
 {
-    if(side == InOut::IN)
-        inWires.emplace_back(w);
-    else
-        outWires.emplace_back(w);
+    auto cleanVector = [&] (std::vector<std::weak_ptr<Wire> > & wv) {
+        auto remove_func = [] (std::weak_ptr<Wire> & w) { return w.expired() or w.lock()->IsDead(); } ;
+        auto new_end = std::remove_if(begin(wv), end(wv), remove_func );
+        wv.erase(new_end, end(wv));
+    };
+    cleanVector(inWires);
+    cleanVector(outWires);
 }
 
 
-int Wirable::CountWires(InOut side) const
-{
-    CleanWireVectors();
-    if (side == InOut::IN)
-        return inWires.size();
-    else
-        return outWires.size();
-}
 
 //RED
 //bool Wirable::IsTagFree(InOut side, Tag tag) const
@@ -120,28 +148,3 @@ int Wirable::CountWires(InOut side) const
 //    }
 //    return true;
 //}
-
-std::set<Tag> Wirable::GetTagCloud(InOut side)
-{
-    CleanWireVectors();
-    std::set<Tag> ret;
-    if (side == InOut::IN)
-    {
-        for (auto & x: inWires)
-        {
-            auto l = x.lock();
-            if (l and not l->IsDead())
-                ret.insert( l->GetToTag() );
-        }
-    }
-    else
-    {
-        for (auto & x: outWires)
-        {
-            auto l = x.lock();
-            if (l and not l->IsDead())
-                ret.insert( l->GetFromTag() );
-        }
-    }
-    return ret;
-}

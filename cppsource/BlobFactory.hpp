@@ -21,9 +21,9 @@ class BlobFactory
 public:
     BlobFactory(Shp<PlanGroupData> pgd) :planGroupData_(pgd) {}
     NeuronShp     AddNeuron(PlanPos pos);
-    NeuronShp     AddNeuron(PlanShp plan, PlanID, VectorSmart, int threshold, bool hasBulb);
+    NeuronShp     AddNeuron(PlanShp plan, DevSerial, VectorSmart, int threshold, bool hasBulb);
     HandleShp     AddHandle(PlanPos pos);
-    HandleShp     AddHandle(PlanShp plan, PlanID, VectorSmart);
+    HandleShp     AddHandle(PlanShp plan, DevSerial, VectorSmart);
     
     PlanShp       MakePlan();
     Shp<BaseReferer> MakeBrain();

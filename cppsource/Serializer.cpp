@@ -202,7 +202,7 @@ bool Serializer::DoSavePlan(pugi::xml_node container, PlanShp plan)
             {
                 auto n = std::dynamic_pointer_cast<Neuron>(d);
                 pugi::xml_node dev = pNode.append_child("NEUR");
-                dev.append_attribute("i").set_value(d->GetPlanID() );
+                dev.append_attribute("i").set_value(d->GetDevSerial() );
                 dev.append_attribute("x").set_value(d->GetSmartPos().x);
                 dev.append_attribute("y").set_value(d->GetSmartPos().y);
                 if (n->GetThreshold() != XMLD_NEUR_THR)
@@ -216,7 +216,7 @@ bool Serializer::DoSavePlan(pugi::xml_node container, PlanShp plan)
                 //holy recursion batman!?!...
                 //if (p) SavePlanRecursively(container, p);
                 pugi::xml_node dev = pNode.append_child("HAND");
-                dev.append_attribute("i").set_value(d->GetPlanID() );
+                dev.append_attribute("i").set_value(d->GetDevSerial() );
                 dev.append_attribute("x").set_value(d->GetSmartPos().x);
                 dev.append_attribute("y").set_value(d->GetSmartPos().y);
                 PlanID pID = NULL_PID;
@@ -234,8 +234,10 @@ bool Serializer::DoSavePlan(pugi::xml_node container, PlanShp plan)
             auto * td = dynamic_cast<const Device*>( &(w->GetTo()) );
             int fserial = 0;
             int tserial = 0;
-            if (fd) fserial = fd->GetPlanID();
-            if (td) tserial = td->GetPlanID();
+            if (fd)
+                fserial = fd->GetDevSerial();
+            if (td)
+                tserial = td->GetDevSerial();
             pugi::xml_node wire = pNode.append_child("WIRE");
             wire.append_attribute("f").set_value(fserial);
             wire.append_attribute("t").set_value(tserial);

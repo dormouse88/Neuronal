@@ -157,17 +157,17 @@ void ChipPlan::SetPosition(DeviceShp d, VectorSmart newPos)
         PlodeRefresh(newPos);
     }
 }
-PlanID ChipPlan::GetFreeSerial() const
+DevSerial ChipPlan::GetFreeSerial() const
 {
     for (int i = 1; true; i++)
     {
         if (IsSerialFree(i)) return i;
     }
 }
-bool ChipPlan::IsSerialFree(PlanID pid) const
+bool ChipPlan::IsSerialFree(DevSerial ds) const
 {
     for (const auto & x : devices) {
-        if (x->GetPlanID() == pid) return false;
+        if (x->GetDevSerial() == ds) return false;
     }
     return true;
 }
@@ -277,7 +277,7 @@ PortLocation ChipPlan::GetPort(VectorSmart pos)
     
     ret.num = pos.y - box_tl_.y;
     if ( ret.num < 1 or (ret.side == ZoomSide::HEAD and ret.num > inPorts_.size()) or (ret.side == ZoomSide::TAIL and ret.num > outPorts_.size()) )
-        ret.num = 0;
+        ret.num = NULL_PORT;
 
     return ret;
 }
@@ -292,10 +292,10 @@ DeviceShp ChipPlan::GetDevice(VectorSmart pos)
     }
     return nullptr;
 }
-DeviceShp ChipPlan::GetDevice(PlanID pid)
+DeviceShp ChipPlan::GetDevice(DevSerial ds)
 {
     for (auto & x: devices) {
-        if (pid == x->GetPlanID()) {
+        if (ds == x->GetDevSerial()) {
             return x;
         }
     }
@@ -630,13 +630,16 @@ bool ChipPlan::HasPort(PortLocation port) const
 
 VectorSmart ChipPlan::GetPortSmartPos(PortLocation port) const
 {
-    if (port.num == 0)
-        port.num = (port.side == ZoomSide::HEAD) ? inPorts_.size() +1 : outPorts_.size() +1 ;
+    int offset;
+    if (port.num != NULL_PORT)
+        offset = port.num;
+    else
+        offset = (port.side == ZoomSide::HEAD) ? inPorts_.size() +1 : outPorts_.size() +1 ;
     PlanRect r = GetSmartPaddedBound();
     VectorSmart start;
     start.x = (port.side == ZoomSide::HEAD) ? r.tl.GetSmartPos().x : start.x = r.br.GetSmartPos().x ;
     start.y = r.tl.GetSmartPos().y;
-    return { start.x, start.y + port.num };
+    return { start.x, start.y + offset };
 }
 
 void ChipPlan::ReCalculatePorts(ZoomSide side)
@@ -683,7 +686,7 @@ PortNum ChipPlan::MapTagToPort(ZoomSide pSide, Tag tag) const
         if (x.first == tag)
             return x.second;
     }
-    return 0;
+    return NULL_PORT;
 }
 
 Tag ChipPlan::MapPortToTag(ZoomSide pSide, PortNum portNum) const
