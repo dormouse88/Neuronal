@@ -79,24 +79,32 @@ Tag ChipPlan::GetFirstFreeTag(InOut was)
 {
     const int AUTO_TAG_MAX_LENGTH = 20;
     const std::string AUTO_TAG_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    auto & ports = (was == InOut::OUT) ? inPorts_ : outPorts_ ;
 
-    //Initialize tag to the first available value.
-    Tag autoTag;
-    for (int i = 0; i <= AUTO_TAG_MAX_LENGTH; ++i)
+    auto & ports = (was == InOut::OUT) ? inPorts_ : outPorts_ ;
+    Tag autoTag { AUTO_TAG_CHARS.front() };
+
+    //Initializes tag to the first available value (similar to numeric counting).
+    //These loops look a bit odd but work as intended. (A,B,C...Z,AA,AB...AZ,BA,BB,etc)
+    while (autoTag.size() - 1 <= AUTO_TAG_MAX_LENGTH)
     {
-        autoTag.push_back( AUTO_TAG_CHARS.front() );
-        for (auto c: AUTO_TAG_CHARS)
+        if (ports.count(autoTag) == 0)
+            return autoTag;
+        int ti = autoTag.size() - 1;
+        while ( (not (ti < 0)) and (autoTag.at(ti) == AUTO_TAG_CHARS.back()) )
         {
-            autoTag.back() = c;
-            if (ports.count(autoTag) == 0)
-            {
-                return autoTag;
-            }
+            autoTag.at(ti) = AUTO_TAG_CHARS.front();
+            ti--;
         }
-        autoTag.back() = AUTO_TAG_CHARS.front();
+        if (ti < 0)
+        {
+            autoTag.insert(0, 1, AUTO_TAG_CHARS.front());
+        }
+        else
+        {
+            autoTag.at(ti)++;
+        }
     }
-    throw "NAME MAX LENGTH Reached!"; // Highly unlikely to reach this point with Max of 30, but still bad form.;
+    throw "NAME MAX LENGTH Reached!"; // Highly unlikely to reach this point with current consts, but still bad form.;
 }
 
 bool ChipPlan::CanRegisterAnyWire(InOut side, Tag slot) const

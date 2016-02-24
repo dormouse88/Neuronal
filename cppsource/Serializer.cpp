@@ -145,7 +145,7 @@ void Serializer::LoadPlanGroupData(std::shared_ptr<PlanGroupData> ud)
     {
         int i = node.attribute("i").as_int(0);
         std::string name = node.attribute("n").as_string(0);
-        ud->AddName(i, name);
+        ud->AddName(i, name, false); //can assert success
     }
 }
 

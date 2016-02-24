@@ -34,13 +34,11 @@ public:
     PlanShp LoadPlan(PlanShp, PlanNav nav, bool forced = false);
     void SavePlan(PlanShp, PlanNamingMode);
 
-    PlanShp EngageNameFilter(PlanShp plan, std::string filter)        { planGroupData_->SetNameFilter(filter); return LoadPlan(plan, PlanNav::FILTER_NAME); }
+    PlanShp EngageNameFilter(PlanShp plan, std::string filter)        { planGroupData_->SetNameFilter(REAL_NAME_PREFIX + filter); return LoadPlan(plan, PlanNav::FILTER_NAME); }
     std::string GetNameFilter() const                                 { return planGroupData_->GetNameFilter(); }
-
-    std::string GetPlanName(PlanID id) const                    { return planGroupData_->GetNameByID(id); }
-    bool CanAddName(PlanID id) const                            {planGroupData_->CanAddName(id);}
-    void AddName(PlanID id, std::string name)                   {if (planGroupData_->CanAddName(id, name)) { planGroupData_->RemoveName(id); planGroupData_->AddName(id, name); serializer->SavePlanGroupData(planGroupData_); } }
-    void RemoveName(PlanID id)                                  {planGroupData_->RemoveName(id); serializer->SavePlanGroupData(planGroupData_); }
+    std::string GetCleanRealPlanName(PlanID id) const;
+    void SetRealName(PlanID id, std::string name);
+    void RemoveName(PlanID id);
 
     Shp<const PlanGroupData> GetPlanGroupData() const       {return planGroupData_;}
     Shp<BlobFactory> GetFactory()                           {return factory_;}

@@ -1,13 +1,12 @@
 Do Next
 =======
+adding wires to collapsed handles. EDIT: Seems to already work fine
+fixed autoTag generator as it wasn't exhaustive.
 ---v---
 Overhaul ownership (shared ptrs, weak ptrs, references, deletion, etc. Devices own wires? Port-Arrays are their own entity- shared between handles and plans?)
+	named slots bug fixes
+		Add some interface method to enter a Tag string with the keyboard.
 	
-Name sorting:
-	Make sure autoname symbol (@) doesn't get sorted between numbers and letters.
-	Should autonames be included in name searching at all?
-	Have an auto-added symbol for real names too? Would allow easy selection between autos and reals using name filter.
-
 
 General
 =======
@@ -26,7 +25,8 @@ Visual / Interface
 	Add a collapse all/expand! all button.
 	Add a device copy button? (useful for non-empty handles)
 	Add an encapsulate button. This will put all devices (and their wires) within a rectangular area bounded by the cursors into a newly created sub-plan. Fucking groovy. May require multiwires.
-	Draw active name filter.
+
+	HIG: Draw active name filter.
 
 InnerSim
 ========
@@ -37,11 +37,9 @@ InnerSim
 		containment tree traversal.
 
 	Multichannel wire bug fixing:
-		adding wires to collapsed handles (could just disallow),
-		modifying the tags on wires (and the cursor selection of that wire) (could just disallow),
-		adding a wire involving a port with the cursors reversed is highly surprising.
-	named slots bug fixes
-		Add some interface method to enter a Tag string with the keyboard.
+		MED: Draw wires adjoining collapsed handles as bundles (perhaps only where multiple wires overlap?).
+		LOW: Enable modifying the tags on wires (cursors would have to move if they are to keep selection of that wire) (currently just disallowed).
+		LOW: adding a wire involving a port with the cursors reversed is highly surprising.
 
 Inbetween
 =========

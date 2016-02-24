@@ -43,6 +43,7 @@ PlanShp Model::LoadPlan(PlanShp plan, PlanNav nav, bool forced)
         {
             auto ref = plan->GetReferer();
             if (ref) ref->SetSubPlan(newPlan, ref);
+            newPlan->StructuralRefresh();
             return newPlan;
         }
     }
@@ -57,29 +58,6 @@ void Model::SavePlan(PlanShp plan, PlanNamingMode mode)
         serializer->SavePlanGroupData(planGroupData_);
     }
 }
-
-//void Model::SavePlan(PlanShp plan, PlanSaveMode mode)
-//{
-//    if (plan->IsModified())
-//    {
-//        PlanID oldID = plan->GetPlanID();
-//        std::string oldName = planGroupData_->GetNameByID( oldID );
-//        if (oldName.empty())
-//            mode = PlanSaveMode::ASNEW; //Saving as UPDATE on a nameless plan should be disabled in the UI really, so an assert instead.
-//        std::string newName = (mode == PlanSaveMode::ASNEW) ? planGroupData_->GetUnusedAutoName() : oldName;
-//        bool success = serializer->SaveUserPlan(plan);
-//        assert(success);
-//        PlanID newID = plan->GetPlanID();
-//        planGroupData_->AddAncestryEntry(newID, oldID);
-//        if (mode == PlanSaveMode::UPDATE)
-//        {
-//            planGroupData_->RemoveName(oldID);
-//        }
-//        planGroupData_->AddName(newID, newName);
-//        serializer->SavePlanGroupData(planGroupData_);
-//    }
-//}
-
 
 void Model::SavePlanRecursively(PlanShp plan, PlanNamingMode mode)
 {
@@ -108,13 +86,39 @@ void Model::SavePlanRecursively(PlanShp plan, PlanNamingMode mode)
     //names...
     PlanName oldName = planGroupData_->GetNameByID( oldID );
     assert(not (mode == PlanNamingMode::TRANSFER and oldName.empty()) );
-    if (mode != PlanNamingMode::ANON)
+    if (mode == PlanNamingMode::AUTONAME)
     {
-        PlanName newName = (mode == PlanNamingMode::AUTONAME) ? planGroupData_->GetUnusedAutoName() : oldName;
-        if (mode == PlanNamingMode::TRANSFER)
-        {
-            planGroupData_->RemoveName(oldID);
-        }
-        planGroupData_->AddName(newID, newName);
+        planGroupData_->AddName(newID, planGroupData_->GetUnusedAutoName(), false); //can assert success
     }
+    else if (mode == PlanNamingMode::TRANSFER)
+    {
+        planGroupData_->RemoveName(oldID);
+        planGroupData_->AddName(newID, oldName, false); //can assert success
+    }
+    else if (mode == PlanNamingMode::ANON)
+        {    }
+    else
+        assert(false);
+}
+
+std::string Model::GetCleanRealPlanName(PlanID id) const
+{
+    auto n = planGroupData_->GetNameByID(id);
+    if (not n.empty() and n.substr(0,1) == REAL_NAME_PREFIX)
+        return n.substr(1);
+    return NULL_PLAN_NAME;
+}
+
+
+void Model::SetRealName(PlanID id, std::string name)
+{
+    auto prefixedName = REAL_NAME_PREFIX + name;
+    planGroupData_->AddName(id, prefixedName, true); //stomp any nametype (but may still fail on non-unique name)
+    serializer->SavePlanGroupData(planGroupData_);
+}
+
+void Model::RemoveName(PlanID id)
+{
+    planGroupData_->RemoveName(id);
+    serializer->SavePlanGroupData(planGroupData_);
 }

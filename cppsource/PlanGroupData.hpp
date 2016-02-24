@@ -15,6 +15,14 @@
 #include <cstdlib>
 #include "BasicTypes.hpp"
 
+const std::string REAL_NAME_PREFIX = "%";
+const std::string AUTO_NAME_PREFIX = "#";
+const int NAME_MAX_LENGTH = 30;
+const int AUTO_NAME_MAX_LENGTH = NAME_MAX_LENGTH - 1; //to account for the @ identifier
+const std::string AUTO_NAME_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+enum class NameType { NONE, AUTO, REAL };
+
 enum class PlanNav { EMPTY, PARENT, FIRST_CHILD, PREV_SIBLING, NEXT_SIBLING, PREV_ID, NEXT_ID, PREV_NAME, NEXT_NAME, FILTER_NAME };
 //enum class IDNav { PREV_ID, NEXT_ID };
 //enum class NameNav { PREV_NAME, NEXT_NAME };
@@ -44,11 +52,9 @@ public:
     PlanID   GetIDByName(PlanName name) const;
     PlanName GetNameByID(PlanID planID) const;
     PlanName GetUnusedAutoName() const;
-    bool CanAddName(PlanID) const;
-    bool CanAddName(PlanID, PlanName) const;
     //setters
     void RemoveName(PlanID planID);
-    void AddName(PlanID planID, std::string name);
+    bool AddName(PlanID planID, std::string name, bool stomp);
 
 private:
     std::map<PlanID, std::shared_ptr<Relatives> > ancestry;
@@ -60,6 +66,9 @@ private:
     
     friend class Serializer;
 };
+
+
+NameType DeduceNameType(PlanName);
 
 #endif	/* PLANGROUPDATA_HPP */
 

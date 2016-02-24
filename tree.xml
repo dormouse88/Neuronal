@@ -2908,11 +2908,26 @@
 		<NEUR i="4" x="-1" y="-1" bulb="0" />
 		<NEUR i="5" x="1" y="1" bulb="0" />
 	</PLAN>
+	<PLAN i="117" anc="0">
+		<NEUR i="1" x="-1" y="0" bulb="1" />
+		<NEUR i="2" x="0" y="0" bulb="0" />
+		<WIRE f="1" t="2" />
+	</PLAN>
+	<PLAN i="118" anc="0">
+		<NEUR i="1" x="0" y="0" thr="4" bulb="1" />
+		<NEUR i="2" x="1" y="0" thr="4" bulb="1" />
+	</PLAN>
+	<PLAN i="119" anc="117">
+		<NEUR i="1" x="-1" y="0" bulb="1" />
+		<NEUR i="2" x="0" y="0" bulb="0" />
+		<HAND i="3" x="-1" y="-1" link="118" />
+		<WIRE f="1" t="2" />
+	</PLAN>
 </PLANS>
 <NAMES>
-	<NAME i="1" n="WAIT10" />
-	<NAME i="2" n="BOUNDED" />
-	<NAME i="3" n="REBOUNDED" />
+	<NAME i="1" n="%FIRSTO" />
+	<NAME i="2" n="%OKCA" />
+	<NAME i="3" n="%REB" />
 	<NAME i="6" n="MOVELINK" />
 	<NAME i="7" n="4CHAINSPIRAL" />
 	<NAME i="8" n="4SEQSPIRAL" />
@@ -2975,4 +2990,6 @@
 	<NAME i="114" n="A_NAME_HERE" />
 	<NAME i="115" n="WREAL" />
 	<NAME i="116" n="#M" />
+	<NAME i="118" n="%YOYOY" />
+	<NAME i="119" n="#J" />
 </NAMES>

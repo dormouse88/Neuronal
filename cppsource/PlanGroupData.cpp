@@ -9,11 +9,6 @@
 #include <cassert>
 #include <map>
 
-const std::string AUTO_NAME_PREFIX = "#";
-const int NAME_MAX_LENGTH = 30;
-const int AUTO_NAME_MAX_LENGTH = NAME_MAX_LENGTH - 1; //to account for the @ identifier
-const std::string AUTO_NAME_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-
 
 PlanGroupData::PlanGroupData()
 {}
@@ -165,14 +160,6 @@ PlanName PlanGroupData::GetNameByID(PlanID planID) const
     if (namesByID.count(planID) > 0) return namesByID.at(planID);
     else return NULL_PLAN_NAME;
 }
-bool PlanGroupData::CanAddName(PlanID planID) const
-{
-    return planID != NULL_PID and (GetNameByID(planID) == NULL_PLAN_NAME or GetNameByID(planID).substr(0,1) == AUTO_NAME_PREFIX);
-}
-bool PlanGroupData::CanAddName(PlanID planID, PlanName name) const
-{
-    return CanAddName(planID) and name != NULL_PLAN_NAME and GetIDByName(name) == NULL_PID;
-}
 
 //Names //Setters
 void PlanGroupData::RemoveName(PlanID planID)
@@ -183,11 +170,24 @@ void PlanGroupData::RemoveName(PlanID planID)
         namesByID.erase(planID);
     }
 }
-void PlanGroupData::AddName(PlanID planID, PlanName name)
+bool PlanGroupData::AddName(PlanID planID, PlanName name, bool stomp)
 {
-    assert(CanAddName(planID, name));
-    namesByID.insert( std::make_pair(planID, name) );
-    namesByName.insert( std::make_pair(name, planID) );
+    if ( GetIDByName(name) != NULL_PID )
+    {
+        return false;
+    }
+    if (stomp)
+    {
+        RemoveName(planID);
+    }
+    if ( DeduceNameType( GetNameByID(planID) ) == NameType::NONE)
+    {
+        namesByID.insert( std::make_pair(planID, name) );
+        namesByName.insert( std::make_pair(name, planID) );
+        return true;
+    }
+    assert(not stomp);
+    return false;
 }
 
 PlanName PlanGroupData::GetUnusedAutoName() const
@@ -204,4 +204,18 @@ PlanName PlanGroupData::GetUnusedAutoName() const
     return NULL_PLAN_NAME;
 }
 
+
+
+
+
+NameType DeduceNameType(PlanName name)
+{
+    if (name == NULL_PLAN_NAME)
+        return NameType::NONE;
+    else if (name.substr(0,1) == AUTO_NAME_PREFIX)
+        return NameType::AUTO;
+    else if (name.substr(0,1) == REAL_NAME_PREFIX)
+        return NameType::REAL;
+    assert(false);
+}
 

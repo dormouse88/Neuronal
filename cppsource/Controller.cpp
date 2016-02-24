@@ -295,13 +295,13 @@ void Controller::EventsPlan(PlanShp plan)
         assert(not textEnterer_);
         model_.RemoveName(plan->GetPlanID());
     }
-    if (event.key.code == sf::Keyboard::E and model_.CanAddName(plan->GetPlanID()))
+    if (event.key.code == sf::Keyboard::E)// and model_.CanAddSomeRealName(plan->GetPlanID()))
     {
         assert(not textEnterer_);
         textEnterer_ = std::make_shared<TextEnterer>();
-        auto bound = std::bind( &Model::AddName, &model_, cu1.GetPlan()->GetPlanID(), std::placeholders::_1 );
+        auto bound = std::bind( &Model::SetRealName, &model_, cu1.GetPlan()->GetPlanID(), std::placeholders::_1 );
         textEnterer_->SetDispatchTarget( bound );
-        textEnterer_->SetText( model_.GetPlanName(cu1.GetPlan()->GetPlanID()) );
+        textEnterer_->SetText( model_.GetCleanRealPlanName(cu1.GetPlan()->GetPlanID()) );
     }
 }
 
