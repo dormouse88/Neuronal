@@ -1,0 +1,379 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configurationDescriptor version="95">
+  <logicalFolder name="root" displayName="root" projectFiles="true" kind="ROOT">
+    <logicalFolder name="HeaderFiles"
+                   displayName="Header Files"
+                   projectFiles="true">
+      <itemPath>cppsource/AllXPuts.hpp</itemPath>
+      <itemPath>cppsource/App.hpp</itemPath>
+      <itemPath>cppsource/Arena.hpp</itemPath>
+      <itemPath>cppsource/ArenaBasics.hpp</itemPath>
+      <itemPath>cppsource/BaseReferer.hpp</itemPath>
+      <itemPath>cppsource/BasicTypes.hpp</itemPath>
+      <itemPath>cppsource/BlobFactory.hpp</itemPath>
+      <itemPath>cppsource/ChipHandle.hpp</itemPath>
+      <itemPath>cppsource/ChipPlan.hpp</itemPath>
+      <itemPath>cppsource/Controller.hpp</itemPath>
+      <itemPath>cppsource/Cursor.hpp</itemPath>
+      <itemPath>cppsource/Device.hpp</itemPath>
+      <itemPath>cppsource/Model.hpp</itemPath>
+      <itemPath>cppsource/Neuron.hpp</itemPath>
+      <itemPath>cppsource/Pansions.hpp</itemPath>
+      <itemPath>cppsource/PlanGrid.hpp</itemPath>
+      <itemPath>cppsource/PlanGroupData.hpp</itemPath>
+      <itemPath>cppsource/PlanOwned.hpp</itemPath>
+      <itemPath>cppsource/PlanPos.hpp</itemPath>
+      <itemPath>cppsource/Puppet.hpp</itemPath>
+      <itemPath>cppsource/RefererInterface.hpp</itemPath>
+      <itemPath>cppsource/Serializer.hpp</itemPath>
+      <itemPath>cppsource/SpawnGroups.hpp</itemPath>
+      <itemPath>cppsource/Spawners.hpp</itemPath>
+      <itemPath>cppsource/View.hpp</itemPath>
+      <itemPath>cppsource/ViewResources.hpp</itemPath>
+      <itemPath>cppsource/Wirable.hpp</itemPath>
+      <itemPath>cppsource/Wire.hpp</itemPath>
+      <itemPath>cppsource/WiringPair.hpp</itemPath>
+      <itemPath>cppsource/miscUtil.hpp</itemPath>
+    </logicalFolder>
+    <logicalFolder name="ResourceFiles"
+                   displayName="Resource Files"
+                   projectFiles="true">
+    </logicalFolder>
+    <logicalFolder name="SourceFiles"
+                   displayName="Source Files"
+                   projectFiles="true">
+      <itemPath>cppsource/App.cpp</itemPath>
+      <itemPath>cppsource/Arena.cpp</itemPath>
+      <itemPath>cppsource/BaseReferer.cpp</itemPath>
+      <itemPath>cppsource/BlobFactory.cpp</itemPath>
+      <itemPath>cppsource/ChipHandle.cpp</itemPath>
+      <itemPath>cppsource/ChipPlan.cpp</itemPath>
+      <itemPath>cppsource/Controller.cpp</itemPath>
+      <itemPath>cppsource/Cursor.cpp</itemPath>
+      <itemPath>cppsource/Device.cpp</itemPath>
+      <itemPath>cppsource/Model.cpp</itemPath>
+      <itemPath>cppsource/Neuron.cpp</itemPath>
+      <itemPath>cppsource/Pansions.cpp</itemPath>
+      <itemPath>cppsource/PlanGrid.cpp</itemPath>
+      <itemPath>cppsource/PlanGroupData.cpp</itemPath>
+      <itemPath>cppsource/PlanOwned.cpp</itemPath>
+      <itemPath>cppsource/PlanPos.cpp</itemPath>
+      <itemPath>cppsource/Puppet.cpp</itemPath>
+      <itemPath>cppsource/Serializer.cpp</itemPath>
+      <itemPath>cppsource/SpawnGroups.cpp</itemPath>
+      <itemPath>cppsource/Spawners.cpp</itemPath>
+      <itemPath>cppsource/View.cpp</itemPath>
+      <itemPath>cppsource/ViewResources.cpp</itemPath>
+      <itemPath>cppsource/Wirable.cpp</itemPath>
+      <itemPath>cppsource/Wire.cpp</itemPath>
+      <itemPath>cppsource/main.cpp</itemPath>
+    </logicalFolder>
+    <logicalFolder name="TestFiles"
+                   displayName="Test Files"
+                   projectFiles="false"
+                   kind="TEST_LOGICAL_FOLDER">
+    </logicalFolder>
+    <logicalFolder name="ExternalFiles"
+                   displayName="Important Files"
+                   projectFiles="false"
+                   kind="IMPORTANT_FILES_FOLDER">
+      <itemPath>Makefile</itemPath>
+    </logicalFolder>
+    <itemPath>external/pugixml-1.6/src/pugixml.cpp</itemPath>
+  </logicalFolder>
+  <projectmakefile>Makefile</projectmakefile>
+  <confs>
+    <conf name="Debug" type="1">
+      <toolsSet>
+        <compilerSet>default</compilerSet>
+        <dependencyChecking>true</dependencyChecking>
+        <rebuildPropChanged>false</rebuildPropChanged>
+      </toolsSet>
+      <compileType>
+        <ccTool>
+          <standard>8</standard>
+          <incDir>
+            <pElem>../../../../../devlib/SFML-2.2/include</pElem>
+          </incDir>
+        </ccTool>
+        <linkerTool>
+          <linkerAddLib>
+            <pElem>../../../../../devlib/SFML-2.2/lib</pElem>
+          </linkerAddLib>
+          <linkerLibItems>
+            <linkerLibFileItem>../../../../../devlib/SFML-2.2/lib/libsfml-audio-d.a</linkerLibFileItem>
+            <linkerLibFileItem>../../../../../devlib/SFML-2.2/lib/libsfml-graphics-d.a</linkerLibFileItem>
+            <linkerLibFileItem>../../../../../devlib/SFML-2.2/lib/libsfml-window-d.a</linkerLibFileItem>
+            <linkerLibFileItem>../../../../../devlib/SFML-2.2/lib/libsfml-system-d.a</linkerLibFileItem>
+          </linkerLibItems>
+        </linkerTool>
+      </compileType>
+      <item path="cppsource/AllXPuts.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="cppsource/App.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="cppsource/App.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="cppsource/Arena.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="cppsource/Arena.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="cppsource/ArenaBasics.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="cppsource/BaseReferer.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="cppsource/BaseReferer.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="cppsource/BasicTypes.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="cppsource/BlobFactory.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="cppsource/BlobFactory.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="cppsource/ChipHandle.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="cppsource/ChipHandle.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="cppsource/ChipPlan.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="cppsource/ChipPlan.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="cppsource/Controller.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="cppsource/Controller.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="cppsource/Cursor.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="cppsource/Cursor.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="cppsource/Device.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="cppsource/Device.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="cppsource/Model.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="cppsource/Model.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="cppsource/Neuron.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="cppsource/Neuron.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="cppsource/Pansions.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="cppsource/Pansions.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="cppsource/PlanGrid.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="cppsource/PlanGrid.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="cppsource/PlanGroupData.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="cppsource/PlanGroupData.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="cppsource/PlanOwned.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="cppsource/PlanOwned.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="cppsource/PlanPos.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="cppsource/PlanPos.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="cppsource/Puppet.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="cppsource/Puppet.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="cppsource/RefererInterface.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="cppsource/Serializer.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="cppsource/Serializer.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="cppsource/SpawnGroups.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="cppsource/SpawnGroups.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="cppsource/Spawners.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="cppsource/Spawners.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="cppsource/View.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="cppsource/View.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="cppsource/ViewResources.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="cppsource/ViewResources.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="cppsource/Wirable.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="cppsource/Wirable.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="cppsource/Wire.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="cppsource/Wire.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="cppsource/WiringPair.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="cppsource/main.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="cppsource/miscUtil.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="external/pugixml-1.6/src/pugixml.cpp"
+            ex="false"
+            tool="1"
+            flavor2="0">
+      </item>
+    </conf>
+    <conf name="Release" type="1">
+      <toolsSet>
+        <compilerSet>default</compilerSet>
+        <dependencyChecking>true</dependencyChecking>
+        <rebuildPropChanged>false</rebuildPropChanged>
+      </toolsSet>
+      <compileType>
+        <cTool>
+          <developmentMode>5</developmentMode>
+        </cTool>
+        <ccTool>
+          <developmentMode>5</developmentMode>
+          <standard>8</standard>
+          <incDir>
+            <pElem>../../../../../devlib/SFML-2.2/include</pElem>
+          </incDir>
+        </ccTool>
+        <fortranCompilerTool>
+          <developmentMode>5</developmentMode>
+        </fortranCompilerTool>
+        <asmTool>
+          <developmentMode>5</developmentMode>
+        </asmTool>
+        <linkerTool>
+          <linkerAddLib>
+            <pElem>../../../../../devlib/SFML-2.2/lib</pElem>
+          </linkerAddLib>
+          <linkerLibItems>
+            <linkerLibFileItem>../../../../../devlib/SFML-2.2/lib/libsfml-audio.a</linkerLibFileItem>
+            <linkerLibFileItem>../../../../../devlib/SFML-2.2/lib/libsfml-graphics.a</linkerLibFileItem>
+            <linkerLibFileItem>../../../../../devlib/SFML-2.2/lib/libsfml-window.a</linkerLibFileItem>
+            <linkerLibFileItem>../../../../../devlib/SFML-2.2/lib/libsfml-system.a</linkerLibFileItem>
+          </linkerLibItems>
+        </linkerTool>
+      </compileType>
+      <item path="cppsource/AllXPuts.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="cppsource/App.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="cppsource/App.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="cppsource/Arena.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="cppsource/Arena.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="cppsource/ArenaBasics.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="cppsource/BaseReferer.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="cppsource/BaseReferer.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="cppsource/BasicTypes.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="cppsource/BlobFactory.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="cppsource/BlobFactory.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="cppsource/ChipHandle.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="cppsource/ChipHandle.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="cppsource/ChipPlan.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="cppsource/ChipPlan.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="cppsource/Controller.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="cppsource/Controller.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="cppsource/Cursor.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="cppsource/Cursor.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="cppsource/Device.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="cppsource/Device.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="cppsource/Model.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="cppsource/Model.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="cppsource/Neuron.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="cppsource/Neuron.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="cppsource/Pansions.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="cppsource/Pansions.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="cppsource/PlanGrid.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="cppsource/PlanGrid.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="cppsource/PlanGroupData.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="cppsource/PlanGroupData.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="cppsource/PlanOwned.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="cppsource/PlanOwned.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="cppsource/PlanPos.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="cppsource/PlanPos.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="cppsource/Puppet.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="cppsource/Puppet.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="cppsource/RefererInterface.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="cppsource/Serializer.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="cppsource/Serializer.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="cppsource/SpawnGroups.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="cppsource/SpawnGroups.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="cppsource/Spawners.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="cppsource/Spawners.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="cppsource/View.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="cppsource/View.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="cppsource/ViewResources.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="cppsource/ViewResources.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="cppsource/Wirable.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="cppsource/Wirable.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="cppsource/Wire.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="cppsource/Wire.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="cppsource/WiringPair.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="cppsource/main.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="cppsource/miscUtil.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="external/pugixml-1.6/src/pugixml.cpp"
+            ex="false"
+            tool="1"
+            flavor2="0">
+      </item>
+    </conf>
+  </confs>
+</configurationDescriptor>

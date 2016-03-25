@@ -47,16 +47,20 @@ public:
 
     const Wirable& GetFrom() const {return from_; }
     const Tag GetFromTag() const {return fromTag_; }
+    void SetFromTag(Tag t) {fromTag_ = t; SetModified();}
     const Wirable& GetTo() const {return to_; }
     const Tag GetToTag() const {return toTag_; }
+    void SetToTag(Tag t) {toTag_ = t; SetModified();}
     
     virtual std::string SerialName() const { return "WIRE";}
     virtual void Draw(sf::RenderTarget & rt) override;
     virtual void Handle(HandleCode code) override;
 
+private:
+    void SetModified();
     void SetWeight(CWeight w);
     void TagCycle(int step, bool fromSide);
-private:
+    
     Wirable& from_;
     Tag fromTag_;
     Wirable& to_;

@@ -2923,6 +2923,16 @@
 		<HAND i="3" x="-1" y="-1" link="118" />
 		<WIRE f="1" t="2" />
 	</PLAN>
+	<PLAN i="120" anc="0">
+		<NEUR i="1" x="0" y="0" bulb="0" />
+		<WIRE f="1" t="0" ts="A" />
+		<WIRE f="1" t="0" ts="B" />
+		<WIRE f="0" t="1" fs="A" />
+		<WIRE f="0" t="1" fs="C" />
+		<WIRE f="0" t="1" fs="B" />
+		<WIRE f="0" t="1" fs="I" />
+		<WIRE f="0" t="1" fs="D" />
+	</PLAN>
 </PLANS>
 <NAMES>
 	<NAME i="1" n="%FIRSTO" />
@@ -2992,4 +3002,5 @@
 	<NAME i="116" n="#M" />
 	<NAME i="118" n="%YOYOY" />
 	<NAME i="119" n="#J" />
+	<NAME i="120" n="#P" />
 </NAMES>

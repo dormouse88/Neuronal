@@ -41,6 +41,7 @@ public:
     bool HasWireTo(Tag fromSlot, Wirable & to, Tag toSlot) const;
     int CountWires(InOut side) const;
     std::set<Tag> GetTagCloud(InOut side);
+    void RenameTag(InOut side, Tag oldTag, Tag newTag);
     
 protected:
     void PropagateRefresh(Tag slot = NULL_TAG);

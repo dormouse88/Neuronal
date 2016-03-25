@@ -88,6 +88,7 @@ public:
     void Draw(sf::RenderTarget & rt);
     void SubDraw(sf::RenderTarget & rt);
 
+    void RenamePortTag(PortLocation, Tag);
     bool HasPort(PortLocation) const;
     VectorSmart GetPortSmartPos(PortLocation) const;
     void ReCalculatePorts(ZoomSide);

@@ -79,6 +79,27 @@ std::set<Tag> Wirable::GetTagCloud(InOut side)
     return ret;
 }
 
+void Wirable::RenameTag(InOut side, Tag oldTag, Tag newTag)
+{
+    if (side == InOut::IN)
+    {
+        for (auto x : inWires)
+        {
+            auto locked = x.lock();
+            if (locked and locked->GetToTag() == oldTag)
+                locked->SetToTag(newTag);
+        }
+    }
+    else
+    {
+        for (auto x : outWires)
+        {
+            auto locked = x.lock();
+            if (locked and locked->GetFromTag() == oldTag)
+                locked->SetFromTag(newTag);
+        }
+    }
+}
 
 
 

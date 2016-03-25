@@ -619,6 +619,25 @@ void ChipPlan::DrawParts(sf::RenderTarget & rt)
 }
 
 
+void ChipPlan::RenamePortTag(PortLocation pl, Tag newTag)
+{
+    auto handle = GetHandle();
+    if (handle)
+    {
+        Tag oldTag = MapPortToTag(pl.side, pl.num);
+        if (pl.side == ZoomSide::HEAD)
+        {
+            handle->RenameTag(InOut::IN, oldTag, newTag);
+            RenameTag(InOut::OUT, oldTag, newTag);
+        }
+        else
+        {
+            handle->RenameTag(InOut::OUT, oldTag, newTag);
+            RenameTag(InOut::IN, oldTag, newTag);
+        }
+    }
+    StructuralRefresh();
+}
 
 bool ChipPlan::HasPort(PortLocation port) const
 {

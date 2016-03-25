@@ -190,7 +190,12 @@ void Wire::Handle(HandleCode code)
             SetWeight( GetWeight() - 1);
         }
     }
-    GetContainer()->SetModified();
+    SetModified();
+}
+
+void Wire::SetModified()
+{
+    GetContainer()->SetModified();    
 }
 
 void Wire::SetWeight(CWeight w)

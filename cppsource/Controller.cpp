@@ -188,6 +188,20 @@ void Controller::HandleInputEventsFreeMode()
             plan1 = cu1.GetPlan();
             EventsPlan(plan1);
         }
+        if (cu1.GetState() == CursorState::PORT)
+        {
+            plan1 = cu1.GetPlan();
+            PortLocation pl = cu1.GetPort();
+            if (event.key.code == sf::Keyboard::G)
+            {
+                //plan1->RenamePortTag(pl, newTag);
+                assert(not textEnterer_);
+                textEnterer_ = std::make_shared<TextEnterer>();
+                auto bound = std::bind( &ChipPlan::RenamePortTag, plan1, pl, std::placeholders::_1 );
+                textEnterer_->SetDispatchTarget( bound );
+                textEnterer_->SetText( model_.GetNameFilter() );
+            }
+        }
         if (cu1.GetState() == CursorState::LOCATED)
         {
             PlanPos pos1 = cu1.GetPlanPos();
