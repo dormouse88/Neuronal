@@ -35,7 +35,7 @@ public:
     void SavePlan(PlanShp, PlanNamingMode);
 
     PlanShp EngageNameFilter(PlanShp plan, std::string filter)        { planGroupData_->SetNameFilter(REAL_NAME_PREFIX + filter); return LoadPlan(plan, PlanNav::FILTER_NAME); }
-    std::string GetNameFilter() const                                 { return planGroupData_->GetNameFilter(); }
+    std::string GetNameFilter() const                                 { auto s = planGroupData_->GetNameFilter(); if (s.size()>0) return s.substr(1); else return s; }
     std::string GetCleanRealPlanName(PlanID id) const;
     void SetRealName(PlanID id, std::string name);
     void RemoveName(PlanID id);

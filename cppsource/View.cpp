@@ -133,10 +133,15 @@ View::View(Model & model_p)
 
     mainOverlayBox.setSize(sf::Vector2f{1400.f, 720.f} );
     
-    barText1.setFont(ViewResources::GetInstance().font);
-    barText1.setCharacterSize(25.f);
-    barText1.setPosition(30.f, 30.f);
-    barText1.setColor( sf::Color::Green );
+    textEntering.setFont(ViewResources::GetInstance().font);
+    textEntering.setCharacterSize(25.f);
+    textEntering.setPosition(30.f, 30.f);
+    textEntering.setColor( sf::Color::Green );
+
+    nameFilter.setFont(ViewResources::GetInstance().font);
+    nameFilter.setCharacterSize(25.f);
+    nameFilter.setPosition(38.f, 70.f);
+    nameFilter.setColor( sf::Color::Yellow );
 }
 
 
@@ -224,11 +229,13 @@ void View::DrawBar() //Bar Port...
         ap = GetViewBasePlan();
     assert(ap);
     
-    //barText1.setString( "text1: " + patch::to_string(ap->GetPlanID()) );
+    //textEntering.setString( "text1: " + patch::to_string(ap->GetPlanID()) );
     if (drawTextEntering)
     {
-        window.draw(barText1);
+        window.draw(textEntering);
     }
+    nameFilter.setString( theModel.GetNameFilter() );
+    window.draw(nameFilter);
 
     marquee.Draw(window);
     

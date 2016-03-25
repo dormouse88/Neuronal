@@ -74,7 +74,7 @@ public:
     void PostMessage(std::string message)       { marquee.PostMessage(message);}
     Marquee marquee;
     
-    void SetTextEntering(bool on, std::string text = "")     { barText1.setString("-->" + text + "<--"); drawTextEntering = on; }
+    void SetTextEntering(bool on, std::string text = "")     { textEntering.setString("-->" + text + "<--"); drawTextEntering = on; }
     bool drawTextEntering;
 
     sf::RenderWindow & GetWindow()                          {return window;}
@@ -88,7 +88,8 @@ private:
     sf::View barOverlay;
 
     sf::RectangleShape mainOverlayBox;
-    sf::Text barText1;
+    sf::Text textEntering;
+    sf::Text nameFilter;
 
     Model & theModel;
 
