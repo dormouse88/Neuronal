@@ -102,37 +102,31 @@ void Marquee::Draw(sf::RenderTarget &rt)
 
 
 
-
-
 ///////////////////     class View      ////////////////////////////////////////////////
 
+const unsigned BAR_WIDTH = 720;
+const unsigned BAR_HEIGHT = 180;
+const sf::Vector2u MINIMUM_WINDOW_SIZE { BAR_WIDTH, BAR_HEIGHT + 300 };
+const sf::Vector2u INITIAL_WINDOW_SIZE { 1400, 900 };
 
-const sf::FloatRect MAIN_VIEWPORT {0.f, 0.f, 1.f, 0.8f};
-const sf::FloatRect BAR_VIEWPORT {0.f, 0.8f, 1.f, 0.2f};
-const int BAR_HEIGHT = 180.f;
-//This is all very shonky. Need to consider what is flexible and what is fixed on screen.
-const sf::Vector2i INITIAL_WINDOW_SIZE { 1400, 900 };
-const sf::Vector2f INITIAL_MAINVIEW_SIZE { (float)INITIAL_WINDOW_SIZE.x, (float)INITIAL_WINDOW_SIZE.y - BAR_HEIGHT };
+const sf::Vector2f INITIAL_BAR_SIZE    { (float)INITIAL_WINDOW_SIZE.x, (float)BAR_HEIGHT };
+const sf::Vector2f INITIAL_FIELD_SIZE  { (float)INITIAL_WINDOW_SIZE.x, (float)INITIAL_WINDOW_SIZE.y - (float)BAR_HEIGHT };
 
 View::View(Model & model_p)
    :theModel(model_p)
     ,window(sf::VideoMode(INITIAL_WINDOW_SIZE.x, INITIAL_WINDOW_SIZE.y), "Neuronal", sf::Style::Default, sf::ContextSettings{0,0,8} )
-    ,mainView(sf::Vector2f{0.f, 0.f}, INITIAL_MAINVIEW_SIZE )
-    ,mainOverlay(sf::FloatRect{0.f,0.f, INITIAL_MAINVIEW_SIZE.x, INITIAL_MAINVIEW_SIZE.y})
-    ,barOverlay(sf::FloatRect{0.f,0.f, INITIAL_MAINVIEW_SIZE.x, BAR_HEIGHT})
+    ,brainView      ( sf::Vector2f{0.f, 0.f}, INITIAL_FIELD_SIZE )
+    ,levelView      ( sf::Vector2f{0.f, 0.f}, INITIAL_FIELD_SIZE )
+    ,barView        ( sf::FloatRect{0.f, 0.f, INITIAL_BAR_SIZE.x, INITIAL_BAR_SIZE.y} )
     ,cursorOne( model_p.GetMouseBrain()->GetSubPlan()->GetGrid(), sf::Color::Yellow )
     ,cursorTwo( model_p.GetMouseBrain()->GetSubPlan()->GetGrid(), sf::Color::Cyan )
     ,highlightingMode(1)
 {
     window.setVerticalSyncEnabled(true);
     //window.setFramerateLimit(3);
-    mainView.setViewport(MAIN_VIEWPORT);
-    mainOverlay.setViewport(MAIN_VIEWPORT);
-    barOverlay.setViewport(BAR_VIEWPORT);
-    window.setView(mainView);
+    SizingsRefresh();
+    window.setView(brainView);
 
-    mainOverlayBox.setSize(sf::Vector2f{1400.f, 720.f} );
-    
     textEntering.setFont(ViewResources::GetInstance().font);
     textEntering.setCharacterSize(25.f);
     textEntering.setPosition(30.f, 30.f);
@@ -155,12 +149,12 @@ void View::Draw()
     DrawBar();
 
     window.display();
-    window.setView(mainView);
+    window.setView(brainView);
 }
 
 void View::DrawMain() //Main Port...
 {
-    window.setView(mainView);
+    window.setView(brainView);
     
     GetArena()->Draw(window);
     
@@ -174,10 +168,13 @@ void View::DrawMain() //Main Port...
     //Highlighting modes...
     if (highlightingMode != 1)  //dim everything that's been drawn so far...
     {
-        window.setView(mainOverlay);
-        mainOverlayBox.setFillColor( sf::Color{0,0,0,210} );
-        window.draw(mainOverlayBox);
-        window.setView(mainView);
+        //window.setView(fieldOverlay);
+        brainOverlayBox.setPosition( brainView.getCenter() - (brainView.getSize() / 2.f) );
+        brainOverlayBox.setSize( brainView.getSize() );
+
+        brainOverlayBox.setFillColor( sf::Color{0,0,0,210} );
+        window.draw(brainOverlayBox);
+        //window.setView(brainView);
     }
     cursorTwo.Draw(window);
     cursorOne.Draw(window);
@@ -206,10 +203,10 @@ void View::DrawMain() //Main Port...
 
 void View::DrawBar() //Bar Port...
 {
-    window.setView(barOverlay);
+    window.setView(barView);
     sf::RectangleShape bar;
-    bar.setSize( barOverlay.getSize() );
-    bar.setPosition( barOverlay.getCenter() - barOverlay.getSize()/2.f );
+    bar.setSize( barView.getSize() );
+    bar.setPosition( barView.getCenter() - barView.getSize()/2.f );
     bar.setFillColor(sf::Color::Blue);
     window.draw(bar);
 //    //Draw the bar using a VertexArray...
@@ -245,25 +242,60 @@ void View::DrawBar() //Bar Port...
 
 void View::Zoom(float zoomFactor)
 {
-    mainView.zoom( zoomFactor );
+    brainView.zoom( zoomFactor );
     Clamp();
-    window.setView(mainView);
+    window.setView(brainView);
 }
 void View::Pan(sf::Vector2f moveBy)
 {
-    mainView.move(moveBy);
+    brainView.move(moveBy);
     Clamp();
-    window.setView(mainView);
+    window.setView(brainView);
 }
 void View::Resize(sf::Vector2f newSize)
 {
-    mainView.setSize( sf::Vector2f{newSize.x * MAIN_VIEWPORT.width, newSize.y * MAIN_VIEWPORT.height} ); //This is all very shonky. Need to consider what is flexible and what is fixed on screen.
+//    brainView.setSize( sf::Vector2f{newSize.x * FIELD_VIEWPORT.width, newSize.y * FIELD_VIEWPORT.height} ); //This is all very shonky. Need to consider what is flexible and what is fixed on screen.
+    brainView.setSize( sf::Vector2f{newSize.x, newSize.y - BAR_HEIGHT} );
     Clamp();
-    window.setView(mainView);
+    window.setView(brainView);
 }
+void View::SizingsRefresh()
+{
+    sf::Vector2u winSize = window.getSize();
+    bool underMin = false;
+    if (winSize.x < MINIMUM_WINDOW_SIZE.x)
+    {
+        winSize.x = MINIMUM_WINDOW_SIZE.x;
+        underMin = true;
+    }
+    if (winSize.y < MINIMUM_WINDOW_SIZE.y)
+    {
+        winSize.y = MINIMUM_WINDOW_SIZE.y;
+        underMin = true;
+    }
+    if (underMin)
+        window.setSize(winSize);
+
+    const float barRatio = (float)BAR_HEIGHT / (float)winSize.y ;
+    const sf::FloatRect barViewport   { 0.0f, 1.f - barRatio,   1.0f, barRatio };
+    const sf::FloatRect fieldViewport { 0.0f, 0.0f,             1.0f, 1.f - barRatio };
+
+    brainView.setViewport(fieldViewport);
+    levelView.setViewport(fieldViewport);
+    barView.setViewport(barViewport);
+
+    brainView.setSize( sf::Vector2f{(float)winSize.x, (float)winSize.y - (float)BAR_HEIGHT} );
+    levelView.setSize( sf::Vector2f{(float)winSize.x, (float)winSize.y - (float)BAR_HEIGHT} );
+    barView.setSize( sf::Vector2f{(float)winSize.x, (float)BAR_HEIGHT} );
+    barView.setCenter( barView.getSize() / 2.f );
+    //Clamp();
+    //window.setView(brainView);
+}
+
+
 void View::CentreOn(VectorWorld point)
 {
-    mainView.setCenter(point);
+    brainView.setCenter(point);
 }
 
 
@@ -273,8 +305,8 @@ void View::Clamp()
     if (clampPlan and false) //CLAMP IS TEMPORARILY DISABLED!!  Because the arena and brain are drawn together at the moment.
     {
         RectWorld b = clampPlan->GetWorldPaddedBoundPlusPorts();  //unimportant
-        auto center = mainView.getCenter();
-        auto viewSize = mainView.getSize();
+        auto center = brainView.getCenter();
+        auto viewSize = brainView.getSize();
         VectorWorld size = viewSize - VectorWorld{120.f, 120.f};
         VectorWorld tl = center - (size/2.f);
         bool oversizedX = (b.width > size.x) ? true : false;
@@ -295,7 +327,7 @@ void View::Clamp()
             if (tl.y          > b.top)             tl.y = b.top;
             if (tl.y + size.y < b.top + b.height) tl.y = b.top + b.height - size.y;
         }
-        mainView.setCenter(tl + (size/2.f) );
+        brainView.setCenter(tl + (size/2.f) );
     }
 }
 

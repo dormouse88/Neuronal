@@ -1,7 +1,9 @@
 Do Next
 =======
 ---v---
-	
+	Split view level/brain
+	Make levels easier to make.
+		Cat brains should be selectable and editable and saveable.
 
 General
 =======
@@ -21,7 +23,6 @@ Visual / Interface
 	Add a device copy button? (useful for non-empty handles)
 	Add an encapsulate button. This will put all devices (and their wires) within a rectangular area bounded by the cursors into a newly created sub-plan. Fucking groovy. May require multiwires.
 
-	HIG: Draw active name filter.
 
 InnerSim
 ========

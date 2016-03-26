@@ -64,6 +64,7 @@ public:
 
     void Zoom(float zoomFactor);
     void Pan(sf::Vector2f moveBy);
+    void SizingsRefresh();
     void Resize(sf::Vector2f newSize);
     void CentreOn(VectorWorld point);
     void Clamp();
@@ -83,11 +84,11 @@ public:
     
 private:
     sf::RenderWindow window;
-    sf::View mainView;
-    sf::View mainOverlay;
-    sf::View barOverlay;
+    sf::View brainView;
+    sf::View levelView;
+    sf::View barView;
 
-    sf::RectangleShape mainOverlayBox;
+    sf::RectangleShape brainOverlayBox;
     sf::Text textEntering;
     sf::Text nameFilter;
 

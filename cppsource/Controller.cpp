@@ -80,7 +80,8 @@ void Controller::HandleInputEvents()
         if (event.type == sf::Event::Resized)
         {
             // update the view to the new size of the window
-            view_.Resize( sf::Vector2f{static_cast<float>(event.size.width), static_cast<float>(event.size.height)} );
+            //view_.Resize( sf::Vector2f{static_cast<float>(event.size.width), static_cast<float>(event.size.height)} );
+            view_.SizingsRefresh();
         }
         
         //Mouse Events
