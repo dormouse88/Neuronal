@@ -28,6 +28,7 @@
       <itemPath>cppsource/Serializer.hpp</itemPath>
       <itemPath>cppsource/SpawnGroups.hpp</itemPath>
       <itemPath>cppsource/Spawners.hpp</itemPath>
+      <itemPath>cppsource/TextEnterer.hpp</itemPath>
       <itemPath>cppsource/View.hpp</itemPath>
       <itemPath>cppsource/ViewResources.hpp</itemPath>
       <itemPath>cppsource/Wirable.hpp</itemPath>
@@ -62,6 +63,7 @@
       <itemPath>cppsource/Serializer.cpp</itemPath>
       <itemPath>cppsource/SpawnGroups.cpp</itemPath>
       <itemPath>cppsource/Spawners.cpp</itemPath>
+      <itemPath>cppsource/TextEnterer.cpp</itemPath>
       <itemPath>cppsource/View.cpp</itemPath>
       <itemPath>cppsource/ViewResources.cpp</itemPath>
       <itemPath>cppsource/Wirable.cpp</itemPath>
@@ -195,6 +197,10 @@
       <item path="cppsource/Spawners.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="cppsource/Spawners.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="cppsource/TextEnterer.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="cppsource/TextEnterer.hpp" ex="false" tool="3" flavor2="0">
       </item>
       <item path="cppsource/View.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -346,6 +352,10 @@
       <item path="cppsource/Spawners.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="cppsource/Spawners.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="cppsource/TextEnterer.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="cppsource/TextEnterer.hpp" ex="false" tool="3" flavor2="0">
       </item>
       <item path="cppsource/View.cpp" ex="false" tool="1" flavor2="0">
       </item>

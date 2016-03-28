@@ -20,8 +20,9 @@ public:
     void Run();
 private:
     Model model;
-    View view;
-    Controller controller;
+    PaneGroup paneGroup;
+//    View view;
+//    Controller controller;
 };
 
 #endif	/* APP_HPP */

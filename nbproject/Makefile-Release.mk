@@ -55,6 +55,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/cppsource/Serializer.o \
 	${OBJECTDIR}/cppsource/SpawnGroups.o \
 	${OBJECTDIR}/cppsource/Spawners.o \
+	${OBJECTDIR}/cppsource/TextEnterer.o \
 	${OBJECTDIR}/cppsource/View.o \
 	${OBJECTDIR}/cppsource/ViewResources.o \
 	${OBJECTDIR}/cppsource/Wirable.o \
@@ -194,6 +195,11 @@ ${OBJECTDIR}/cppsource/Spawners.o: cppsource/Spawners.cpp
 	${MKDIR} -p ${OBJECTDIR}/cppsource
 	${RM} "$@.d"
 	$(COMPILE.cc) -O2 -I../../../../../devlib/SFML-2.2/include -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/cppsource/Spawners.o cppsource/Spawners.cpp
+
+${OBJECTDIR}/cppsource/TextEnterer.o: cppsource/TextEnterer.cpp 
+	${MKDIR} -p ${OBJECTDIR}/cppsource
+	${RM} "$@.d"
+	$(COMPILE.cc) -O2 -I../../../../../devlib/SFML-2.2/include -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/cppsource/TextEnterer.o cppsource/TextEnterer.cpp
 
 ${OBJECTDIR}/cppsource/View.o: cppsource/View.cpp 
 	${MKDIR} -p ${OBJECTDIR}/cppsource

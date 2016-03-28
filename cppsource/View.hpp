@@ -13,6 +13,7 @@
 #include "ViewResources.hpp"
 #include "Model.hpp"
 #include "Cursor.hpp"
+#include "TextEnterer.hpp"
 
 
 class ViewPanel
@@ -49,56 +50,144 @@ private:
 
 
 
-class View
+//class View
+//{
+//public:
+//    View(Model & model_p);
+//    View(const View&) = delete;
+//    ~View() {}
+//    void Draw();
+//
+////Hmmm...
+////    sf::RenderWindow & GetWindow()                          {return window;}
+////    std::shared_ptr<Arena> GetArena()                       {return theModel.GetArena(); }
+////    PlanShp GetViewBasePlan()             {return theModel.GetMouseBrain()->GetSubPlan(); }
+//
+//};
+
+
+struct UIObjects
 {
-public:
-    View(Model & model_p);
-    View(const View&) = delete;
-    ~View() {}
-    
-    void Draw();
-private:
-    void DrawMain();
-    void DrawBar();
-public:    
-
-    void Zoom(float zoomFactor);
-    void Pan(sf::Vector2f moveBy);
-    void SizingsRefresh();
-    void Resize(sf::Vector2f newSize);
-    void CentreOn(VectorWorld point);
-    void Clamp();
-    void SetHighlightingMode(int x)             { highlightingMode = x; }
-    
-    ViewPanel viewPanel;
-
-    void PostMessage(std::string message)       { marquee.PostMessage(message);}
-    Marquee marquee;
-    
-    void SetTextEntering(bool on, std::string text = "")     { textEntering.setString("-->" + text + "<--"); drawTextEntering = on; }
-    bool drawTextEntering;
-
-    sf::RenderWindow & GetWindow()                          {return window;}
-    std::shared_ptr<Arena> GetArena()                       {return theModel.GetArena(); }
-    PlanShp GetViewBasePlan()             {return theModel.GetMouseBrain()->GetSubPlan(); }
-    
-private:
-    sf::RenderWindow window;
-    sf::View brainView;
-    sf::View levelView;
-    sf::View barView;
-
-    sf::RectangleShape brainOverlayBox;
-    sf::Text textEntering;
-    sf::Text nameFilter;
-
-    Model & theModel;
-
-    int highlightingMode;
-public:
+    UIObjects()
+        :cursorOne( nullptr, sf::Color::Yellow )
+        ,cursorTwo( nullptr, sf::Color::Cyan )
+    {}
     Cursor cursorOne;
     Cursor cursorTwo;
+    std::shared_ptr<TextEnterer> textEnterer_;
 };
+
+
+class BasePane
+{
+public:
+    virtual void Draw(sf::RenderWindow &) = 0;
+    virtual void Handle(sf::Event &) = 0;
+    virtual void HandleMouse(sf::Event &, sf::Vector2f) = 0;
+protected:
+public:
+    sf::View view;
+};
+
+class BaseAreaPane : public BasePane
+{
+public:
+    virtual void AutoClamp() = 0;
+    void Zoom(float zoomFactor);
+    void Pan(sf::Vector2f moveBy);
+    void CentreOn(VectorWorld point);
+    void ClampToRect(RectWorld);
+};
+
+
+
+class PaneLevel : public BaseAreaPane
+{
+public:
+    PaneLevel(Shp<Arena>, UIObjects &);
+    virtual void Draw(sf::RenderWindow &) override;
+    virtual void Handle(sf::Event &) override;
+    virtual void HandleMouse(sf::Event &, sf::Vector2f) override;
+    virtual void AutoClamp() override;
+private:
+    Shp<Arena> arena;
+    UIObjects & uiObjects;
+};
+
+class PaneBrain : public BaseAreaPane
+{
+public:
+    PaneBrain(Shp<BaseReferer>, UIObjects &);
+    virtual void Draw(sf::RenderWindow &) override;
+    virtual void Handle(sf::Event &) override;
+    virtual void HandleMouse(sf::Event &, sf::Vector2f) override;
+    virtual void AutoClamp() override;
+    void SetHighlightingMode(int x)             { highlightingMode = x; }
+private:
+    Shp<BaseReferer> brain;
+    UIObjects & uiObjects;
+    sf::RectangleShape brainOverlayBox;
+    int highlightingMode;
+//    Cursor cursorOne;
+//    Cursor cursorTwo;
+};
+
+class PaneBar : public BasePane
+{
+public:
+    PaneBar(Model &, UIObjects &);
+    virtual void Draw(sf::RenderWindow &) override;
+    virtual void Handle(sf::Event &) override;
+    virtual void HandleMouse(sf::Event &, sf::Vector2f) override;
+    void PostMessage(std::string message)       { marquee.PostMessage(message);}
+private:
+    Model & theModel;
+    UIObjects & uiObjects;
+    Marquee marquee;
+    ViewPanel viewPanel;
+    sf::Text nameFilter;
+};
+
+class PaneText : public BasePane
+{
+public:
+    PaneText(UIObjects &);
+    virtual void Draw(sf::RenderWindow &) override;
+    virtual void Handle(sf::Event &) override;
+    virtual void HandleMouse(sf::Event &, sf::Vector2f) override;
+    void SetTextEntering(bool on, std::string text = "")     { textEntering.setString("-->" + text + "<--"); drawTextEntering = on; }
+private:
+    UIObjects & uiObjects;
+    sf::Text textEntering;
+    bool drawTextEntering;
+};
+
+
+
+class PaneGroup
+{
+public:
+    PaneGroup(Model & model_p);
+    void Draw();
+    bool HandleInput();
+    void HandleInputEvents();
+    void ToggleFieldMode()                      { fieldMode = not fieldMode; }
+private:
+    void SizingsRefresh();
+    Model & theModel;
+    UIObjects uiObjects;
+    sf::RenderWindow window;
+    bool fieldMode;
+    
+    PaneLevel paneLevel;
+    PaneBrain paneBrain;
+    PaneBar paneBar;
+    PaneText paneText;
+    
+    bool quitYet_; //scrappy
+};
+
+
 
 #endif	/* VIEW_HPP */
 

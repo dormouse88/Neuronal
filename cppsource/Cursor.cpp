@@ -13,7 +13,7 @@
 
 Cursor::Cursor(std::shared_ptr<PlanGrid> g, sf::Color color)
     :cursorState_(CursorState::PLAN)
-    ,plan_(g->GetPlan())
+    //hmm//,plan_(g->GetPlan())
 {
     shape_.setFillColor(sf::Color::Transparent);
     shape_.setOutlineColor( color );

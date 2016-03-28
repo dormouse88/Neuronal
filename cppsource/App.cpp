@@ -8,9 +8,10 @@
 #include "App.hpp"
 
 App::App()
-    :model(),
-    view(model),
-    controller(model, view)
+    :model()
+    ,paneGroup(model)
+//    view(model),
+//    controller(model, view)
 {}
 
 void App::Run()
@@ -18,8 +19,10 @@ void App::Run()
     bool quitYet = false;
     while (quitYet == false)
     {
-        quitYet = controller.HandleInput();
-        view.Draw();
+//        quitYet = controller.HandleInput();
+//        view.Draw();
+        quitYet = paneGroup.HandleInput();
+        paneGroup.Draw();
     }
 }
 
