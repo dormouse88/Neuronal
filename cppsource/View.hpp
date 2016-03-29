@@ -97,6 +97,8 @@ public:
     void Pan(sf::Vector2f moveBy);
     void CentreOn(VectorWorld point);
     void ClampToRect(RectWorld);
+protected:
+    sf::Vector2f prevMouseWorldPos;
 };
 
 
@@ -133,7 +135,6 @@ private:
     UIObjects & uiObjects;
     sf::RectangleShape brainOverlayBox;
     int highlightingMode;
-    sf::Vector2f prevMouseWorldPos;
 };
 
 class PaneBar : public BasePane
@@ -159,7 +160,6 @@ public:
     virtual void Draw(sf::RenderWindow &) override;
     virtual void Handle(sf::Event &) override;
     virtual void HandleMouse(sf::Event &, sf::Vector2f) override;
-    //void SetTextEntering(bool on, std::string text = "")     { textEntering.setString("-->" + text + "<--"); drawTextEntering = on; }
 private:
     UIObjects & uiObjects;
     sf::Text textEntering;
@@ -176,13 +176,13 @@ public:
     bool HandleInput();
     void HandleInputState(BasePane * pane, sf::Vector2f worldPos);
     void HandleInputEvents(BasePane * pane, sf::Vector2f worldPos);
-    void ToggleFieldMode()                      { fieldMode = not fieldMode; }
+    void CycleFieldMode()                      { fieldMode++; if (fieldMode > 3) fieldMode = 1; SizingsRefresh(); }
 private:
     void SizingsRefresh();
     Model & theModel;
     UIObjects uiObjects;
     sf::RenderWindow window;
-    bool fieldMode;
+    int fieldMode;
     
     PaneLevel paneLevel;
     PaneBrain paneBrain;

@@ -9,7 +9,7 @@
 #include "Puppet.hpp"
 
 const sf::Vector2f ARENA_GRID_SIZE  { 200.f , 200.f };
-const sf::Vector2f ARENA_POS        { 1800.f, 0.f };
+const sf::Vector2f ARENA_POS        { 0.f, 0.f };
 
 Arena::Arena(std::shared_ptr<BlobFactory> factory)
     :levelNum(0)

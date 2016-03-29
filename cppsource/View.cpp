@@ -99,6 +99,12 @@ void Marquee::Draw(sf::RenderTarget &rt)
 
 
 
+
+sf::FloatRect ConvertRect(sf::IntRect ir)
+{
+    return sf::FloatRect { (float)ir.left, (float)ir.top, (float)ir.width, (float)ir.height };
+}
+
 //defunct?
 sf::Vector2i GetMouseEventPos(sf::Event & event, sf::RenderWindow & window)
 {
@@ -129,36 +135,31 @@ const sf::Vector2u INITIAL_WINDOW_SIZE { 1400, 900 };
 PaneGroup::PaneGroup(Model & model_p)
     :theModel(model_p)
     ,window(sf::VideoMode(INITIAL_WINDOW_SIZE.x, INITIAL_WINDOW_SIZE.y), "Neuronal", sf::Style::Default, sf::ContextSettings{0,0,8} )
-    ,fieldMode(true)
+    ,fieldMode(1)
     ,paneLevel(model_p.GetArena(), uiObjects)
     ,paneBrain(model_p, model_p.GetMouseBrain(), uiObjects)
     ,paneBar(model_p, uiObjects)
     ,paneText(uiObjects)
     ,quitYet_(false)
     //,textEnterer_(nullptr)
-    //,isMouseCursorSet_(false)
 {
     window.setVerticalSyncEnabled(true);
     //window.setFramerateLimit(3);
     SizingsRefresh();
-    //window.setView(paneBrain.view);
 }
 
 void PaneGroup::Draw()
 {
-//    cursorOne.Revalidate();
-//    cursorTwo.Revalidate();
     window.clear();
 
-    if (fieldMode)
+    if (fieldMode != 2)
         paneBrain.Draw(window);
-    else
+    if (fieldMode != 1)
         paneLevel.Draw(window);
     paneBar.Draw(window);
     paneText.Draw(window);
 
     window.display();
-    //window.setView(brainView);
 }
 
 bool PaneGroup::HandleInput()
@@ -233,15 +234,13 @@ void PaneGroup::HandleInputEvents(BasePane * pane, sf::Vector2f worldPos)
             {
                 if (event.key.code == sf::Keyboard::Num0)
                 {
-                    ToggleFieldMode();
+                    CycleFieldMode();
                 }
             }
             
             paneBrain.Handle(event);
         }
     } //while event
-    
-    
 }
 
 
@@ -249,6 +248,7 @@ void PaneGroup::HandleInputEvents(BasePane * pane, sf::Vector2f worldPos)
 void PaneGroup::SizingsRefresh()
 {
     sf::Vector2u winSize = window.getSize();
+    //Disallow tiny windows...
     bool underMin = false;
     if (winSize.x < MINIMUM_WINDOW_SIZE.x)
     {
@@ -263,22 +263,42 @@ void PaneGroup::SizingsRefresh()
     if (underMin)
         window.setSize(winSize);
 
+    //Calculate viewPort ratios...
     const float barRatio = (float)BAR_HEIGHT / (float)winSize.y ;
+    const sf::FloatRect nullViewport { 0.0f, 0.0f, 0.0f, 0.0f };
     const sf::FloatRect barViewport   { 0.0f, 1.f - barRatio,   1.0f, barRatio };
     const sf::FloatRect fieldViewport { 0.0f, 0.0f,             1.0f, 1.f - barRatio };
+    const sf::FloatRect leftField  { fieldViewport.left, fieldViewport.top , fieldViewport.width * 0.5f , fieldViewport.height };
+    const sf::FloatRect rightField { fieldViewport.left + (fieldViewport.width * 0.5f), fieldViewport.top , fieldViewport.width * 0.5f , fieldViewport.height };
+    
 
-    paneBrain.view.setViewport(fieldViewport);
-    paneLevel.view.setViewport(fieldViewport);
-    paneBar.view.setViewport(barViewport);
-
-    //could use...
-        //sf::IntRect window.getViewport(brainView);
-    paneBrain.view.setSize( sf::Vector2f{(float)winSize.x, (float)winSize.y - (float)BAR_HEIGHT} );
-    paneLevel.view.setSize( sf::Vector2f{(float)winSize.x, (float)winSize.y - (float)BAR_HEIGHT} );
-    paneBar.view.setSize( sf::Vector2f{(float)winSize.x, (float)BAR_HEIGHT} );
-    paneBar.view.setCenter( paneBar.view.getSize() / 2.f );
-    //could use...
-        //view.reset(FloatRect);
+    //Set sf::view (viewports + worldzone)...
+    {
+        if (fieldMode == 1)
+            paneBrain.view.setViewport(fieldViewport);
+        if (fieldMode == 2)
+            paneBrain.view.setViewport(nullViewport);
+        if (fieldMode == 3)
+            paneBrain.view.setViewport(leftField);
+        sf::FloatRect vp = ConvertRect( window.getViewport(paneBrain.view) );
+        paneBrain.view.setSize(vp.width, vp.height);
+    }
+    {
+        if (fieldMode == 1)
+            paneLevel.view.setViewport(nullViewport);
+        if (fieldMode == 2)
+            paneLevel.view.setViewport(fieldViewport);
+        if (fieldMode == 3)
+            paneLevel.view.setViewport(rightField);
+        sf::FloatRect vp = ConvertRect( window.getViewport(paneLevel.view) );
+        paneLevel.view.setSize(vp.width, vp.height);
+    }
+    {
+        paneBar.view.setViewport(barViewport);
+        sf::FloatRect vp = ConvertRect( window.getViewport(paneBar.view) );
+        paneBar.view.setSize(vp.width, vp.height);
+        paneBar.view.setCenter( vp.width * 0.5f, vp.height * 0.5f );
+    }
 }
 
 
@@ -372,7 +392,23 @@ void PaneLevel::Handle(sf::Event & event)
 }
 void PaneLevel::HandleMouse(sf::Event & event, sf::Vector2f worldPos)
 {
-    
+    if (event.type == sf::Event::MouseMoved)
+    {
+        if ( sf::Mouse::isButtonPressed(sf::Mouse::Middle) )
+        {
+            Pan( -(worldPos - prevMouseWorldPos) * 1.00f );
+        }
+        else
+            prevMouseWorldPos = worldPos;
+    }
+    if (event.type == sf::Event::MouseWheelMoved)
+    {
+        if (event.mouseWheel.delta > 0)
+        {
+            CentreOn(worldPos);
+        }
+        Zoom( 1.f + (-0.4f * event.mouseWheel.delta) );
+    }
 }
 
 void PaneLevel::Draw(sf::RenderWindow & window)
