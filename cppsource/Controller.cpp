@@ -152,203 +152,13 @@
 
 
 
-//void Controller::EventsPlan(PlanShp plan)
-//{
-//    //requires cu1 PLAN
-//    if (event.key.code == sf::Keyboard::X)
-//    {
-//        auto h = plan->GetHandle();
-//        if (h)
-//            h->SetExploded(false);
-//    }
-//
-//    if (event.key.code == sf::Keyboard::LBracket)
-//    {
-//        view_.cursorOne.SetToPlan();
-//    }
-//    if (event.key.code == sf::Keyboard::RBracket)
-//    {
-//        view_.cursorTwo.SetToPlan();
-//    }
-//
-//    if (event.key.code == sf::Keyboard::Q)
-//    {
-//        if (not event.key.shift and (model_.GetPlanGroupData()->GetNameByID(plan->GetPlanID()) != NULL_PLAN_NAME))  //ouch
-//            model_.SavePlan( plan, PlanNamingMode::TRANSFER );
-//        else;
-//            model_.SavePlan( plan, PlanNamingMode::AUTONAME );
-//    }
-//    if (event.key.code == sf::Keyboard::W)
-//    {
-//        model_.LoadPlan(plan, PlanNav::EMPTY, event.key.shift and event.key.control);
-//    }
-//
-//    if (event.key.code == sf::Keyboard::Numpad1)
-//    {
-//        model_.LoadPlan(plan, PlanNav::PREV_ID);
-//    }
-//    if (event.key.code == sf::Keyboard::Numpad3)
-//    {
-//        model_.LoadPlan(plan, PlanNav::NEXT_ID);
-//    }
-//    if (event.key.code == sf::Keyboard::Numpad7)
-//    {
-//        model_.LoadPlan(plan, PlanNav::PREV_NAME);
-//    }
-//    if (event.key.code == sf::Keyboard::Numpad9)
-//    {
-//        model_.LoadPlan(plan, PlanNav::NEXT_NAME);
-//    }
-//    if (event.key.code == sf::Keyboard::Numpad8)
-//    {
-//        model_.LoadPlan(plan, PlanNav::PARENT);
-//    }
-//    if (event.key.code == sf::Keyboard::Numpad2)
-//    {
-//        model_.LoadPlan(plan, PlanNav::FIRST_CHILD);
-//    }
-//    if (event.key.code == sf::Keyboard::Numpad4)
-//    {
-//        model_.LoadPlan(plan, PlanNav::PREV_SIBLING);
-//    }
-//    if (event.key.code == sf::Keyboard::Numpad6)
-//    {
-//        model_.LoadPlan(plan, PlanNav::NEXT_SIBLING);
-//    }
-//    if (event.key.code == sf::Keyboard::Subtract)
-//    {
-//        assert(not textEnterer_);
-//        model_.EngageNameFilter(plan, "");
-//    }
-//    if (event.key.code == sf::Keyboard::Add)
-//    {
-//        assert(not textEnterer_);
-//        textEnterer_ = std::make_shared<TextEnterer>();
-//        auto bound = std::bind( &Model::EngageNameFilter, &model_, cu1.GetPlan(), std::placeholders::_1 );
-//        textEnterer_->SetDispatchTarget( bound );
-//        textEnterer_->SetText( model_.GetNameFilter() );
-//    }
-//
-//    if (event.key.code == sf::Keyboard::R)
-//    {
-//        assert(not textEnterer_);
-//        model_.RemoveName(plan->GetPlanID());
-//    }
-//    if (event.key.code == sf::Keyboard::E)// and model_.CanAddSomeRealName(plan->GetPlanID()))
-//    {
-//        assert(not textEnterer_);
-//        textEnterer_ = std::make_shared<TextEnterer>();
-//        auto bound = std::bind( &Model::SetRealName, &model_, cu1.GetPlan()->GetPlanID(), std::placeholders::_1 );
-//        textEnterer_->SetDispatchTarget( bound );
-//        textEnterer_->SetText( model_.GetCleanRealPlanName(cu1.GetPlan()->GetPlanID()) );
-//    }
-//}
-//
-//
-//
-//void Controller::EventsLocated(PlanPos pos1)
-//{
-//    //requires cu1 LOCATED
-//    if (event.key.code == sf::Keyboard::S)
-//    {
-//        auto h = pos1.GetDeviceAsHandle();
-//        if (h)
-//            h->SetExploded(true);
-//    }
-//
-//    if (event.key.code == sf::Keyboard::N)
-//    {
-//        if (event.key.shift == false)
-//        {
-//            model_.GetFactory()->AddNeuron(pos1);
-//        }
-//        else
-//        {
-//            pos1.GetPlan()->RemoveDevice(pos1);
-//        }
-//    }
-//    if (event.key.code == sf::Keyboard::H)
-//    {
-//        model_.GetFactory()->AddHandle(pos1);
-//    }
-//    //if PlanPos sucessfully selects a device...
-//    DeviceShp dev1 = pos1.GetDevice();
-//    if (dev1)
-//    {
-//        if (event.key.code == sf::Keyboard::A)
-//        {
-//            view_.PostMessage("Tried to modify a device upwards");
-//            dev1->Handle(1);
-//        }
-//        if (event.key.code == sf::Keyboard::Z)
-//        {
-//            dev1->Handle(2);
-//        }
-//        if (event.key.code == sf::Keyboard::BackSlash)
-//        {
-//            dev1->Handle(3);
-//        }
-//
-//        //if cu1 DEVICE + cu2 LOCATED
-//        if (cu2.GetState() == CursorState::LOCATED)
-//        {
-//            PlanPos pos2 = cu2.GetPlanPos();
-//            //EventsBothLocated(pos1, pos2);
-//            if (event.key.code == sf::Keyboard::M)
-//            {
-//                view_.PostMessage("Tried to move something");
-//                if (dev1->GetContainer() == pos2.GetPlan())
-//                    dev1->GetContainer()->SetPosition(dev1, pos2.GetSmartPos());
-//                //ChipPlanFunc::SetPosition(pos1, pos2); //allows moving of exploded plans
-//            }
-//        }
-//    }
-//}
-//
-//
-//void Controller::EventsBothLocated(PlanPos pos1, PlanPos pos2)
-//{
-//    //defunct
-//}
-//
-//
-//
-//void Controller::EventsBothWirable(Shp<WiringPair> wp)
-//{
-//    //requires cu1 + cu2 in a VALID WIRING RELATIONSHIP
-//    if (event.key.code == sf::Keyboard::B)
-//    {
-//        if (event.key.shift == false)
-//        {
-//            model_.GetFactory()->AddWire(wp, 1);
-//        }
-//        else
-//        {
-//            auto wire = wp->plan->GetWire(wp);
-//            if (wire)
-//                wp->plan->RemoveWire(wire);
-//        }
-//    }
-//    auto wire = wp->plan->GetWire(wp);
-//    if (wire) 
-//    {
-//        if (event.key.code == sf::Keyboard::D) {
-//            wire->Handle(1);
-//        }
-//        if (event.key.code == sf::Keyboard::C) {
-//            wire->Handle(2);
-//        }
-//        if (event.key.code == sf::Keyboard::F) {
-//            wire->Handle(3);
-//        }
-//        if (event.key.code == sf::Keyboard::V) {
-//            wire->Handle(4);
-//        }
-//    }
-//}
-//
-//
-//
+
+
+
+
+
+
+
 //void Controller::HandleInputState()
 //{
 //    if ( sf::Mouse::isButtonPressed(sf::Mouse::Middle) )
@@ -369,3 +179,16 @@
 //    }
 //}
 //
+//
+//void PaneBrain::HandleInputState()
+//{
+//    mousePos = sf::Mouse::getPosition;
+//    if (mouse moved)
+//    {
+//        if (mid is pressed)
+//            pan( (world)mousePos - (world)prevMousePos_ );
+//    }
+//    prevMousePos_ = mousePos;
+//}
+
+        

@@ -117,19 +117,23 @@ private:
 class PaneBrain : public BaseAreaPane
 {
 public:
-    PaneBrain(Shp<BaseReferer>, UIObjects &);
+    PaneBrain(Model &, Shp<BaseReferer>, UIObjects &);
     virtual void Draw(sf::RenderWindow &) override;
     virtual void Handle(sf::Event &) override;
     virtual void HandleMouse(sf::Event &, sf::Vector2f) override;
     virtual void AutoClamp() override;
     void SetHighlightingMode(int x)             { highlightingMode = x; }
 private:
+    void HandlePlan(sf::Event &, PlanShp);
+    void HandleLocated(sf::Event &, PlanPos);
+    void EventsBothWirable(sf::Event &, Shp<WiringPair>);
+
+    Model & model_;
     Shp<BaseReferer> brain;
     UIObjects & uiObjects;
     sf::RectangleShape brainOverlayBox;
     int highlightingMode;
-//    Cursor cursorOne;
-//    Cursor cursorTwo;
+    sf::Vector2f prevMouseWorldPos;
 };
 
 class PaneBar : public BasePane
@@ -155,7 +159,7 @@ public:
     virtual void Draw(sf::RenderWindow &) override;
     virtual void Handle(sf::Event &) override;
     virtual void HandleMouse(sf::Event &, sf::Vector2f) override;
-    void SetTextEntering(bool on, std::string text = "")     { textEntering.setString("-->" + text + "<--"); drawTextEntering = on; }
+    //void SetTextEntering(bool on, std::string text = "")     { textEntering.setString("-->" + text + "<--"); drawTextEntering = on; }
 private:
     UIObjects & uiObjects;
     sf::Text textEntering;
@@ -170,7 +174,8 @@ public:
     PaneGroup(Model & model_p);
     void Draw();
     bool HandleInput();
-    void HandleInputEvents();
+    void HandleInputState(BasePane * pane, sf::Vector2f worldPos);
+    void HandleInputEvents(BasePane * pane, sf::Vector2f worldPos);
     void ToggleFieldMode()                      { fieldMode = not fieldMode; }
 private:
     void SizingsRefresh();

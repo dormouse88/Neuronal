@@ -2,6 +2,8 @@ Do Next
 =======
 ---v---
 	Split view level/brain
+	Split Model class
+	Think about Cursor class
 	Make levels easier to make.
 		Cat brains should be selectable and editable and saveable.
 

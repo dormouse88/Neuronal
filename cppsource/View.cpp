@@ -99,24 +99,21 @@ void Marquee::Draw(sf::RenderTarget &rt)
 
 
 
-
-bool GetMouseEventPos(sf::Event & event, sf::Vector2i & returnPos)
+//defunct?
+sf::Vector2i GetMouseEventPos(sf::Event & event, sf::RenderWindow & window)
 {
-    if (event.type == sf::Event::MouseButtonPressed or event.type == sf::Event::MouseWheelMoved)
+    if (event.type == sf::Event::MouseButtonPressed)
     {
-        if (event.type == sf::Event::MouseButtonPressed)
-        {
-            returnPos.x = event.mouseButton.x;
-            returnPos.y = event.mouseButton.y;
-        }
-        if (event.type == sf::Event::MouseWheelMoved)
-        {
-            returnPos.x = event.mouseWheel.x;
-            returnPos.y = event.mouseWheel.y;
-        }
-        return true;
+        return sf::Vector2i{ event.mouseButton.x, event.mouseButton.y };
     }
-    return false;
+    else if (event.type == sf::Event::MouseWheelMoved)
+    {
+        return sf::Vector2i{ event.mouseWheel.x, event.mouseWheel.y };
+    }
+    else
+    {
+        return sf::Mouse::getPosition(window);
+    }
 }
 
 ///////////////////     class View      ////////////////////////////////////////////////
@@ -132,8 +129,9 @@ const sf::Vector2u INITIAL_WINDOW_SIZE { 1400, 900 };
 PaneGroup::PaneGroup(Model & model_p)
     :theModel(model_p)
     ,window(sf::VideoMode(INITIAL_WINDOW_SIZE.x, INITIAL_WINDOW_SIZE.y), "Neuronal", sf::Style::Default, sf::ContextSettings{0,0,8} )
+    ,fieldMode(true)
     ,paneLevel(model_p.GetArena(), uiObjects)
-    ,paneBrain(model_p.GetMouseBrain(), uiObjects)
+    ,paneBrain(model_p, model_p.GetMouseBrain(), uiObjects)
     ,paneBar(model_p, uiObjects)
     ,paneText(uiObjects)
     ,quitYet_(false)
@@ -157,6 +155,7 @@ void PaneGroup::Draw()
     else
         paneLevel.Draw(window);
     paneBar.Draw(window);
+    paneText.Draw(window);
 
     window.display();
     //window.setView(brainView);
@@ -164,14 +163,55 @@ void PaneGroup::Draw()
 
 bool PaneGroup::HandleInput()
 {
-    HandleInputEvents();
-    //temp//HandleInputState();
+    //Get Pane and WorldPos under the mouse...
+      //sf::Vector2i mousePixelPos = GetMouseEventPos(event, window);
+    sf::Vector2i mousePixelPos = sf::Mouse::getPosition(window);
+    BasePane * pane = nullptr;
+    sf::Vector2f mouseWPos;
+    BasePane * allPanes[] { &paneLevel, &paneBrain, &paneBar };
+    for (auto * p: allPanes)
+    {
+        sf::IntRect vp = window.getViewport(p->view);
+        if (vp.contains(mousePixelPos))
+        {
+            //sf::Vector2f worldPos = window.mapPixelToCoords(mousePixelPos, p->view);
+            //p->HandleMouse(event, worldPos);
+            mouseWPos = window.mapPixelToCoords(mousePixelPos, p->view);
+            pane = p;
+        }
+    }
+    
+    HandleInputEvents(pane, mouseWPos);
+    HandleInputState(pane, mouseWPos);
     return quitYet_;
 }
 
-void PaneGroup::HandleInputEvents()
+void PaneGroup::HandleInputState(BasePane * pane, sf::Vector2f worldPos)
+{
+
+    
+//    if ( sf::Mouse::isButtonPressed(sf::Mouse::Middle) )
+//    {
+//        sf::Vector2i pixelPos{ sf::Mouse::getPosition(view_.GetWindow()) };
+//        sf::Vector2f worldPos{ view_.GetWindow().mapPixelToCoords( pixelPos ) };
+//        if (!isMouseCursorSet_) {
+//            isMouseCursorSet_ = true;
+//        }
+//        else {
+//            view_.Pan( (-worldPos + mouseCursorWorldPos_) /1.00f );
+//        }
+//        sf::Vector2i newPixelPos{ sf::Mouse::getPosition(view_.GetWindow()) };
+//        mouseCursorWorldPos_ = view_.GetWindow().mapPixelToCoords( newPixelPos );
+//    }
+//    else {
+//        isMouseCursorSet_ = false;
+//    }
+}
+
+void PaneGroup::HandleInputEvents(BasePane * pane, sf::Vector2f worldPos)
 {
     sf::Event event;
+
     while (window.pollEvent(event))
     {
         if (event.type == sf::Event::Closed)
@@ -179,29 +219,15 @@ void PaneGroup::HandleInputEvents()
         if (event.type == sf::Event::Resized)
             SizingsRefresh();
         
-        //Mouse Events
-        sf::Vector2i mousePixelPos;
-        bool isMouseEvent = GetMouseEventPos(event, mousePixelPos);
-        if (isMouseEvent)
-        {
-            BasePane * allPanes[] { &paneLevel, &paneBrain, &paneBar };
-            for (auto * p: allPanes)
-            {
-                sf::IntRect vp = window.getViewport(p->view);
-                if (vp.contains(mousePixelPos))
-                {
-                    sf::Vector2f worldPos = window.mapPixelToCoords(mousePixelPos, p->view);
-                    p->HandleMouse(event, worldPos);
-                }
-            }
-        }
-
         if (uiObjects.textEnterer_)
         {
             paneText.Handle(event);
         }
         else
         {
+            if (pane)
+                pane->HandleMouse(event, worldPos);
+            
             //Keyboard Events
             if (event.type == sf::Event::KeyPressed)
             {
@@ -210,9 +236,12 @@ void PaneGroup::HandleInputEvents()
                     ToggleFieldMode();
                 }
             }
+            
             paneBrain.Handle(event);
         }
-    }
+    } //while event
+    
+    
 }
 
 
@@ -259,6 +288,15 @@ void PaneGroup::SizingsRefresh()
 
 void BaseAreaPane::Zoom(float zoomFactor)
 {
+    //Better to have a googlemaps style zoom:
+    // p_centrePoint = AsPixelPos(0.5,0.5);
+    // p_offset = p_centrePoint - p_mousePos;
+    // setCenter( AsWorldPos(p_mousePos) );
+    // zoom();
+    // p_newCenter = p_mousePos + p_offset;
+    // setCenter( AsWorldPos(p_newCenter) );
+    // 
+    // ...etc
     view.zoom( zoomFactor );
     AutoClamp();
 }
@@ -348,8 +386,9 @@ void PaneLevel::Draw(sf::RenderWindow & window)
 
 
 
-PaneBrain::PaneBrain(Shp<BaseReferer> br, UIObjects & uio)
-    :brain(br)
+PaneBrain::PaneBrain(Model & model_p, Shp<BaseReferer> br, UIObjects & uio)
+    :model_(model_p)
+    ,brain(br)
     ,uiObjects(uio)
     ,highlightingMode(1)
 {
@@ -399,7 +438,7 @@ void PaneBrain::Handle(sf::Event & event)
         if (cursorOne.GetState() != CursorState::ABSENT)
         {
             plan1 = cursorOne.GetPlan();
-            //temp//EventsPlan(plan1);
+            HandlePlan(event, plan1);
         }
         if (cursorOne.GetState() == CursorState::PORT)
         {
@@ -416,19 +455,224 @@ void PaneBrain::Handle(sf::Event & event)
         if (cursorOne.GetState() == CursorState::LOCATED)
         {
             PlanPos pos1 = cursorOne.GetPlanPos();
-            //temp//EventsLocated(pos1);
+            HandleLocated(event, pos1);
         }
         Shp<WiringPair> wp = RetrieveWiringPair(cursorOne, cursorTwo);
         if (wp)
         {
-            //temp//EventsBothWirable(wp);
+            EventsBothWirable(event, wp);
+        }
+        cursorOne.Revalidate();
+        cursorTwo.Revalidate();
+    }
+}
+
+void PaneBrain::HandlePlan(sf::Event & event, PlanShp plan)
+{
+    //requires cu1 PLAN
+    if (event.key.code == sf::Keyboard::X)
+    {
+        //Collapse an expanded plan
+        auto h = plan->GetHandle();
+        if (h)
+            h->SetExploded(false);
+    }
+
+    if (event.key.code == sf::Keyboard::LBracket)
+    {
+        uiObjects.cursorOne.SetToPlan();
+    }
+    if (event.key.code == sf::Keyboard::RBracket)
+    {
+        uiObjects.cursorTwo.SetToPlan();
+    }
+
+    if (event.key.code == sf::Keyboard::Q)
+    {
+        //Save plan
+        if (not event.key.shift and (model_.GetPlanGroupData()->GetNameByID(plan->GetPlanID()) != NULL_PLAN_NAME))  //ouch
+            model_.SavePlan( plan, PlanNamingMode::TRANSFER );
+        else;
+            model_.SavePlan( plan, PlanNamingMode::AUTONAME );
+    }
+    if (event.key.code == sf::Keyboard::W)
+    {
+        //Wipe Plan
+        model_.LoadPlan(plan, PlanNav::EMPTY, event.key.shift and event.key.control);
+    }
+
+    //Various Load Plan Options...
+    if (event.key.code == sf::Keyboard::Numpad1)
+    {
+        model_.LoadPlan(plan, PlanNav::PREV_ID);
+    }
+    if (event.key.code == sf::Keyboard::Numpad3)
+    {
+        model_.LoadPlan(plan, PlanNav::NEXT_ID);
+    }
+    if (event.key.code == sf::Keyboard::Numpad7)
+    {
+        model_.LoadPlan(plan, PlanNav::PREV_NAME);
+    }
+    if (event.key.code == sf::Keyboard::Numpad9)
+    {
+        model_.LoadPlan(plan, PlanNav::NEXT_NAME);
+    }
+    if (event.key.code == sf::Keyboard::Numpad8)
+    {
+        model_.LoadPlan(plan, PlanNav::PARENT);
+    }
+    if (event.key.code == sf::Keyboard::Numpad2)
+    {
+        model_.LoadPlan(plan, PlanNav::FIRST_CHILD);
+    }
+    if (event.key.code == sf::Keyboard::Numpad4)
+    {
+        model_.LoadPlan(plan, PlanNav::PREV_SIBLING);
+    }
+    if (event.key.code == sf::Keyboard::Numpad6)
+    {
+        model_.LoadPlan(plan, PlanNav::NEXT_SIBLING);
+    }
+    if (event.key.code == sf::Keyboard::Subtract)
+    {
+        //clear name filter
+        assert(not uiObjects.textEnterer_);
+        model_.EngageNameFilter(plan, "");
+    }
+    if (event.key.code == sf::Keyboard::Add)
+    {
+        //set name filter
+        assert(not uiObjects.textEnterer_);
+        uiObjects.textEnterer_ = std::make_shared<TextEnterer>();
+        auto bound = std::bind( &Model::EngageNameFilter, &model_, plan, std::placeholders::_1 );
+        uiObjects.textEnterer_->SetDispatchTarget( bound );
+        uiObjects.textEnterer_->SetText( model_.GetNameFilter() );
+    }
+
+    if (event.key.code == sf::Keyboard::R)
+    {
+        //erase plan name
+        assert(not uiObjects.textEnterer_);
+        model_.RemoveName(plan->GetPlanID());
+    }
+    if (event.key.code == sf::Keyboard::E)// and model_.CanAddSomeRealName(plan->GetPlanID()))
+    {
+        //set plan name
+        assert(not uiObjects.textEnterer_);
+        uiObjects.textEnterer_ = std::make_shared<TextEnterer>();
+        auto bound = std::bind( &Model::SetRealName, &model_, plan->GetPlanID(), std::placeholders::_1 );
+        uiObjects.textEnterer_->SetDispatchTarget( bound );
+        uiObjects.textEnterer_->SetText( model_.GetCleanRealPlanName(plan->GetPlanID()) );
+    }
+}
+
+void PaneBrain::HandleLocated(sf::Event & event, PlanPos pos1)
+{
+    //requires cu1 LOCATED
+    if (event.key.code == sf::Keyboard::S)
+    {
+        auto h = pos1.GetDeviceAsHandle();
+        if (h)
+            h->SetExploded(true);
+    }
+
+    if (event.key.code == sf::Keyboard::N)
+    {
+        if (event.key.shift == false)
+        {
+            model_.GetFactory()->AddNeuron(pos1);
+        }
+        else
+        {
+            pos1.GetPlan()->RemoveDevice(pos1);
         }
     }
-//    cu1.Revalidate();
-//    cu2.Revalidate();
+    if (event.key.code == sf::Keyboard::H)
+    {
+        model_.GetFactory()->AddHandle(pos1);
+    }
+    //if PlanPos sucessfully selects a device...
+    DeviceShp dev1 = pos1.GetDevice();
+    if (dev1)
+    {
+        if (event.key.code == sf::Keyboard::A)
+        {
+            //view_.PostMessage("Tried to modify a device upwards");
+            dev1->Handle(1);
+        }
+        if (event.key.code == sf::Keyboard::Z)
+        {
+            dev1->Handle(2);
+        }
+        if (event.key.code == sf::Keyboard::BackSlash)
+        {
+            dev1->Handle(3);
+        }
+
+        //if cu1 DEVICE + cu2 LOCATED
+        if (uiObjects.cursorTwo.GetState() == CursorState::LOCATED)
+        {
+            PlanPos pos2 = uiObjects.cursorTwo.GetPlanPos();
+            //EventsBothLocated(pos1, pos2);
+            if (event.key.code == sf::Keyboard::M)
+            {
+                //view_.PostMessage("Tried to move something");
+                if (dev1->GetContainer() == pos2.GetPlan())
+                    dev1->GetContainer()->SetPosition(dev1, pos2.GetSmartPos());
+                //ChipPlanFunc::SetPosition(pos1, pos2); //allows moving of exploded plans
+            }
+        }
+    }
 }
+
+void PaneBrain::EventsBothWirable(sf::Event & event, Shp<WiringPair> wp)
+{
+    //requires cu1 + cu2 in a VALID WIRING RELATIONSHIP
+    if (event.key.code == sf::Keyboard::B)
+    {
+        if (event.key.shift == false)
+        {
+            model_.GetFactory()->AddWire(wp, 1);
+        }
+        else
+        {
+            auto wire = wp->plan->GetWire(wp);
+            if (wire)
+                wp->plan->RemoveWire(wire);
+        }
+    }
+    auto wire = wp->plan->GetWire(wp);
+    if (wire) 
+    {
+        if (event.key.code == sf::Keyboard::D) {
+            wire->Handle(1);
+        }
+        if (event.key.code == sf::Keyboard::C) {
+            wire->Handle(2);
+        }
+        if (event.key.code == sf::Keyboard::F) {
+            wire->Handle(3);
+        }
+        if (event.key.code == sf::Keyboard::V) {
+            wire->Handle(4);
+        }
+    }
+}
+
+
+
 void PaneBrain::HandleMouse(sf::Event & event, sf::Vector2f worldPos)
 {
+    if (event.type == sf::Event::MouseMoved)
+    {
+        if ( sf::Mouse::isButtonPressed(sf::Mouse::Middle) )
+        {
+            Pan( -(worldPos - prevMouseWorldPos) * 1.00f );
+        }
+        else
+            prevMouseWorldPos = worldPos;
+    }
     if (event.type == sf::Event::MouseButtonPressed)
     {
         if (event.mouseButton.button == sf::Mouse::Left)
@@ -548,6 +792,7 @@ void PaneBar::Draw(sf::RenderWindow & window)
 
 PaneText::PaneText(UIObjects & uio)
     :uiObjects(uio)
+    ,drawTextEntering(false)
 {
     textEntering.setFont(ViewResources::GetInstance().font);
     textEntering.setCharacterSize(25.f);
@@ -578,10 +823,10 @@ void PaneText::Handle(sf::Event & event)
         if (textEnterer_)
             textEnterer_->Append(event.text.unicode);
     }
-    if (textEnterer_)
-        SetTextEntering(true, textEnterer_->GetText());
-    else
-        SetTextEntering(false);
+//    if (textEnterer_)
+//        SetTextEntering(true, textEnterer_->GetText());
+//    else
+//        SetTextEntering(false);
 }
 
 void PaneText::HandleMouse(sf::Event & event, sf::Vector2f worldPos)
@@ -592,8 +837,9 @@ void PaneText::HandleMouse(sf::Event & event, sf::Vector2f worldPos)
 void PaneText::Draw(sf::RenderWindow & window)
 {
     //textEntering.setString( "text1: " + patch::to_string(ap->GetPlanID()) );
-    if (drawTextEntering)
+    if (uiObjects.textEnterer_)
     {
+        textEntering.setString("-->" + uiObjects.textEnterer_->GetText() + "<--");
         window.draw(textEntering);
     }
 }
