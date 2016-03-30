@@ -306,18 +306,14 @@ void PaneGroup::SizingsRefresh()
 
 
 
-void BaseAreaPane::Zoom(float zoomFactor)
+void BaseAreaPane::Zoom(float zoomFactor, VectorWorld anchorPoint)
 {
-    //Better to have a googlemaps style zoom:
-    // p_centrePoint = AsPixelPos(0.5,0.5);
-    // p_offset = p_centrePoint - p_mousePos;
-    // setCenter( AsWorldPos(p_mousePos) );
-    // zoom();
-    // p_newCenter = p_mousePos + p_offset;
-    // setCenter( AsWorldPos(p_newCenter) );
-    // 
-    // ...etc
-    view.zoom( zoomFactor );
+    //Googlemaps-style zoom: (the same worldPoint stays under mouse cursor)
+    VectorWorld worldOffset = view.getCenter() - anchorPoint;
+    sf::Vector2f normOffset { worldOffset.x / view.getSize().x, worldOffset.y / view.getSize().y };
+    view.zoom( zoomFactor);
+    VectorWorld newWorldOffset { normOffset.x * view.getSize().x, normOffset.y * view.getSize().y };
+    CentreOn( anchorPoint + newWorldOffset );
     AutoClamp();
 }
 void BaseAreaPane::Pan(sf::Vector2f moveBy)
@@ -403,11 +399,7 @@ void PaneLevel::HandleMouse(sf::Event & event, sf::Vector2f worldPos)
     }
     if (event.type == sf::Event::MouseWheelMoved)
     {
-        if (event.mouseWheel.delta > 0)
-        {
-            CentreOn(worldPos);
-        }
-        Zoom( 1.f + (-0.4f * event.mouseWheel.delta) );
+        Zoom( 1.f + (-0.3f * event.mouseWheel.delta), worldPos );
     }
 }
 
@@ -722,11 +714,7 @@ void PaneBrain::HandleMouse(sf::Event & event, sf::Vector2f worldPos)
     }
     if (event.type == sf::Event::MouseWheelMoved)
     {
-        if (event.mouseWheel.delta > 0)
-        {
-            CentreOn(worldPos);
-        }
-        Zoom( 1.f + (-0.4f * event.mouseWheel.delta) );
+        Zoom( 1.f + (-0.3f * event.mouseWheel.delta), worldPos );
     }
 }
 

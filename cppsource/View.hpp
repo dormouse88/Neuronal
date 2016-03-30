@@ -93,7 +93,7 @@ class BaseAreaPane : public BasePane
 {
 public:
     virtual void AutoClamp() = 0;
-    void Zoom(float zoomFactor);
+    void Zoom(float zoomFactor, VectorWorld anchorPoint);
     void Pan(sf::Vector2f moveBy);
     void CentreOn(VectorWorld point);
     void ClampToRect(RectWorld);

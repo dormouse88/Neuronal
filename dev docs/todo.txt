@@ -1,7 +1,6 @@
 Do Next
 =======
 ---v---
-	Split view level/brain
 	Split Model class
 	Think about Cursor class
 	Make levels easier to make.
