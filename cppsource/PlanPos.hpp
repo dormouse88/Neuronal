@@ -12,6 +12,18 @@
 class ChipPlan; //fwd dec
 #include "PlanGrid.hpp"
 
+
+enum class PlanAddressMode { ABSENT, PLANONLY, CELL, PORT };
+struct PlanAddress
+{
+    PlanAddress() :mode(PlanAddressMode::ABSENT) {}
+    PlanAddressMode mode;
+    std::weak_ptr<ChipPlan> plan;
+    VectorSmart pos;
+    PortLocation port;
+};
+
+
 class PlanPos
 {
 public:

@@ -450,8 +450,9 @@ PaneBrain::PaneBrain(Model & model_p, UIObjects & uio)
     ,uiObjects(uio)
     ,highlightingMode(1)
 {
-    uiObjects.cursorOne.SetToPlan( brain->GetSubPlan() );
-    uiObjects.cursorTwo.SetToPlan( brain->GetSubPlan() );
+    //DEL
+//    uiObjects.cursorOne.SetToPlan( brain->GetSubPlan() );
+//    uiObjects.cursorTwo.SetToPlan( brain->GetSubPlan() );
 }
 
 void PaneBrain::AutoClamp()
@@ -490,18 +491,16 @@ void PaneBrain::Handle(sf::Event & event)
         }
 
         //Brain sections...
-        auto & cursorOne = uiObjects.cursorOne;
-        auto & cursorTwo = uiObjects.cursorTwo;
-        PlanShp plan1;
-        if (cursorOne.GetState() != CursorState::ABSENT)
+        PlanAddress pa1 = uiObjects.cursorOne.GetPA();
+        PlanAddress pa2 = uiObjects.cursorTwo.GetPA();
+        PlanShp plan1 = pa1.plan.lock();
+        if (pa1.mode != PlanAddressMode::ABSENT)
         {
-            plan1 = cursorOne.GetPlan();
             HandlePlan(event, plan1);
         }
-        if (cursorOne.GetState() == CursorState::PORT)
+        if (pa1.mode == PlanAddressMode::PORT)
         {
-            plan1 = cursorOne.GetPlan();
-            PortLocation pl = cursorOne.GetPort();
+            PortLocation pl = pa1.port;
             if (event.key.code == sf::Keyboard::G)
             {
                 assert(not uiObjects.textEnterer_);
@@ -510,18 +509,20 @@ void PaneBrain::Handle(sf::Event & event)
                 uiObjects.textEnterer_->SetDispatchTarget( bound );
             }
         }
-        if (cursorOne.GetState() == CursorState::LOCATED)
+        if (pa1.mode == PlanAddressMode::CELL)
         {
-            PlanPos pos1 = cursorOne.GetPlanPos();
-            HandleLocated(event, pos1);
+            PlanPos pp1 { pa1.pos, plan1->GetGrid() };
+            HandleLocated(event, pp1);
         }
-        Shp<WiringPair> wp = RetrieveWiringPair(cursorOne, cursorTwo);
+        Shp<WiringPair> wp = RetrieveWiringPair(pa1, pa2);
         if (wp)
         {
             EventsBothWirable(event, wp);
         }
-        cursorOne.Revalidate();
-        cursorTwo.Revalidate();
+        MakeValidAndVisible(pa1);
+        MakeValidAndVisible(pa2);
+        uiObjects.cursorOne.SetPlanAddress( pa1 );
+        uiObjects.cursorTwo.SetPlanAddress( pa2 );
     }
 }
 
@@ -538,11 +539,11 @@ void PaneBrain::HandlePlan(sf::Event & event, PlanShp plan)
 
     if (event.key.code == sf::Keyboard::LBracket)
     {
-        uiObjects.cursorOne.SetToPlan();
+        //uiObjects.cursorOne.SetToPlan();
     }
     if (event.key.code == sf::Keyboard::RBracket)
     {
-        uiObjects.cursorTwo.SetToPlan();
+        //uiObjects.cursorTwo.SetToPlan();
     }
 
     if (event.key.code == sf::Keyboard::Q)
@@ -669,15 +670,17 @@ void PaneBrain::HandleLocated(sf::Event & event, PlanPos pos1)
         }
 
         //if cu1 DEVICE + cu2 LOCATED
-        if (uiObjects.cursorTwo.GetState() == CursorState::LOCATED)
+        PlanAddress pa2 = uiObjects.cursorTwo.GetPA();
+        PlanShp plan2 = pa2.plan.lock();
+        if (pa2.mode == PlanAddressMode::CELL)
         {
-            PlanPos pos2 = uiObjects.cursorTwo.GetPlanPos();
+            //RED//PlanPos pp2 { pa2.pos, plan2->GetGrid() };
             //EventsBothLocated(pos1, pos2);
             if (event.key.code == sf::Keyboard::M)
             {
                 //view_.PostMessage("Tried to move something");
-                if (dev1->GetContainer() == pos2.GetPlan())
-                    dev1->GetContainer()->SetPosition(dev1, pos2.GetSmartPos());
+                if (dev1->GetContainer() == plan2)
+                    dev1->GetContainer()->SetPosition(dev1, pa2.pos);
                 //ChipPlanFunc::SetPosition(pos1, pos2); //allows moving of exploded plans
             }
         }
@@ -735,11 +738,13 @@ void PaneBrain::HandleMouse(sf::Event & event, sf::Vector2f worldPos)
     {
         if (event.mouseButton.button == sf::Mouse::Left)
         {
-            uiObjects.cursorOne.SetPosWorld(worldPos);
+            PlanAddress pa = brain->GetSubPlan()->GetInnermostExplodedPlanAddress(worldPos);
+            uiObjects.cursorOne.SetPlanAddress( pa );
         }
         if (event.mouseButton.button == sf::Mouse::Right)
         {
-            uiObjects.cursorTwo.SetPosWorld(worldPos);
+            PlanAddress pa = brain->GetSubPlan()->GetInnermostExplodedPlanAddress(worldPos);
+            uiObjects.cursorTwo.SetPlanAddress( pa );
         }
     }
     if (event.type == sf::Event::MouseWheelMoved)
@@ -829,8 +834,8 @@ void PaneBar::Draw(sf::RenderWindow & window)
 //    window.draw(lines);
 
     PlanShp ap = nullptr;
-    if (uiObjects.cursorOne.GetState() != CursorState::ABSENT)
-        ap = uiObjects.cursorOne.GetPlan();
+    if (uiObjects.cursorOne.GetPA().mode != PlanAddressMode::ABSENT)
+        ap = uiObjects.cursorOne.GetPA().plan.lock();
     PlanID planID = 0;
     if (ap)
         planID = ap->GetPlanID();

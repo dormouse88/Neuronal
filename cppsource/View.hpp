@@ -62,11 +62,11 @@ struct ArenaCursor
 struct UIObjects
 {
     UIObjects()
-        :cursorOne( nullptr, sf::Color::Yellow )
-        ,cursorTwo( nullptr, sf::Color::Cyan )
+        :cursorOne( sf::Color::Yellow )
+        ,cursorTwo( sf::Color::Cyan )
     {}
-    Cursor cursorOne;
-    Cursor cursorTwo;
+    BrainCursor cursorOne;
+    BrainCursor cursorTwo;
     ArenaCursor arenaCursor;
     std::shared_ptr<TextEnterer> textEnterer_;
 };

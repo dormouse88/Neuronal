@@ -22,7 +22,7 @@ class PlanGroupData;  //fwd dec
 class WiringPair; //fwd dec
 class ChipHandle;
 
-class ChipPlan : public Wirable
+class ChipPlan : public Wirable, public std::enable_shared_from_this<ChipPlan>
 {
 public:
     ChipPlan(std::shared_ptr<PlanGrid> g, std::shared_ptr<PlanGroupData> u);
@@ -65,7 +65,9 @@ public:
     bool IsModified()                                       {return modified;}
     bool IsEmpty()                                          {return devices.empty() and wires.empty();}
     
-    std::shared_ptr<PlanGrid> GetGrid()                     {return planGrid;}
+    PlanAddress GetPlanAddress(VectorWorld point);
+    PlanAddress GetInnermostExplodedPlanAddress(VectorWorld point);
+    Shp<PlanGrid> GetGrid()                     {return planGrid;}
     PlanRegion GetRegion(VectorSmart);
     PortLocation GetPort(VectorSmart);
     DeviceShp GetDevice(VectorSmart);

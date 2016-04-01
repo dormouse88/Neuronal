@@ -17,9 +17,20 @@
 #include "PlanPos.hpp"
 #include "WiringPair.hpp"
 
+class BrainCursor
+{
+public:
+    BrainCursor(sf::Color);
+    void Draw(sf::RenderTarget & rt);
+    void SetPlanAddress(PlanAddress pa) {pa_ = pa;}
+    PlanAddress GetPA()                 {return pa_;}
+private:
+    PlanAddress pa_;
+    sf::RectangleShape shape_;    
+};
+
 
 enum class CursorState { ABSENT, PLAN, LOCATED, PORT };
-
 class Cursor
 {
 public:
@@ -46,9 +57,9 @@ public:
     void SetToPort(PortLocation pl)
         { cursorState_ = CursorState::PORT; port_ = pl;}
 
-    void SetPosWorld(VectorWorld);
+    void SetToIntelligent(VectorWorld);
 
-    void Revalidate();
+    void RemainVisible();
     WirableShp GetWirable();
     PlanShp GetParentPlan();
     
@@ -62,8 +73,9 @@ private:
 };
 
 
-Shp<WiringPair> RetrieveWiringPair(Cursor & cu1, Cursor & cu2);
-
+//Shp<WiringPair> RetrieveWiringPair(Cursor & cu1, Cursor & cu2);
+Shp<WiringPair> RetrieveWiringPair(PlanAddress & pa1, PlanAddress & pa2);
+void MakeValidAndVisible(PlanAddress & pa);
 
 #endif	/* CURSOR_HPP */
 

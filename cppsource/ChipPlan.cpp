@@ -247,6 +247,60 @@ void ChipPlan::SetModified()
 }
 
 
+PlanAddress ChipPlan::GetPlanAddress(VectorWorld point)
+{
+    PlanShp plan = shared_from_this();
+    VectorSmart sPos = plan->GetGrid()->MapWorldtoSmart(point);
+    PlanAddress ret;
+
+    PlanRegion reg = plan->GetRegion(sPos);
+    if (reg == PlanRegion::NONE)
+    {
+        ret.mode = PlanAddressMode::ABSENT;
+    }
+    else if (reg == PlanRegion::WHOLEPLAN)
+    {
+        ret.mode = PlanAddressMode::PLANONLY;
+        ret.plan = plan;
+    }
+    else if (reg == PlanRegion::PORTS)
+    {
+        ret.mode = PlanAddressMode::PORT;
+        ret.plan = plan;
+        ret.port = plan->GetPort(sPos);
+    }
+    else if (reg == PlanRegion::CONTENTS)
+    {
+        ret.mode = PlanAddressMode::CELL;
+        ret.plan = plan;
+        ret.pos = sPos;
+    }
+    return ret;
+}
+
+PlanAddress ChipPlan::GetInnermostExplodedPlanAddress(VectorWorld point)
+{
+    PlanShp plan = shared_from_this();
+    PlanAddress pa;
+    //zoom in to innermost exploded plan...
+    while (true)
+    {
+        pa = plan->GetPlanAddress(point);
+        if (pa.mode == PlanAddressMode::CELL)
+        {
+            DeviceShp d = plan->GetDevice(pa.pos);
+            HandleShp h = std::dynamic_pointer_cast<ChipHandle>(d);
+            if (h and h->IsExploded())
+                plan = h->GetSubPlan();
+            else
+                return pa;
+        }
+        else
+            return pa;
+    }
+}
+
+
 PlanRegion ChipPlan::GetRegion(VectorSmart pos)
 {
     if (pos.x == box_tl_.x or pos.x == box_br_.x)
