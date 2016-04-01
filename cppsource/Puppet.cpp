@@ -10,33 +10,14 @@
 #include "Arena.hpp"  //fwd dec
 #include "AllXPuts.hpp"
 
+
 //////////////////////////////////////Entity....
-ArenaEntity::ArenaEntity(ArenaPoint s_pos, Orientation s_ori, std::shared_ptr<Arena> ar)
+ArenaEntity::ArenaEntity(ArenaPoint s_pos, Orientation s_ori, Shp<Arena> ar)
     :pos_(s_pos)
     ,ori_(s_ori)
     ,arena_(ar)
-    ,alive_(true)
 {}
 
-void ArenaEntity::WalkForward()
-{
-    pos_ =  GetAdjacentPos(OriEnums::FRONT);
-}
-void ArenaEntity::TurnLeft()
-{
-    ori_--;
-    if (ori_ < 0) ori_ = 3;
-}
-void ArenaEntity::TurnRight()
-{
-    ori_++;
-    if (ori_ > 3) ori_ = 0;
-}
-void ArenaEntity::Die()
-{
-    alive_ = false;
-    pos_ = {0,0}; //GetInitialPos(); //(temporary solution)
-}
 ArenaPoint ArenaEntity::GetAdjacentPos(Orientation tile)
 {
     if      ( (ori_ + tile) % 4 == 0) return ArenaPoint { pos_.x,       pos_.y - 1 };
@@ -49,12 +30,40 @@ ArenaPoint ArenaEntity::GetAdjacentPos(Orientation tile)
 
 
 
+//////////////////////////////////////Mobile....
+ArenaMobile::ArenaMobile(ArenaPoint s_pos, Orientation s_ori, Shp<Arena> ar)
+    :ArenaEntity(s_pos, s_ori, ar)
+    ,alive_(true)
+{}
+
+void ArenaMobile::WalkForward()
+{
+    pos_ =  GetAdjacentPos(OriEnums::FRONT);
+}
+void ArenaMobile::TurnLeft()
+{
+    ori_--;
+    if (ori_ < 0) ori_ = 3;
+}
+void ArenaMobile::TurnRight()
+{
+    ori_++;
+    if (ori_ > 3) ori_ = 0;
+}
+void ArenaMobile::Die()
+{
+    alive_ = false;
+    pos_ = {0,0}; //GetInitialPos(); //(temporary solution)
+}
+
+
+
 
 
 
 //////////////////////////// Puppet
-Puppet::Puppet(ArenaPoint s_pos, Orientation s_ori, std::shared_ptr<Arena> ar, std::shared_ptr<BaseReferer> brain)
-    :ArenaEntity(s_pos, s_ori, ar)
+Puppet::Puppet(ArenaPoint s_pos, Orientation s_ori, Shp<Arena> ar, Shp<BaseReferer> brain)
+    :ArenaMobile(s_pos, s_ori, ar)
     ,brain_(brain)
 {}
 
@@ -121,7 +130,7 @@ void Mouse::Draw(sf::RenderTarget & rt)
     }
     shape.setRotation( 90.f * GetActualOri() );
 
-    auto fr = arena_.lock()->GetCellBounds(GetActualPos().x, GetActualPos().y);
+    auto fr = arena_.lock()->GetCellBounds(GetActualPos());
     shape.setPosition( fr.left + (fr.width/2.f), fr.top + (fr.height/2.f) );
 
     shape.setFillColor( MOUSE_COLOR_1 );
@@ -146,7 +155,7 @@ void Cat::Draw(sf::RenderTarget & rt)
     }
     shape.setRotation( 90.f * GetActualOri() );
 
-    auto fr = arena_.lock()->GetCellBounds(GetActualPos().x, GetActualPos().y);
+    auto fr = arena_.lock()->GetCellBounds(GetActualPos());
     shape.setPosition( fr.left + (fr.width/2.f), fr.top + (fr.height/2.f) );
 
     shape.setFillColor( CAT_COLOR_1 );

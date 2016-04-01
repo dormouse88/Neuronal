@@ -14,22 +14,25 @@ Model::Model()
     ,planGroupData_(std::make_shared<PlanGroupData>())
     ,factory_(std::make_shared<BlobFactory>(planGroupData_))
     ,arena(std::make_shared<Arena>(factory_))
+    ,mouseBasePlan(factory_->MakePlan())
 {
     serializer->LoadPlanGroupData(planGroupData_);
     serializer->LoadLevel(1, arena, factory_);
+    auto mouseBrain = arena->GetMouseBrain();
+    mouseBrain->SetSubPlan(mouseBasePlan, mouseBrain);
     arena->Specify();
 }
 
-void Model::OuterTick()
-{
-    arena->TimeAdvance();
-}
-void Model::InnerTick()
-//Does an InnerTick ONLY if it won't affect the Outer
-{
-    if ( not arena->GetMouseBrain()->IsAnyOutputOn() )
-        arena->GetMouseBrain()->TickOnce();
-}
+//void Model::OuterTick()
+//{
+//    arena->TimeAdvance();
+//}
+//void Model::InnerTick()
+////Does an InnerTick ONLY if it won't affect the Outer
+//{
+//    if ( not GetMouseBrain()->IsAnyOutputOn() )
+//        GetMouseBrain()->TickOnce();
+//}
 
 PlanShp Model::LoadPlan(PlanShp plan, PlanNav nav, bool forced)
 {

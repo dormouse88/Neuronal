@@ -6,7 +6,6 @@
  */
 
 #include "Arena.hpp"
-#include "Puppet.hpp"
 
 const sf::Vector2f ARENA_GRID_SIZE  { 200.f , 200.f };
 const sf::Vector2f ARENA_POS        { 0.f, 0.f };
@@ -60,14 +59,56 @@ std::shared_ptr<CatSpawner> Arena::MakeCatSpawner(ArenaPoint p, Orientation o, T
 }
 
 
+sf::FloatRect Arena::GetCellBounds(ArenaPoint ap)
+{
+    sf::FloatRect fr;
+    fr.left = ARENA_POS.x + (ARENA_GRID_SIZE.x * (ap.x - minCorner.x));
+    fr.top = ARENA_POS.y + (ARENA_GRID_SIZE.y * (ap.y - minCorner.y));
+    fr.width = ARENA_GRID_SIZE.x;
+    fr.height = ARENA_GRID_SIZE.y;
+    return fr;
+}
+ArenaPoint Arena::GetArenaPoint( VectorWorld worldPos )
+{
+    VectorWorld fromTopLeft = worldPos - ARENA_POS;
+    ArenaPoint ret {
+        static_cast<int>(floorf(fromTopLeft.x / ARENA_GRID_SIZE.x)),
+        static_cast<int>(floorf(fromTopLeft.y / ARENA_GRID_SIZE.y))
+    };
+    ret.x += minCorner.x;
+    ret.y += minCorner.y;
+    return ret;
+}
+Shp<ArenaEntity> Arena::GetEntity(ArenaPoint addr)
+{
+    Shp<ArenaEntity> ret = nullptr;
+    for (auto cat : cats)
+    {
+        if (cat->GetActualPos() == addr)
+            return cat;
+    }
+    for (auto mouse : mice)
+    {
+        if (mouse->GetActualPos() == addr)
+            return mouse;
+    }
+//    for (auto goal : goals)
+//    {
+//        if (goal->GetActualPos() == addr)
+//            return goal;
+//    }
+    return nullptr;
+}
+
+
 void Arena::Draw(sf::RenderTarget &rt)
 {
     sf::RectangleShape box;
     box.setFillColor( sf::Color {35,35,75} );
     box.setOutlineColor( sf::Color {155,155,255} );
     box.setOutlineThickness(3.f);
-    auto min_c = GetCellBounds(minCorner.x, minCorner.y);
-    auto max_c = GetCellBounds(maxCorner.x, maxCorner.y);
+    auto min_c = GetCellBounds(minCorner);
+    auto max_c = GetCellBounds(maxCorner);
     box.setSize( sf::Vector2f { max_c.left - min_c.left + max_c.width, max_c.top - min_c.top + max_c.height } );
     box.setPosition( min_c.left, min_c.top );
     rt.draw(box);
@@ -79,7 +120,7 @@ void Arena::Draw(sf::RenderTarget &rt)
     dot.setOutlineColor( sf::Color {145, 145, 95} );
     for (int i = minCorner.x; i<=maxCorner.x; i++) {
         for (int j = minCorner.y; j<=maxCorner.y; j++) {
-            auto b = GetCellBounds(i,j);
+            auto b = GetCellBounds( ArenaPoint{i,j} );
             dot.setPosition( b.left + (b.width*0.f), b.top + (b.height*0.f));
             rt.draw(dot);
         }
@@ -118,16 +159,6 @@ bool Arena::WhiskerDetect(ArenaPoint xy)
         }
     }
     return false;
-}
-
-sf::FloatRect Arena::GetCellBounds(int x, int y)
-{
-    sf::FloatRect fr;
-    fr.left = ARENA_POS.x + (ARENA_GRID_SIZE.x * (x - minCorner.x));
-    fr.top = ARENA_POS.y + (ARENA_GRID_SIZE.y * (y - minCorner.y));
-    fr.width = ARENA_GRID_SIZE.x;
-    fr.height = ARENA_GRID_SIZE.y;
-    return fr;
 }
 
 void Arena::Interactions()

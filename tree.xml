@@ -2933,6 +2933,27 @@
 		<WIRE f="0" t="1" fs="I" />
 		<WIRE f="0" t="1" fs="D" />
 	</PLAN>
+	<PLAN i="121" anc="0">
+		<NEUR i="1" x="0" y="0" bulb="0" />
+		<NEUR i="2" x="1" y="-1" bulb="0" />
+	</PLAN>
+	<PLAN i="122" anc="121">
+		<NEUR i="1" x="0" y="0" bulb="0" />
+		<NEUR i="2" x="1" y="-1" bulb="0" />
+		<NEUR i="3" x="1" y="0" bulb="0" />
+	</PLAN>
+	<PLAN i="123" anc="122">
+		<NEUR i="1" x="0" y="0" bulb="0" />
+		<NEUR i="2" x="1" y="-1" bulb="0" />
+		<NEUR i="3" x="1" y="0" bulb="0" />
+		<NEUR i="4" x="-1" y="0" bulb="0" />
+	</PLAN>
+	<PLAN i="124" anc="122">
+		<NEUR i="1" x="0" y="0" bulb="0" />
+		<NEUR i="2" x="1" y="-1" bulb="0" />
+		<NEUR i="3" x="1" y="0" bulb="0" />
+		<NEUR i="4" x="2" y="1" bulb="0" />
+	</PLAN>
 </PLANS>
 <NAMES>
 	<NAME i="1" n="%FIRSTO" />
@@ -3004,4 +3025,6 @@
 	<NAME i="118" n="%YOYOY" />
 	<NAME i="119" n="#J" />
 	<NAME i="120" n="#P" />
+	<NAME i="123" n="#W" />
+	<NAME i="124" n="#A" />
 </NAMES>

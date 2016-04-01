@@ -129,19 +129,15 @@ const unsigned BAR_HEIGHT = 180;
 const sf::Vector2u MINIMUM_WINDOW_SIZE { BAR_WIDTH, BAR_HEIGHT + 300 };
 const sf::Vector2u INITIAL_WINDOW_SIZE { 1400, 900 };
 
-//const sf::Vector2f INITIAL_BAR_SIZE    { (float)INITIAL_WINDOW_SIZE.x, (float)BAR_HEIGHT };
-//const sf::Vector2f INITIAL_FIELD_SIZE  { (float)INITIAL_WINDOW_SIZE.x, (float)INITIAL_WINDOW_SIZE.y - (float)BAR_HEIGHT };
-
 PaneGroup::PaneGroup(Model & model_p)
     :theModel(model_p)
     ,window(sf::VideoMode(INITIAL_WINDOW_SIZE.x, INITIAL_WINDOW_SIZE.y), "Neuronal", sf::Style::Default, sf::ContextSettings{0,0,8} )
     ,fieldMode(1)
     ,paneLevel(model_p.GetArena(), uiObjects)
-    ,paneBrain(model_p, model_p.GetMouseBrain(), uiObjects)
+    ,paneBrain(model_p, uiObjects)
     ,paneBar(model_p, uiObjects)
     ,paneText(uiObjects)
     ,quitYet_(false)
-    //,textEnterer_(nullptr)
 {
     window.setVerticalSyncEnabled(true);
     //window.setFramerateLimit(3);
@@ -236,9 +232,25 @@ void PaneGroup::HandleInputEvents(BasePane * pane, sf::Vector2f worldPos)
                 {
                     CycleFieldMode();
                 }
+                if (event.key.code == sf::Keyboard::P)
+                {
+                    //view brain
+                    ArenaPoint addr = uiObjects.arenaCursor.GetArenaPoint();
+                    auto ele = theModel.GetArena()->GetEntity( addr );
+                    if (ele)
+                    {
+                        auto puppet = std::dynamic_pointer_cast<Puppet>(ele);
+                        if (puppet)
+                        {
+                            paneBrain.SetBrain( puppet->GetBrain() );
+                        }
+                    }
+                }
             }
             
             paneBrain.Handle(event);
+            paneLevel.Handle(event);
+            paneBar.Handle(event);
         }
     } //while event
 }
@@ -381,13 +393,31 @@ void PaneLevel::Handle(sf::Event & event)
     {
         if (event.key.code == sf::Keyboard::Period)
         {
-            //model_.OuterTick();
             arena->TimeAdvance();
         }
+            //add cat
+            //add mouse
+            //add goal
+            //remove element
+            //edit element (various)
     }
 }
 void PaneLevel::HandleMouse(sf::Event & event, sf::Vector2f worldPos)
 {
+    if (event.type == sf::Event::MouseButtonPressed)
+    {
+        if (event.mouseButton.button == sf::Mouse::Left)
+        {
+            ArenaPoint addr = arena->GetArenaPoint( worldPos );
+            uiObjects.arenaCursor.SetArenaPoint( addr );
+            //uiObjects.cursorOne.SetPosWorld(worldPos);
+        }
+        if (event.mouseButton.button == sf::Mouse::Right)
+        {
+            //uiObjects.cursorTwo.SetPosWorld(worldPos);
+        }
+    }
+    
     if (event.type == sf::Event::MouseMoved)
     {
         if ( sf::Mouse::isButtonPressed(sf::Mouse::Middle) )
@@ -414,9 +444,9 @@ void PaneLevel::Draw(sf::RenderWindow & window)
 
 
 
-PaneBrain::PaneBrain(Model & model_p, Shp<BaseReferer> br, UIObjects & uio)
+PaneBrain::PaneBrain(Model & model_p, UIObjects & uio)
     :model_(model_p)
-    ,brain(br)
+    ,brain(model_p.GetArena()->GetMouseBrain())
     ,uiObjects(uio)
     ,highlightingMode(1)
 {
@@ -798,18 +828,19 @@ void PaneBar::Draw(sf::RenderWindow & window)
 //    lines[2].color = sf::Color::Yellow;
 //    window.draw(lines);
 
-//    PlanShp ap;
-//    if (cursorOne.GetState() != CursorState::ABSENT)
-//        ap = cursorOne.GetPlan();
-//    else
-//        ap = GetViewBasePlan();
-//    assert(ap);
+    PlanShp ap = nullptr;
+    if (uiObjects.cursorOne.GetState() != CursorState::ABSENT)
+        ap = uiObjects.cursorOne.GetPlan();
+    PlanID planID = 0;
+    if (ap)
+        planID = ap->GetPlanID();
+
     nameFilter.setString( theModel.GetNameFilter() );
     window.draw(nameFilter);
 
     marquee.Draw(window);
     
-    viewPanel.SetPlanID( 0 /*ap->GetPlanID()*/, theModel.GetPlanGroupData() );
+    viewPanel.SetPlanID( planID, theModel.GetPlanGroupData() );
     viewPanel.Draw(window);
 }
 
@@ -847,10 +878,6 @@ void PaneText::Handle(sf::Event & event)
         if (textEnterer_)
             textEnterer_->Append(event.text.unicode);
     }
-//    if (textEnterer_)
-//        SetTextEntering(true, textEnterer_->GetText());
-//    else
-//        SetTextEntering(false);
 }
 
 void PaneText::HandleMouse(sf::Event & event, sf::Vector2f worldPos)

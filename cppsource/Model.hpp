@@ -25,11 +25,11 @@ public:
     Model();
     Model(const Model&) = delete;
 
-    void OuterTick();
-    void InnerTick();
+//    void OuterTick();
+//    void InnerTick();
     
     Shp<Arena> GetArena()                                       {return arena;} //for View
-    Shp<BaseReferer> GetMouseBrain()                            {return arena->GetMouseBrain(); }
+    //Shp<BaseReferer> GetMouseBrain()                            {return mouseBa; }
 
     PlanShp LoadPlan(PlanShp, PlanNav nav, bool forced = false);
     void SavePlan(PlanShp, PlanNamingMode);
@@ -50,6 +50,7 @@ private:
     Shp<BlobFactory> factory_;
 
     Shp<Arena> arena;
+    Shp<ChipPlan> mouseBasePlan;
 };
 
 

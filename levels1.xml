@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<LEVEL num="x" name="test" min_x="-7" min_y="-7" max_x="5" max_y="6">
+<LEVEL num="1" name="test" min_x="-7" min_y="-7" max_x="5" max_y="6">
 	<INPUT name="F_WHISK" />
 	<INPUT name="L_WHISK" />
 	<INPUT name="R_WHISK" />
@@ -25,13 +25,15 @@
 		<WIRE f="1" t="0" w="1" fs="0" ts="2" />
 	</PLAN>
 </LEVEL>
-<LEVEL num="1" name="empty" min_x="-3" min_y="-3" max_x="3" max_y="3">
+<LEVEL num="x" name="empty" min_x="-3" min_y="-3" max_x="3" max_y="3">
 	<INPUT name="F_WHISK" />
 	<INPUT name="L_WHISK" />
 	<INPUT name="R_WHISK" />
 	<OUTPUT name="L_FOOT" />
 	<OUTPUT name="R_FOOT" />
 	<MSPAWN pos_x="0" pos_y="0" ori="0" />
+	<MSPAWN pos_x="-1" pos_y="1" ori="1" />
+	<MSPAWN pos_x="1" pos_y="1" ori="1" />
 	<CSPAWN pos_x="3" pos_y="3" ori="0" min_t="0" max_t="0" cat_plan="0" />
 </LEVEL>
 <LEVEL num="1x" name="go" min_x="0" min_y="-3" max_x="0" max_y="3">

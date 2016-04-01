@@ -19,28 +19,31 @@
 class Arena : public std::enable_shared_from_this<Arena>
 {
 public:
-    Arena(std::shared_ptr<BlobFactory>);
+    Arena(Shp<BlobFactory>);
     void Specify();
     void TimeAdvance();
-    std::shared_ptr<BaseReferer> GetMouseBrain()    { return mouseSpawnGroup.GetMouseBrain(); }
+    Shp<BaseReferer> GetMouseBrain()    { return mouseSpawnGroup.GetMouseBrain(); }
 
-    void RegisterMouse(std::shared_ptr<Mouse> mouse);
-    void RegisterCat(std::shared_ptr<Cat> cat);
-    std::shared_ptr<MouseSpawner> MakeMouseSpawner(ArenaPoint p, Orientation o);
-    std::shared_ptr<CatSpawner> MakeCatSpawner(ArenaPoint p, Orientation o, TimeRange timeRange, int planNum);
+    void RegisterMouse(Shp<Mouse> mouse);
+    void RegisterCat(Shp<Cat> cat);
+    Shp<MouseSpawner> MakeMouseSpawner(ArenaPoint p, Orientation o);
+    Shp<CatSpawner> MakeCatSpawner(ArenaPoint p, Orientation o, TimeRange timeRange, int planNum);
 
+    sf::FloatRect GetCellBounds(ArenaPoint ap);
+    ArenaPoint GetArenaPoint( VectorWorld worldPos );
+    Shp<ArenaEntity> GetEntity(ArenaPoint addr);
+    
     void Draw(sf::RenderTarget &rt);
     bool IsInBounds(ArenaPoint);
     bool WhiskerDetect(ArenaPoint);
-    sf::FloatRect GetCellBounds(int x, int y);
 private:
     void Interactions();
     void CrossoverCheck();
     int levelNum;
     CatSpawnGroup catSpawnGroup;
     MouseSpawnGroup mouseSpawnGroup;
-    std::vector< std::shared_ptr<Cat> > cats;
-    std::vector< std::shared_ptr<Mouse> > mice;
+    std::vector< Shp<Cat> > cats;
+    std::vector< Shp<Mouse> > mice;
     ArenaPoint minCorner;
     ArenaPoint maxCorner;
     bool isTimeOn_;

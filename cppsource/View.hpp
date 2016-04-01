@@ -50,21 +50,14 @@ private:
 
 
 
-//class View
-//{
-//public:
-//    View(Model & model_p);
-//    View(const View&) = delete;
-//    ~View() {}
-//    void Draw();
-//
-////Hmmm...
-////    sf::RenderWindow & GetWindow()                          {return window;}
-////    std::shared_ptr<Arena> GetArena()                       {return theModel.GetArena(); }
-////    PlanShp GetViewBasePlan()             {return theModel.GetMouseBrain()->GetSubPlan(); }
-//
-//};
 
+struct ArenaCursor
+{
+    ArenaPoint GetArenaPoint() { return ArenaPoint{x,y}; }
+    void SetArenaPoint(ArenaPoint a) { x = a.x; y = a.y; }
+    int x;
+    int y;
+};
 
 struct UIObjects
 {
@@ -74,6 +67,7 @@ struct UIObjects
     {}
     Cursor cursorOne;
     Cursor cursorTwo;
+    ArenaCursor arenaCursor;
     std::shared_ptr<TextEnterer> textEnterer_;
 };
 
@@ -119,12 +113,13 @@ private:
 class PaneBrain : public BaseAreaPane
 {
 public:
-    PaneBrain(Model &, Shp<BaseReferer>, UIObjects &);
+    PaneBrain(Model &, UIObjects &);
     virtual void Draw(sf::RenderWindow &) override;
     virtual void Handle(sf::Event &) override;
     virtual void HandleMouse(sf::Event &, sf::Vector2f) override;
     virtual void AutoClamp() override;
     void SetHighlightingMode(int x)             { highlightingMode = x; }
+    void SetBrain( Shp<BaseReferer> br)         { brain = br; }
 private:
     void HandlePlan(sf::Event &, PlanShp);
     void HandleLocated(sf::Event &, PlanPos);

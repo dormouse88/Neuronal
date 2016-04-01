@@ -37,3 +37,34 @@ TERMINOLOGY:
 	TIMEEXACT		- Time SPECIFIED
 	
 	LEVEL			- A defined configuration of an ARENA and its contents.
+
+
+
+KEYBINDINGS:
+0 		Cycle field mode
+1,2,3 	Select brain highlighting mode
+Q		Save (+shift - AsNew)
+W		Wipe (+ctrl+shift - forced)
+,		brain timestep
+.		arena timestep
+G		rename port
+S,X		explode/collapse handle
+[,]		revert cursor to plan only
+np1,3	next,prev ID
+np7,9	next,prev name
+np8,2	parent,firstchild
+np4,6	next,prev sibling
+-,+		clear/set name filter
+R		erase plan name
+E		add (or change) plan name
+H		add handle
+N		add neuron
+shiftN	remove device
+A,Z,\	device specific
+M		move device
+B		add wire (+shift - remove)
+D,C		wire specific (from end)
+F,V		wire specific (to end)
+
+8	view mouse-brain
+9	view/cycle cat-brains

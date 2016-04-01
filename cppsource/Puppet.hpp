@@ -19,42 +19,48 @@ class Arena;  //fwd dec
 class ArenaEntity
 {
 public:
-    ArenaEntity(ArenaPoint s_pos, Orientation s_ori, std::shared_ptr<Arena> ar);
+    ArenaEntity(ArenaPoint s_pos, Orientation s_ori, Shp<Arena> ar);
     virtual bool WhiskerDetectable() = 0;
     virtual void Draw(sf::RenderTarget & rt) = 0;
+    ArenaPoint GetActualPos()                                             { return pos_; }
+    Orientation GetActualOri()                                            { return ori_; }
+protected:
+    ArenaPoint GetAdjacentPos(Orientation);
+    std::weak_ptr<Arena> arena_;
+    ArenaPoint pos_;
+    Orientation ori_;
+};
+
+
+class ArenaMobile : public ArenaEntity
+{
+public:
+    ArenaMobile(ArenaPoint s_pos, Orientation s_ori, Shp<Arena> ar);
     virtual void Act() = 0;
     virtual void Sense() = 0;
 
-    ArenaPoint GetActualPos()                                             { return pos_; }
-    Orientation GetActualOri()                                            { return ori_; }
     void Die();
-
 protected:
     void WalkForward();
     void TurnLeft();
     void TurnRight();
-
-    ArenaPoint GetAdjacentPos(Orientation);
-    std::weak_ptr<Arena> arena_;
 private:
-    ArenaPoint pos_;
-    Orientation ori_;
     bool alive_;
 };
 
 
 
-class Puppet : public ArenaEntity
+class Puppet : public ArenaMobile
 {
 public:
-    Puppet(ArenaPoint s_pos, Orientation s_ori, std::shared_ptr<Arena> ar, std::shared_ptr<BaseReferer> brain);
+    Puppet(ArenaPoint s_pos, Orientation s_ori, Shp<Arena> ar, Shp<BaseReferer> brain);
     virtual void Act() override;
     virtual void Sense() override;
 
     //void SetBrain(std::shared_ptr<BaseReferer> b)       {brain_ = b;}
-    std::shared_ptr<BaseReferer> GetBrain()             {return brain_;}
+    Shp<BaseReferer> GetBrain()             {return brain_;}
 private:
-    std::shared_ptr<BaseReferer> brain_;
+    Shp<BaseReferer> brain_;
 };
 
 
@@ -65,7 +71,7 @@ const sf::Color CAT_COLOR_1     {255,0,100};
 class Mouse : public Puppet
 {
 public:
-    Mouse(ArenaPoint s_pos, Orientation s_ori, std::shared_ptr<Arena> ar, std::shared_ptr<BaseReferer> brain) :Puppet(s_pos, s_ori, ar, brain) {}
+    Mouse(ArenaPoint s_pos, Orientation s_ori, Shp<Arena> ar, Shp<BaseReferer> brain) :Puppet(s_pos, s_ori, ar, brain) {}
     bool WhiskerDetectable()                override 	{ return true; }
     void Draw(sf::RenderTarget & rt)        override;
 };
@@ -73,7 +79,7 @@ public:
 class Cat : public Puppet
 {
 public:
-    Cat(ArenaPoint s_pos, Orientation s_ori, std::shared_ptr<Arena> ar, std::shared_ptr<BaseReferer> brain) :Puppet(s_pos, s_ori, ar, brain) {}
+    Cat(ArenaPoint s_pos, Orientation s_ori, Shp<Arena> ar, Shp<BaseReferer> brain) :Puppet(s_pos, s_ori, ar, brain) {}
     bool WhiskerDetectable()                override    { return true; }
     void Draw(sf::RenderTarget & rt)        override;
 };

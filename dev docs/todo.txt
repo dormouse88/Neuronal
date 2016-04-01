@@ -1,6 +1,9 @@
 Do Next
 =======
 ---v---
+	Revert to highest_ID planID allocation method
+	PlanLoading: Add a namedOnly toggle (on by default). (Need sorting in planID order, but only through named plans). user should only really see plans by name.
+	Clean up plan name strings (externalize autoname/realname symbols)
 	Split Model class
 	Think about Cursor class
 	Make levels easier to make.
@@ -12,13 +15,12 @@ General
 Visual / Interface
 ==================
 	Draw slot valency number (to show how many slots are ignored in both directions) between handles and chips.
-	Set discrete zoom levels + use a smarter better centering algo (like googlemaps).
+	Set discrete zoom levels
 	Solve: No space to see wires between exploded chips when adjacent. Disallow adjacency? Draw plan boundary half a cell inwards? (changing GRID_SIZE doesn't help exploded chips)
 	Make wire text labels circle-shaped and place them intelligently (on wire but close to device).
 	Allow chip cycling while unexploded and draw name on the handle.
 	Choose highest number plan to load into an empty plan, not lowest.
 	Plan Grabbers becoming a bit unnecessary. Only used for loading/saving now.
-	View centers in wrong place in both: 1 Plan collapse and 2 Plan Load/Wipe
 	Add a reset all charge button.
 	Add a collapse all/expand! all button.
 	Add a device copy button? (useful for non-empty handles)
@@ -40,7 +42,6 @@ InnerSim
 
 Inbetween
 =========
-	Split view for arena/brain
 	Tools to make cat plans (plan exporting) (related to db trimming)
 	Allow viewing of cat brains. (if only for debugging and level design)
 	More robust XML loading (with feedback on failures)

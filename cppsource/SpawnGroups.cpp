@@ -64,7 +64,7 @@ void MouseSpawnGroup::Draw(sf::RenderTarget &rt, std::shared_ptr<Arena> ar)
     shape.setOutlineColor( MOUSE_COLOR_1 );
     for (auto s: spawns_)
     {
-        auto fr = ar->GetCellBounds(s->pos_.x,s->pos_.y);
+        auto fr = ar->GetCellBounds(s->pos_);
         shape.setPosition( fr.left + (fr.width/2.f), fr.top + (fr.height/2.f) );
         shape.setRotation( 90.f * s->ori_ );
         rt.draw(shape);
@@ -150,7 +150,7 @@ void CatSpawnGroup::Draw(sf::RenderTarget &rt, std::shared_ptr<Arena> ar)
     }
     for (auto s: spawns_)
     {
-        auto fr = ar->GetCellBounds(s->pos_.x,s->pos_.y);
+        auto fr = ar->GetCellBounds(s->pos_);
         shape.setPosition( fr.left + (fr.width/2.f), fr.top + (fr.height/2.f) );
         shape.setRotation( 90.f * s->ori_ );
         rt.draw(shape);
