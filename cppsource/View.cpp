@@ -100,27 +100,54 @@ void Marquee::Draw(sf::RenderTarget &rt)
 
 
 
+
+
+
+
+ArenaCursor::ArenaCursor(sf::Color color)
+{
+    shape_.setFillColor(sf::Color::Transparent);
+    shape_.setOutlineColor( color );
+    shape_.setOutlineThickness(-4.5f);
+}
+
+void ArenaCursor::Draw(sf::RenderTarget & rt)
+{
+    Shp<Arena> arena = addr_.arena.lock();
+    if (addr_.mode == ArenaAddressMode::CELL and arena)
+    {
+        sf::FloatRect bounds { arena->GetCellBounds(addr_.arenaPoint) };
+        shape_.setPosition( bounds.left, bounds.top );
+        shape_.setSize( {bounds.width, bounds.height} );
+        rt.draw(shape_, sf::RenderStates(sf::BlendAdd));
+    }
+}
+
+
+
+
+
 sf::FloatRect ConvertRect(sf::IntRect ir)
 {
     return sf::FloatRect { (float)ir.left, (float)ir.top, (float)ir.width, (float)ir.height };
 }
 
 //defunct?
-sf::Vector2i GetMouseEventPos(sf::Event & event, sf::RenderWindow & window)
-{
-    if (event.type == sf::Event::MouseButtonPressed)
-    {
-        return sf::Vector2i{ event.mouseButton.x, event.mouseButton.y };
-    }
-    else if (event.type == sf::Event::MouseWheelMoved)
-    {
-        return sf::Vector2i{ event.mouseWheel.x, event.mouseWheel.y };
-    }
-    else
-    {
-        return sf::Mouse::getPosition(window);
-    }
-}
+//sf::Vector2i GetMouseEventPos(sf::Event & event, sf::RenderWindow & window)
+//{
+//    if (event.type == sf::Event::MouseButtonPressed)
+//    {
+//        return sf::Vector2i{ event.mouseButton.x, event.mouseButton.y };
+//    }
+//    else if (event.type == sf::Event::MouseWheelMoved)
+//    {
+//        return sf::Vector2i{ event.mouseWheel.x, event.mouseWheel.y };
+//    }
+//    else
+//    {
+//        return sf::Mouse::getPosition(window);
+//    }
+//}
 
 ///////////////////     class View      ////////////////////////////////////////////////
 
@@ -171,8 +198,6 @@ bool PaneGroup::HandleInput()
         sf::IntRect vp = window.getViewport(p->view);
         if (vp.contains(mousePixelPos))
         {
-            //sf::Vector2f worldPos = window.mapPixelToCoords(mousePixelPos, p->view);
-            //p->HandleMouse(event, worldPos);
             mouseWPos = window.mapPixelToCoords(mousePixelPos, p->view);
             pane = p;
         }
@@ -408,13 +433,11 @@ void PaneLevel::HandleMouse(sf::Event & event, sf::Vector2f worldPos)
     {
         if (event.mouseButton.button == sf::Mouse::Left)
         {
-            ArenaPoint addr = arena->GetArenaPoint( worldPos );
-            uiObjects.arenaCursor.SetArenaPoint( addr );
-            //uiObjects.cursorOne.SetPosWorld(worldPos);
+            ArenaPoint ap = arena->GetArenaPoint( worldPos );
+            uiObjects.arenaCursor.SetArenaPoint( ap, arena );
         }
         if (event.mouseButton.button == sf::Mouse::Right)
         {
-            //uiObjects.cursorTwo.SetPosWorld(worldPos);
         }
     }
     
@@ -438,6 +461,7 @@ void PaneLevel::Draw(sf::RenderWindow & window)
     window.setView(view);
     assert(arena);
     arena->Draw(window);
+    uiObjects.arenaCursor.Draw(window);
 }
 
 
@@ -449,11 +473,7 @@ PaneBrain::PaneBrain(Model & model_p, UIObjects & uio)
     ,brain(model_p.GetArena()->GetMouseBrain())
     ,uiObjects(uio)
     ,highlightingMode(1)
-{
-    //DEL
-//    uiObjects.cursorOne.SetToPlan( brain->GetSubPlan() );
-//    uiObjects.cursorTwo.SetToPlan( brain->GetSubPlan() );
-}
+{}
 
 void PaneBrain::AutoClamp()
 {
@@ -473,7 +493,6 @@ void PaneBrain::Handle(sf::Event & event)
         //requires brain...
         if (event.key.code == sf::Keyboard::Comma)
         {
-            //model_.InnerTick();
             if (not brain->IsAnyOutputOn())
                 brain->TickOnce();
         }
@@ -674,7 +693,6 @@ void PaneBrain::HandleLocated(sf::Event & event, PlanPos pos1)
         PlanShp plan2 = pa2.plan.lock();
         if (pa2.mode == PlanAddressMode::CELL)
         {
-            //RED//PlanPos pp2 { pa2.pos, plan2->GetGrid() };
             //EventsBothLocated(pos1, pos2);
             if (event.key.code == sf::Keyboard::M)
             {

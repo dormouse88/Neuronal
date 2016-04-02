@@ -5,7 +5,6 @@ Do Next
 	PlanLoading: Add a namedOnly toggle (on by default). (Need sorting in planID order, but only through named plans). user should only really see plans by name.
 	Clean up plan name strings (externalize autoname/realname symbols)
 	Split Model class
-	Think about Cursor class
 	Make levels easier to make.
 		Cat brains should be selectable and editable and saveable.
 
@@ -42,8 +41,7 @@ InnerSim
 
 Inbetween
 =========
-	Tools to make cat plans (plan exporting) (related to db trimming)
-	Allow viewing of cat brains. (if only for debugging and level design)
+	Incorporate cat plans into main db. (Plan and Level import and export can come later)
 	More robust XML loading (with feedback on failures)
 
 

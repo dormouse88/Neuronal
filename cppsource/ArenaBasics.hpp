@@ -27,13 +27,6 @@ struct ArenaPoint
     int y;
 };
 
-enum class ArenaAddressMode { ABSENT, CELL };
-struct ArenaAddress
-{
-    ArenaAddressMode mode;
-    ArenaPoint arenaPoint;
-};
-
 inline bool operator==(const ArenaPoint & lhs, const ArenaPoint & rhs)
 {
     return (lhs.x == rhs.x and lhs.y == rhs.y);

@@ -9,19 +9,17 @@
         <group>
             <file>file:/C:/Users/Dormouse/Documents/NetBeansProjects/Neuronal/cppsource/Puppet.cpp</file>
             <file>file:/C:/Users/Dormouse/Documents/NetBeansProjects/Neuronal/cppsource/View.cpp</file>
-            <file>file:/C:/Users/Dormouse/Documents/NetBeansProjects/Neuronal/cppsource/Spawners.hpp</file>
             <file>file:/C:/Users/Dormouse/Documents/NetBeansProjects/Neuronal/cppsource/Arena.hpp</file>
             <file>file:/C:/Users/Dormouse/Documents/NetBeansProjects/Neuronal/cppsource/ArenaBasics.hpp</file>
+            <file>file:/C:/Users/Dormouse/Documents/NetBeansProjects/Neuronal/cppsource/PlanPos.hpp</file>
+            <file>file:/C:/Users/Dormouse/Documents/NetBeansProjects/Neuronal/cppsource/WiringPair.hpp</file>
             <file>file:/C:/Users/Dormouse/Documents/NetBeansProjects/Neuronal/cppsource/View.hpp</file>
             <file>file:/C:/Users/Dormouse/Documents/NetBeansProjects/Neuronal/cppsource/Puppet.hpp</file>
-            <file>file:/C:/Users/Dormouse/Documents/NetBeansProjects/Neuronal/cppsource/Model.hpp</file>
-            <file>file:/C:/Users/Dormouse/Documents/NetBeansProjects/Neuronal/cppsource/Serializer.cpp</file>
             <file>file:/C:/Users/Dormouse/Documents/NetBeansProjects/Neuronal/cppsource/Arena.cpp</file>
             <file>file:/C:/Users/Dormouse/Documents/NetBeansProjects/Neuronal/cppsource/ChipPlan.cpp</file>
-            <file>file:/C:/Users/Dormouse/Documents/NetBeansProjects/Neuronal/cppsource/Model.cpp</file>
-            <file>file:/C:/Users/Dormouse/Documents/NetBeansProjects/Neuronal/cppsource/SpawnGroups.hpp</file>
-            <file>file:/C:/Users/Dormouse/Documents/NetBeansProjects/Neuronal/cppsource/Serializer.hpp</file>
-            <file>file:/C:/Users/Dormouse/Documents/NetBeansProjects/Neuronal/cppsource/BaseReferer.cpp</file>
+            <file>file:/C:/Users/Dormouse/Documents/NetBeansProjects/Neuronal/cppsource/Cursor.cpp</file>
+            <file>file:/C:/Users/Dormouse/Documents/NetBeansProjects/Neuronal/cppsource/Cursor.hpp</file>
+            <file>file:/C:/Users/Dormouse/Documents/NetBeansProjects/Neuronal/cppsource/ChipPlan.hpp</file>
         </group>
     </open-files>
 </project-private>

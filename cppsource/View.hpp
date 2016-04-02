@@ -50,13 +50,25 @@ private:
 
 
 
-
-struct ArenaCursor
+enum class ArenaAddressMode { ABSENT, CELL };
+struct ArenaAddress
 {
-    ArenaPoint GetArenaPoint() { return ArenaPoint{x,y}; }
-    void SetArenaPoint(ArenaPoint a) { x = a.x; y = a.y; }
-    int x;
-    int y;
+    ArenaAddressMode mode;
+    ArenaPoint arenaPoint;
+    std::weak_ptr<Arena> arena;
+};
+
+class ArenaCursor
+{
+public:
+    ArenaCursor(sf::Color);
+    void Draw(sf::RenderTarget & rt);
+    ArenaAddressMode GetMode() { return addr_.mode; }
+    ArenaPoint GetArenaPoint() { assert(addr_.mode == ArenaAddressMode::CELL); return addr_.arenaPoint; }
+    void SetArenaPoint(ArenaPoint ap, Shp<Arena> ar) { addr_.mode = ArenaAddressMode::CELL; addr_.arenaPoint = ap; addr_.arena = ar;}
+private:
+    ArenaAddress addr_;
+    sf::RectangleShape shape_;
 };
 
 struct UIObjects
@@ -64,6 +76,7 @@ struct UIObjects
     UIObjects()
         :cursorOne( sf::Color::Yellow )
         ,cursorTwo( sf::Color::Cyan )
+        ,arenaCursor( sf::Color::Green )
     {}
     BrainCursor cursorOne;
     BrainCursor cursorTwo;
