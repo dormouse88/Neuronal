@@ -23,17 +23,6 @@ Model::Model()
     arena->Specify();
 }
 
-//void Model::OuterTick()
-//{
-//    arena->TimeAdvance();
-//}
-//void Model::InnerTick()
-////Does an InnerTick ONLY if it won't affect the Outer
-//{
-//    if ( not GetMouseBrain()->IsAnyOutputOn() )
-//        GetMouseBrain()->TickOnce();
-//}
-
 PlanShp Model::LoadPlan(PlanShp plan, PlanNav nav, bool forced)
 {
     if (forced or not plan->IsModified())
@@ -53,16 +42,16 @@ PlanShp Model::LoadPlan(PlanShp plan, PlanNav nav, bool forced)
     return nullptr;
 }
 
-void Model::SavePlan(PlanShp plan, PlanNamingMode mode)
+void Model::SavePlan(PlanShp plan, PlanNamingMode mode, std::string provided)
 {
     if (plan->IsModified())
     {
-        SavePlanRecursively(plan, mode);
+        SavePlanRecursively(plan, mode, provided);
         serializer->SavePlanGroupData(planGroupData_);
     }
 }
 
-void Model::SavePlanRecursively(PlanShp plan, PlanNamingMode mode)
+void Model::SavePlanRecursively(PlanShp plan, PlanNamingMode mode, std::string provided)
 {
     for (auto d: plan->devices)
     {
@@ -88,13 +77,18 @@ void Model::SavePlanRecursively(PlanShp plan, PlanNamingMode mode)
 
     //names...
     PlanName oldName = planGroupData_->GetNameByID( oldID );
-    assert(not (mode == PlanNamingMode::TRANSFER and oldName.empty()) );
-    if (mode == PlanNamingMode::AUTONAME)
+    if (mode == PlanNamingMode::PROVIDED)
     {
-        planGroupData_->AddName(newID, planGroupData_->GetUnusedAutoName(), false); //can assert success
+        planGroupData_->AddName(newID, provided, false);
+        //Append unique suffix in event of name clash (or if empty string)
     }
+//    else if (mode == PlanNamingMode::AUTONAME)
+//    {
+//        planGroupData_->AddName(newID, planGroupData_->GetUnusedAutoName(), false); //can assert success
+//    }
     else if (mode == PlanNamingMode::TRANSFER)
     {
+        assert( not (oldName.empty()) );
         planGroupData_->RemoveName(oldID);
         planGroupData_->AddName(newID, oldName, false); //can assert success
     }
@@ -106,17 +100,18 @@ void Model::SavePlanRecursively(PlanShp plan, PlanNamingMode mode)
 
 std::string Model::GetCleanRealPlanName(PlanID id) const
 {
-    auto n = planGroupData_->GetNameByID(id);
-    if (not n.empty() and n.substr(0,1) == REAL_NAME_PREFIX)
-        return n.substr(1);
-    return NULL_PLAN_NAME;
+    return planGroupData_->GetNameByID(id);
+//    auto n = planGroupData_->GetNameByID(id);
+//    if (not n.empty() and n.substr(0,1) == REAL_NAME_PREFIX)
+//        return n.substr(1);
+//    return NULL_PLAN_NAME;
 }
 
 
-void Model::SetRealName(PlanID id, std::string name)
+void Model::AddOrChangeName(PlanID id, std::string name)
 {
-    auto prefixedName = REAL_NAME_PREFIX + name;
-    planGroupData_->AddName(id, prefixedName, true); //stomp any nametype (but may still fail on non-unique name)
+    //auto prefixedName = REAL_NAME_PREFIX + name;
+    planGroupData_->AddName(id, name, true); //stomp any nametype (but may still fail on non-unique name)
     serializer->SavePlanGroupData(planGroupData_);
 }
 

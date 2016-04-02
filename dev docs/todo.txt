@@ -1,12 +1,13 @@
 Do Next
 =======
 ---v---
+	Clean up plan name strings (externalize autoname/realname symbols)
+		Do away with autonames and require plans to have a primed name before saving???
 	Revert to highest_ID planID allocation method
 	PlanLoading: Add a namedOnly toggle (on by default). (Need sorting in planID order, but only through named plans). user should only really see plans by name.
-	Clean up plan name strings (externalize autoname/realname symbols)
+	
 	Split Model class
-	Make levels easier to make.
-		Cat brains should be selectable and editable and saveable.
+	Make levels easier to make. (editable and saveable)
 
 General
 =======
@@ -41,8 +42,8 @@ InnerSim
 
 Inbetween
 =========
-	Incorporate cat plans into main db. (Plan and Level import and export can come later)
 	More robust XML loading (with feedback on failures)
+	Plan and Level import and export can come a lot later.
 
 
 OuterGame

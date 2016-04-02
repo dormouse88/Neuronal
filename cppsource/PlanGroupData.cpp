@@ -180,7 +180,8 @@ bool PlanGroupData::AddName(PlanID planID, PlanName name, bool stomp)
     {
         RemoveName(planID);
     }
-    if ( DeduceNameType( GetNameByID(planID) ) == NameType::NONE)
+    //if ( DeduceNameType( GetNameByID(planID) ) == NameType::NONE)
+    if (GetNameByID(planID) == NULL_PLAN_NAME)
     {
         namesByID.insert( std::make_pair(planID, name) );
         namesByName.insert( std::make_pair(name, planID) );
@@ -190,32 +191,32 @@ bool PlanGroupData::AddName(PlanID planID, PlanName name, bool stomp)
     return false;
 }
 
-PlanName PlanGroupData::GetUnusedAutoName() const
-{
-    PlanName randomName;
-    for (int i = 0; i <= AUTO_NAME_MAX_LENGTH; ++i)
-    {
-        randomName.push_back( AUTO_NAME_CHARS.at( rand() % AUTO_NAME_CHARS.length() ) );
-        if (namesByName.count(AUTO_NAME_PREFIX + randomName) == 0)
-        {
-            return AUTO_NAME_PREFIX + randomName;
-        }
-    }
-    return NULL_PLAN_NAME;
-}
+//PlanName PlanGroupData::GetUnusedAutoName() const
+//{
+//    PlanName randomName;
+//    for (int i = 0; i <= AUTO_NAME_MAX_LENGTH; ++i)
+//    {
+//        randomName.push_back( AUTO_NAME_CHARS.at( rand() % AUTO_NAME_CHARS.length() ) );
+//        if (namesByName.count(AUTO_NAME_PREFIX + randomName) == 0)
+//        {
+//            return AUTO_NAME_PREFIX + randomName;
+//        }
+//    }
+//    return NULL_PLAN_NAME;
+//}
 
 
 
 
 
-NameType DeduceNameType(PlanName name)
-{
-    if (name == NULL_PLAN_NAME)
-        return NameType::NONE;
-    else if (name.substr(0,1) == AUTO_NAME_PREFIX)
-        return NameType::AUTO;
-    else if (name.substr(0,1) == REAL_NAME_PREFIX)
-        return NameType::REAL;
-    assert(false);
-}
+//NameType DeduceNameType(PlanName name)
+//{
+//    if (name == NULL_PLAN_NAME)
+//        return NameType::NONE;
+//    else if (name.substr(0,1) == AUTO_NAME_PREFIX)
+//        return NameType::AUTO;
+//    else if (name.substr(0,1) == REAL_NAME_PREFIX)
+//        return NameType::REAL;
+//    assert(false);
+//}
 

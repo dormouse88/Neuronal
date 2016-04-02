@@ -268,6 +268,8 @@ void PaneGroup::HandleInputEvents(BasePane * pane, sf::Vector2f worldPos)
                         if (puppet)
                         {
                             paneBrain.SetBrain( puppet->GetBrain() );
+                            uiObjects.cursorOne.SetPlanAddress(PlanAddress{});
+                            uiObjects.cursorTwo.SetPlanAddress(PlanAddress{});
                         }
                     }
                 }
@@ -570,9 +572,17 @@ void PaneBrain::HandlePlan(sf::Event & event, PlanShp plan)
         //Save plan
         if (not event.key.shift and (model_.GetPlanGroupData()->GetNameByID(plan->GetPlanID()) != NULL_PLAN_NAME))  //ouch
             model_.SavePlan( plan, PlanNamingMode::TRANSFER );
-        else;
-            model_.SavePlan( plan, PlanNamingMode::AUTONAME );
+//        else;
+//            model_.SavePlan( plan, PlanNamingMode::AUTONAME );
     }
+    if (event.key.code == sf::Keyboard::Tab)
+    {
+        //Save plan with a name
+        uiObjects.textEnterer_ = std::make_shared<TextEnterer>();
+        auto bound = std::bind( &Model::SavePlan, &model_, plan, PlanNamingMode::PROVIDED, std::placeholders::_1 );
+        uiObjects.textEnterer_->SetDispatchTarget( bound );
+    }
+    
     if (event.key.code == sf::Keyboard::W)
     {
         //Wipe Plan
@@ -639,7 +649,7 @@ void PaneBrain::HandlePlan(sf::Event & event, PlanShp plan)
         //set plan name
         assert(not uiObjects.textEnterer_);
         uiObjects.textEnterer_ = std::make_shared<TextEnterer>();
-        auto bound = std::bind( &Model::SetRealName, &model_, plan->GetPlanID(), std::placeholders::_1 );
+        auto bound = std::bind( &Model::AddOrChangeName, &model_, plan->GetPlanID(), std::placeholders::_1 );
         uiObjects.textEnterer_->SetDispatchTarget( bound );
         uiObjects.textEnterer_->SetText( model_.GetCleanRealPlanName(plan->GetPlanID()) );
     }

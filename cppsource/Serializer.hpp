@@ -30,7 +30,7 @@ public:
     PlanID    GetFirstFreePlanID() const;
     bool      SaveUserPlan(PlanShp);
     PlanShp   LoadUserPlan(PlanID, std::shared_ptr<BlobFactory>);
-    PlanShp   LoadLevelPlan(LevelNum, PlanID, std::shared_ptr<BlobFactory>);
+//    PlanShp   LoadLevelPlan(LevelNum, PlanID, std::shared_ptr<BlobFactory>);
 
     //PlanGroups...
     void LoadPlanGroupData(std::shared_ptr<PlanGroupData>);

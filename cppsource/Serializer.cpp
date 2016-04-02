@@ -83,7 +83,8 @@ void Serializer::LoadLevel(LevelNum num, std::shared_ptr<Arena> a, std::shared_p
             auto brain = spawner->GetCatBrain();
             if (planNum != 0)
             {
-                auto catPlan = LoadLevelPlan( num, planNum, f );
+                //WAS//auto catPlan = LoadLevelPlan( num, planNum, f );
+                auto catPlan = LoadUserPlan(planNum, f);
                 assert(catPlan);
                 brain->SetSubPlan(catPlan, brain);
             }
@@ -98,19 +99,28 @@ void Serializer::LoadLevel(LevelNum num, std::shared_ptr<Arena> a, std::shared_p
 
 PlanID Serializer::GetFirstFreePlanID() const
 {
-    const int MAX_PLAN_ID = 100000;
-    //check highest used planID in the XML and use next number as new planID...
-    PlanID ret = NULL_PID;
-    for (int i = 1; i<MAX_PLAN_ID; i++)
-    {
-        if ( not userDoc_.child("PLANS").find_child_by_attribute("PLAN", "i", patch::to_string( i ).c_str() ) )
-        {
-            ret = i;
-            break;
-        }
-    }
-    assert(ret != NULL_PID);
-    return ret;
+    //Newer method of getting unique planID...
+    //Gone back to old method now since it preserves historical uniqueness...
+//    const int MAX_PLAN_ID = 100000;
+//    //check highest used planID in the XML and use next number as new planID...
+//    PlanID ret = NULL_PID;
+//    for (int i = 1; i<MAX_PLAN_ID; i++)
+//    {
+//        if ( not userDoc_.child("PLANS").find_child_by_attribute("PLAN", "i", patch::to_string( i ).c_str() ) )
+//        {
+//            ret = i;
+//            break;
+//        }
+//    }
+//    assert(ret != NULL_PID);
+//    return ret;
+
+//        Old method of saving highest int used...
+    pugi::xml_node db = userDoc_.child("PLANS").child("PLAN_DB");
+    PlanID newID = db.attribute("HIGHEST_ID").as_int() + 1;
+    db.attribute("HIGHEST_ID") = newID;
+    assert(newID != NULL_PID);
+    return newID;
 }
 
 bool Serializer::SaveUserPlan(PlanShp plan_p)
@@ -124,11 +134,11 @@ PlanShp Serializer::LoadUserPlan(PlanID planID, std::shared_ptr<BlobFactory> fac
     return LoadPlanRecursively(userDoc_.child("PLANS"), planID, factory);
 }
 
-PlanShp Serializer::LoadLevelPlan(LevelNum levelNum, PlanID planID, std::shared_ptr<BlobFactory> factory)
-{
-    pugi::xml_node con = levelsDoc_.find_child_by_attribute("LEVEL", "num", patch::to_string( levelNum ).c_str() );
-    return LoadPlanRecursively(con, planID, factory);
-}
+//PlanShp Serializer::LoadLevelPlan(LevelNum levelNum, PlanID planID, std::shared_ptr<BlobFactory> factory)
+//{
+//    pugi::xml_node con = levelsDoc_.find_child_by_attribute("LEVEL", "num", patch::to_string( levelNum ).c_str() );
+//    return LoadPlanRecursively(con, planID, factory);
+//}
 
 void Serializer::LoadPlanGroupData(std::shared_ptr<PlanGroupData> ud)
 {

@@ -51,7 +51,7 @@ public:
 //names    
     PlanID   GetIDByName(PlanName name) const;
     PlanName GetNameByID(PlanID planID) const;
-    PlanName GetUnusedAutoName() const;
+//    PlanName GetUnusedAutoName() const;
     //setters
     void RemoveName(PlanID planID);
     bool AddName(PlanID planID, std::string name, bool stomp);
@@ -68,7 +68,7 @@ private:
 };
 
 
-NameType DeduceNameType(PlanName);
+//NameType DeduceNameType(PlanName);
 
 #endif	/* PLANGROUPDATA_HPP */
 
