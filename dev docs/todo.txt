@@ -1,11 +1,8 @@
 Do Next
 =======
 ---v---
-	Clean up plan name strings (externalize autoname/realname symbols)
-		Do away with autonames and require plans to have a primed name before saving???
-	Revert to highest_ID planID allocation method
-	PlanLoading: Add a namedOnly toggle (on by default). (Need sorting in planID order, but only through named plans). user should only really see plans by name.
-	
+	Saved and unsaved plans should be different colour
+	Handles, etc. should show name primarily and ID only faintly.
 	Split Model class
 	Make levels easier to make. (editable and saveable)
 

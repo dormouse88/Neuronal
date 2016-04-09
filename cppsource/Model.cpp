@@ -29,7 +29,7 @@ PlanShp Model::LoadPlan(PlanShp plan, PlanNav nav, bool forced)
     {
         PlanID newID = planGroupData_->GetID(plan->GetPlanID(), nav);
         auto newPlan = factory_->MakePlan();
-        if (newID != 0)
+        if (newID != NULL_PID)
             newPlan = serializer->LoadUserPlan(newID, factory_);
         assert(newPlan);
         {
@@ -79,8 +79,8 @@ void Model::SavePlanRecursively(PlanShp plan, PlanNamingMode mode, std::string p
     PlanName oldName = planGroupData_->GetNameByID( oldID );
     if (mode == PlanNamingMode::PROVIDED)
     {
-        planGroupData_->AddName(newID, provided, false);
-        //Append unique suffix in event of name clash (or if empty string)
+        AddName(newID, provided);
+            //Will append unique suffix in event of name clash (or if empty string)
     }
 //    else if (mode == PlanNamingMode::AUTONAME)
 //    {
@@ -89,8 +89,8 @@ void Model::SavePlanRecursively(PlanShp plan, PlanNamingMode mode, std::string p
     else if (mode == PlanNamingMode::TRANSFER)
     {
         assert( not (oldName.empty()) );
-        planGroupData_->RemoveName(oldID);
-        planGroupData_->AddName(newID, oldName, false); //can assert success
+        RemoveName(oldID);
+        AddName(newID, oldName);
     }
     else if (mode == PlanNamingMode::ANON)
         {    }
@@ -98,21 +98,28 @@ void Model::SavePlanRecursively(PlanShp plan, PlanNamingMode mode, std::string p
         assert(false);
 }
 
-std::string Model::GetCleanRealPlanName(PlanID id) const
+
+std::string Model::GetPlanName(PlanID id) const
 {
     return planGroupData_->GetNameByID(id);
-//    auto n = planGroupData_->GetNameByID(id);
-//    if (not n.empty() and n.substr(0,1) == REAL_NAME_PREFIX)
-//        return n.substr(1);
-//    return NULL_PLAN_NAME;
 }
 
-
-void Model::AddOrChangeName(PlanID id, std::string name)
+void Model::AddName(PlanID id, std::string name)
 {
-    //auto prefixedName = REAL_NAME_PREFIX + name;
-    planGroupData_->AddName(id, name, true); //stomp any nametype (but may still fail on non-unique name)
-    serializer->SavePlanGroupData(planGroupData_);
+    if ( GetPlanName(id) == NULL_PLAN_NAME )
+    {
+        planGroupData_->SetName(id, name);
+        serializer->SavePlanGroupData(planGroupData_);
+    }
+}
+
+void Model::ChangeName(PlanID id, std::string name)
+{
+    if ( GetPlanName(id) != NULL_PLAN_NAME )
+    {
+        planGroupData_->SetName(id, name);
+        serializer->SavePlanGroupData(planGroupData_);
+    }
 }
 
 void Model::RemoveName(PlanID id)

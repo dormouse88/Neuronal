@@ -31,11 +31,11 @@ public:
     void SavePlan(PlanShp, PlanNamingMode, std::string provided = "");
 
     PlanShp EngageNameFilter(PlanShp plan, std::string filter)        { planGroupData_->SetNameFilter(filter); return LoadPlan(plan, PlanNav::FILTER_NAME); }
-        //{ planGroupData_->SetNameFilter(REAL_NAME_PREFIX + filter); return LoadPlan(plan, PlanNav::FILTER_NAME); }
     std::string GetNameFilter() const                                 { return planGroupData_->GetNameFilter(); }
-        //{ auto s = planGroupData_->GetNameFilter(); if (s.size()>0) return s.substr(1); else return s; }
-    std::string GetCleanRealPlanName(PlanID id) const;
-    void AddOrChangeName(PlanID id, std::string name);
+
+    PlanName GetPlanName(PlanID id) const;
+    void AddName(PlanID id, std::string name);
+    void ChangeName(PlanID id, std::string name);
     void RemoveName(PlanID id);
 
     Shp<const PlanGroupData> GetPlanGroupData() const       {return planGroupData_;}

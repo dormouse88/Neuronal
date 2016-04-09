@@ -22,7 +22,7 @@ PlanID PlanGroupData::GetID(PlanID planID, PlanNav nav) const
     {
         target = NULL_PID;
     }
-    else if (nav == PlanNav::PREV_NAME or nav == PlanNav::NEXT_NAME or nav == PlanNav::FILTER_NAME)  //access the name maps
+    else if (nav == PlanNav::PREV_NAME or nav == PlanNav::NEXT_NAME or nav == PlanNav::FILTER_NAME)  //access the named by name maps
     {
         auto nn_it = namesByName.find( GetNameByID(planID) );
         auto nn_end = namesByName.end();
@@ -55,6 +55,25 @@ PlanID PlanGroupData::GetID(PlanID planID, PlanNav nav) const
             if ( nav == PlanNav::PREV_NAME and nn_it != lower ) --nn_it;
             if ( nav == PlanNav::NEXT_NAME and nn_it != std::prev(upper) ) ++nn_it;
             target = nn_it->second;
+        }
+    }
+    else if (nav == PlanNav::PREV_NAMED_ID or nav == PlanNav::NEXT_NAMED_ID)  //access the named by id maps
+    {        //(this section does not currently apply the nameFilter)
+        auto lower = namesByID.begin();
+        auto upper = namesByID.end();
+        auto valid_it = namesByID.lower_bound(planID);
+        if (lower == upper)
+            target = NULL_PID;
+        else
+        {
+            if (valid_it->first == planID)
+            {
+                if (nav == PlanNav::PREV_NAMED_ID and valid_it != lower)
+                    --valid_it;
+                if (nav == PlanNav::NEXT_NAMED_ID and valid_it != std::prev(upper))
+                    ++valid_it;
+            }
+            target = valid_it->first;
         }
     }
     else  //access the ancestry maps
@@ -150,46 +169,43 @@ void PlanGroupData::AddAncestryEntry(PlanID id, PlanID anc)
 
 
 //Names //Getters
-PlanID PlanGroupData::GetIDByName(PlanName name) const
-{
-    if (namesByName.count(name) > 0) return namesByName.at(name);
-    else return NULL_PID;
-}
+//PlanID PlanGroupData::GetIDByName(PlanName name) const
+//{
+//    if (namesByName.count(name) > 0)
+//        return namesByName.at(name);
+//    else
+//        return NULL_PID;
+//}
 PlanName PlanGroupData::GetNameByID(PlanID planID) const
 {
-    if (namesByID.count(planID) > 0) return namesByID.at(planID);
-    else return NULL_PLAN_NAME;
+    if (namesByID.count(planID) > 0)
+        return namesByID.at(planID);
+    else
+        return NULL_PLAN_NAME;
 }
 
 //Names //Setters
+void PlanGroupData::SetName(PlanID planID, PlanName name)
+{
+    if (planID != NULL_PID)
+    {
+        RemoveName(planID);
+        std::string uniqueName = AddUniqueifyingAppendage(name);
+
+        namesByID.insert( std::make_pair(planID, uniqueName) );
+        namesByName.insert( std::make_pair(uniqueName, planID) );
+    }
+}
+
 void PlanGroupData::RemoveName(PlanID planID)
 {
-    if ( GetNameByID(planID) != NULL_PLAN_NAME )
+    if (planID != NULL_PID)
     {
         namesByName.erase( GetNameByID(planID) );
         namesByID.erase(planID);
     }
 }
-bool PlanGroupData::AddName(PlanID planID, PlanName name, bool stomp)
-{
-    if ( GetIDByName(name) != NULL_PID )
-    {
-        return false;
-    }
-    if (stomp)
-    {
-        RemoveName(planID);
-    }
-    //if ( DeduceNameType( GetNameByID(planID) ) == NameType::NONE)
-    if (GetNameByID(planID) == NULL_PLAN_NAME)
-    {
-        namesByID.insert( std::make_pair(planID, name) );
-        namesByName.insert( std::make_pair(name, planID) );
-        return true;
-    }
-    assert(not stomp);
-    return false;
-}
+
 
 //PlanName PlanGroupData::GetUnusedAutoName() const
 //{
@@ -205,18 +221,32 @@ bool PlanGroupData::AddName(PlanID planID, PlanName name, bool stomp)
 //    return NULL_PLAN_NAME;
 //}
 
+std::string PlanGroupData::AddUniqueifyingAppendage(std::string name)
+{
+    if (namesByName.count(name) == 0)
+        return name;
+    const std::string CHAR_POOL = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    name.append( 1, CHAR_POOL.front() );
 
-
-
-
-//NameType DeduceNameType(PlanName name)
-//{
-//    if (name == NULL_PLAN_NAME)
-//        return NameType::NONE;
-//    else if (name.substr(0,1) == AUTO_NAME_PREFIX)
-//        return NameType::AUTO;
-//    else if (name.substr(0,1) == REAL_NAME_PREFIX)
-//        return NameType::REAL;
-//    assert(false);
-//}
-
+    //Initializes tag to the first available value (similar to numeric counting).
+    //These loops look a bit odd but work as intended. (A,B,C...Z,AA,AB...AZ,BA,BB,etc)
+    while (true)
+    {
+        if (namesByName.count(name) == 0)
+            return name;
+        int ti = name.size() - 1;
+        while ( (not (ti < 0)) and (name.at(ti) == CHAR_POOL.back()) )
+        {
+            name.at(ti) = CHAR_POOL.front();
+            ti--;
+        }
+        if (ti < 0)
+        {
+            name.insert(0, 1, CHAR_POOL.front());
+        }
+        else
+        {
+            name.at(ti)++;
+        }
+    }
+}

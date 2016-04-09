@@ -1,5 +1,13 @@
-
-
-
-
+PLAN LOADING:
+	containment traversal ordering algo:
+		Read from the XML and create a map<planIDs, vector<directly contained planIDs> >
+		From that create another map of map<planIDs, vector<directly or indirectly contained planIDs> >
+		From that create another map of map<planIDs, vector<directly or indirectly containing planIDs> >
+		Iterate through the map (in any order) and assign a float order value (FOV) that is bigger than biggest containing planIDs FOV and smaller than the smallest contained planIDs FOV.
+		Sort by FOV.
+	Traversal categories:
+		Named (by name, by id)
+		All (by id)
+		Ancestry(as is?)
+		Containment(5 keys: parents, children, next/prev siblings, accept)
 

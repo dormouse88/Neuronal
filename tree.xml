@@ -75,7 +75,7 @@
 	<REL i="75" anc="0" />
 </RELATIVES>
 <PLANS>
-	<PLAN_DB HIGHEST_ID="152" />
+	<PLAN_DB HIGHEST_ID="156" />
 	<PLAN i="1">
 		<NEUR i="1" x="-1" y="-1" thr="1" />
 		<NEUR i="2" x="0" y="-1" thr="1" />
@@ -3039,16 +3039,29 @@
 		<HAND i="2" x="-1" y="0" link="151" />
 		<NEUR i="3" x="-1" y="2" bulb="0" />
 	</PLAN>
+	<PLAN i="153" anc="0">
+		<NEUR i="1" x="0" y="0" bulb="0" />
+	</PLAN>
+	<PLAN i="154" anc="0">
+		<NEUR i="1" x="0" y="0" bulb="0" />
+	</PLAN>
+	<PLAN i="155" anc="153">
+		<NEUR i="1" x="0" y="0" bulb="0" />
+		<NEUR i="2" x="0" y="1" bulb="0" />
+		<HAND i="3" x="1" y="0" link="154" />
+	</PLAN>
+	<PLAN i="156" anc="0">
+		<NEUR i="1" x="1" y="0" bulb="0" />
+		<NEUR i="2" x="1" y="1" bulb="0" />
+		<NEUR i="3" x="0" y="1" bulb="0" />
+	</PLAN>
 </PLANS>
 <NAMES>
-	<NAME i="1" n="%FIRSTO" />
-	<NAME i="2" n="%OKCA" />
-	<NAME i="3" n="%REB" />
-	<NAME i="5" n="%OOPS" />
+	<NAME i="2" n="COW" />
 	<NAME i="6" n="MOVELINK" />
 	<NAME i="7" n="4CHAINSPIRAL" />
 	<NAME i="8" n="4SEQSPIRAL" />
-	<NAME i="9" n="LATCH" />
+	<NAME i="9" n="LATCHY" />
 	<NAME i="13" n="DECREMENTER" />
 	<NAME i="14" n="4BITDEC" />
 	<NAME i="17" n="GATEDLATCH" />
@@ -3075,44 +3088,13 @@
 	<NAME i="53" n="1BITDIMEM" />
 	<NAME i="54" n="4BITDIMEM" />
 	<NAME i="55" n="8BITDIMEM" />
-	<NAME i="56" n="@Q" />
-	<NAME i="57" n="@F" />
 	<NAME i="61" n="BREADCRUMB" />
 	<NAME i="64" n="NEWADD" />
 	<NAME i="66" n="SIMPLERESPONSE" />
-	<NAME i="67" n="@K" />
-	<NAME i="69" n="NEWINNER" />
-	<NAME i="70" n="NEWOUTER" />
-	<NAME i="71" n="@R" />
-	<NAME i="72" n="@J" />
-	<NAME i="73" n="@O" />
-	<NAME i="75" n="@M" />
 	<NAME i="80" n="OVERNAME" />
-	<NAME i="81" n="@G" />
-	<NAME i="85" n="@C" />
-	<NAME i="86" n="@Z" />
-	<NAME i="89" n="@U" />
-	<NAME i="90" n="@X" />
-	<NAME i="91" n="@E" />
-	<NAME i="92" n="@I" />
-	<NAME i="93" n="@N" />
-	<NAME i="94" n="@Y" />
-	<NAME i="96" n="@QO" />
-	<NAME i="97" n="@QI" />
-	<NAME i="103" n="ECHHY" />
-	<NAME i="108" n="@KE" />
-	<NAME i="109" n="@II" />
-	<NAME i="110" n="@ZT" />
 	<NAME i="113" n="ENTRY_OK" />
-	<NAME i="114" n="A_NAME_HERE" />
 	<NAME i="115" n="WREAL" />
-	<NAME i="116" n="#M" />
-	<NAME i="118" n="%YOYOY" />
-	<NAME i="119" n="#J" />
-	<NAME i="120" n="#P" />
-	<NAME i="123" n="#W" />
-	<NAME i="124" n="#A" />
-	<NAME i="128" n="TRIPOWER" />
-	<NAME i="133" n="NAMED1" />
 	<NAME i="152" n="HIGHID" />
+	<NAME i="154" n="" />
+	<NAME i="155" n="NAME" />
 </NAMES>

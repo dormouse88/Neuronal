@@ -57,6 +57,9 @@ np4,6	next,prev sibling
 -,+		clear/set name filter
 R		erase plan name
 E		add (or change) plan name
+	E erase (delname)
+	R rename
+	T recover (addname)
 H		add handle
 N		add neuron
 shiftN	remove device

@@ -592,11 +592,17 @@ void PaneBrain::HandlePlan(sf::Event & event, PlanShp plan)
     //Various Load Plan Options...
     if (event.key.code == sf::Keyboard::Numpad1)
     {
-        model_.LoadPlan(plan, PlanNav::PREV_ID);
+        if (event.key.control)
+            model_.LoadPlan(plan, PlanNav::PREV_ID);
+        else
+            model_.LoadPlan(plan, PlanNav::PREV_NAMED_ID);
     }
     if (event.key.code == sf::Keyboard::Numpad3)
     {
-        model_.LoadPlan(plan, PlanNav::NEXT_ID);
+        if (event.key.control)
+            model_.LoadPlan(plan, PlanNav::NEXT_ID);
+        else
+            model_.LoadPlan(plan, PlanNav::NEXT_NAMED_ID);
     }
     if (event.key.code == sf::Keyboard::Numpad7)
     {
@@ -638,20 +644,25 @@ void PaneBrain::HandlePlan(sf::Event & event, PlanShp plan)
         uiObjects.textEnterer_->SetText( model_.GetNameFilter() );
     }
 
-    if (event.key.code == sf::Keyboard::R)
+    if (event.key.code == sf::Keyboard::E)
     {
         //erase plan name
-        assert(not uiObjects.textEnterer_);
         model_.RemoveName(plan->GetPlanID());
     }
-    if (event.key.code == sf::Keyboard::E)// and model_.CanAddSomeRealName(plan->GetPlanID()))
+    if (event.key.code == sf::Keyboard::T and (model_.GetPlanName(plan->GetPlanID()) == NULL_PLAN_NAME) )
     {
-        //set plan name
-        assert(not uiObjects.textEnterer_);
+        //Add plan name
         uiObjects.textEnterer_ = std::make_shared<TextEnterer>();
-        auto bound = std::bind( &Model::AddOrChangeName, &model_, plan->GetPlanID(), std::placeholders::_1 );
+        auto bound = std::bind( &Model::AddName, &model_, plan->GetPlanID(), std::placeholders::_1 );
         uiObjects.textEnterer_->SetDispatchTarget( bound );
-        uiObjects.textEnterer_->SetText( model_.GetCleanRealPlanName(plan->GetPlanID()) );
+    }
+    if (event.key.code == sf::Keyboard::R and (model_.GetPlanName(plan->GetPlanID()) != NULL_PLAN_NAME) )
+    {
+        //Change plan name
+        uiObjects.textEnterer_ = std::make_shared<TextEnterer>();
+        auto bound = std::bind( &Model::ChangeName, &model_, plan->GetPlanID(), std::placeholders::_1 );
+        uiObjects.textEnterer_->SetDispatchTarget( bound );
+        uiObjects.textEnterer_->SetText( model_.GetPlanName(plan->GetPlanID()) );
     }
 }
 
