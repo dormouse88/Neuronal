@@ -7,10 +7,12 @@
 
 #include "ChipHandle.hpp"
 #include "miscUtil.hpp"
+#include "PlanGroupData.hpp"
 
 const sf::Vector2f RECTANGLE { 90.f, 65.f };
 
-const sf::Vector2f PLANID_OFFSET { 18.f, 2.f };
+const sf::Vector2f PLAN_NAME_OFFSET { 12.f, 2.f };
+const sf::Vector2f PLAN_NUM_OFFSET { 12.f, 38.f };
 
 const sf::Vector2f WIRE_IN_OFFSET  { RECTANGLE.x * 0.f, RECTANGLE.y *.5f };
 const sf::Vector2f WIRE_OUT_OFFSET { RECTANGLE.x * 1.f, RECTANGLE.y *.5f };
@@ -23,9 +25,14 @@ ChipHandle::ChipHandle(PlanID pid, VectorSmart pos, PlanShp cont)
 {
     shape_.setOutlineColor(sf::Color::White);
     shape_.setOutlineThickness(3);
+
+    planNameText_.setFont(ViewResources::GetInstance().font);
+    planNameText_.setCharacterSize(30);
+    planNameText_.setColor(sf::Color::Black);
+
     planNumText_.setFont(ViewResources::GetInstance().font);
     planNumText_.setCharacterSize(30);
-    planNumText_.setColor(sf::Color::Black);
+    planNumText_.setColor(sf::Color{180,180,180});
 }
 
 
@@ -52,11 +59,22 @@ void ChipHandle::Draw(sf::RenderTarget & rt)
         VectorWorld perceivedPos { CalculateOffsetForCentering(RECTANGLE) };
         shape_.setPosition( perceivedPos );
         shape_.setFillColor(sf::Color::Yellow);
-        std::string text = patch::to_string( subPlan_->GetPlanID() );
-        if (subPlan_->IsModified()) text.append("*");
-        planNumText_.setString( text );
-        planNumText_.setPosition( perceivedPos + PLANID_OFFSET );
+        PlanID pid = subPlan_->GetPlanID();
+        //PlanNameText
+        std::string nameText = subPlan_->GetPlanGroupData()->GetNameByID(pid);
+        if (subPlan_->IsModified())
+            nameText.append("*");
+        planNameText_.setString( nameText );
+        planNameText_.setPosition( perceivedPos + PLAN_NAME_OFFSET );
+        //PlanNumText
+        std::string numText = patch::to_string( pid );
+        if (subPlan_->IsModified())
+            numText.append("*");
+        planNumText_.setString( numText );
+        planNumText_.setPosition( perceivedPos + PLAN_NUM_OFFSET );
+        //draw
         rt.draw(shape_);
+        rt.draw(planNameText_);
         rt.draw(planNumText_);
     }
 }

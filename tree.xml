@@ -75,7 +75,7 @@
 	<REL i="75" anc="0" />
 </RELATIVES>
 <PLANS>
-	<PLAN_DB HIGHEST_ID="156" />
+	<PLAN_DB HIGHEST_ID="158" />
 	<PLAN i="1">
 		<NEUR i="1" x="-1" y="-1" thr="1" />
 		<NEUR i="2" x="0" y="-1" thr="1" />
@@ -3055,6 +3055,16 @@
 		<NEUR i="2" x="1" y="1" bulb="0" />
 		<NEUR i="3" x="0" y="1" bulb="0" />
 	</PLAN>
+	<PLAN i="157" anc="0">
+		<NEUR i="1" x="-1" y="0" bulb="0" />
+		<NEUR i="2" x="0" y="-1" bulb="0" />
+	</PLAN>
+	<PLAN i="158" anc="157">
+		<NEUR i="1" x="-1" y="0" bulb="0" />
+		<NEUR i="2" x="0" y="-1" bulb="0" />
+		<NEUR i="3" x="-1" y="-1" bulb="0" />
+		<NEUR i="4" x="-1" y="-2" bulb="0" />
+	</PLAN>
 </PLANS>
 <NAMES>
 	<NAME i="2" n="COW" />
@@ -3094,7 +3104,9 @@
 	<NAME i="80" n="OVERNAME" />
 	<NAME i="113" n="ENTRY_OK" />
 	<NAME i="115" n="WREAL" />
+	<NAME i="151" n="RECOVERED" />
 	<NAME i="152" n="HIGHID" />
 	<NAME i="154" n="" />
 	<NAME i="155" n="NAME" />
+	<NAME i="158" n="NEWTEST" />
 </NAMES>

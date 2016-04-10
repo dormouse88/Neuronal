@@ -1,8 +1,6 @@
 Do Next
 =======
 ---v---
-	Saved and unsaved plans should be different colour
-	Handles, etc. should show name primarily and ID only faintly.
 	Split Model class
 	Make levels easier to make. (editable and saveable)
 
@@ -12,10 +10,11 @@ General
 Visual / Interface
 ==================
 	Draw slot valency number (to show how many slots are ignored in both directions) between handles and chips.
+	Saved and unsaved plans should be different colour
 	Set discrete zoom levels
 	Solve: No space to see wires between exploded chips when adjacent. Disallow adjacency? Draw plan boundary half a cell inwards? (changing GRID_SIZE doesn't help exploded chips)
 	Make wire text labels circle-shaped and place them intelligently (on wire but close to device).
-	Allow chip cycling while unexploded and draw name on the handle.
+	Allow chip cycling while unexploded.
 	Choose highest number plan to load into an empty plan, not lowest.
 	Plan Grabbers becoming a bit unnecessary. Only used for loading/saving now.
 	Add a reset all charge button.

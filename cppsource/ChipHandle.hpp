@@ -51,6 +51,7 @@ private:
     PlanShp subPlan_;
     bool exploded_;
     sf::RectangleShape shape_;
+    sf::Text planNameText_;
     sf::Text planNumText_;
 };
 

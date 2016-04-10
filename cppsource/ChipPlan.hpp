@@ -54,6 +54,7 @@ public:
     bool IsSerialFree(DevSerial) const;
     bool IsPositionFree(VectorSmart) const;
     PlanID GetPlanID() const                                   {return planID;}
+    std::shared_ptr<const PlanGroupData> GetPlanGroupData() const {return planGroupData_;} //should probably take this member out of ChipPlan
 
     void ImportDevice(DeviceShp device);
     void ImportWire(WireShp wire);
