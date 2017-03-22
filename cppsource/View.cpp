@@ -102,8 +102,6 @@ void Marquee::Draw(sf::RenderTarget &rt)
 
 
 
-
-
 ArenaCursor::ArenaCursor(sf::Color color)
 {
     shape_.setFillColor(sf::Color::Transparent);
@@ -119,6 +117,25 @@ void ArenaCursor::Draw(sf::RenderTarget & rt)
         sf::FloatRect bounds { arena->GetCellBounds(addr_.arenaPoint) };
         shape_.setPosition( bounds.left, bounds.top );
         shape_.setSize( {bounds.width, bounds.height} );
+        rt.draw(shape_, sf::RenderStates(sf::BlendAdd));
+    }
+}
+
+PuppetCursor::PuppetCursor(sf::Color color)
+{
+    shape_.setFillColor(sf::Color::Transparent);
+    shape_.setOutlineColor( color );
+    shape_.setOutlineThickness(-6.5f);
+}
+void PuppetCursor::Draw(sf::RenderTarget &rt)
+{
+    Shp<Puppet> puppet = brainMonitored_.lock();
+    Shp<Arena> ar_lock = arena_.lock();
+    if (puppet and ar_lock)
+    {
+        sf::FloatRect bounds { ar_lock->GetCellBounds( puppet->GetActualPos() ) };
+        shape_.setPosition( bounds.left + (bounds.width*0.25f), bounds.top + (bounds.height*0.25f) );
+        shape_.setSize( {bounds.width * 0.5f, bounds.height * 0.5f} );
         rt.draw(shape_, sf::RenderStates(sf::BlendAdd));
     }
 }
@@ -257,21 +274,9 @@ void PaneGroup::HandleInputEvents(BasePane * pane, sf::Vector2f worldPos)
                 {
                     CycleFieldMode();
                 }
-                if (event.key.code == sf::Keyboard::P)
+                if (event.key.code == sf::Keyboard::Period)
                 {
-                    //view brain
-                    ArenaPoint addr = uiObjects.arenaCursor.GetArenaPoint();
-                    auto ele = theModel.GetArena()->GetEntity( addr );
-                    if (ele)
-                    {
-                        auto puppet = std::dynamic_pointer_cast<Puppet>(ele);
-                        if (puppet)
-                        {
-                            paneBrain.SetBrain( puppet->GetBrain() );
-                            uiObjects.cursorOne.SetPlanAddress(PlanAddress{});
-                            uiObjects.cursorTwo.SetPlanAddress(PlanAddress{});
-                        }
-                    }
+                    theModel.GetArena()->TimeAdvance();
                 }
             }
             
@@ -406,6 +411,7 @@ void BaseAreaPane::ClampToRect(RectWorld b)
 PaneLevel::PaneLevel(Shp<Arena> aren, UIObjects & uio)
     :arena(aren)
     ,uiObjects(uio)
+    ,puppetCursor(sf::Color::Yellow)
 {}
 
 void PaneLevel::AutoClamp()
@@ -418,9 +424,22 @@ void PaneLevel::Handle(sf::Event & event)
     //Keyboard Events
     if (event.type == sf::Event::KeyPressed)
     {
-        if (event.key.code == sf::Keyboard::Period)
+        if (event.key.code == sf::Keyboard::P)
         {
-            arena->TimeAdvance();
+            //view brain
+            ArenaPoint addr = uiObjects.arenaCursor.GetArenaPoint();
+            auto ele = arena->GetEntity( addr );
+            if (ele)
+            {
+                auto puppet = std::dynamic_pointer_cast<Puppet>(ele);
+                if (puppet)
+                {
+                    puppetCursor.UpdateMonitorTarget(puppet, arena);
+                    //paneBrain.SetBrain( puppet->GetBrain() );
+                    //uiObjects.cursorOne.SetPlanAddress(PlanAddress{});
+                    //uiObjects.cursorTwo.SetPlanAddress(PlanAddress{});
+                }
+            }
         }
             //add cat
             //add mouse
@@ -464,10 +483,8 @@ void PaneLevel::Draw(sf::RenderWindow & window)
     assert(arena);
     arena->Draw(window);
     uiObjects.arenaCursor.Draw(window);
+    puppetCursor.Draw(window);
 }
-
-
-
 
 
 PaneBrain::PaneBrain(Model & model_p, UIObjects & uio)
@@ -567,20 +584,22 @@ void PaneBrain::HandlePlan(sf::Event & event, PlanShp plan)
         //uiObjects.cursorTwo.SetToPlan();
     }
 
-    if (event.key.code == sf::Keyboard::Q)
+    if (event.key.code == sf::Keyboard::Q or event.key.code == sf::Keyboard::Tab)
     {
-        //Save plan
-        if (not event.key.shift and (model_.GetPlanGroupData()->GetNameByID(plan->GetPlanID()) != NULL_PLAN_NAME))  //ouch
+        if (    event.key.code == sf::Keyboard::Q and
+                (model_.GetPlanGroupData()->GetNameByID(plan->GetPlanID()) != NULL_PLAN_NAME)   //if plan has a name
+            )
+        {
+            //Save plan and transfer existing name to new plan...
             model_.SavePlan( plan, PlanNamingMode::TRANSFER );
-//        else;
-//            model_.SavePlan( plan, PlanNamingMode::AUTONAME );
-    }
-    if (event.key.code == sf::Keyboard::Tab)
-    {
-        //Save plan with a name
-        uiObjects.textEnterer_ = std::make_shared<TextEnterer>();
-        auto bound = std::bind( &Model::SavePlan, &model_, plan, PlanNamingMode::PROVIDED, std::placeholders::_1 );
-        uiObjects.textEnterer_->SetDispatchTarget( bound );
+        }
+        else
+        {
+            //Save plan with a new name...
+            uiObjects.textEnterer_ = std::make_shared<TextEnterer>();
+            auto bound = std::bind( &Model::SavePlan, &model_, plan, PlanNamingMode::PROVIDED, std::placeholders::_1 );
+            uiObjects.textEnterer_->SetDispatchTarget( bound );
+        }
     }
     
     if (event.key.code == sf::Keyboard::W)

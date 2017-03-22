@@ -11,7 +11,7 @@
 #include <memory>
 #include <vector>
 #include "BasicTypes.hpp"
-#include "PlanGrid.hpp"     //for VectorWorld (for now)
+//#include "PlanGrid.hpp"     //for VectorWorld (for now)
 class Wire;
 
 enum class WireAttachSide { IN, OUT };

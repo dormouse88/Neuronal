@@ -10,6 +10,8 @@
 	<CSPAWN pos_x="2" pos_y="4" ori="2" min_t="-3" max_t="-1" cat_plan="2" />
 	<CSPAWN pos_x="4" pos_y="4" ori="3" min_t="-1" max_t="-1" cat_plan="2" />
 	<GSPAWN pos_x="-3" pos_y="-3" />
+	<!--
+	(The game no longer uses plans integrated into levels)
 	<PLAN i="1">
 		<NEUR i="1" x="-1" y="-1" thr="1" />
 		<NEUR i="2" x="0" y="-1" thr="-1" />
@@ -24,6 +26,7 @@
 		<NEUR i="2" x="2" y="0" thr="1" />
 		<WIRE f="1" t="0" w="1" fs="0" ts="2" />
 	</PLAN>
+	-->
 </LEVEL>
 <LEVEL num="x" name="empty" min_x="-3" min_y="-3" max_x="3" max_y="3">
 	<INPUT name="F_WHISK" />

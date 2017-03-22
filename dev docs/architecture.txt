@@ -1,0 +1,83 @@
+- AllXPuts
+App					Model				View
+Arena				BlobFactory			Puppet			SpawnGroups
+- ArenaBasics
+BaseReferer			ChipPlan			;RefererInterface
+- BasicTypes
+BlobFactory			Neuron				ChipHandle		ChipPlan		Wire			WiringPair		BaseReferer
+ChipHandle			Device				ChipPlan
+ChipPlan			Device				Wire			PlanGrid		;Wirable		;RefererInterface	#ChipHandle		#PlanGroupData	#PlanPos	#WiringPair
+Cursor				ChipPlan			PlanPos			WiringPair
+Device				PlanOwned			PlanPos			;Wirable		#ChipPlan
+Model				BlobFactory			Serializer		ChipPlan		Arena			Puppet			;PlanGroupData
+Neuron				Device
+- Pansions
+PlanGrid			;Pansions			#ChipPlan
+- PlanGroupData		
+PlanOwned			#ChipPlan
+PlanPos				PlanGrid			#ChipPlan	
+Puppet				BaseReferer			BlobFactory
+- RefererInterface
+Serializer			BlobFactory			Device			Wire			ChipPlan		#PlanGroupData	#Arena
+SpawnGroups			Spawners			BlobFactory
+Spawners			BaseReferer			BlobFactory
+- TextEnterer
+View				Model				Cursor			;TextEnterer	;ViewResources
+- ViewResources
+- Wirable
+Wire				;ViewResources		PlanOwned		;Wirable
+WiringPair			;Wirable	
+- miscUtil
+
+
+############################################################
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+- TextEnterer
+- Pansions
+- PlanGroupData		
+- RefererInterface
+- Wirable
+PlanOwned
+WiringPair			;Wirable	
+Wire				PlanOwned			;Wirable
+PlanGrid			;Pansions
+ PlanPos			PlanGrid
+  Device			PlanOwned			PlanPos			;Wirable
+   Neuron			Device
+ChipPlan			Device				Wire			PlanGrid		;Wirable		;RefererInterface
+ChipHandle			Device				ChipPlan
+BaseReferer			ChipPlan			;RefererInterface
+BlobFactory			Neuron				ChipHandle		ChipPlan		Wire			WiringPair		BaseReferer
+Puppet				BaseReferer			BlobFactory
+Spawners			BaseReferer			BlobFactory
+SpawnGroups			Spawners			BlobFactory
+Serializer			BlobFactory			Device			Wire			ChipPlan
+Arena				BlobFactory			Puppet			SpawnGroups
+Cursor				ChipPlan			PlanPos			WiringPair
+Model				BlobFactory			Serializer		ChipPlan		Arena			Puppet			;PlanGroupData
+View				Model				Cursor			;TextEnterer	;ViewResources
+App					Model				View
+
+
+
+
+
+
+
+
+

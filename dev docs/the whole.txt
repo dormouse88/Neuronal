@@ -24,7 +24,7 @@ TERMINOLOGY:
 	OUTERGAME		- An ARENA and its contents
 	ARENA			- The playing field for ENTITYs
 	SPAWNER			- A cursor located on the ARENA that can create an ENTITY
-	ENTITY			- An actor on the ARENA (inc GOALs?)
+	ENTITY			- An actor on the ARENA (inc GOALs?) (not inc SPAWNERS?)
 	CAT				- An ENTITY that kills MOUSEs
 	MOUSE			- An ENTITY that the player controls the BRAIN of
 	GOAL			- The target which the MOUSE has to reach to win.
@@ -42,32 +42,35 @@ TERMINOLOGY:
 
 KEYBINDINGS:
 0 		Cycle field mode
-1,2,3 	Select brain highlighting mode
-Q		Save (+shift - AsNew)
-W		Wipe (+ctrl+shift - forced)
 ,		brain timestep
 .		arena timestep
-G		rename port
-S,X		explode/collapse handle
-[,]		revert cursor to plan only
-np1,3	next,prev ID
-np7,9	next,prev name
-np8,2	parent,firstchild
-np4,6	next,prev sibling
--,+		clear/set name filter
-R		erase plan name
-E		add (or change) plan name
-	E erase (delname)
-	R rename
-	T recover (addname)
-H		add handle
-N		add neuron
-shiftN	remove device
-A,Z,\	device specific
-M		move device
-B		add wire (+shift - remove)
-D,C		wire specific (from end)
-F,V		wire specific (to end)
+	BRAIN WINDOW:
+	1,2,3 	Select brain highlighting mode
+	-,+		clear/set name filter
+		PLAN SELECTED:
+		S,X		explode/collapse handle
+		[,]		revert cursor to plan only
+		np1,3	next,prev ID
+		np7,9	next,prev name
+		np8,2	parent,firstchild
+		np4,6	next,prev sibling
+		Q		Save (Transfer name)
+		TAB		Save (Provide name)
+		W		Wipe (+ctrl+shift - forced)
+		E 		erase (delname)
+		R 		rename
+		T 		recover (addname)
+			ONE LOCATED CURSOR:
+			H		add handle
+			N		add neuron
+			G		rename port
+			shiftN	remove device
+			A,Z,\	device specific
+			TWO LOCATED CURSORS:
+			M		move device
+			B		add wire (+shift - remove)
+			D,C		wire specific (from end)
+			F,V		wire specific (to end)
+	ARENA WINDOW:
+	P		peek at mouse/cat brain
 
-8	view mouse-brain
-9	view/cycle cat-brains

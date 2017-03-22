@@ -32,35 +32,57 @@ ENTITIES AND LEVELS:
 		OBS: FREEZING is best as a boolean property of CAT
 	
 
+SPECIFYING:
+	Fixed subset of specification possibilities:
+		A pseudo-random set of possible tests is derived from each suite (using a RNG with fixed seed probably).
+		This set is fixed and is like a hash of the suite (this set can be the full range of possibilities when that range isn't too big).
+		Each member of this fixed set is tested comprehensively. This ensures testing of a given suite provides a consistent outcome.
+		(Note that if pressing the 'specify' button (truly) randomly chooses a specification from this subset, this is nothing to do with testing so is no problem)
 
 STEP BUTTONS:
-	Transitions:
-		DeSpecced:
-			Spec
-			Test / Cancel
-		Specced:
-			DeSpec
-			Reset
-			Step (inner+outer)
-			Play (inner+outer&to-Prep+to-End) / Stop
 	States:
-		DeSpecced		Spec->Sp
-			DeSp		Test->Testing
-			*Testing*	Cancel->Paused		(fail)->Ended		(pass)->Victory
-		Specced			DeSpec->DeSp		Reset->Sp
-			Sp			Step->Paused		Play->Playing
-			Paused		Step->Paused/Ended	Play->Playing
-			*Playing*	Stop->Paused		(end)->Ended
-			Ended
+		STATE			TRANSITION_NAME->TARGET_STATE
+		De-Ready		Spec	->Sp-Stopped	Test	->De-Testing
+		De-Testing		Cancel	->De-Ready		(fail)	->Sp-Stopped	(pass)	->De-Victory
+		De-Victory		
+		Sp-Stopped		DeSpec	->De-Ready		Step	->nochange		Play	->Playing		Reset	->nochange
+		Sp-Playing		Stop	->Stopped		(end)	->Stopped
 
-	Test/Cancel Test
-	Reset
-	Step Outer
-	Step Inner
-	Play Outer/Pause
-	Play Inner/Pause
-	Specify Level
-	De-Specify Level
+	Transitions/Actions/Buttons:
+		TRANSITION									AVAILABLE_IN
+		Spec										DeSpecced
+		Test / Cancel								DeSpecced
+		DeSpec										Specced
+		Reset										Specced
+		Step (inner+outer)							Specced
+		Play (inner+outer&to-Prep+to-End) / Stop	Specced
+
+	Playing vs Stepping:
+		What is the actual difference between playing and stepping? Is an 'outer step' just 'playing' until that point?
+		IDEA: Everything is playing. There are two significant properties - visual granularity (VG) + halting point (HP).
+			VG: Since all inner calculations need to be done regardless, VG is just whether inner 'steps' are drawn to the screen or not.
+			HP: A versatile property that determines the condition when playing stops. Can be inner change, outer change, time zero, or end. Could have more options (eg. 10 outer changes).
+			A Stop command perhaps uses the VG property to determine when stopping can occur. Or perhaps not (can stop an 'outer step' mid-way through?).
+
+						OLD:
+							States:
+								DeSpecced		Spec->Sp
+									DeSp		Test->Testing
+									*Testing*	Cancel->Paused		(fail)->Ended		(pass)->Victory
+									Specced		DeSpec->DeSp		Reset->Sp
+									Sp			Step->Paused		Play->Playing
+									Paused		Step->Paused/Ended	Play->Playing
+									*Playing*	Stop->Paused		(end)->Ended
+									Ended
+
+							Test/Cancel Test
+							Reset
+							Step Outer
+							Step Inner
+							Play Outer/Pause
+							Play Inner/Pause
+							Specify Level
+							De-Specify Level
 
 DONT FORGET:
 	ear detection: detects presence of cats (moving only?) in a certain radius

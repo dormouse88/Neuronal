@@ -1,13 +1,30 @@
 PLAN LOADING:
-	containment traversal ordering algo:
-		Read from the XML and create a map<planIDs, vector<directly contained planIDs> >
-		From that create another map of map<planIDs, vector<directly or indirectly contained planIDs> >
-		From that create another map of map<planIDs, vector<directly or indirectly containing planIDs> >
-		Iterate through the map (in any order) and assign a float order value (FOV) that is bigger than biggest containing planIDs FOV and smaller than the smallest contained planIDs FOV.
-		Sort by FOV.
-	Traversal categories:
-		Named (by name, by id)
-		All (by id)
-		Ancestry(as is?)
-		Containment(5 keys: parents, children, next/prev siblings, accept)
-
+	Containment Graphing:
+		It would be possible (though arsey) to draw a containment graph simultaneously showing all plans in 'containment order'. This could be used as a snazzy plan traversal tool.
+		Drawing such a graph would require determination of 'containment order' (so containers are always to the left and contained to the right).
+		Ordering Algo:
+			1) Read from the XML and create a map<planIDs, vector<directly contained planIDs> >
+			2) From that create another map of map<planIDs, vector<directly or indirectly contained planIDs> >
+			3) From that create another map of map<planIDs, vector<directly or indirectly containing planIDs> >
+			Iterate through any map (in any order) and assign a float order value (FOV) that is bigger than biggest containing planIDs FOV (using 3) and smaller than the smallest contained planIDs FOV (using 2).
+			Sort by FOV.
+	Traversal Possibilities:
+		Traversal Sets:
+			All
+			Named
+			Starred?
+		Traversal Orders:
+			By Name
+			By ID (creation date)
+			By Most Recently Used
+			By Ancestry (as is?) (4 buttons: parent, children, next/prev siblings)
+			By Containment       (5 buttons: parents, children, next/prev siblings, accept)
+				A control scheme for Trees and Graphs (Ancestry + Containment):
+				4 buttons: Up, NextSib, PrevSib, Down
+				2 Cursors: 'Current' and 'Previous'. 'Previous' is used as the pivot parent or pivot child when cycling through siblings.
+				NextSib and PrevSib will move 'Current' but never affect 'Previous'.
+				Up and Down Buttons always move 'Current' when possible. 'Previous' is set to whatever 'Current' just was (even if it means they swap places).
+				So 'Current' and 'Previous' will point to the same plan in the initial state only.
+	Overview:
+		Ultimately, using a large "plan picker" window to open plans might be necessary for useability. Rather than loading plans immediately in-place as at the moment.
+		What's the closest comparable system that could be used as thought experiments to pre-test usability?

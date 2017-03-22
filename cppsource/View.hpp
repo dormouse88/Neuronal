@@ -16,7 +16,7 @@
 #include "TextEnterer.hpp"
 
 
-class ViewPanel
+class ViewPanel   //really rename this!
 {
 public:
     ViewPanel();
@@ -71,7 +71,21 @@ private:
     sf::RectangleShape shape_;
 };
 
-struct UIObjects
+class PuppetCursor
+{
+public:
+    PuppetCursor(sf::Color);
+    void Draw(sf::RenderTarget &);
+    void UpdateMonitorTarget( Shp<Puppet> p, Shp<Arena> ar ) {brainMonitored_ = p; arena_ = ar;}
+private:
+    sf::RectangleShape shape_;
+    std::weak_ptr<Puppet> brainMonitored_;
+    std::weak_ptr<Arena> arena_;
+};
+
+
+
+struct UIObjects //eventually refactor this away (textEnterer stays common, cursors move to their respective panes)
 {
     UIObjects()
         :cursorOne( sf::Color::Yellow )
@@ -81,6 +95,7 @@ struct UIObjects
     BrainCursor cursorOne;
     BrainCursor cursorTwo;
     ArenaCursor arenaCursor;
+//    PuppetCursor puppetCursor;
     std::shared_ptr<TextEnterer> textEnterer_;
 };
 
@@ -121,6 +136,7 @@ public:
 private:
     Shp<Arena> arena;
     UIObjects & uiObjects;
+    PuppetCursor puppetCursor;
 };
 
 class PaneBrain : public BaseAreaPane
@@ -182,6 +198,7 @@ public:
     PaneGroup(Model & model_p);
     void Draw();
     bool HandleInput();
+private:
     void HandleInputState(BasePane * pane, sf::Vector2f worldPos);
     void HandleInputEvents(BasePane * pane, sf::Vector2f worldPos);
     void CycleFieldMode()                      { fieldMode++; if (fieldMode > 3) fieldMode = 1; SizingsRefresh(); }

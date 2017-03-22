@@ -75,7 +75,7 @@
 	<REL i="75" anc="0" />
 </RELATIVES>
 <PLANS>
-	<PLAN_DB HIGHEST_ID="158" />
+	<PLAN_DB HIGHEST_ID="169" />
 	<PLAN i="1">
 		<NEUR i="1" x="-1" y="-1" thr="1" />
 		<NEUR i="2" x="0" y="-1" thr="1" />
@@ -3065,10 +3065,322 @@
 		<NEUR i="3" x="-1" y="-1" bulb="0" />
 		<NEUR i="4" x="-1" y="-2" bulb="0" />
 	</PLAN>
+	<PLAN i="159" anc="158">
+		<NEUR i="1" x="-1" y="0" bulb="0" />
+		<NEUR i="2" x="0" y="-1" bulb="0" />
+		<NEUR i="3" x="-1" y="-1" bulb="0" />
+		<NEUR i="4" x="-1" y="-2" bulb="0" />
+		<NEUR i="5" x="0" y="-2" bulb="0" />
+		<NEUR i="6" x="0" y="0" bulb="0" />
+		<NEUR i="7" x="-1" y="1" thr="0" bulb="0" />
+		<WIRE f="0" t="4" fs="A" />
+		<WIRE f="0" t="3" fs="B" />
+		<WIRE f="0" t="1" fs="C" />
+		<WIRE f="5" t="0" ts="A" />
+		<WIRE f="2" t="0" ts="B" />
+		<WIRE f="6" t="0" ts="C" />
+		<WIRE f="4" t="6" w="-1" />
+		<WIRE f="7" t="2" />
+		<WIRE f="7" t="6" />
+	</PLAN>
+	<PLAN i="160" anc="2">
+		<NEUR i="1" x="0" y="-1" thr="2" bulb="1" />
+		<NEUR i="2" x="0" y="-2" bulb="1" />
+		<NEUR i="4" x="0" y="2" thr="2" bulb="1" />
+		<NEUR i="5" x="0" y="1" bulb="1" />
+		<NEUR i="3" x="0" y="-3" thr="0" bulb="0" />
+		<NEUR i="6" x="0" y="3" bulb="0" />
+		<NEUR i="7" x="1" y="0" bulb="0" />
+		<WIRE f="2" t="3" fs="0" ts="0" />
+		<WIRE f="3" t="2" fs="0" ts="0" />
+		<WIRE f="2" t="1" fs="0" ts="0" />
+		<WIRE f="0" t="2" fs="1" ts="0" />
+		<WIRE f="1" t="0" fs="0" ts="1" />
+		<WIRE f="0" t="5" fs="2" ts="0" />
+		<WIRE f="5" t="1" fs="0" ts="0" />
+		<WIRE f="5" t="4" fs="0" ts="0" />
+		<WIRE f="4" t="6" fs="0" ts="0" />
+		<WIRE f="6" t="4" fs="0" ts="0" />
+		<WIRE f="4" t="5" w="-2" fs="0" ts="0" />
+		<WIRE f="1" t="7" fs="0" ts="0" />
+		<WIRE f="7" t="0" fs="0" ts="2" />
+	</PLAN>
+	<PLAN i="161" anc="32">
+		<HAND i="19" x="-3" y="1" link="28" />
+		<HAND i="20" x="0" y="1" link="30" />
+		<HAND i="5" x="-2" y="5" link="1" />
+		<HAND i="7" x="-4" y="5" link="1" />
+		<HAND i="24" x="1" y="5" link="1" />
+		<NEUR i="12" x="2" y="1" bulb="1" />
+		<NEUR i="13" x="3" y="2" bulb="1" />
+		<NEUR i="14" x="3" y="0" thr="2" bulb="1" />
+		<NEUR i="11" x="-5" y="3" thr="0" bulb="1" />
+		<NEUR i="16" x="-5" y="2" thr="0" bulb="1" />
+		<NEUR i="22" x="-5" y="5" bulb="1" />
+		<NEUR i="6" x="0" y="5" bulb="1" />
+		<NEUR i="1" x="-1" y="0" bulb="0" />
+		<NEUR i="2" x="-1" y="1" bulb="0" />
+		<NEUR i="3" x="-1" y="2" bulb="0" />
+		<NEUR i="4" x="-1" y="3" bulb="0" />
+		<NEUR i="10" x="1" y="0" bulb="0" />
+		<NEUR i="17" x="1" y="1" bulb="0" />
+		<NEUR i="18" x="1" y="2" bulb="0" />
+		<NEUR i="21" x="1" y="3" bulb="0" />
+		<NEUR i="15" x="2" y="5" bulb="0" />
+		<NEUR i="9" x="-3" y="5" bulb="0" />
+		<NEUR i="8" x="4" y="0" bulb="0" />
+		<NEUR i="23" x="4" y="2" bulb="0" />
+		<NEUR i="25" x="4" y="1" bulb="0" />
+		<WIRE f="1" t="20" fs="0" ts="2" />
+		<WIRE f="2" t="20" fs="0" ts="3" />
+		<WIRE f="3" t="20" fs="0" ts="4" />
+		<WIRE f="4" t="20" fs="0" ts="5" />
+		<WIRE f="19" t="1" fs="1" ts="0" />
+		<WIRE f="19" t="2" fs="2" ts="0" />
+		<WIRE f="19" t="3" fs="3" ts="0" />
+		<WIRE f="19" t="4" fs="4" ts="0" />
+		<WIRE f="20" t="10" fs="1" ts="0" />
+		<WIRE f="20" t="17" fs="2" ts="0" />
+		<WIRE f="20" t="18" fs="3" ts="0" />
+		<WIRE f="20" t="21" fs="4" ts="0" />
+		<WIRE f="10" t="12" fs="0" ts="0" />
+		<WIRE f="17" t="12" fs="0" ts="0" />
+		<WIRE f="18" t="12" fs="0" ts="0" />
+		<WIRE f="21" t="12" fs="0" ts="0" />
+		<WIRE f="12" t="13" w="-1" fs="0" ts="0" />
+		<WIRE f="15" t="14" fs="0" ts="0" />
+		<WIRE f="15" t="13" fs="0" ts="0" />
+		<WIRE f="12" t="14" fs="0" ts="0" />
+		<WIRE f="9" t="20" fs="0" ts="6" />
+		<WIRE f="7" t="9" fs="1" ts="0" />
+		<WIRE f="9" t="5" fs="0" ts="1" />
+		<WIRE f="16" t="11" w="-1" fs="0" ts="0" />
+		<WIRE f="11" t="22" fs="0" ts="0" />
+		<WIRE f="22" t="19" fs="0" ts="1" />
+		<WIRE f="22" t="7" fs="0" ts="1" />
+		<WIRE f="14" t="8" fs="0" ts="0" />
+		<WIRE f="13" t="23" fs="0" ts="0" />
+		<WIRE f="23" t="22" fs="0" ts="0" />
+		<WIRE f="14" t="0" fs="0" ts="1" />
+		<WIRE f="13" t="0" fs="0" ts="2" />
+		<WIRE f="24" t="15" fs="1" ts="0" />
+		<WIRE f="15" t="20" fs="0" ts="1" />
+		<WIRE f="5" t="6" fs="1" ts="0" />
+		<WIRE f="6" t="24" fs="0" ts="1" />
+		<WIRE f="8" t="6" fs="0" ts="0" />
+		<WIRE f="13" t="0" ts="B" />
+		<WIRE f="25" t="0" ts="A" />
+		<WIRE f="14" t="0" ts="B" />
+		<WIRE f="14" t="0" ts="C" />
+	</PLAN>
+	<PLAN i="162" anc="68">
+		<HAND i="4" x="1" y="1" link="69" />
+		<NEUR i="1" x="0" y="0" bulb="0" />
+		<NEUR i="2" x="0" y="1" bulb="0" />
+		<NEUR i="3" x="0" y="2" bulb="0" />
+		<NEUR i="5" x="2" y="1" bulb="0" />
+		<NEUR i="6" x="2" y="0" bulb="0" />
+		<NEUR i="7" x="2" y="2" bulb="0" />
+		<WIRE f="1" t="4" fs="NULLZ" ts="A" />
+		<WIRE f="2" t="4" fs="NULLZ" ts="A" />
+		<WIRE f="3" t="4" fs="NULLZ" ts="A" />
+		<WIRE f="4" t="6" fs="A" ts="NULLZ" />
+		<WIRE f="4" t="5" fs="A" ts="NULLZ" />
+		<WIRE f="4" t="7" fs="A" ts="NULLZ" />
+		<WIRE f="0" t="1" fs="A" ts="NULLZ" />
+		<WIRE f="0" t="2" fs="B" ts="NULLZ" />
+		<WIRE f="0" t="3" fs="C" ts="NULLZ" />
+		<WIRE f="6" t="0" fs="NULLZ" ts="A" />
+		<WIRE f="5" t="0" fs="NULLZ" ts="B" />
+		<WIRE f="7" t="0" fs="NULLZ" ts="C" />
+	</PLAN>
+	<PLAN i="163" anc="6">
+		<NEUR i="1" x="0" y="-1" thr="2" bulb="1" />
+		<NEUR i="2" x="0" y="-2" bulb="1" />
+		<NEUR i="4" x="0" y="2" bulb="1" />
+		<NEUR i="3" x="0" y="-3" bulb="0" />
+		<NEUR i="6" x="0" y="3" bulb="0" />
+		<NEUR i="7" x="1" y="0" bulb="0" />
+		<NEUR i="8" x="1" y="1" bulb="0" />
+		<NEUR i="5" x="1" y="-1" bulb="0" />
+		<NEUR i="9" x="-1" y="0" bulb="0" />
+		<NEUR i="10" x="-2" y="1" bulb="0" />
+		<NEUR i="11" x="-2" y="2" bulb="0" />
+		<WIRE f="2" t="3" fs="0" ts="0" />
+		<WIRE f="3" t="2" fs="0" ts="0" />
+		<WIRE f="2" t="1" fs="0" ts="0" />
+		<WIRE f="0" t="2" fs="2" ts="0" />
+		<WIRE f="4" t="6" fs="0" ts="0" />
+		<WIRE f="6" t="4" fs="0" ts="0" />
+		<WIRE f="1" t="7" fs="0" ts="0" />
+		<WIRE f="7" t="0" fs="0" ts="2" />
+		<WIRE f="1" t="8" fs="0" ts="0" />
+		<WIRE f="8" t="0" fs="0" ts="3" />
+		<WIRE f="0" t="1" w="5" fs="1" ts="0" />
+		<WIRE f="1" t="4" fs="0" ts="0" />
+		<WIRE f="4" t="1" w="-2" fs="0" ts="0" />
+		<WIRE f="1" t="5" fs="0" ts="0" />
+		<WIRE f="5" t="0" fs="0" ts="1" />
+		<WIRE f="0" t="9" fs="3" ts="0" />
+		<WIRE f="9" t="1" fs="0" ts="0" />
+		<WIRE f="0" t="10" fs="4" ts="0" />
+		<WIRE f="10" t="4" w="-2" fs="0" ts="0" />
+		<WIRE f="10" t="2" w="-2" fs="0" ts="0" />
+	</PLAN>
+	<PLAN i="164" anc="22">
+		<HAND i="1" x="0" y="-1" link="17" />
+		<HAND i="2" x="0" y="1" link="17" />
+		<HAND i="3" x="0" y="3" link="17" />
+		<HAND i="4" x="0" y="5" link="17" />
+		<NEUR i="6" x="-3" y="-1" thr="2" bulb="1" />
+		<NEUR i="7" x="-3" y="0" thr="2" bulb="1" />
+		<NEUR i="8" x="-3" y="1" thr="2" bulb="1" />
+		<NEUR i="9" x="-3" y="2" thr="2" bulb="1" />
+		<NEUR i="10" x="-3" y="-2" bulb="1" />
+		<NEUR i="11" x="-1" y="-1" bulb="1" />
+		<NEUR i="12" x="-3" y="4" bulb="1" />
+		<NEUR i="13" x="-3" y="5" bulb="1" />
+		<NEUR i="14" x="-3" y="6" bulb="1" />
+		<NEUR i="15" x="-3" y="7" bulb="1" />
+		<NEUR i="16" x="-3" y="8" bulb="1" />
+		<NEUR i="18" x="-1" y="0" bulb="1" />
+		<NEUR i="19" x="-1" y="2" bulb="1" />
+		<NEUR i="20" x="-1" y="4" bulb="1" />
+		<NEUR i="21" x="-1" y="6" bulb="1" />
+		<NEUR i="22" x="-1" y="1" bulb="1" />
+		<NEUR i="23" x="-1" y="3" bulb="1" />
+		<NEUR i="24" x="-1" y="5" bulb="1" />
+		<NEUR i="5" x="-4" y="-2" bulb="0" />
+		<NEUR i="17" x="-4" y="4" bulb="0" />
+		<NEUR i="25" x="0" y="8" bulb="0" />
+		<NEUR i="26" x="0" y="9" bulb="0" />
+		<NEUR i="27" x="1" y="8" bulb="0" />
+		<NEUR i="28" x="1" y="9" bulb="0" />
+		<WIRE f="1" t="0" fs="1" ts="1" />
+		<WIRE f="2" t="0" fs="1" ts="2" />
+		<WIRE f="3" t="0" fs="1" ts="3" />
+		<WIRE f="4" t="0" fs="1" ts="4" />
+		<WIRE f="0" t="5" fs="5" ts="0" />
+		<WIRE f="0" t="6" fs="1" ts="0" />
+		<WIRE f="0" t="7" fs="2" ts="0" />
+		<WIRE f="0" t="8" fs="3" ts="0" />
+		<WIRE f="0" t="9" fs="4" ts="0" />
+		<WIRE f="5" t="6" fs="0" ts="0" />
+		<WIRE f="5" t="7" fs="0" ts="0" />
+		<WIRE f="5" t="8" fs="0" ts="0" />
+		<WIRE f="5" t="9" fs="0" ts="0" />
+		<WIRE f="5" t="10" fs="0" ts="0" />
+		<WIRE f="11" t="1" fs="0" ts="1" />
+		<WIRE f="6" t="11" fs="0" ts="0" />
+		<WIRE f="0" t="13" fs="6" ts="0" />
+		<WIRE f="0" t="14" fs="7" ts="0" />
+		<WIRE f="0" t="15" fs="8" ts="0" />
+		<WIRE f="0" t="16" fs="9" ts="0" />
+		<WIRE f="0" t="17" fs="10" ts="0" />
+		<WIRE f="17" t="13" fs="0" ts="0" />
+		<WIRE f="17" t="14" fs="0" ts="0" />
+		<WIRE f="17" t="15" fs="0" ts="0" />
+		<WIRE f="17" t="16" fs="0" ts="0" />
+		<WIRE f="17" t="12" fs="0" ts="0" />
+		<WIRE f="13" t="11" fs="0" ts="0" />
+		<WIRE f="10" t="18" fs="0" ts="0" />
+		<WIRE f="12" t="18" fs="0" ts="0" />
+		<WIRE f="10" t="19" fs="0" ts="0" />
+		<WIRE f="10" t="20" fs="0" ts="0" />
+		<WIRE f="10" t="21" fs="0" ts="0" />
+		<WIRE f="12" t="19" fs="0" ts="0" />
+		<WIRE f="12" t="20" fs="0" ts="0" />
+		<WIRE f="12" t="21" fs="0" ts="0" />
+		<WIRE f="7" t="22" fs="0" ts="0" />
+		<WIRE f="14" t="22" fs="0" ts="0" />
+		<WIRE f="8" t="23" fs="0" ts="0" />
+		<WIRE f="15" t="23" fs="0" ts="0" />
+		<WIRE f="16" t="24" fs="0" ts="0" />
+		<WIRE f="9" t="24" fs="0" ts="0" />
+		<WIRE f="18" t="1" fs="0" ts="2" />
+		<WIRE f="22" t="2" fs="0" ts="1" />
+		<WIRE f="19" t="2" fs="0" ts="2" />
+		<WIRE f="23" t="3" fs="0" ts="1" />
+		<WIRE f="20" t="3" fs="0" ts="2" />
+		<WIRE f="24" t="4" fs="0" ts="1" />
+		<WIRE f="21" t="4" fs="0" ts="2" />
+	</PLAN>
+	<PLAN i="165" anc="0">
+		<NEUR i="1" x="0" y="0" bulb="0" />
+		<NEUR i="2" x="0" y="-1" bulb="0" />
+		<NEUR i="3" x="-1" y="0" bulb="0" />
+		<NEUR i="4" x="1" y="1" bulb="0" />
+	</PLAN>
+	<PLAN i="166" anc="0">
+		<NEUR i="1" x="0" y="0" bulb="0" />
+		<NEUR i="2" x="0" y="-2" bulb="0" />
+		<NEUR i="3" x="-1" y="-2" bulb="0" />
+		<NEUR i="4" x="1" y="-1" bulb="0" />
+		<NEUR i="5" x="1" y="0" bulb="0" />
+		<NEUR i="6" x="-1" y="-1" bulb="0" />
+		<WIRE f="6" t="4" />
+	</PLAN>
+	<PLAN i="167" anc="166">
+		<NEUR i="1" x="0" y="0" bulb="0" />
+		<NEUR i="2" x="0" y="-2" bulb="0" />
+		<NEUR i="3" x="-1" y="-2" bulb="0" />
+		<NEUR i="4" x="1" y="-1" bulb="0" />
+		<NEUR i="5" x="1" y="0" bulb="0" />
+		<NEUR i="6" x="-1" y="-1" bulb="0" />
+		<HAND i="7" x="-1" y="0" link="0" />
+		<HAND i="8" x="1" y="-2" link="0" />
+		<WIRE f="6" t="4" />
+	</PLAN>
+	<PLAN i="168" anc="1">
+		<NEUR i="1" x="-1" y="-1" bulb="1" />
+		<NEUR i="2" x="0" y="-1" bulb="1" />
+		<NEUR i="3" x="1" y="-1" bulb="1" />
+		<NEUR i="4" x="2" y="-1" bulb="1" />
+		<NEUR i="5" x="3" y="-1" bulb="1" />
+		<NEUR i="6" x="4" y="-1" bulb="1" />
+		<NEUR i="7" x="5" y="-1" bulb="1" />
+		<NEUR i="8" x="6" y="-1" bulb="1" />
+		<NEUR i="9" x="7" y="-1" bulb="1" />
+		<NEUR i="10" x="8" y="-1" bulb="1" />
+		<NEUR i="11" x="2" y="0" bulb="0" />
+		<NEUR i="12" x="2" y="1" bulb="0" />
+		<WIRE f="0" t="1" fs="1" ts="0" />
+		<WIRE f="1" t="2" fs="0" ts="0" />
+		<WIRE f="2" t="3" fs="0" ts="0" />
+		<WIRE f="3" t="4" fs="0" ts="0" />
+		<WIRE f="4" t="5" fs="0" ts="0" />
+		<WIRE f="5" t="6" fs="0" ts="0" />
+		<WIRE f="6" t="7" fs="0" ts="0" />
+		<WIRE f="7" t="8" fs="0" ts="0" />
+		<WIRE f="8" t="9" fs="0" ts="0" />
+		<WIRE f="9" t="10" fs="0" ts="0" />
+		<WIRE f="10" t="0" fs="0" ts="1" />
+	</PLAN>
+	<PLAN i="169" anc="2">
+		<NEUR i="1" x="0" y="-1" thr="2" bulb="1" />
+		<NEUR i="2" x="0" y="-2" bulb="1" />
+		<NEUR i="4" x="0" y="2" bulb="1" />
+		<NEUR i="5" x="0" y="1" bulb="1" />
+		<NEUR i="3" x="0" y="-3" bulb="0" />
+		<NEUR i="6" x="0" y="3" bulb="0" />
+		<NEUR i="7" x="1" y="0" bulb="0" />
+		<HAND i="8" x="1" y="2" link="0" />
+		<WIRE f="2" t="3" fs="0" ts="0" />
+		<WIRE f="3" t="2" fs="0" ts="0" />
+		<WIRE f="2" t="1" fs="0" ts="0" />
+		<WIRE f="0" t="2" fs="1" ts="0" />
+		<WIRE f="1" t="0" fs="0" ts="1" />
+		<WIRE f="0" t="5" fs="2" ts="0" />
+		<WIRE f="5" t="1" fs="0" ts="0" />
+		<WIRE f="5" t="4" fs="0" ts="0" />
+		<WIRE f="4" t="6" fs="0" ts="0" />
+		<WIRE f="6" t="4" fs="0" ts="0" />
+		<WIRE f="4" t="5" w="-2" fs="0" ts="0" />
+		<WIRE f="1" t="7" fs="0" ts="0" />
+		<WIRE f="7" t="0" fs="0" ts="2" />
+	</PLAN>
 </PLANS>
 <NAMES>
-	<NAME i="2" n="COW" />
-	<NAME i="6" n="MOVELINK" />
 	<NAME i="7" n="4CHAINSPIRAL" />
 	<NAME i="8" n="4SEQSPIRAL" />
 	<NAME i="9" n="LATCHY" />
@@ -3080,7 +3392,6 @@
 	<NAME i="27" n="4BINC" />
 	<NAME i="28" n="4BINCCOUNTER" />
 	<NAME i="30" n="4BDECCOUNTMEM" />
-	<NAME i="32" n="4BITSPIRAL" />
 	<NAME i="33" n="EVERYOTHERPULSE" />
 	<NAME i="34" n="4BITALTSPIRAL" />
 	<NAME i="36" n="MOVEIFDETECT" />
@@ -3104,9 +3415,20 @@
 	<NAME i="80" n="OVERNAME" />
 	<NAME i="113" n="ENTRY_OK" />
 	<NAME i="115" n="WREAL" />
+	<NAME i="120" n="POOLP" />
 	<NAME i="151" n="RECOVERED" />
 	<NAME i="152" n="HIGHID" />
 	<NAME i="154" n="" />
 	<NAME i="155" n="NAME" />
 	<NAME i="158" n="NEWTEST" />
+	<NAME i="159" n="BASICCAT" />
+	<NAME i="160" n="COW" />
+	<NAME i="161" n="4BITSPIRAL" />
+	<NAME i="162" n="REC3R" />
+	<NAME i="163" n="MOVELINK" />
+	<NAME i="164" n="22NEW" />
+	<NAME i="165" n="COOLIO" />
+	<NAME i="167" n="SAVETEST" />
+	<NAME i="168" n="WHA" />
+	<NAME i="169" n="CATBRAIN" />
 </NAMES>

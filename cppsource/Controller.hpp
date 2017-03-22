@@ -5,11 +5,11 @@
  * Created on 16 January 2015, 12:42
  */
 
-#ifndef CONTROLLER_HPP
-#define	CONTROLLER_HPP
+//#ifndef CONTROLLER_HPP
+//#define	CONTROLLER_HPP
 
-#include "Model.hpp"
-#include "View.hpp"
+//#include "Model.hpp"
+//#include "View.hpp"
 
 
 
@@ -40,5 +40,5 @@
 //    bool isMouseCursorSet_;
 //};
 
-#endif	/* CONTROLLER_HPP */
+//#endif	/* CONTROLLER_HPP */
 

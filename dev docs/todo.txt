@@ -1,27 +1,42 @@
 Do Next
 =======
+	DONE: Bug: When any key is pressed (even shift) -> it selects outer-most plan and doesn't affect location.
 ---v---
-	Split Model class
+	BugFix: Fix entity tracker so brain is actually selected
+	Refactor: Change BlobFactory into BrainFactory
+	Refactor: Change PlanPos to GridPos and remove pointer to Plan
+	
 	Make levels easier to make. (editable and saveable)
+		Where are cat brains saved??? (saved and loaded in the main brain db)
+	Add 'determine specified subset' function (and Add specify / despecify functions)
+	Add test function 			(to despec)
+	Add play / step functions	(to spec)
+
+	Split Model class (?? into what?) (separate into three: brain, arena + plan_picker)
+	Split View class (into panes)
 
 General
 =======
 	Why CPU load + Framerate loss when exploded?
 Visual / Interface
 ==================
-	Draw slot valency number (to show how many slots are ignored in both directions) between handles and chips.
-	Saved and unsaved plans should be different colour
-	Set discrete zoom levels
-	Solve: No space to see wires between exploded chips when adjacent. Disallow adjacency? Draw plan boundary half a cell inwards? (changing GRID_SIZE doesn't help exploded chips)
-	Make wire text labels circle-shaped and place them intelligently (on wire but close to device).
-	Allow chip cycling while unexploded.
-	Choose highest number plan to load into an empty plan, not lowest.
-	Plan Grabbers becoming a bit unnecessary. Only used for loading/saving now.
-	Add a reset all charge button.
-	Add a collapse all/expand! all button.
-	Add a device copy button? (useful for non-empty handles)
-	Add an encapsulate button. This will put all devices (and their wires) within a rectangular area bounded by the cursors into a newly created sub-plan. Fucking groovy. May require multiwires.
-
+	Innersim:
+		Draw slot valency number (to show how many slots are ignored in both directions) between handles and chips.
+		Saved and unsaved plans should be different colour
+		Solve: No space to see wires between exploded chips when adjacent. Disallow adjacency? Draw plan boundary half a cell inwards? (changing GRID_SIZE doesn't help exploded chips)
+		Make wire text labels circle-shaped and place them intelligently (on wire but close to device).
+		Possibly make neurons circle-shaped with a common point of attachment for in and out wires?
+		Allow chip cycling while unexploded.
+		Choose highest number plan to load into an empty plan, not lowest.
+		Plan Grabbers becoming a bit unnecessary. Only used for loading/saving now.
+		Add a reset all charge button.
+		Add a collapse all/expand! all button using plan as context (affecting all children of current plan).
+		Add a device copy button? (useful for non-empty handles)
+		Add an encapsulate button. This will put all devices (and their wires) within a rectangular area bounded by the cursors into a newly created sub-plan. Fucking groovy. May require multiwires.
+	OuterGame:
+		DOING: Add a entity-tracking visual marker to indicate whose brain is active in the brain view.
+	Both/General
+		Set discrete zoom levels
 
 InnerSim
 ========
@@ -34,19 +49,17 @@ InnerSim
 	Multichannel wire bug fixing:
 		MED: Draw wires adjoining collapsed handles as bundles (perhaps only where multiple wires overlap?).
 		LOW: Enable modifying the tags on wires (cursors would have to move if they are to keep selection of that wire) (currently just disallowed).
-		LOW: adding a wire involving a port with the cursors reversed is highly surprising.
+		LOW: adding a wire involving a port with the cursors reversed is highly surprising. Possibly merge the two selection regions of plans (inBar and outBar) into one region.
 
 Inbetween
 =========
 	More robust XML loading (with feedback on failures)
 	Plan and Level import and export can come a lot later.
 
-
 OuterGame
 =========
 	Add goals
 	Freezing cats
-
 
 Don't Do This!
 ==============

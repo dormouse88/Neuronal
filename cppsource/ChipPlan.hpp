@@ -11,7 +11,7 @@
 #include <memory>
 #include <vector>
 #include "BasicTypes.hpp"
-#include "PlanOwned.hpp"
+//#include "PlanOwned.hpp"
 #include "Wirable.hpp"
 #include "Device.hpp"
 #include "Wire.hpp"
@@ -20,7 +20,7 @@ class PlanRect; //fwd dec
 #include "RefererInterface.hpp"
 class PlanGroupData;  //fwd dec
 class WiringPair; //fwd dec
-class ChipHandle;
+//class ChipHandle;
 
 class ChipPlan : public Wirable, public std::enable_shared_from_this<ChipPlan>
 {

@@ -6,10 +6,10 @@
  */
 
 #include "ChipPlan.hpp"
-#include "ChipHandle.hpp"
 #include <cassert>
 #include <algorithm>
 #include <iterator>
+#include "ChipHandle.hpp" //fwd dec
 #include "PlanGroupData.hpp" //fwd dec
 #include "PlanPos.hpp"  //fwd dec
 #include "WiringPair.hpp"  //fwd dec

@@ -10,14 +10,14 @@
             <file>file:/C:/Users/Dormouse/Documents/NetBeansProjects/Neuronal/cppsource/Model.hpp</file>
             <file>file:/C:/Users/Dormouse/Documents/NetBeansProjects/Neuronal/cppsource/Serializer.cpp</file>
             <file>file:/C:/Users/Dormouse/Documents/NetBeansProjects/Neuronal/cppsource/View.cpp</file>
+            <file>file:/C:/Users/Dormouse/Documents/NetBeansProjects/Neuronal/cppsource/ChipHandle.hpp</file>
+            <file>file:/C:/Users/Dormouse/Documents/NetBeansProjects/Neuronal/cppsource/Spawners.hpp</file>
             <file>file:/C:/Users/Dormouse/Documents/NetBeansProjects/Neuronal/cppsource/ChipPlan.cpp</file>
             <file>file:/C:/Users/Dormouse/Documents/NetBeansProjects/Neuronal/cppsource/Model.cpp</file>
-            <file>file:/C:/Users/Dormouse/Documents/NetBeansProjects/Neuronal/cppsource/PlanGroupData.hpp</file>
-            <file>file:/C:/Users/Dormouse/Documents/NetBeansProjects/Neuronal/cppsource/PlanGroupData.cpp</file>
-            <file>file:/C:/Users/Dormouse/Documents/NetBeansProjects/Neuronal/cppsource/BasicTypes.hpp</file>
+            <file>file:/C:/Users/Dormouse/Documents/NetBeansProjects/Neuronal/cppsource/PlanOwned.hpp</file>
+            <file>file:/C:/Users/Dormouse/Documents/NetBeansProjects/Neuronal/cppsource/Wire.hpp</file>
             <file>file:/C:/Users/Dormouse/Documents/NetBeansProjects/Neuronal/cppsource/ChipPlan.hpp</file>
             <file>file:/C:/Users/Dormouse/Documents/NetBeansProjects/Neuronal/cppsource/View.hpp</file>
-            <file>file:/C:/Users/Dormouse/Documents/NetBeansProjects/Neuronal/cppsource/Serializer.hpp</file>
         </group>
     </open-files>
 </project-private>

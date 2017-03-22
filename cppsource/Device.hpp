@@ -36,10 +36,10 @@ public:
     VectorSmart GetSmartPos() const             {return ppos_.GetSmartPos();}
     void SetPosSmart(VectorSmart p)             {ppos_.SetPosSmart(p);}
 
-    PlanID GetDevSerial() const                       {return ds_;}
+    DevSerial GetDevSerial() const                       {return ds_;}
 private:
     PlanPos ppos_;
-    PlanID ds_;
+    DevSerial ds_;
     
 };
 

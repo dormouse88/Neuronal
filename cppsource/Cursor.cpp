@@ -173,6 +173,9 @@ void MakeValidAndVisible(PlanAddress & pa)
                 plan = h->GetSubPlan();
             }
         }
+
+        pa.plan = plan;
+
         //Then work back up (the other way) to the base
         //Ultimately select the nearest plan that is exploded all the way back.
         HandleShp newAddressee = nullptr;
@@ -189,9 +192,9 @@ void MakeValidAndVisible(PlanAddress & pa)
             }
             else break;
         }
-        pa.plan = plan;
         if (newAddressee)
         {
+            pa.plan = newAddressee->GetContainer();
             pa.mode = PlanAddressMode::CELL;
             pa.pos = newAddressee->GetSmartPos();
         }

@@ -11,7 +11,7 @@
 
 #include "Model.hpp"
 #include "View.hpp"
-#include "Controller.hpp"
+//#include "Controller.hpp"
 
 class App
 {
