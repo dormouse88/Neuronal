@@ -16,15 +16,15 @@
 #include "TextEnterer.hpp"
 
 
-class ViewPanel   //really rename this!
+class RelativesViewer
 {
 public:
-    ViewPanel();
-    void SetPlanID(PlanID, std::shared_ptr<const PlanGroupData>);
+    RelativesViewer();
+    void SetPlanID(PlanID, std::shared_ptr<const PlansDirectory>);
     void Draw(sf::RenderTarget &rt);
 
 private:
-    std::shared_ptr<PlanGroupData> planGroupData;
+    std::shared_ptr<PlansDirectory> plansDir;
     PlanID pid_;
     
     sf::RectangleShape mainOutlineBox;
@@ -77,6 +77,7 @@ public:
     PuppetCursor(sf::Color);
     void Draw(sf::RenderTarget &);
     void UpdateMonitorTarget( Shp<Puppet> p, Shp<Arena> ar ) {brainMonitored_ = p; arena_ = ar;}
+    Shp<BaseReferer> GetBrain() {auto b = brainMonitored_.lock(); if (b) return b->GetBrain(); else return nullptr;}
 private:
     sf::RectangleShape shape_;
     std::weak_ptr<Puppet> brainMonitored_;
@@ -91,11 +92,12 @@ struct UIObjects //eventually refactor this away (textEnterer stays common, curs
         :cursorOne( sf::Color::Yellow )
         ,cursorTwo( sf::Color::Cyan )
         ,arenaCursor( sf::Color::Green )
+        ,puppetCursor(sf::Color::Yellow)
     {}
     BrainCursor cursorOne;
     BrainCursor cursorTwo;
     ArenaCursor arenaCursor;
-//    PuppetCursor puppetCursor;
+    PuppetCursor puppetCursor;
     std::shared_ptr<TextEnterer> textEnterer_;
 };
 
@@ -136,7 +138,6 @@ public:
 private:
     Shp<Arena> arena;
     UIObjects & uiObjects;
-    PuppetCursor puppetCursor;
 };
 
 class PaneBrain : public BaseAreaPane
@@ -148,7 +149,6 @@ public:
     virtual void HandleMouse(sf::Event &, sf::Vector2f) override;
     virtual void AutoClamp() override;
     void SetHighlightingMode(int x)             { highlightingMode = x; }
-    void SetBrain( Shp<BaseReferer> br)         { brain = br; }
 private:
     void HandlePlan(sf::Event &, PlanShp);
     void HandleLocated(sf::Event &, PlanPos);
@@ -173,7 +173,7 @@ private:
     Model & theModel;
     UIObjects & uiObjects;
     Marquee marquee;
-    ViewPanel viewPanel;
+    RelativesViewer viewPanel;
     sf::Text nameFilter;
 };
 
@@ -191,7 +191,6 @@ private:
 };
 
 
-
 class PaneGroup
 {
 public:
@@ -201,12 +200,12 @@ public:
 private:
     void HandleInputState(BasePane * pane, sf::Vector2f worldPos);
     void HandleInputEvents(BasePane * pane, sf::Vector2f worldPos);
-    void CycleFieldMode()                      { fieldMode++; if (fieldMode > 3) fieldMode = 1; SizingsRefresh(); }
+    void CycleFieldMode();
 private:
     void SizingsRefresh();
     Model & theModel;
-    UIObjects uiObjects;
     sf::RenderWindow window;
+    UIObjects uiObjects;
     int fieldMode;
     
     PaneLevel paneLevel;

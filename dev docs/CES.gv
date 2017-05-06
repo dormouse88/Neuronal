@@ -1,0 +1,62 @@
+
+digraph CES {
+    rankdir = LR;
+    ranksep = 4.5;
+	subgraph cluster_0 {
+		label = "systems";
+
+		//nodelist systems:
+		ChargeRefresh [tooltip="Instant Refreshment"];
+		ChargeTick [tooltip="Bulbs cycle"];
+		EditAtCursor [tooltip="Use Cursor Position + Input to make changes to parts"];
+		CursorPlacer [tooltip="Use MousePos to set cursor Pos"];
+		Collapser [tooltip="Do expansions/collapses of handles/plans"];
+		Namer [tooltip="Add/Change/Del plan names"];
+		Commiter [tooltip="Serialize with pugixml"];
+		Renderer [tooltip="Draw"];
+	}
+
+	subgraph cluster_1 {
+		label = "components";
+
+		//nodelist components:
+		Scoped [tooltip="e parent,"];
+		Cartesian [tooltip="int x, int y,"];
+		IsCursor [tooltip="int id"];
+		ToWeighted [tooltip="int weight,"];
+		FromTagged [tooltip="string tag,"];
+		ToTagged [tooltip="string tag,"];
+		Connecting [tooltip="e from, e to,"];
+		ChargeHaving [tooltip="bool charge, bool refreshRequired,"];
+		ChargeCalculating [tooltip="int thresh,"];
+		ChargeBuffering [tooltip="bool bulbCharge,"];
+		ScaleSlipping [tooltip="enum inOrOut,"];
+		Collapsible [tooltip="bool collapsed, (cache),"];
+		Editable [tooltip="bool unsavedEdits"];
+		Commitable [tooltip="int plan_id, string plan_name"];
+		
+    	subgraph cluster_editable_parts {
+    	    color=red;
+    		Cartesian
+    		ToWeighted
+    		FromTagged
+    		ToTagged
+    		Connecting
+    		ChargeHaving
+    		ChargeCalculating
+    		ChargeBuffering
+    	}
+	}
+	
+	
+	//connections:
+	ChargeRefresh -> {ChargeHaving ChargeBuffering ChargeCalculating Connecting ToWeighted FromTagged ToTagged ScaleSlipping Scoped} [color=blue style=dotted];
+	ChargeTick -> {ChargeHaving ChargeBuffering};
+	EditAtCursor -> {IsCursor Scoped Cartesian ToWeighted FromTagged ToTagged Connecting ChargeHaving ChargeCalculating ChargeBuffering ScaleSlipping Editable} [color=red style=dotted];
+	CursorPlacer -> {IsCursor Scoped Cartesian};
+	Collapser -> {IsCursor Scoped Cartesian Collapsible};
+	Namer -> {Commitable};
+	Commiter -> {Editable Commitable Scoped Cartesian ToWeighted FromTagged ToTagged Connecting ChargeHaving ChargeCalculating ChargeBuffering ScaleSlipping} [color=green style=dashed];
+	Renderer -> {};
+
+}

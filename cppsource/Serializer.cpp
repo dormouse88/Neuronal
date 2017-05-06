@@ -13,7 +13,7 @@
 #include <string>
 #include <SFML/System.hpp>// (/Vector2.hpp)
 #include <cassert>
-#include "PlanGroupData.hpp"  //fwd dec
+#include "PlansDirectory.hpp"  //fwd dec
 #include "Arena.hpp" //fwd dec
 
 const char XML_USER_FILENAME [] = "tree.xml";
@@ -140,7 +140,7 @@ PlanShp Serializer::LoadUserPlan(PlanID planID, std::shared_ptr<BlobFactory> fac
 //    return LoadPlanRecursively(con, planID, factory);
 //}
 
-void Serializer::LoadPlanGroupData(std::shared_ptr<PlanGroupData> ud)
+void Serializer::LoadPlansDirectory(std::shared_ptr<PlansDirectory> ud)
 {
     //Ancestry...
     for (pugi::xml_node node: userDoc_.child("PLANS").children("PLAN"))
@@ -159,7 +159,7 @@ void Serializer::LoadPlanGroupData(std::shared_ptr<PlanGroupData> ud)
     }
 }
 
-void Serializer::SavePlanGroupData(std::shared_ptr<PlanGroupData> pgd)
+void Serializer::SavePlansDirectory(std::shared_ptr<PlansDirectory> pgd)
 //This method could be a little gentler and just update where necessary rather than stomp the whole NAMES node
 {
     userDoc_.remove_child("NAMES");

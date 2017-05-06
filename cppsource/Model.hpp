@@ -11,10 +11,10 @@
 #include <memory>
 #include "BlobFactory.hpp"
 #include "Serializer.hpp"
-#include "PlanGroupData.hpp"
+#include "PlansDirectory.hpp"
 #include "ChipPlan.hpp"
 #include "Arena.hpp"
-#include "Puppet.hpp"
+//#include "Puppet.hpp"
 #include "BasicTypes.hpp"
 
 enum class PlanNamingMode { PROVIDED, TRANSFER, ANON }; //AUTONAME,
@@ -30,25 +30,24 @@ public:
     PlanShp LoadPlan(PlanShp, PlanNav nav, bool forced = false);
     void SavePlan(PlanShp, PlanNamingMode, std::string provided = "");
 
-    PlanShp EngageNameFilter(PlanShp plan, std::string filter)        { planGroupData_->SetNameFilter(filter); return LoadPlan(plan, PlanNav::FILTER_NAME); }
-    std::string GetNameFilter() const                                 { return planGroupData_->GetNameFilter(); }
+    PlanShp EngageNameFilter(PlanShp plan, std::string filter)        { plansDir_->SetNameFilter(filter); return LoadPlan(plan, PlanNav::FILTER_NAME); }
+    std::string GetNameFilter() const                                 { return plansDir_->GetNameFilter(); }
 
     PlanName GetPlanName(PlanID id) const;
     void AddName(PlanID id, std::string name);
     void ChangeName(PlanID id, std::string name);
     void RemoveName(PlanID id);
 
-    Shp<const PlanGroupData> GetPlanGroupData() const       {return planGroupData_;}
+    Shp<const PlansDirectory> GetPlansDirectory() const       {return plansDir_;}
     Shp<BlobFactory> GetFactory()                           {return factory_;}
 private:
     void SavePlanRecursively(PlanShp, PlanNamingMode, std::string provided = "");
     
     Shp<Serializer> serializer;
-    Shp<PlanGroupData> planGroupData_;
+    Shp<PlansDirectory> plansDir_;
     Shp<BlobFactory> factory_;
 
     Shp<Arena> arena;
-    Shp<ChipPlan> mouseBasePlan;
 };
 
 

@@ -16,7 +16,7 @@
 #include "Device.hpp"
 #include "Wire.hpp"
 #include "ChipPlan.hpp"
-class PlanGroupData; //fwd dec
+class PlansDirectory; //fwd dec
 class Arena; //fwd dec
 
 class Serializer
@@ -30,11 +30,10 @@ public:
     PlanID    GetFirstFreePlanID() const;
     bool      SaveUserPlan(PlanShp);
     PlanShp   LoadUserPlan(PlanID, std::shared_ptr<BlobFactory>);
-//    PlanShp   LoadLevelPlan(LevelNum, PlanID, std::shared_ptr<BlobFactory>);
 
     //PlanGroups...
-    void LoadPlanGroupData(std::shared_ptr<PlanGroupData>);
-    void SavePlanGroupData(std::shared_ptr<PlanGroupData>);
+    void LoadPlansDirectory(std::shared_ptr<PlansDirectory>);
+    void SavePlansDirectory(std::shared_ptr<PlansDirectory>);
     
 private:
     void OpenFile(pugi::xml_document & doc, const char * fileName);

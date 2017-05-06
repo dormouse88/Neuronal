@@ -1,12 +1,12 @@
 /* 
- * File:   PlanGroupData.hpp
+ * File:   PlansDirectory.hpp
  * Author: Dormouse
  *
  * Created on 24 November 2015, 15:05
  */
 
-#ifndef PLANGROUPDATA_HPP
-#define	PLANGROUPDATA_HPP
+#ifndef PLANSDIRECTORY_HPP
+#define	PLANSDIRECTORY_HPP
 
 #include <map>
 #include <set>
@@ -43,10 +43,10 @@ struct Relatives
     std::set<PlanID> kids;
 };
 
-class PlanGroupData
+class PlansDirectory
 {
 public:
-    PlanGroupData();
+    PlansDirectory();
 
     PlanID GetID(PlanID planID, PlanNav nav) const;
     void SetNameFilter(std::string s)               {nameFilter = s;}
@@ -77,5 +77,5 @@ private:
 };
 
 
-#endif	/* PLANGROUPDATA_HPP */
+#endif	/* PLANSDIRECTORY_HPP */
 

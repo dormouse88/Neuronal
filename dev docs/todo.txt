@@ -1,12 +1,11 @@
 Do Next
 =======
 	DONE: Bug: When any key is pressed (even shift) -> it selects outer-most plan and doesn't affect location.
+	DONE: Add a entity-tracking visual marker to indicate whose brain is active in the brain view.
+	DONE: BugFix: Fix entity tracker so brain is actually selected
 ---v---
-	BugFix: Fix entity tracker so brain is actually selected
-	Refactor: Change BlobFactory into BrainFactory
-	Refactor: Change PlanPos to GridPos and remove pointer to Plan
-	
-	Make levels easier to make. (editable and saveable)
+	BugFix: Cyclic dependencies ARE problematic. A neuron whose own output determines its own state (with no delay) crashes the app!
+	Make levels easier to make. (editable and saveable, changes reflected immediately)
 		Where are cat brains saved??? (saved and loaded in the main brain db)
 	Add 'determine specified subset' function (and Add specify / despecify functions)
 	Add test function 			(to despec)
@@ -14,6 +13,8 @@ Do Next
 
 	Split Model class (?? into what?) (separate into three: brain, arena + plan_picker)
 	Split View class (into panes)
+	Refactor: Change BlobFactory into BrainFactory
+	Refactor: Change PlanPos to GridPos and remove pointer to Plan
 
 General
 =======
@@ -34,7 +35,7 @@ Visual / Interface
 		Add a device copy button? (useful for non-empty handles)
 		Add an encapsulate button. This will put all devices (and their wires) within a rectangular area bounded by the cursors into a newly created sub-plan. Fucking groovy. May require multiwires.
 	OuterGame:
-		DOING: Add a entity-tracking visual marker to indicate whose brain is active in the brain view.
+
 	Both/General
 		Set discrete zoom levels
 

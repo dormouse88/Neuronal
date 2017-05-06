@@ -137,7 +137,15 @@ CWeight Wirable::GetTotalIncomingWeight(Tag tag) const
 void Wirable::CleanWireVectors() const //this method is necessary since the limits work by checking vector size.
 {
     auto cleanVector = [&] (std::vector<std::weak_ptr<Wire> > & wv) {
-        auto remove_func = [] (std::weak_ptr<Wire> & w) { return w.expired() or w.lock()->IsDead(); } ;
+        auto remove_func = [] (std::weak_ptr<Wire> & w)
+        //{ return w.expired() or w.lock()->IsDead(); } ;
+        {
+            auto l = w.lock();
+            if (l and not l->IsDead())
+                return false;
+            else
+                return true;
+        };
         auto new_end = std::remove_if(begin(wv), end(wv), remove_func );
         wv.erase(new_end, end(wv));
     };

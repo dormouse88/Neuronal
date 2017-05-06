@@ -48,9 +48,9 @@ OBJECTFILES= \
 	${OBJECTDIR}/cppsource/Neuron.o \
 	${OBJECTDIR}/cppsource/Pansions.o \
 	${OBJECTDIR}/cppsource/PlanGrid.o \
-	${OBJECTDIR}/cppsource/PlanGroupData.o \
 	${OBJECTDIR}/cppsource/PlanOwned.o \
 	${OBJECTDIR}/cppsource/PlanPos.o \
+	${OBJECTDIR}/cppsource/PlansDirectory.o \
 	${OBJECTDIR}/cppsource/Puppet.o \
 	${OBJECTDIR}/cppsource/Serializer.o \
 	${OBJECTDIR}/cppsource/SpawnGroups.o \
@@ -161,11 +161,6 @@ ${OBJECTDIR}/cppsource/PlanGrid.o: cppsource/PlanGrid.cpp
 	${RM} "$@.d"
 	$(COMPILE.cc) -g -I../../../../../devlib/SFML-2.2/include -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/cppsource/PlanGrid.o cppsource/PlanGrid.cpp
 
-${OBJECTDIR}/cppsource/PlanGroupData.o: cppsource/PlanGroupData.cpp 
-	${MKDIR} -p ${OBJECTDIR}/cppsource
-	${RM} "$@.d"
-	$(COMPILE.cc) -g -I../../../../../devlib/SFML-2.2/include -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/cppsource/PlanGroupData.o cppsource/PlanGroupData.cpp
-
 ${OBJECTDIR}/cppsource/PlanOwned.o: cppsource/PlanOwned.cpp 
 	${MKDIR} -p ${OBJECTDIR}/cppsource
 	${RM} "$@.d"
@@ -175,6 +170,11 @@ ${OBJECTDIR}/cppsource/PlanPos.o: cppsource/PlanPos.cpp
 	${MKDIR} -p ${OBJECTDIR}/cppsource
 	${RM} "$@.d"
 	$(COMPILE.cc) -g -I../../../../../devlib/SFML-2.2/include -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/cppsource/PlanPos.o cppsource/PlanPos.cpp
+
+${OBJECTDIR}/cppsource/PlansDirectory.o: cppsource/PlansDirectory.cpp 
+	${MKDIR} -p ${OBJECTDIR}/cppsource
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -I../../../../../devlib/SFML-2.2/include -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/cppsource/PlansDirectory.o cppsource/PlansDirectory.cpp
 
 ${OBJECTDIR}/cppsource/Puppet.o: cppsource/Puppet.cpp 
 	${MKDIR} -p ${OBJECTDIR}/cppsource

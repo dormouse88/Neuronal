@@ -7,7 +7,7 @@
 
 #include "ChipHandle.hpp"
 #include "miscUtil.hpp"
-#include "PlanGroupData.hpp" //?
+#include "PlansDirectory.hpp" //for drawing
 
 const sf::Vector2f RECTANGLE { 90.f, 65.f };
 

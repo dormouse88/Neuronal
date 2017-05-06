@@ -11,15 +11,13 @@
 
 Model::Model()
     :serializer(std::make_shared<Serializer>())
-    ,planGroupData_(std::make_shared<PlanGroupData>())
-    ,factory_(std::make_shared<BlobFactory>(planGroupData_))
+    ,plansDir_(std::make_shared<PlansDirectory>())
+    ,factory_(std::make_shared<BlobFactory>(plansDir_))
     ,arena(std::make_shared<Arena>(factory_))
-    ,mouseBasePlan(factory_->MakePlan())
 {
-    serializer->LoadPlanGroupData(planGroupData_);
+    serializer->LoadPlansDirectory(plansDir_);
     serializer->LoadLevel(1, arena, factory_);
-    auto mouseBrain = arena->GetMouseBrain();
-    mouseBrain->SetSubPlan(mouseBasePlan, mouseBrain);
+    
     arena->Specify();
 }
 
@@ -27,7 +25,7 @@ PlanShp Model::LoadPlan(PlanShp plan, PlanNav nav, bool forced)
 {
     if (forced or not plan->IsModified())
     {
-        PlanID newID = planGroupData_->GetID(plan->GetPlanID(), nav);
+        PlanID newID = plansDir_->GetID(plan->GetPlanID(), nav);
         auto newPlan = factory_->MakePlan();
         if (newID != NULL_PID)
             newPlan = serializer->LoadUserPlan(newID, factory_);
@@ -47,7 +45,7 @@ void Model::SavePlan(PlanShp plan, PlanNamingMode mode, std::string provided)
     if (plan->IsModified())
     {
         SavePlanRecursively(plan, mode, provided);
-        serializer->SavePlanGroupData(planGroupData_);
+        serializer->SavePlansDirectory(plansDir_);
     }
 }
 
@@ -73,10 +71,10 @@ void Model::SavePlanRecursively(PlanShp plan, PlanNamingMode mode, std::string p
     plan->planID = newID;
     
     serializer->SaveUserPlan(plan);
-    planGroupData_->AddAncestryEntry(newID, oldID);
+    plansDir_->AddAncestryEntry(newID, oldID);
 
     //names...
-    PlanName oldName = planGroupData_->GetNameByID( oldID );
+    PlanName oldName = plansDir_->GetNameByID( oldID );
     if (mode == PlanNamingMode::PROVIDED)
     {
         AddName(newID, provided);
@@ -101,15 +99,15 @@ void Model::SavePlanRecursively(PlanShp plan, PlanNamingMode mode, std::string p
 
 std::string Model::GetPlanName(PlanID id) const
 {
-    return planGroupData_->GetNameByID(id);
+    return plansDir_->GetNameByID(id);
 }
 
 void Model::AddName(PlanID id, std::string name)
 {
     if ( GetPlanName(id) == NULL_PLAN_NAME )
     {
-        planGroupData_->SetName(id, name);
-        serializer->SavePlanGroupData(planGroupData_);
+        plansDir_->SetName(id, name);
+        serializer->SavePlansDirectory(plansDir_);
     }
 }
 
@@ -117,13 +115,13 @@ void Model::ChangeName(PlanID id, std::string name)
 {
     if ( GetPlanName(id) != NULL_PLAN_NAME )
     {
-        planGroupData_->SetName(id, name);
-        serializer->SavePlanGroupData(planGroupData_);
+        plansDir_->SetName(id, name);
+        serializer->SavePlansDirectory(plansDir_);
     }
 }
 
 void Model::RemoveName(PlanID id)
 {
-    planGroupData_->RemoveName(id);
-    serializer->SavePlanGroupData(planGroupData_);
+    plansDir_->RemoveName(id);
+    serializer->SavePlansDirectory(plansDir_);
 }

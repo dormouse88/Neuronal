@@ -18,14 +18,14 @@
 #include "PlanGrid.hpp"
 class PlanRect; //fwd dec
 #include "RefererInterface.hpp"
-class PlanGroupData;  //fwd dec
+class PlansDirectory;  //fwd dec
 class WiringPair; //fwd dec
 //class ChipHandle;
 
 class ChipPlan : public Wirable, public std::enable_shared_from_this<ChipPlan>
 {
 public:
-    ChipPlan(std::shared_ptr<PlanGrid> g, std::shared_ptr<PlanGroupData> u);
+    ChipPlan(std::shared_ptr<PlanGrid> g, std::shared_ptr<PlansDirectory> u);
     virtual ~ChipPlan() {}
 
     void RegisterReferer(std::shared_ptr<RefererInterface> ref);
@@ -54,7 +54,7 @@ public:
     bool IsSerialFree(DevSerial) const;
     bool IsPositionFree(VectorSmart) const;
     PlanID GetPlanID() const                                   {return planID;}
-    std::shared_ptr<const PlanGroupData> GetPlanGroupData() const {return planGroupData_;} //should probably take this member out of ChipPlan
+    std::shared_ptr<const PlansDirectory> GetPlanGroupData() const {return planGroupData_;} //should probably take this member out of ChipPlan
 
     void ImportDevice(DeviceShp device);
     void ImportWire(WireShp wire);
@@ -106,7 +106,7 @@ private:
 
     PlanID planID;
     PlanID ancID;
-    std::shared_ptr<const PlanGroupData> planGroupData_;
+    std::shared_ptr<const PlansDirectory> planGroupData_;
     std::shared_ptr<PlanGrid> planGrid;
     std::shared_ptr<RefererInterface> referer;
     std::vector<DeviceShp > devices;

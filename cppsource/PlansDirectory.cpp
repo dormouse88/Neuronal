@@ -1,19 +1,19 @@
 /* 
- * File:   PlanGroupData.cpp
+ * File:   PlansDirectory.cpp
  * Author: Dormouse
  * 
  * Created on 24 November 2015, 15:05
  */
 
-#include "PlanGroupData.hpp"
+#include "PlansDirectory.hpp"
 #include <cassert>
 #include <map>
 
 
-PlanGroupData::PlanGroupData()
+PlansDirectory::PlansDirectory()
 {}
 
-PlanID PlanGroupData::GetID(PlanID planID, PlanNav nav) const
+PlanID PlansDirectory::GetID(PlanID planID, PlanNav nav) const
 {
     //assert(planID != 0); //May receive zero
     PlanID target = planID;
@@ -139,14 +139,14 @@ PlanID PlanGroupData::GetID(PlanID planID, PlanNav nav) const
 
 
 //Ancestry //Getters
-std::shared_ptr<const Relatives> PlanGroupData::GetRelatives(PlanID id) const
+std::shared_ptr<const Relatives> PlansDirectory::GetRelatives(PlanID id) const
 {
     if (ancestry.count(id) > 0) return ancestry.at(id);
     else return nullptr;
 }
 
 //Ancestry //Setters
-void PlanGroupData::AddAncestryEntry(PlanID id, PlanID anc)
+void PlansDirectory::AddAncestryEntry(PlanID id, PlanID anc)
 {
     assert(ancestry.count(id) == 0);
     //Note that map::insert() won't do anything if key is already present
@@ -176,7 +176,7 @@ void PlanGroupData::AddAncestryEntry(PlanID id, PlanID anc)
 //    else
 //        return NULL_PID;
 //}
-PlanName PlanGroupData::GetNameByID(PlanID planID) const
+PlanName PlansDirectory::GetNameByID(PlanID planID) const
 {
     if (namesByID.count(planID) > 0)
         return namesByID.at(planID);
@@ -185,7 +185,7 @@ PlanName PlanGroupData::GetNameByID(PlanID planID) const
 }
 
 //Names //Setters
-void PlanGroupData::SetName(PlanID planID, PlanName name)
+void PlansDirectory::SetName(PlanID planID, PlanName name)
 {
     if (planID != NULL_PID)
     {
@@ -197,7 +197,7 @@ void PlanGroupData::SetName(PlanID planID, PlanName name)
     }
 }
 
-void PlanGroupData::RemoveName(PlanID planID)
+void PlansDirectory::RemoveName(PlanID planID)
 {
     if (planID != NULL_PID)
     {
@@ -221,7 +221,7 @@ void PlanGroupData::RemoveName(PlanID planID)
 //    return NULL_PLAN_NAME;
 //}
 
-std::string PlanGroupData::AddUniqueifyingAppendage(std::string name)
+std::string PlansDirectory::AddUniqueifyingAppendage(std::string name)
 {
     if (namesByName.count(name) == 0)
         return name;

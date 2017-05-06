@@ -1,0 +1,97 @@
+<ul>
+<li><h3>NEURONs, WIREs and CHARGE</h3>
+	<p>NEURONS are the atomic logic unit. NEURONs are one of two DEVICE types. NEURONS have a integer THRESHOLD value and have a binary CHARGE state.</p>
+	<p>WIRES connect one DEVICE to another. WIRES are directional. A DEVICE may receive input from multiple WIRES and send output to multiple WIRES.</p>
+	<p>A NEURON has a integer WEIGHT value assigned to each input WIRE.</p>
+	<p>A NEURON's CHARGE state is a function of its inputs and its THRESHOLD. If the sum of its weighted inputs is >= its THRESHOLD, it is ON. Otherwise it is OFF. A NEURON sends its CHARGE state to its output wires.</p>
+	<h4>Delay BULBs</h4>
+		<p>NEURONs can optionally hold a delay BULB. When present, these prevent the immediate application of the NEURONs CHARGE state to its outputs. Instead, BULBs retain their own state and output that continually. At each INNER TIME STEP, delay BULBs adopt the state of their parent NEURON.</p>
+		<p>A NOTE ON FAST LOOPS: If a system is dependent on itself and contains no delay BULBs, it may be unstable and impossible to resolve all CHARGEs using immediate updates. For this reason, the 'instant refresh' of CHARGEs that normally occurs whenever there is a system change should 'fail' if a fast loop exists. Time steps (and testing) are disabled until 'instant refresh' can be restored. Other functionality (eg. saving) remains intact</p>
+	<a href="flexible neurons">see</a>
+</li>
+<li><h3>PLANs, HANDLEs and TAGs</h3>
+	<p>DEVICEs and WIREs are always located on a PLAN. DEVICEs have a location property that defines their location within their parent PLAN, whereas WIREs are defined just by which DEVICEs they connect to.</p>
+	<p>PLANs themselves can input and output CHARGE. WIREs within a PLAN can connect to the PLAN itself. Such WIREs have a TAG property that is used in resolving CHARGE routing.</p>
+	<p>PLANs can also contain links to other PLANs. These are called HANDLEs and are a type of DEVICE. HANDLEs are wired externally like NEURONs are. However, WIREs connecting to HANDLEs have the TAG property like PLANs. HANDLEs contain a single PLAN. CHARGE transmission occurs at two interfaces: HANDLE inputs -> PLAN inputs and PLAN outputs -> HANDLE outputs. In both cases, a CHARGE is transmitted to any WIREs that have a matching value for their TAG property (CHARGE of OFF is used for a non-match).</p>
+	<a href="named slots">see</a>
+</li>
+<li><h3>SAVING and LOADING</h3>
+	<p>PLANs are the atomic unit of saving. PLANs are assigned a unique ID upon saving. Saved PLANs can never be overwritten or deleted. A modified version of a PLAN must be saved as a new PLAN with a new ID. HANDLEs are never automatically updated and will point to the same PLAN ID unless manually reassigned.</p>
+	<p>To save a PLAN, all of its contained PLANs must be saved first so that HANDLEs can point to correct IDs. This is done automatically. The user chooses a single PLAN to save (modified PLANs only). When saving a PLAN, the system will recursively save all modified contained PLANs first. PLANs containing the saved PLAN are not affected (eg. are not saved).</p>
+	<ul>
+		<li><h4>Appendix: PLAN XML Schema</h4>
+			<p>ETC.</p>
+		</li>
+		<li><h4>PLAN Names</h4>
+			<p>PLAN Names are an overlay system, built upon the fundamental system of saving by ID.</p>
+			<p>Each PLAN name is unique at any given time. Any naming operation using a PROVIDED name that already exists will be suffixed with letters until it is unique. PROVIDING a blank name is acceptable and in this case the 'suffix' will constitute the entire name.</p>
+			<p>The three possible naming strategies for each PLAN are PROVIDED, TRANSFERED, and ANON. PROVIDED names the saved PLAN with the user-provided name. TRANSFERED names the saved PLAN with its version parent's name if it has one. Where the version parent has no name, the saved PLAN is not named. Either way, the version parent will be nameless. ANON does not assign a name.</p>
+			<p>The PROVIDED and TRANSFERED options feel somewhat parallel to the typical 'save as' and 'overwrite' options, remember however that this choice affects naming only.</p>
+			<p>The user may choose to save a PLAN using the PROVIDED or TRANSFERED strategy but not ANON. Therefore all PLANs saved directly by the user will initially get a name. Modified contained PLANs of the PLAN being saved will be saved using the ANON strategy.</p>
+		</li>
+		<li><h4>PLAN Loading Picker</h4>
+			<p>There are several different possible ways to relate PLANs to one another. These different options are available in the PLAN Picker when loading PLANs to facilitate selection. The traversals are: ancestry, containment, alphabetical, creation date, modification date. Ancestry is a normal tree, containment is a complex tree (nodes can have multiple parents), the others are linear.</p>
+		</li>
+	</ul>
+
+	<a href="no-local no-updating">see</a>
+</li>
+<li>
+	<h3>Visual PLAN Folding</h3>
+	<p>PLANs can be visually collapsed and expanded. This has no substansive effect on the system, is not saved and does not affect the CHARGE transmission functionality. It is only a useful abstraction for examining complex systems.</p>
+	<p>Expansion works by increasing the size of certain rows and columns so they can accomodate the complete PLAN that is 'contained' within a given HANDLE. All cells in the same row or column as the expanded cell (containing a HANDLE) are also increased in size, meaning that other DEVICEs may have excess space. If a further HANDLE is expanded on an already oversized row or column, the size of that row/column is increased only if cannot already accommodate the 'contained' PLAN.</p>
+	<p>While DEVICE locations are quantized to integer values (the coordinates of the row and column), the size of rows and columns themselves is instead a worldspace (float) value. Expansion therefore is not measured in units of a standard cell size.</p>
+</li>
+</ul>
+
+	# The ARENA
+	The ARENA is a grid of cells with specified dimensions that contains a number of entities. These entities include actors (cats and mice), spawners (that create actors), and goals. Each Actor can have a BRAIN and thereby contain its own microcosm of the INNERSIM. If present, the BRAIN will receive sense data from the ACTOR and can determine an action to take accordingly.
+	
+	mice spawn at t=0
+
+	# Defining Levels
+	The data that makes up a level is:
+		* the name and number of the level
+		* x and y coords for the max and min corners of the ARENA
+		* a list of the inputs and outputs available to the MOUSE BRAIN
+		* a list of fixed entities (MOUSE SPAWNERS, CAT SPAWNERS, GOALS)
+			* each MOUSE SPAWNER specifies x and y position, orientation,
+			* each CAT SPAWNER specifies x and y position, orientation, min and max spawn times, plan ID,
+			* each GOAL specifies x and y position,
+	as expressed using this XML schema:
+		<LEVEL num="" name="" min_x="" min_y="" max_x="" max_y="">
+			<INPUT name="" />
+			<OUTPUT name="" />
+			<MSPAWN pos_x="" pos_y="" ori="" />
+			<CSPAWN pos_x="" pos_y="" ori="" min_t="" max_t="" cat_plan="" />
+			<GSPAWN pos_x="" pos_y="" />
+		</LEVEL>
+
+	Through this data, levels are mostly fixed, but some variables exist: actual cat spawn time, active mouse spawner, active goal. Depending on the particular level data, there could be very few or very many possible level setups. When a solution is tested, some or all of these posibilities are tested individually. The solution passes if all individual setups that are tested pass. The collection of tested setups is called a TEST SUITE.
+
+	# Test Suites
+		A pseudo-random set of possible tests is derived from each suite (using a RNG with fixed seed probably).
+		This set is fixed and is like a hash of the suite (this set can be the full range of possibilities when that range isn't too big).
+		Each member of this fixed set is tested comprehensively. This ensures testing of a given suite provides a consistent outcome.
+		(Note that if pressing the 'specify' button (truly) randomly chooses a specification from this subset, this is nothing to do with testing so is no problem)
+	
+	
+
+
+
+<br />
+<br />
+<hr />
+Description of NEURONS (with Thresholds and Weights) and WIRES and CHARGE. (see flexible neurons)
+	Delay Bulbs. (Address Fast Loop problem)
+These are always located on a PLAN. PLAN links (HANDLES) can also be contained within PLANs and wired up using TAGS (see named slots).
+PLANs are the atomic unit of saving (saved by ID). PLANs are never overwritten but are saved as new ID. (see no-local no-updating)
+	Appendix: XML Schema
+	Names are an overlay system. (transfer or provided) (see prop-names and autonames)
+	Several traversal options are available for loading of PLANs (ancestry, containment, alphabetical, creation date, modification date)
+Expansion/collapse (visual only)
+
+
+20151212 where outer meets inner.txt
+20151221 basic arena design and architecture.txt
+20160110 defining test suites.txt

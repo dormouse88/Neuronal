@@ -13,7 +13,7 @@
 #include "ChipPlan.hpp"
 
 
-ViewPanel::ViewPanel()
+RelativesViewer::RelativesViewer()
 {
     mainOutlineBox.setSize(sf::Vector2f{300.f, 140.f} );
     mainOutlineBox.setPosition(300.f, 20.f );
@@ -37,7 +37,7 @@ ViewPanel::ViewPanel()
     kidsPlanText.setColor( sf::Color::Green );
 }
 
-void ViewPanel::SetPlanID(PlanID pid, std::shared_ptr<const PlanGroupData> pData)
+void RelativesViewer::SetPlanID(PlanID pid, std::shared_ptr<const PlansDirectory> pData)
 {
     pid_ = pid;
     
@@ -53,7 +53,7 @@ void ViewPanel::SetPlanID(PlanID pid, std::shared_ptr<const PlanGroupData> pData
     kidsPlanText.setString( "< kids: " + patch::to_string(numKids) + "   >" );
 }
 
-void ViewPanel::Draw(sf::RenderTarget &rt)
+void RelativesViewer::Draw(sf::RenderTarget &rt)
 {
     rt.draw( mainOutlineBox );
     rt.draw( parentPlanText );
@@ -172,11 +172,15 @@ const unsigned BAR_WIDTH = 720;
 const unsigned BAR_HEIGHT = 180;
 const sf::Vector2u MINIMUM_WINDOW_SIZE { BAR_WIDTH, BAR_HEIGHT + 300 };
 const sf::Vector2u INITIAL_WINDOW_SIZE { 1400, 900 };
+const int FIELD_MODE_BRAIN = 0;
+const int FIELD_MODE_LEVEL = 1;
+const int FIELD_MODE_SPLIT = 2;
+const int FIELD_MODE_MAX = 3;
 
 PaneGroup::PaneGroup(Model & model_p)
     :theModel(model_p)
     ,window(sf::VideoMode(INITIAL_WINDOW_SIZE.x, INITIAL_WINDOW_SIZE.y), "Neuronal", sf::Style::Default, sf::ContextSettings{0,0,8} )
-    ,fieldMode(1)
+    ,fieldMode(0)
     ,paneLevel(model_p.GetArena(), uiObjects)
     ,paneBrain(model_p, uiObjects)
     ,paneBar(model_p, uiObjects)
@@ -192,10 +196,12 @@ void PaneGroup::Draw()
 {
     window.clear();
 
-    if (fieldMode != 2)
+    //These conditionals are not important, just saving unnecessary operations...
+    if (fieldMode != FIELD_MODE_LEVEL)
         paneBrain.Draw(window);
-    if (fieldMode != 1)
+    if (fieldMode != FIELD_MODE_BRAIN)
         paneLevel.Draw(window);
+
     paneBar.Draw(window);
     paneText.Draw(window);
 
@@ -227,24 +233,6 @@ bool PaneGroup::HandleInput()
 
 void PaneGroup::HandleInputState(BasePane * pane, sf::Vector2f worldPos)
 {
-
-    
-//    if ( sf::Mouse::isButtonPressed(sf::Mouse::Middle) )
-//    {
-//        sf::Vector2i pixelPos{ sf::Mouse::getPosition(view_.GetWindow()) };
-//        sf::Vector2f worldPos{ view_.GetWindow().mapPixelToCoords( pixelPos ) };
-//        if (!isMouseCursorSet_) {
-//            isMouseCursorSet_ = true;
-//        }
-//        else {
-//            view_.Pan( (-worldPos + mouseCursorWorldPos_) /1.00f );
-//        }
-//        sf::Vector2i newPixelPos{ sf::Mouse::getPosition(view_.GetWindow()) };
-//        mouseCursorWorldPos_ = view_.GetWindow().mapPixelToCoords( newPixelPos );
-//    }
-//    else {
-//        isMouseCursorSet_ = false;
-//    }
 }
 
 void PaneGroup::HandleInputEvents(BasePane * pane, sf::Vector2f worldPos)
@@ -279,14 +267,29 @@ void PaneGroup::HandleInputEvents(BasePane * pane, sf::Vector2f worldPos)
                     theModel.GetArena()->TimeAdvance();
                 }
             }
-            
-            paneBrain.Handle(event);
-            paneLevel.Handle(event);
-            paneBar.Handle(event);
+            //Pass keyboard events onto the active panel...
+            if (fieldMode == FIELD_MODE_BRAIN)
+                paneBrain.Handle(event);
+            else if (fieldMode == FIELD_MODE_LEVEL)
+                paneLevel.Handle(event);
+            else if (fieldMode == FIELD_MODE_SPLIT) {
+                if (pane)
+                    pane->Handle(event);
+            }
+            else
+                assert(false);
+            paneBar.Handle(event); //what's this gonna handle?
         }
     } //while event
 }
 
+void PaneGroup::CycleFieldMode()
+{
+    fieldMode++;
+    if (fieldMode >= FIELD_MODE_MAX)
+        fieldMode = 0;
+    SizingsRefresh();
+}
 
 
 void PaneGroup::SizingsRefresh()
@@ -317,23 +320,25 @@ void PaneGroup::SizingsRefresh()
     
 
     //Set sf::view (viewports + worldzone)...
+    if (fieldMode == FIELD_MODE_BRAIN) {
+        paneBrain.view.setViewport(fieldViewport);
+        paneLevel.view.setViewport(nullViewport);
+    }
+    else if (fieldMode == FIELD_MODE_LEVEL) {
+        paneBrain.view.setViewport(nullViewport);
+        paneLevel.view.setViewport(fieldViewport);
+    }
+    else if (fieldMode == FIELD_MODE_SPLIT) {
+        paneBrain.view.setViewport(leftField);
+        paneLevel.view.setViewport(rightField);
+    }
+    else
+        assert(false);
     {
-        if (fieldMode == 1)
-            paneBrain.view.setViewport(fieldViewport);
-        if (fieldMode == 2)
-            paneBrain.view.setViewport(nullViewport);
-        if (fieldMode == 3)
-            paneBrain.view.setViewport(leftField);
         sf::FloatRect vp = ConvertRect( window.getViewport(paneBrain.view) );
         paneBrain.view.setSize(vp.width, vp.height);
     }
     {
-        if (fieldMode == 1)
-            paneLevel.view.setViewport(nullViewport);
-        if (fieldMode == 2)
-            paneLevel.view.setViewport(fieldViewport);
-        if (fieldMode == 3)
-            paneLevel.view.setViewport(rightField);
         sf::FloatRect vp = ConvertRect( window.getViewport(paneLevel.view) );
         paneLevel.view.setSize(vp.width, vp.height);
     }
@@ -411,7 +416,6 @@ void BaseAreaPane::ClampToRect(RectWorld b)
 PaneLevel::PaneLevel(Shp<Arena> aren, UIObjects & uio)
     :arena(aren)
     ,uiObjects(uio)
-    ,puppetCursor(sf::Color::Yellow)
 {}
 
 void PaneLevel::AutoClamp()
@@ -434,10 +438,7 @@ void PaneLevel::Handle(sf::Event & event)
                 auto puppet = std::dynamic_pointer_cast<Puppet>(ele);
                 if (puppet)
                 {
-                    puppetCursor.UpdateMonitorTarget(puppet, arena);
-                    //paneBrain.SetBrain( puppet->GetBrain() );
-                    //uiObjects.cursorOne.SetPlanAddress(PlanAddress{});
-                    //uiObjects.cursorTwo.SetPlanAddress(PlanAddress{});
+                    uiObjects.puppetCursor.UpdateMonitorTarget(puppet, arena);
                 }
             }
         }
@@ -483,7 +484,7 @@ void PaneLevel::Draw(sf::RenderWindow & window)
     assert(arena);
     arena->Draw(window);
     uiObjects.arenaCursor.Draw(window);
-    puppetCursor.Draw(window);
+    uiObjects.puppetCursor.Draw(window);
 }
 
 
@@ -500,12 +501,22 @@ void PaneBrain::AutoClamp()
     if (clampPlan)
     {
         RectWorld b = clampPlan->GetWorldPaddedBoundPlusPorts();  //unimportant
+        b.left -= 100.f;  //(so the xputs are visible)
+        b.width += 200.f;
         ClampToRect(b);
     }
 }
 
 void PaneBrain::Handle(sf::Event & event)
 {
+    //track the brain of the puppetCursor...
+    auto b = uiObjects.puppetCursor.GetBrain();
+    if (b and brain != b) {
+        brain = b;
+        uiObjects.cursorOne.SetPlanAddress(PlanAddress{});
+        uiObjects.cursorTwo.SetPlanAddress(PlanAddress{});
+    }
+    
     //Keyboard Events
     if (event.type == sf::Event::KeyPressed)
     {
@@ -587,7 +598,7 @@ void PaneBrain::HandlePlan(sf::Event & event, PlanShp plan)
     if (event.key.code == sf::Keyboard::Q or event.key.code == sf::Keyboard::Tab)
     {
         if (    event.key.code == sf::Keyboard::Q and
-                (model_.GetPlanGroupData()->GetNameByID(plan->GetPlanID()) != NULL_PLAN_NAME)   //if plan has a name
+                (model_.GetPlansDirectory()->GetNameByID(plan->GetPlanID()) != NULL_PLAN_NAME)   //if plan has a name
             )
         {
             //Save plan and transfer existing name to new plan...
@@ -903,7 +914,7 @@ void PaneBar::Draw(sf::RenderWindow & window)
 
     marquee.Draw(window);
     
-    viewPanel.SetPlanID( planID, theModel.GetPlanGroupData() );
+    viewPanel.SetPlanID( planID, theModel.GetPlansDirectory() );
     viewPanel.Draw(window);
 }
 

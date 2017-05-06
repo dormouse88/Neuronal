@@ -10,13 +10,13 @@
 #include <algorithm>
 #include <iterator>
 #include "ChipHandle.hpp" //fwd dec
-#include "PlanGroupData.hpp" //fwd dec
+#include "PlansDirectory.hpp" //fwd dec
 #include "PlanPos.hpp"  //fwd dec
 #include "WiringPair.hpp"  //fwd dec
 
 const int PADDING { 2 };
 
-ChipPlan::ChipPlan(std::shared_ptr<PlanGrid> g, std::shared_ptr<PlanGroupData> u)
+ChipPlan::ChipPlan(std::shared_ptr<PlanGrid> g, std::shared_ptr<PlansDirectory> u)
     :Wirable()
     , planID(NULL_PID)
     , ancID(NULL_PID)

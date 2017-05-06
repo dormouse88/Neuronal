@@ -20,9 +20,9 @@
       <itemPath>cppsource/Neuron.hpp</itemPath>
       <itemPath>cppsource/Pansions.hpp</itemPath>
       <itemPath>cppsource/PlanGrid.hpp</itemPath>
-      <itemPath>cppsource/PlanGroupData.hpp</itemPath>
       <itemPath>cppsource/PlanOwned.hpp</itemPath>
       <itemPath>cppsource/PlanPos.hpp</itemPath>
+      <itemPath>cppsource/PlansDirectory.hpp</itemPath>
       <itemPath>cppsource/Puppet.hpp</itemPath>
       <itemPath>cppsource/RefererInterface.hpp</itemPath>
       <itemPath>cppsource/Serializer.hpp</itemPath>
@@ -56,9 +56,9 @@
       <itemPath>cppsource/Neuron.cpp</itemPath>
       <itemPath>cppsource/Pansions.cpp</itemPath>
       <itemPath>cppsource/PlanGrid.cpp</itemPath>
-      <itemPath>cppsource/PlanGroupData.cpp</itemPath>
       <itemPath>cppsource/PlanOwned.cpp</itemPath>
       <itemPath>cppsource/PlanPos.cpp</itemPath>
+      <itemPath>cppsource/PlansDirectory.cpp</itemPath>
       <itemPath>cppsource/Puppet.cpp</itemPath>
       <itemPath>cppsource/Serializer.cpp</itemPath>
       <itemPath>cppsource/SpawnGroups.cpp</itemPath>
@@ -168,10 +168,6 @@
       </item>
       <item path="cppsource/PlanGrid.hpp" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="cppsource/PlanGroupData.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="cppsource/PlanGroupData.hpp" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="cppsource/PlanOwned.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="cppsource/PlanOwned.hpp" ex="false" tool="3" flavor2="0">
@@ -179,6 +175,10 @@
       <item path="cppsource/PlanPos.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="cppsource/PlanPos.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="cppsource/PlansDirectory.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="cppsource/PlansDirectory.hpp" ex="false" tool="3" flavor2="0">
       </item>
       <item path="cppsource/Puppet.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -323,10 +323,6 @@
       </item>
       <item path="cppsource/PlanGrid.hpp" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="cppsource/PlanGroupData.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="cppsource/PlanGroupData.hpp" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="cppsource/PlanOwned.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="cppsource/PlanOwned.hpp" ex="false" tool="3" flavor2="0">
@@ -334,6 +330,10 @@
       <item path="cppsource/PlanPos.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="cppsource/PlanPos.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="cppsource/PlansDirectory.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="cppsource/PlansDirectory.hpp" ex="false" tool="3" flavor2="0">
       </item>
       <item path="cppsource/Puppet.cpp" ex="false" tool="1" flavor2="0">
       </item>

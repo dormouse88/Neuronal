@@ -46,10 +46,10 @@ KEYBINDINGS:
 .		arena timestep
 	BRAIN WINDOW:
 	1,2,3 	Select brain highlighting mode
-	-,+		clear/set name filter
 		PLAN SELECTED:
 		S,X		explode/collapse handle
-		[,]		revert cursor to plan only
+		-defunct- [,]		revert cursor to plan only
+		-,+		clear/set name filter (must have plan selected?)
 		np1,3	next,prev ID
 		np7,9	next,prev name
 		np8,2	parent,firstchild
@@ -73,4 +73,31 @@ KEYBINDINGS:
 			F,V		wire specific (to end)
 	ARENA WINDOW:
 	P		peek at mouse/cat brain
+		PROPOSED:
+		- Arena	Set Arena size (x+y)
+		- 		Set Mouse XPuts (???)
+		- Cats	Add CatSpwn
+		-		?Del CatSpwn?
+		- 		?Move catSpwn?
+		- 		Set CatSpwn Ori
+		- 		Set CatSpwn Time Range (a-b)
+		- 		Set CatSpwn plan number
+		-		Toggle freeze
+		- Mouse	Add MouseSpwn
+		-		?Del MouseSpwn?
+		-		?Move mouseSpwn?
+		-		Set MouseSpwn Ori
+		- Goals	Add Goal
+		-		?Del Goal?
+		-		?Move Goal?
+		So, arena plus:
+		3 Add Body (CatSpwn/MouseSpwn/Goal)
+		1 Del Body
+		1 Move/Swap Body
+		1 Rotate Body
+		4? Edit Cat Time Range
+		? Edit Cat Plan Number
+		1 Toggle Cat Freeze
+		
+		
 

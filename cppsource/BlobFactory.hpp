@@ -19,7 +19,7 @@
 class BlobFactory
 {
 public:
-    BlobFactory(Shp<PlanGroupData> pgd) :planGroupData_(pgd) {}
+    BlobFactory(Shp<PlansDirectory> pgd) :planGroupData_(pgd) {}
     NeuronShp     AddNeuron(PlanPos pos);
     NeuronShp     AddNeuron(PlanShp plan, DevSerial, VectorSmart, int threshold, bool hasBulb);
     HandleShp     AddHandle(PlanPos pos);
@@ -31,7 +31,7 @@ public:
     WireShp       AddWire(Shp<WiringPair> wp, signed weight);
 
 protected:
-    std::shared_ptr<PlanGroupData> planGroupData_;
+    std::shared_ptr<PlansDirectory> planGroupData_;
 };
 
 

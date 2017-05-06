@@ -31,21 +31,7 @@ WiringPair			;Wirable
 
 
 ############################################################
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+VAGUE DEPENDENCE ORDER:
 
 - TextEnterer
 - Pansions
@@ -73,6 +59,51 @@ Model				BlobFactory			Serializer		ChipPlan		Arena			Puppet			;PlanGroupData
 View				Model				Cursor			;TextEnterer	;ViewResources
 App					Model				View
 
+
+
+-------------------------------------------------------------
+
+Model Contents:
+Arena			- Holds all macro entities
+Serializer		- Serializes macro and micro objects
+PlansDirectory	- An in-memory directory of all plans
+Factory			- 
+
+Model			- Holds Arena
+PlanManager		- Provides unified interface and controls access to save/load/query of plans
+
+
+
+
+
+
+
+
+-------------------------------------------------------------
+Memory IDs and Serialized IDs are different things!
+Plans should have memory IDs so they can be addressed by an int, but will need to have a serialized ID too.
+If Devices use the same ID for both, they will need to be uniquely addressed using plan_uid AND dev_sid.
+
+If the model were a Relational DB:
+PLAN			: bref_uid(parent),
+DEVICE			: plan_uid(parent), xy, (uc plan_uid, dev_sid)
+	NEURON			: charge, thresh, bulb,
+	HANDLE			: 
+IN_SOLDER		:
+	IN_SOLDER_PLAN	: plan_uid, tag,
+	IN_SOLDER_HAND	: dev_uid, tag,
+	IN_SOLDER_NEUR	: dev_uid, weight,
+OUT_SOLDER		:
+	OUT_SOLDER_PLAN	: plan_uid, tag,
+	OUT_SOLDER_HAND	: dev_uid, tag,
+	OUT_SOLDER_NEUR	: dev_uid,
+WIRE			: out_solder_uid, in_solder_uid, (charge?),
+
+//WIRES: FROM_TYPE, FROM_ID, TO_TYPE, TO_ID, charge, {from_tag, to_tag, to_weight,}
+
+--------------------------------------------------------------
+ChipPlan aspects:
+	Wirable, Referred, PartContainer, Visual, PortCache(Visual),
 
 
 

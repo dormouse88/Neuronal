@@ -58,7 +58,7 @@ PlanShp BlobFactory::MakePlan()
     return p;
 }
 
-std::shared_ptr<BaseReferer> BlobFactory::MakeBrain()
+Shp<BaseReferer> BlobFactory::MakeBrain()
 {
     auto brain = std::make_shared<BaseReferer>();
     PlanShp basePlan = BlobFactory::MakePlan();
